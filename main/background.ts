@@ -1,8 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { app, contextBridge, dialog, ipcMain, ipcRenderer } from "electron";
+import { app, dialog, ipcMain } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
+import ElectronStore from "electron-store";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -11,6 +12,8 @@ if (isProd) {
 } else {
   app.setPath("userData", `${app.getPath("userData")} (development)`);
 }
+
+const store = new ElectronStore();
 
 (async () => {
   await app.whenReady();
@@ -50,6 +53,13 @@ ipcMain.handle("app:get-files", () => {
   });
 });
 
+ipcMain.handle("app:set-dropbox-folder", (event, path: string) => {
+  store.set("dropboxLocation", path);
+});
+ipcMain.handle("app:get-dropbox-folder", () => {
+  return store.get("dropboxLocation");
+});
+
 ipcMain.handle("app:select-folder", async () => {
   const response = await dialog.showOpenDialog({
     properties: ["openDirectory"],
@@ -58,5 +68,5 @@ ipcMain.handle("app:select-folder", async () => {
   if (!response.canceled) {
     return response.filePaths[0];
   }
-  return "";
+  return null;
 });

@@ -1,5 +1,6 @@
+import { ipcRenderer } from "electron";
 import FolderSelector from "./FolderSelector";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const navigation = [
   { name: "Today", href: "#" },
@@ -8,6 +9,21 @@ const navigation = [
 
 export default function Header() {
   const [selectedDropboxLocation, setSelectedDropboxLocation] = useState("");
+
+  const handleDropboxLocationChange = (path: string) => {
+    setSelectedDropboxLocation(path);
+    ipcRenderer.invoke("app:set-dropbox-folder", path);
+  };
+
+  useEffect(() => {
+    (async () => {
+      const savedLocation = await ipcRenderer.invoke("app:get-dropbox-folder");
+      if (savedLocation) {
+        setSelectedDropboxLocation(savedLocation);
+      }
+    })();
+  }, []);
+
   return (
     <header className="bg-white shadow">
       <div className="flex justify-between h-16 px-2 mx-auto max-w-7xl sm:px-4 lg:px-8">
@@ -39,7 +55,7 @@ export default function Header() {
         <div className="flex items-center flex-shrink min-w-0 gap-4">
           <FolderSelector
             folderLocation={selectedDropboxLocation}
-            setFolderLocation={setSelectedDropboxLocation}
+            setFolderLocation={handleDropboxLocationChange}
           />
         </div>
       </div>

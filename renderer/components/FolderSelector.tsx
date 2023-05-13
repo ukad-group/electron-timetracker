@@ -11,7 +11,7 @@ export default function FolderSelector({
   setFolderLocation,
 }: FolderSelectorProps) {
   const clickHandler = () => {
-    ipcRenderer.invoke("app:select-folder").then((folder) => {
+    ipcRenderer.invoke("app:select-folder").then((folder: string | null) => {
       if (folder) {
         setFolderLocation(folder);
       }
