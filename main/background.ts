@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { app, ipcMain } from "electron";
+import { app, contextBridge, dialog, ipcMain, ipcRenderer } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
 
@@ -48,4 +48,15 @@ ipcMain.handle("app:get-files", () => {
       size: Number(fileStats.size / 1000).toFixed(1), // kb
     };
   });
+});
+
+ipcMain.handle("app:select-folder", async () => {
+  const response = await dialog.showOpenDialog({
+    properties: ["openDirectory"],
+  });
+
+  if (!response.canceled) {
+    return response.filePaths[0];
+  }
+  return "";
 });

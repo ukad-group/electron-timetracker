@@ -1,12 +1,13 @@
-import { PencilIcon } from "@heroicons/react/24/solid";
+import FolderSelector from "./FolderSelector";
+import { useState } from "react";
 
-const selectedDropboxLocation = "/home/mmmykhailo/Dropbox/Mykhailo";
 const navigation = [
   { name: "Today", href: "#" },
   { name: "Month", href: "#" },
 ];
 
 export default function Header() {
+  const [selectedDropboxLocation, setSelectedDropboxLocation] = useState("");
   return (
     <header className="bg-white shadow">
       <div className="flex justify-between h-16 px-2 mx-auto max-w-7xl sm:px-4 lg:px-8">
@@ -36,15 +37,10 @@ export default function Header() {
           </nav>
         </div>
         <div className="flex items-center flex-shrink min-w-0 gap-4">
-          <button
-            className="min-w-0 py-2 px-3 w-[22em] shadow-sm text-gray-500 focus-visible:outline-blue-500 sm:text-sm border border-gray-300 rounded-md flex justify-between items-center gap-4 cursor-pointer"
-            title={selectedDropboxLocation}
-          >
-            <span className="flex-shrink overflow-hidden text-ellipsis whitespace-nowrap">
-              {selectedDropboxLocation}
-            </span>
-            <PencilIcon className="w-4 h-4" aria-hidden="true" />
-          </button>
+          <FolderSelector
+            folderLocation={selectedDropboxLocation}
+            setFolderLocation={setSelectedDropboxLocation}
+          />
         </div>
       </div>
     </header>
