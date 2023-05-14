@@ -1,10 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DateSelector from "../components/DateSelector";
-import Table from "../components/Table";
+import ActivitiesTable from "../components/ActivitiesTable";
 import Header from "../components/Header";
+import { ipcRenderer } from "electron";
+import { ReportActivity, parseReport } from "../utils/reports";
 
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDateReport, setSelectedDateReport] = useState("");
+  const [selectedDateActivities, setSelectedDateActivities] =
+    useState<Array<ReportActivity> | null>([]);
+
+  useEffect(() => {
+    (async () => {
+      const dayReport = await ipcRenderer.invoke(
+        "app:read-day-report",
+        selectedDate
+      );
+      setSelectedDateReport(dayReport || "");
+    })();
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (selectedDateReport) {
+      const activities = parseReport(selectedDateReport);
+      setSelectedDateActivities(activities);
+      return;
+    }
+    setSelectedDateActivities([]);
+  }, [selectedDateReport]);
 
   return (
     <div className="min-h-full">
@@ -22,7 +46,7 @@ export default function Home() {
             <section>
               <div className="bg-white shadow sm:rounded-lg">
                 <div className="px-4 py-5 sm:px-6">
-                  <Table />
+                  <ActivitiesTable activities={selectedDateActivities} />
                 </div>
                 <div>
                   <a
@@ -49,6 +73,8 @@ export default function Home() {
               </h2>
 
               <textarea
+                readOnly
+                value={selectedDateReport}
                 rows={10}
                 className="block w-full px-3 py-2 mt-3 border border-gray-300 rounded-md shadow-sm focus-visible:outline-blue-500 sm:text-sm"
                 defaultValue={""}

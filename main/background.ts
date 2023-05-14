@@ -4,6 +4,7 @@ import { app, dialog, ipcMain } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
 import ElectronStore from "electron-store";
+import { formatTimereportDate, getISOWeek } from "./helpers/datetime";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -69,4 +70,22 @@ ipcMain.handle("app:select-folder", async () => {
     return response.filePaths[0];
   }
   return null;
+});
+
+ipcMain.handle("app:read-day-report", (event, date: Date) => {
+  if (!date) return null;
+
+  const dropbox = store.get("dropboxLocation");
+  const year = date.getFullYear();
+  const week = getISOWeek(date).toString().padStart(2, "0");
+  const timereportDate = formatTimereportDate(date);
+
+  const timereportPath = `${dropbox}/${year}/week ${week}/timereport - ${timereportDate}`;
+
+  try {
+    const data = fs.readFileSync(timereportPath, "utf8");
+    return data;
+  } catch (err) {
+    return null;
+  }
 });
