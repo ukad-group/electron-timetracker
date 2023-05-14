@@ -18,18 +18,18 @@ export default function ActivitiesTable({ activities }: ActivitiesTableProps) {
   }, [nonBreakActivities]);
 
   return (
-    <table className="min-w-full divide-y divide-gray-300">
+    <table className="min-w-full divide-y divide-gray-300 table-fixed">
       <thead>
         <tr>
           <th
             scope="col"
-            className="pb-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0"
+            className="w-24 pb-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0"
           >
             Interval
           </th>
           <th
             scope="col"
-            className="pb-3.5 px-3 text-left text-sm font-semibold text-gray-900"
+            className="w-24 pb-3.5 px-3 text-left text-sm font-semibold text-gray-900"
           >
             Duration
           </th>
