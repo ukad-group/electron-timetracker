@@ -105,7 +105,7 @@ function formatDuration(hours: number): string {
     const minutes = Math.round(hours * 60);
     return `${minutes}m`;
   } else {
-    return `${hours.toFixed(1)}h`;
+    return `${Math.floor(hours * 10) / 10}h`;
   }
 }
 
