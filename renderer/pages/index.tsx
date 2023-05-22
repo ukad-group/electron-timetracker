@@ -1,15 +1,17 @@
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import DateSelector from "../components/DateSelector";
 import ActivitiesTable from "../components/ActivitiesTable";
 import Header from "../components/Header";
 import { ipcRenderer } from "electron";
 import { ReportActivity, parseReport } from "../utils/reports";
+import TrackTimeModal from "../components/TrackTimeModal";
 
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [selectedDateActivities, setSelectedDateActivities] =
     useState<Array<ReportActivity> | null>([]);
+  const [trackTimeModalActivity, setTrackTimeModalActivity] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -30,6 +32,36 @@ export default function Home() {
     setSelectedDateActivities([]);
   }, [selectedDateReport]);
 
+  const submitActivity = (activity: ReportActivity) => {
+    if (activity.id === null) {
+      setSelectedDateActivitiesAndSave((activities) => [
+        ...activities,
+        {
+          ...activity,
+          id: activities.reduce((id, curr) => {
+            if (curr.id >= id) return curr.id + 1;
+            return id;
+          }, 0),
+        },
+      ]);
+      return;
+    }
+
+    setSelectedDateActivitiesAndSave((activities) => {
+      const activityIndex = activities.findIndex(
+        (act) => act.id === activity.id
+      );
+      activities[activityIndex] = activity;
+      return [...activities];
+    });
+  };
+
+  const setSelectedDateActivitiesAndSave = (
+    value: SetStateAction<Array<ReportActivity>>
+  ) => {
+    setSelectedDateActivities(value);
+  };
+
   return (
     <div className="min-h-full">
       <Header />
@@ -46,12 +78,16 @@ export default function Home() {
             <section>
               <div className="bg-white shadow sm:rounded-lg">
                 <div className="px-4 py-5 sm:px-6">
-                  <ActivitiesTable activities={selectedDateActivities} />
+                  <ActivitiesTable
+                    onEditActivity={setTrackTimeModalActivity}
+                    activities={selectedDateActivities}
+                  />
                 </div>
                 <div>
                   <a
                     href="#"
                     className="block px-4 py-4 text-sm font-medium text-center text-gray-500 bg-gray-50 hover:text-gray-700 sm:rounded-b-lg"
+                    onClick={() => setTrackTimeModalActivity(true)}
                   >
                     Track more time
                   </a>
@@ -92,6 +128,12 @@ export default function Home() {
           </section>
         </div>
       </main>
+      <TrackTimeModal
+        isOpen={trackTimeModalActivity !== null}
+        editedActivity={trackTimeModalActivity}
+        close={() => setTrackTimeModalActivity(null)}
+        submitActivity={submitActivity}
+      />
     </div>
   );
 }

@@ -1,26 +1,28 @@
 import clsx from "clsx";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { Combobox } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 
 const projects = ["cimplex.a", "cimplex.d", "ajp"];
 
+type ProjectSelectorProps = {
+  className?: string;
+  selectedProject: string;
+  setSelectedProject: Dispatch<SetStateAction<string>>;
+  validationEnabled: boolean;
+};
+
 export default function ProjectSelector({
   className,
   selectedProject,
   setSelectedProject,
-}: {
-  className?: string;
-  selectedProject: string;
-  setSelectedProject: Dispatch<SetStateAction<string>>;
-}) {
-  const [query, setQuery] = useState("");
-
+  validationEnabled,
+}: ProjectSelectorProps) {
   const filteredProjects =
-    query === ""
+    selectedProject === ""
       ? projects
       : projects.filter((project) => {
-          return project.toLowerCase().includes(query.toLowerCase());
+          return project.toLowerCase().includes(selectedProject.toLowerCase());
         });
 
   return (
@@ -36,8 +38,14 @@ export default function ProjectSelector({
       <div className="relative mt-1">
         <Combobox.Input
           spellCheck={false}
-          className="w-full py-2 pl-3 pr-10 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
-          onChange={(event) => setQuery(event.target.value)}
+          className={clsx(
+            "w-full py-2 pl-3 pr-10 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm",
+            {
+              "border-red-300 text-red-900 placeholder-red-300":
+                validationEnabled && !selectedProject,
+            }
+          )}
+          onChange={(event) => setSelectedProject(event.target.value)}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center px-2 rounded-r-md focus:outline-none">
           <ChevronUpDownIcon

@@ -1,11 +1,15 @@
 import { useMemo } from "react";
-import { ReportActivity } from "../utils/reports";
+import { ReportActivity, formatDuration } from "../utils/reports";
 
 type ActivitiesTableProps = {
   activities: Array<ReportActivity>;
+  onEditActivity: (activity: ReportActivity) => void;
 };
 
-export default function ActivitiesTable({ activities }: ActivitiesTableProps) {
+export default function ActivitiesTable({
+  activities,
+  onEditActivity,
+}: ActivitiesTableProps) {
   const nonBreakActivities = useMemo(
     () => activities.filter((activity) => !activity.isBreak),
     [activities]
@@ -75,7 +79,11 @@ export default function ActivitiesTable({ activities }: ActivitiesTableProps) {
               {activity.description}
             </td>
             <td className="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-6 md:pr-0">
-              <a href="#" className="text-blue-600 hover:text-blue-900">
+              <a
+                href="#"
+                className="text-blue-600 hover:text-blue-900"
+                onClick={() => onEditActivity(activity)}
+              >
                 Edit
               </a>
             </td>
@@ -98,15 +106,6 @@ export default function ActivitiesTable({ activities }: ActivitiesTableProps) {
       </tbody>
     </table>
   );
-}
-
-function formatDuration(hours: number): string {
-  if (hours < 1) {
-    const minutes = Math.round(hours * 60);
-    return `${minutes}m`;
-  } else {
-    return `${Math.floor(hours * 10) / 10}h`;
-  }
 }
 
 function getLackBadge(hours: number) {

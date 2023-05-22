@@ -1,8 +1,13 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, SetStateAction, useState } from "react";
 
 const useTimeInput = (
   initialTime = ""
-): [string, (e: ChangeEvent<HTMLInputElement>) => void, () => void] => {
+): [
+  string,
+  (e: ChangeEvent<HTMLInputElement>) => void,
+  () => void,
+  (value: SetStateAction<string>) => void
+] => {
   const [time, setTime] = useState(initialTime);
 
   const onTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -46,7 +51,7 @@ const useTimeInput = (
     setTime(`${hours.padStart(2, "0")}:${(minutes || "").padStart(2, "0")}`);
   };
 
-  return [time, onTimeChange, onTimeBlur];
+  return [time, onTimeChange, onTimeBlur, setTime];
 };
 
 export default useTimeInput;

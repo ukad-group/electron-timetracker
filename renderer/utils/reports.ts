@@ -49,26 +49,44 @@ export function parseReport(fileContent: string) {
   }
 
   for (const item of reportItems) {
-    item.duration = countHoursBetweenTimes(item.from, item.to);
+    item.duration = calcDurationBetweenTimes(item.from, item.to);
   }
 
   return reportItems as Array<ReportActivity>;
 }
 
-export function countHoursBetweenTimes(from: string, to: string): number {
+function parseIntOrZero(value: string) {
+  return parseInt(value, 10) || 0;
+}
+
+export function calcDurationBetweenTimes(from: string, to: string): number {
   const startParts = from.split(":");
   const endParts = to.split(":");
 
-  const startHours = parseInt(startParts[0], 10);
-  const startMinutes = parseInt(startParts[1], 10);
+  const startHours = parseIntOrZero(startParts[0]);
+  const startMinutes = parseIntOrZero(startParts[1]);
 
-  const endHours = parseInt(endParts[0], 10);
-  const endMinutes = parseInt(endParts[1], 10);
+  const endHours = parseIntOrZero(endParts[0]);
+  const endMinutes = parseIntOrZero(endParts[1]);
 
   const startTotalMinutes = startHours * 60 + startMinutes;
   const endTotalMinutes = endHours * 60 + endMinutes;
 
-  const totalHours = Math.abs(endTotalMinutes - startTotalMinutes) / 60;
+  const totalMinutes = endTotalMinutes - startTotalMinutes;
 
-  return totalHours;
+  const milliseconds = totalMinutes * 60 * 1000;
+
+  return milliseconds;
+}
+
+export function formatDuration(ms: number): string {
+  const minutes = ms / 1000 / 60;
+  const hours = minutes / 60;
+
+  if (Math.abs(hours) < 1) {
+    const minutes = Math.round(ms / 1000 / 60);
+    return `${minutes}m`;
+  } else {
+    return `${Math.floor(hours * 10) / 10}h`;
+  }
 }
