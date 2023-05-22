@@ -100,7 +100,6 @@ ipcMain.handle("app:write-day-report", (event, date: Date, report: string) => {
   try {
     createDirByPath(timereportPath.slice(0, timereportPath.lastIndexOf("/")));
     fs.writeFileSync(timereportPath, report);
-    console.log("no errors");
   } catch (err) {
     console.log(err);
     return;
