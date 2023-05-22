@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import { ipcRenderer } from "electron";
 import { ReportActivity, parseReport, serializeReport } from "../utils/reports";
 import TrackTimeModal from "../components/TrackTimeModal";
+import ManualInputForm from "../components/ManualInputForm";
 
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -38,17 +39,19 @@ export default function Home() {
       JSON.stringify(selectedDateActivities) !==
       JSON.stringify(parseReport(selectedDateReport))
     ) {
-      ipcRenderer.invoke(
-        "app:write-day-report",
-        selectedDate,
-        serializeReport(selectedDateActivities)
-      );
+      const serializedReport = serializeReport(selectedDateActivities);
+      saveSerializedReport(serializedReport);
     }
   }, [selectedDateActivities]);
 
+  const saveSerializedReport = (serializedReport: string) => {
+    ipcRenderer.invoke("app:write-day-report", selectedDate, serializedReport);
+    setSelectedDateReport(serializedReport);
+  };
+
   const submitActivity = (activity: ReportActivity) => {
     if (activity.id === null) {
-      setSelectedDateActivitiesAndSave((activities) => [
+      setSelectedDateActivities((activities) => [
         ...activities,
         {
           ...activity,
@@ -61,19 +64,13 @@ export default function Home() {
       return;
     }
 
-    setSelectedDateActivitiesAndSave((activities) => {
+    setSelectedDateActivities((activities) => {
       const activityIndex = activities.findIndex(
         (act) => act.id === activity.id
       );
       activities[activityIndex] = activity;
       return [...activities];
     });
-  };
-
-  const setSelectedDateActivitiesAndSave = (
-    value: SetStateAction<Array<ReportActivity>>
-  ) => {
-    setSelectedDateActivities(value);
   };
 
   return (
@@ -115,29 +112,10 @@ export default function Home() {
             className="lg:col-start-3 lg:col-span-1"
           >
             <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6">
-              <h2
-                id="manual-input-title"
-                className="text-lg font-medium text-gray-900"
-              >
-                Manual input
-              </h2>
-
-              <textarea
-                readOnly
-                value={selectedDateReport}
-                rows={10}
-                className="block w-full px-3 py-2 mt-3 border border-gray-300 rounded-md shadow-sm focus-visible:outline-blue-500 sm:text-sm"
-                defaultValue={""}
-                spellCheck={false}
+              <ManualInputForm
+                onSave={setSelectedDateReport}
+                selectedDateReport={selectedDateReport}
               />
-              <div className="flex flex-col mt-6 justify-stretch">
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Save
-                </button>
-              </div>
             </div>
           </section>
         </div>
