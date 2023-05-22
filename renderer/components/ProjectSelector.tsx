@@ -9,14 +9,16 @@ type ProjectSelectorProps = {
   className?: string;
   selectedProject: string;
   setSelectedProject: Dispatch<SetStateAction<string>>;
-  validationEnabled: boolean;
+  isValidationEnabled: boolean;
+  required?: boolean;
 };
 
 export default function ProjectSelector({
   className,
   selectedProject,
   setSelectedProject,
-  validationEnabled,
+  isValidationEnabled,
+  required = false,
 }: ProjectSelectorProps) {
   const filteredProjects =
     selectedProject === ""
@@ -37,12 +39,13 @@ export default function ProjectSelector({
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
+          required={required}
           spellCheck={false}
           className={clsx(
             "w-full py-2 pl-3 pr-10 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm",
             {
               "border-red-300 text-red-900 placeholder-red-300":
-                validationEnabled && !selectedProject,
+                required && isValidationEnabled && !selectedProject,
             }
           )}
           onChange={(event) => setSelectedProject(event.target.value)}

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { FormEvent, Fragment, useEffect, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import ProjectSelector from "./ProjectSelector";
@@ -31,7 +31,7 @@ export default function TrackTimeModal({
   const [activity, setActivity] = useState("");
   const [description, setDescription] = useState("");
 
-  const [validationEnabled, setValidationEnabled] = useState(false);
+  const [isValidationEnabled, setIsValidationEnabled] = useState(false);
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -44,6 +44,10 @@ export default function TrackTimeModal({
     return formatDuration(duration);
   }, [duration]);
 
+  const isFormInvalid = useMemo(() => {
+    return !from || !to || !duration || duration < 0 || !project || !activity;
+  }, [from, to, duration, project, activity]);
+
   useEffect(() => {
     if (!editedActivity) return;
 
@@ -54,9 +58,11 @@ export default function TrackTimeModal({
     setDescription(editedActivity.description || "");
   }, [editedActivity]);
 
-  const onSave = () => {
-    if (!from || !to || !project || !activity) {
-      setValidationEnabled(true);
+  const onSave = (e: FormEvent | MouseEvent) => {
+    e.preventDefault();
+
+    if (isFormInvalid) {
+      setIsValidationEnabled(true);
       return;
     }
     submitActivity({
@@ -68,8 +74,7 @@ export default function TrackTimeModal({
       activity,
       description,
     });
-    close();
-    resetModal();
+    closeAndReset();
   };
 
   const resetModal = () => {
@@ -79,7 +84,12 @@ export default function TrackTimeModal({
     setActivity("");
     setDescription("");
 
-    setValidationEnabled(false);
+    setIsValidationEnabled(false);
+  };
+
+  const closeAndReset = () => {
+    resetModal();
+    close();
   };
 
   return (
@@ -87,7 +97,7 @@ export default function TrackTimeModal({
       <Dialog
         as="div"
         className="fixed inset-0 z-10 overflow-y-auto"
-        onClose={close}
+        onClose={closeAndReset}
       >
         <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
           <Transition.Child
@@ -118,12 +128,15 @@ export default function TrackTimeModal({
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className="relative inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+            <form
+              className="relative inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+              onSubmit={onSave}
+            >
               <div className="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
                 <button
                   type="button"
                   className="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
-                  onClick={close}
+                  onClick={closeAndReset}
                 >
                   <span className="sr-only">Close</span>
                   <XMarkIcon className="w-6 h-6" aria-hidden="true" />
@@ -145,6 +158,7 @@ export default function TrackTimeModal({
                       From
                     </label>
                     <input
+                      required
                       value={from}
                       onChange={onFromChange}
                       onBlur={onFromBlur}
@@ -154,7 +168,7 @@ export default function TrackTimeModal({
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
                         {
                           "border-red-300 text-red-900 placeholder-red-300":
-                            validationEnabled && !from,
+                            isValidationEnabled && !from,
                         }
                       )}
                     />
@@ -168,6 +182,7 @@ export default function TrackTimeModal({
                       To
                     </label>
                     <input
+                      required
                       value={to}
                       onChange={onToChange}
                       onBlur={onToBlur}
@@ -177,7 +192,7 @@ export default function TrackTimeModal({
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
                         {
                           "border-red-300 text-red-900 placeholder-red-300":
-                            validationEnabled && !to,
+                            isValidationEnabled && !to,
                         }
                       )}
                     />
@@ -191,15 +206,22 @@ export default function TrackTimeModal({
                       value={formattedDuration}
                       type="text"
                       readOnly
-                      className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                      className={clsx(
+                        "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
+                        {
+                          "border-red-300 text-red-900 placeholder-red-300":
+                            isValidationEnabled && (!duration || duration < 0),
+                        }
+                      )}
                     />
                   </div>
 
                   <div className="col-span-6">
                     <ProjectSelector
+                      required
                       selectedProject={project}
                       setSelectedProject={setProject}
-                      validationEnabled={validationEnabled}
+                      isValidationEnabled={isValidationEnabled}
                     />
                   </div>
 
@@ -211,6 +233,7 @@ export default function TrackTimeModal({
                       Activity
                     </label>
                     <input
+                      required
                       value={activity}
                       onChange={(e) => setActivity(e.target.value)}
                       id="activity"
@@ -219,7 +242,7 @@ export default function TrackTimeModal({
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
                         {
                           "border-red-300 text-red-900 placeholder-red-300":
-                            validationEnabled && !activity,
+                            isValidationEnabled && !activity,
                         }
                       )}
                     />
@@ -245,7 +268,7 @@ export default function TrackTimeModal({
               <div className="mt-6">
                 <div className="flex justify-end">
                   <button
-                    onClick={close}
+                    onClick={closeAndReset}
                     type="button"
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
@@ -260,7 +283,7 @@ export default function TrackTimeModal({
                   </button>
                 </div>
               </div>
-            </div>
+            </form>
           </Transition.Child>
         </div>
       </Dialog>
