@@ -1,3 +1,5 @@
+import next from "next/types";
+
 export type ReportActivity = {
   id: number;
   from: string;
@@ -53,6 +55,24 @@ export function parseReport(fileContent: string) {
   }
 
   return reportItems as Array<ReportActivity>;
+}
+
+export function serializeReport(activities: Array<ReportActivity>) {
+  let report = "";
+  for (const [i, activity] of activities.entries()) {
+    const parts = [activity.from, activity.project, activity.activity];
+    if (activity.description) {
+      parts.push(activity.description);
+    }
+
+    report += `${parts.join(" - ")}\n`;
+
+    const nextActivity = activities[i + 1];
+    if (!nextActivity || nextActivity.from !== activity.to) {
+      report += `${activity.to} - !\n`;
+    }
+  }
+  return report;
 }
 
 function parseIntOrZero(value: string) {

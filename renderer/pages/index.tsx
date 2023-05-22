@@ -3,7 +3,7 @@ import DateSelector from "../components/DateSelector";
 import ActivitiesTable from "../components/ActivitiesTable";
 import Header from "../components/Header";
 import { ipcRenderer } from "electron";
-import { ReportActivity, parseReport } from "../utils/reports";
+import { ReportActivity, parseReport, serializeReport } from "../utils/reports";
 import TrackTimeModal from "../components/TrackTimeModal";
 
 export default function Home() {
@@ -31,6 +31,20 @@ export default function Home() {
     }
     setSelectedDateActivities([]);
   }, [selectedDateReport]);
+
+  // Save report on change
+  useEffect(() => {
+    if (
+      JSON.stringify(selectedDateActivities) !==
+      JSON.stringify(parseReport(selectedDateReport))
+    ) {
+      ipcRenderer.invoke(
+        "app:write-day-report",
+        selectedDate,
+        serializeReport(selectedDateActivities)
+      );
+    }
+  }, [selectedDateActivities]);
 
   const submitActivity = (activity: ReportActivity) => {
     if (activity.id === null) {

@@ -17,3 +17,11 @@ export function formatTimereportDate(date: Date): string {
 
   return `${year}${month}${day}`;
 }
+
+export function getPathFromDate(date: Date, dropboxLocation: string): string {
+  const year = date.getFullYear();
+  const week = getISOWeek(date).toString().padStart(2, "0");
+  const timereportDate = formatTimereportDate(date);
+
+  return `${dropboxLocation}/${year}/week ${week}/timereport - ${timereportDate}`;
+}

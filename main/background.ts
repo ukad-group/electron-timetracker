@@ -4,7 +4,8 @@ import { app, dialog, ipcMain } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
 import ElectronStore from "electron-store";
-import { formatTimereportDate, getISOWeek } from "./helpers/datetime";
+import { getPathFromDate } from "./helpers/datetime";
+import { createDirByPath } from "./helpers/fs";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -75,17 +76,33 @@ ipcMain.handle("app:select-folder", async () => {
 ipcMain.handle("app:read-day-report", (event, date: Date) => {
   if (!date) return null;
 
-  const dropbox = store.get("dropboxLocation");
-  const year = date.getFullYear();
-  const week = getISOWeek(date).toString().padStart(2, "0");
-  const timereportDate = formatTimereportDate(date);
+  const dropbox = store.get("dropboxLocation") as string | null;
+  if (!dropbox) return null;
 
-  const timereportPath = `${dropbox}/${year}/week ${week}/timereport - ${timereportDate}`;
+  const timereportPath = getPathFromDate(date, dropbox);
 
   try {
     const data = fs.readFileSync(timereportPath, "utf8");
     return data;
   } catch (err) {
     return null;
+  }
+});
+
+ipcMain.handle("app:write-day-report", (event, date: Date, report: string) => {
+  if (!date) return null;
+
+  const dropbox = store.get("dropboxLocation") as string | null;
+  if (!dropbox) return null;
+
+  const timereportPath = getPathFromDate(date, dropbox);
+
+  try {
+    createDirByPath(timereportPath.slice(0, timereportPath.lastIndexOf("/")));
+    fs.writeFileSync(timereportPath, report);
+    console.log("no errors");
+  } catch (err) {
+    console.log(err);
+    return;
   }
 });
