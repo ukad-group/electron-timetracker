@@ -83,10 +83,12 @@ export default function Home() {
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
           <div className="space-y-6 lg:col-start-1 lg:col-span-2">
             <section>
-              <DateSelector
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-              />
+              <div className="bg-white shadow sm:rounded-lg">
+                <DateSelector
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                />
+              </div>
             </section>
             <section>
               <div className="bg-white shadow sm:rounded-lg">
