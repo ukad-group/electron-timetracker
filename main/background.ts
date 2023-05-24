@@ -105,3 +105,31 @@ ipcMain.handle("app:write-day-report", (event, date: Date, report: string) => {
     return;
   }
 });
+
+ipcMain.handle("app:find-latest-projects", (event, date: Date) => {
+  if (!date) return [];
+
+  const dropbox = store.get("dropboxLocation") as string | null;
+  if (!dropbox) return [];
+
+  const latestProjects = new Set<string>();
+  let currentDate = new Date(date);
+
+  for (let i = 0; i < 31; i++) {
+    currentDate.setDate(currentDate.getDate() - 1);
+    const timereportPath = getPathFromDate(currentDate, dropbox);
+    try {
+      const lines = fs.readFileSync(timereportPath, "utf8").split("\n");
+      for (const line of lines) {
+        const parts = line.split(" - ");
+        if (parts.length > 2 && parts[1]) {
+          latestProjects.add(parts[1]);
+        }
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return [...latestProjects];
+});

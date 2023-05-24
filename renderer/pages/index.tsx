@@ -15,6 +15,7 @@ export default function Home() {
   const [trackTimeModalActivity, setTrackTimeModalActivity] = useState<
     ReportActivity | "new"
   >(null);
+  const [latestProjects, setLatestProjects] = useState<Array<string>>([]);
 
   useEffect(() => {
     (async () => {
@@ -23,6 +24,10 @@ export default function Home() {
         selectedDate
       );
       setSelectedDateReport(dayReport || "");
+
+      setLatestProjects(
+        await ipcRenderer.invoke("app:find-latest-projects", selectedDate)
+      );
     })();
   }, [selectedDate]);
 
@@ -116,6 +121,7 @@ export default function Home() {
       <TrackTimeModal
         isOpen={trackTimeModalActivity !== null}
         editedActivity={trackTimeModalActivity}
+        latestProjects={latestProjects}
         close={() => setTrackTimeModalActivity(null)}
         submitActivity={submitActivity}
       />

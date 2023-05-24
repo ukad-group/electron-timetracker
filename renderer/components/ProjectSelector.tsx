@@ -3,11 +3,10 @@ import { Dispatch, SetStateAction } from "react";
 import { Combobox } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 
-const projects = ["cimplex.a", "cimplex.d", "ajp"];
-
 type ProjectSelectorProps = {
   className?: string;
   selectedProject: string;
+  availableProjects: Array<string>;
   setSelectedProject: Dispatch<SetStateAction<string>>;
   isValidationEnabled: boolean;
   required?: boolean;
@@ -16,14 +15,15 @@ type ProjectSelectorProps = {
 export default function ProjectSelector({
   className,
   selectedProject,
+  availableProjects,
   setSelectedProject,
   isValidationEnabled,
   required = false,
 }: ProjectSelectorProps) {
   const filteredProjects =
     selectedProject === ""
-      ? projects
-      : projects.filter((project) => {
+      ? availableProjects
+      : availableProjects.filter((project) => {
           return project.toLowerCase().includes(selectedProject.toLowerCase());
         });
 

@@ -13,6 +13,7 @@ import {
 type TrackTimeModalProps = {
   isOpen: boolean;
   editedActivity: ReportActivity | "new";
+  latestProjects: Array<string>;
   close: () => void;
   submitActivity: (
     activity: Omit<ReportActivity, "id"> & Partial<Pick<ReportActivity, "id">>
@@ -22,6 +23,7 @@ type TrackTimeModalProps = {
 export default function TrackTimeModal({
   isOpen,
   editedActivity,
+  latestProjects,
   close,
   submitActivity,
 }: TrackTimeModalProps) {
@@ -217,6 +219,7 @@ export default function TrackTimeModal({
                   <div className="col-span-6">
                     <ProjectSelector
                       required
+                      availableProjects={latestProjects}
                       selectedProject={project}
                       setSelectedProject={setProject}
                       isValidationEnabled={isValidationEnabled}
