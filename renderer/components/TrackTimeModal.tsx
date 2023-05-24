@@ -12,7 +12,7 @@ import {
 
 type TrackTimeModalProps = {
   isOpen: boolean;
-  editedActivity: ReportActivity;
+  editedActivity: ReportActivity | "new";
   close: () => void;
   submitActivity: (
     activity: Omit<ReportActivity, "id"> & Partial<Pick<ReportActivity, "id">>
@@ -49,7 +49,10 @@ export default function TrackTimeModal({
   }, [from, to, duration, project, activity]);
 
   useEffect(() => {
-    if (!editedActivity) return;
+    if (!editedActivity || editedActivity === "new") {
+      resetModal();
+      return;
+    }
 
     setFrom(editedActivity.from || "");
     setTo(editedActivity.to || "");
@@ -66,7 +69,7 @@ export default function TrackTimeModal({
       return;
     }
     submitActivity({
-      id: editedActivity.id ?? null,
+      id: editedActivity === "new" ? null : editedActivity.id,
       from,
       to,
       duration,
@@ -74,7 +77,7 @@ export default function TrackTimeModal({
       activity,
       description,
     });
-    closeAndReset();
+    close();
   };
 
   const resetModal = () => {
@@ -87,17 +90,12 @@ export default function TrackTimeModal({
     setIsValidationEnabled(false);
   };
 
-  const closeAndReset = () => {
-    resetModal();
-    close();
-  };
-
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
         as="div"
         className="fixed inset-0 z-10 overflow-y-auto"
-        onClose={closeAndReset}
+        onClose={close}
       >
         <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
           <Transition.Child
@@ -136,7 +134,7 @@ export default function TrackTimeModal({
                 <button
                   type="button"
                   className="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
-                  onClick={closeAndReset}
+                  onClick={close}
                 >
                   <span className="sr-only">Close</span>
                   <XMarkIcon className="w-6 h-6" aria-hidden="true" />
@@ -268,7 +266,7 @@ export default function TrackTimeModal({
               <div className="mt-6">
                 <div className="flex justify-end">
                   <button
-                    onClick={closeAndReset}
+                    onClick={close}
                     type="button"
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >

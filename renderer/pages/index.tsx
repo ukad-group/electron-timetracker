@@ -1,18 +1,20 @@
-import { SetStateAction, useEffect, useState } from "react";
-import DateSelector from "../components/DateSelector";
-import ActivitiesTable from "../components/ActivitiesTable";
-import Header from "../components/Header";
 import { ipcRenderer } from "electron";
+import { useEffect, useState } from "react";
+import DateSelector from "../components/DateSelector";
+import Header from "../components/Header";
 import { ReportActivity, parseReport, serializeReport } from "../utils/reports";
 import TrackTimeModal from "../components/TrackTimeModal";
 import ManualInputForm from "../components/ManualInputForm";
+import ActivitiesSection from "../components/ActivitiesSection";
 
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [selectedDateActivities, setSelectedDateActivities] =
     useState<Array<ReportActivity> | null>([]);
-  const [trackTimeModalActivity, setTrackTimeModalActivity] = useState(null);
+  const [trackTimeModalActivity, setTrackTimeModalActivity] = useState<
+    ReportActivity | "new"
+  >(null);
 
   useEffect(() => {
     (async () => {
@@ -88,21 +90,10 @@ export default function Home() {
             </section>
             <section>
               <div className="bg-white shadow sm:rounded-lg">
-                <div className="px-4 py-5 sm:px-6">
-                  <ActivitiesTable
-                    onEditActivity={setTrackTimeModalActivity}
-                    activities={selectedDateActivities}
-                  />
-                </div>
-                <div>
-                  <a
-                    href="#"
-                    className="block px-4 py-4 text-sm font-medium text-center text-gray-500 bg-gray-50 hover:text-gray-700 sm:rounded-b-lg"
-                    onClick={() => setTrackTimeModalActivity(true)}
-                  >
-                    Track more time
-                  </a>
-                </div>
+                <ActivitiesSection
+                  activities={selectedDateActivities}
+                  onEditActivity={setTrackTimeModalActivity}
+                />
               </div>
             </section>
           </div>
