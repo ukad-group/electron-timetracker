@@ -28,18 +28,9 @@ export default function Header() {
     <header className="bg-white shadow">
       <div className="flex justify-between h-16 px-2 mx-auto max-w-7xl sm:px-4 lg:px-8">
         <div className="flex flex-shrink-0 px-2 lg:px-0">
-          <div className="flex items-center flex-shrink-0">
-            <a href="#">
-              <img
-                className="w-auto h-8"
-                src="https://tailwindui.com/img/logos/workflow-mark-blue-600.svg"
-                alt="Workflow"
-              />
-            </a>
-          </div>
           <nav
             aria-label="Global"
-            className="hidden lg:ml-6 lg:flex lg:items-center lg:space-x-4"
+            className="hidden md:ml-6 md:flex md:items-center md:space-x-4"
           >
             {navigation.map((item) => (
               <a
