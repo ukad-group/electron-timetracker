@@ -28,7 +28,7 @@ export default function Header() {
     <header className="bg-white shadow">
       <div className="flex justify-between h-16 px-2 mx-auto max-w-7xl sm:px-4 lg:px-8">
         <div className="flex flex-shrink-0 px-2 lg:px-0">
-          <nav
+          {/* <nav
             aria-label="Global"
             className="hidden md:ml-6 md:flex md:items-center md:space-x-4"
           >
@@ -41,7 +41,7 @@ export default function Header() {
                 {item.name}
               </a>
             ))}
-          </nav>
+          </nav> */}
         </div>
         <div className="flex items-center flex-shrink min-w-0 gap-4">
           <FolderSelector
