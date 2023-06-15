@@ -60,7 +60,14 @@ export function parseReport(fileContent: string) {
 export function serializeReport(activities: Array<ReportActivity>) {
   let report = "";
   for (const [i, activity] of activities.entries()) {
-    const parts = [activity.from, activity.project, activity.activity];
+    const parts: Array<string> = [activity.from];
+
+    if (!activity.isBreak) {
+      parts.push(activity.project);
+    }
+
+    parts.push(activity.activity);
+
     if (activity.description) {
       parts.push(activity.description);
     }
