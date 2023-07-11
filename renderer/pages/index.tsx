@@ -12,6 +12,7 @@ export default function Home() {
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [selectedDateActivities, setSelectedDateActivities] =
     useState<Array<ReportActivity> | null>([]);
+  const [shouldAutosave, setShouldAutosave] = useState(false);
   const [trackTimeModalActivity, setTrackTimeModalActivity] = useState<
     ReportActivity | "new"
   >(null);
@@ -42,12 +43,10 @@ export default function Home() {
 
   // Save report on change
   useEffect(() => {
-    if (
-      JSON.stringify(selectedDateActivities) !==
-      JSON.stringify(parseReport(selectedDateReport))
-    ) {
+    if (shouldAutosave) {
       const serializedReport = serializeReport(selectedDateActivities);
       saveSerializedReport(serializedReport);
+      setShouldAutosave(false);
     }
   }, [selectedDateActivities]);
 
@@ -57,6 +56,7 @@ export default function Home() {
   };
 
   const submitActivity = (activity: ReportActivity) => {
+    setShouldAutosave(true);
     if (activity.id === null) {
       setSelectedDateActivities((activities) => [
         ...activities,
