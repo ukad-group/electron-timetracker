@@ -79,6 +79,10 @@ export default function Home() {
       return [...activities];
     });
   };
+  const handleSave = (report: string, shouldAutosave: boolean) => {
+    setSelectedDateReport(report);
+    setShouldAutosave(shouldAutosave);
+  };
 
   return (
     <div className="min-h-full">
@@ -111,7 +115,7 @@ export default function Home() {
           >
             <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6">
               <ManualInputForm
-                onSave={setSelectedDateReport}
+                onSave={handleSave}
                 selectedDateReport={selectedDateReport}
               />
             </div>
