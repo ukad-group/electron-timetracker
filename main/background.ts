@@ -6,7 +6,7 @@ import { createWindow } from "./helpers";
 import ElectronStore from "electron-store";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath } from "./helpers/fs";
-const { autoUpdater, AppUpdater } = require("electron-updater");
+import { autoUpdater } from "electron-updater";
 
 autoUpdater.autoDownload = true;
 autoUpdater.autoInstallOnAppQuit = true;
