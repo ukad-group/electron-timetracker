@@ -2,8 +2,9 @@
   "private": true,
   "name": "timetracker",
   "description": "Timetracker app",
-  "version": "1.0.3",
+  "version": "1.0.10",
   "author": "mmmykhailo <mmmykhailo@proton.me>",
+  "license": "ISC",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",

@@ -1,4 +1,4 @@
-const { ipcMain } = require("electron");
+import { ipcMain } from "electron";
 const path = require("path");
 const fs = require("fs-extra");
 const os = require("os");
