@@ -6,6 +6,7 @@ import { ReportActivity, parseReport, serializeReport } from "../utils/reports";
 import TrackTimeModal from "../components/TrackTimeModal";
 import ManualInputForm from "../components/ManualInputForm";
 import ActivitiesSection from "../components/ActivitiesSection";
+import SelectFolderPlaceholder from "../components/SelectFolderPlaceholder";
 
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -17,6 +18,7 @@ export default function Home() {
     ReportActivity | "new"
   >(null);
   const [latestProjects, setLatestProjects] = useState<Array<string>>([]);
+  const [selectedPath, setSelectedPath] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -84,42 +86,55 @@ export default function Home() {
     setShouldAutosave(shouldAutosave);
   };
 
+  const handleDropboxLocationChange = (path: string) => {
+    setSelectedPath(path);
+    ipcRenderer.invoke("app:set-dropbox-folder", path);
+  };
+
   return (
     <div className="min-h-full">
-      <Header />
+      <Header setPath={setSelectedPath} selectedPath={selectedPath} />
 
       <main className="py-10">
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
-          <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-            <section>
-              <div className="bg-white shadow sm:rounded-lg">
-                <DateSelector
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                />
+          {selectedPath !== "" ? (
+            <>
+              <div className="space-y-6 lg:col-start-1 lg:col-span-2">
+                <section>
+                  <div className="bg-white shadow sm:rounded-lg">
+                    <DateSelector
+                      selectedDate={selectedDate}
+                      setSelectedDate={setSelectedDate}
+                    />
+                  </div>
+                </section>
+                <section>
+                  <div className="bg-white shadow sm:rounded-lg">
+                    <ActivitiesSection
+                      activities={selectedDateActivities}
+                      onEditActivity={setTrackTimeModalActivity}
+                    />
+                  </div>
+                </section>
               </div>
-            </section>
-            <section>
-              <div className="bg-white shadow sm:rounded-lg">
-                <ActivitiesSection
-                  activities={selectedDateActivities}
-                  onEditActivity={setTrackTimeModalActivity}
-                />
-              </div>
-            </section>
-          </div>
 
-          <section
-            aria-labelledby="manual-input-title"
-            className="lg:col-start-3 lg:col-span-1"
-          >
-            <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6">
-              <ManualInputForm
-                onSave={handleSave}
-                selectedDateReport={selectedDateReport}
-              />
-            </div>
-          </section>
+              <section
+                aria-labelledby="manual-input-title"
+                className="lg:col-start-3 lg:col-span-1"
+              >
+                <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6">
+                  <ManualInputForm
+                    onSave={handleSave}
+                    selectedDateReport={selectedDateReport}
+                  />
+                </div>
+              </section>
+            </>
+          ) : (
+            <SelectFolderPlaceholder
+              setFolderLocation={handleDropboxLocationChange}
+            />
+          )}
         </div>
       </main>
       <TrackTimeModal

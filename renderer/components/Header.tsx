@@ -6,8 +6,12 @@ const navigation = [
   { name: "Today", href: "#" },
   { name: "Month", href: "#" },
 ];
+type HeaderProps = {
+  setPath: (location: string) => void;
+  selectedPath: string;
+};
 
-export default function Header() {
+export default function Header({ setPath, selectedPath }: HeaderProps) {
   const [selectedDropboxLocation, setSelectedDropboxLocation] = useState("");
 
   const handleDropboxLocationChange = (path: string) => {
@@ -23,6 +27,16 @@ export default function Header() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    setPath(selectedDropboxLocation);
+    console.log("setPath");
+  }, [selectedDropboxLocation]);
+
+  useEffect(() => {
+    setSelectedDropboxLocation(selectedPath);
+    console.log("setSelectedDropboxLocation");
+  }, [selectedPath]);
 
   return (
     <header className="bg-white shadow">
