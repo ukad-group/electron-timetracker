@@ -6,6 +6,35 @@ import { createWindow } from "./helpers";
 import ElectronStore from "electron-store";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath } from "./helpers/fs";
+const { autoUpdater, AppUpdater } = require("electron-updater");
+
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
+
+app.whenReady().then(() => {
+  autoUpdater.checkForUpdates();
+  alert(`Checking for updates. Current version ${app.getVersion()}`);
+});
+
+/*New Update Available*/
+autoUpdater.on("update-available", (info) => {
+  alert(`Update available. Current version ${app.getVersion()}`);
+  let pth = autoUpdater.downloadUpdate();
+  alert(pth);
+});
+
+autoUpdater.on("update-not-available", (info) => {
+  alert(`No update available. Current version ${app.getVersion()}`);
+});
+
+/*Download Completion Message*/
+autoUpdater.on("update-downloaded", (info) => {
+  alert(`Update downloaded. Current version ${app.getVersion()}`);
+});
+
+autoUpdater.on("error", (info) => {
+  alert(info);
+});
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
