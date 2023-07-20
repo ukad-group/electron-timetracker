@@ -133,7 +133,6 @@ ipcMain.handle("app:find-latest-projects", (event, date: Date) => {
 
   return [...latestProjects];
 });
-console.log(`TEEEEEEEEEEEEEEEEEEEEEEEEST `);
 
 import { autoUpdater } from "electron-updater";
 
@@ -146,7 +145,5 @@ app.whenReady().then(() => {
 
 /*New Update Available*/
 autoUpdater.on("update-available", (info) => {
-  console.log(`Update available. Current version ${app.getVersion()}`);
-  let pth = autoUpdater.downloadUpdate();
-  console.log(pth);
+  autoUpdater.downloadUpdate();
 });
