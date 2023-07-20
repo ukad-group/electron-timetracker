@@ -6,6 +6,7 @@ import { createWindow } from "./helpers";
 import ElectronStore from "electron-store";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath } from "./helpers/fs";
+import { autoUpdater } from "electron-updater";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -134,8 +135,7 @@ ipcMain.handle("app:find-latest-projects", (event, date: Date) => {
   return [...latestProjects];
 });
 
-import { autoUpdater } from "electron-updater";
-
+//Updater
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
@@ -143,7 +143,6 @@ app.whenReady().then(() => {
   autoUpdater.checkForUpdates();
 });
 
-/*New Update Available*/
 autoUpdater.on("update-available", (info) => {
   autoUpdater.downloadUpdate();
 });
