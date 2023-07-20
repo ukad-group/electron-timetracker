@@ -6,6 +6,8 @@ type ActivitiesTableProps = {
   onEditActivity: (activity: ReportActivity) => void;
 };
 
+const msPerHour = 60 * 60 * 1000;
+
 export default function ActivitiesTable({
   activities,
   onEditActivity,
@@ -100,7 +102,7 @@ export default function ActivitiesTable({
             className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
             colSpan={4}
           >
-            {totalDuration < 8 && getLackBadge(totalDuration)}
+            {totalDuration < 8 * msPerHour && getLackBadge(totalDuration)}
           </td>
         </tr>
       </tbody>
@@ -108,8 +110,8 @@ export default function ActivitiesTable({
   );
 }
 
-function getLackBadge(hours: number) {
-  if (hours < 6) {
+function getLackBadge(ms: number) {
+  if (ms < 6 * msPerHour) {
     return (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
         less than 6h
