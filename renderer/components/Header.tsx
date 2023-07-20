@@ -1,28 +1,17 @@
-import { ipcRenderer } from "electron";
+import { shallow } from "zustand/shallow";
 import FolderSelector from "./FolderSelector";
-import { useEffect, useState } from "react";
+import { useMainStore } from "../store/mainStore";
 
-const navigation = [
-  { name: "Today", href: "#" },
-  { name: "Month", href: "#" },
-];
+// const navigation = [
+//   { name: "Today", href: "#" },
+//   { name: "Month", href: "#" },
+// ];
 
 export default function Header() {
-  const [selectedDropboxLocation, setSelectedDropboxLocation] = useState("");
-
-  const handleDropboxLocationChange = (path: string) => {
-    setSelectedDropboxLocation(path);
-    ipcRenderer.invoke("app:set-dropbox-folder", path);
-  };
-
-  useEffect(() => {
-    (async () => {
-      const savedLocation = await ipcRenderer.invoke("app:get-dropbox-folder");
-      if (savedLocation) {
-        setSelectedDropboxLocation(savedLocation);
-      }
-    })();
-  }, []);
+  const [reportsFolder, setReportsFolder] = useMainStore(
+    (state) => [state.reportsFolder, state.setReportsFolder],
+    shallow
+  );
 
   return (
     <header className="bg-white shadow">
@@ -45,8 +34,8 @@ export default function Header() {
         </div>
         <div className="flex items-center flex-shrink min-w-0 gap-4">
           <FolderSelector
-            folderLocation={selectedDropboxLocation}
-            setFolderLocation={handleDropboxLocationChange}
+            folderLocation={reportsFolder}
+            setFolderLocation={setReportsFolder}
           />
         </div>
       </div>

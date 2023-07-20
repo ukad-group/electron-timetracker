@@ -1,13 +1,21 @@
 import { ipcRenderer } from "electron";
 import { useEffect, useState } from "react";
+import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
 import Header from "../components/Header";
 import { ReportActivity, parseReport, serializeReport } from "../utils/reports";
 import TrackTimeModal from "../components/TrackTimeModal";
 import ManualInputForm from "../components/ManualInputForm";
 import ActivitiesSection from "../components/ActivitiesSection";
+import SelectFolderPlaceholder from "../components/SelectFolderPlaceholder";
+import { useMainStore } from "../store/mainStore";
 
 export default function Home() {
+  const [reportsFolder, setReportsFolder] = useMainStore(
+    (state) => [state.reportsFolder, state.setReportsFolder],
+    shallow
+  );
+
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [selectedDateActivities, setSelectedDateActivities] =
@@ -22,12 +30,17 @@ export default function Home() {
     (async () => {
       const dayReport = await ipcRenderer.invoke(
         "app:read-day-report",
+        reportsFolder,
         selectedDate
       );
       setSelectedDateReport(dayReport || "");
 
       setLatestProjects(
-        await ipcRenderer.invoke("app:find-latest-projects", selectedDate)
+        await ipcRenderer.invoke(
+          "app:find-latest-projects",
+          reportsFolder,
+          selectedDate
+        )
       );
     })();
   }, [selectedDate]);
@@ -51,7 +64,12 @@ export default function Home() {
   }, [selectedDateActivities]);
 
   const saveSerializedReport = (serializedReport: string) => {
-    ipcRenderer.invoke("app:write-day-report", selectedDate, serializedReport);
+    ipcRenderer.invoke(
+      "app:write-day-report",
+      reportsFolder,
+      selectedDate,
+      serializedReport
+    );
     setSelectedDateReport(serializedReport);
   };
 
@@ -90,36 +108,42 @@ export default function Home() {
 
       <main className="py-10">
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
-          <div className="space-y-6 lg:col-start-1 lg:col-span-2">
-            <section>
-              <div className="bg-white shadow sm:rounded-lg">
-                <DateSelector
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                />
+          {reportsFolder ? (
+            <>
+              <div className="space-y-6 lg:col-start-1 lg:col-span-2">
+                <section>
+                  <div className="bg-white shadow sm:rounded-lg">
+                    <DateSelector
+                      selectedDate={selectedDate}
+                      setSelectedDate={setSelectedDate}
+                    />
+                  </div>
+                </section>
+                <section>
+                  <div className="bg-white shadow sm:rounded-lg">
+                    <ActivitiesSection
+                      activities={selectedDateActivities}
+                      onEditActivity={setTrackTimeModalActivity}
+                    />
+                  </div>
+                </section>
               </div>
-            </section>
-            <section>
-              <div className="bg-white shadow sm:rounded-lg">
-                <ActivitiesSection
-                  activities={selectedDateActivities}
-                  onEditActivity={setTrackTimeModalActivity}
-                />
-              </div>
-            </section>
-          </div>
 
-          <section
-            aria-labelledby="manual-input-title"
-            className="lg:col-start-3 lg:col-span-1"
-          >
-            <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6">
-              <ManualInputForm
-                onSave={handleSave}
-                selectedDateReport={selectedDateReport}
-              />
-            </div>
-          </section>
+              <section
+                aria-labelledby="manual-input-title"
+                className="lg:col-start-3 lg:col-span-1"
+              >
+                <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6">
+                  <ManualInputForm
+                    onSave={handleSave}
+                    selectedDateReport={selectedDateReport}
+                  />
+                </div>
+              </section>
+            </>
+          ) : (
+            <SelectFolderPlaceholder setFolder={setReportsFolder} />
+          )}
         </div>
       </main>
       <TrackTimeModal
