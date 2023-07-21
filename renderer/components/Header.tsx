@@ -1,45 +1,23 @@
-import { ipcRenderer } from "electron";
+import { shallow } from "zustand/shallow";
 import FolderSelector from "./FolderSelector";
-import { useEffect, useState } from "react";
+import { useMainStore } from "../store/mainStore";
 
-const navigation = [
-  { name: "Today", href: "#" },
-  { name: "Month", href: "#" },
-];
-type HeaderProps = {
-  setPath: (location: string) => void;
-  selectedPath: string;
-};
+// const navigation = [
+//   { name: "Today", href: "#" },
+//   { name: "Month", href: "#" },
+// ];
 
-export default function Header({ setPath, selectedPath }: HeaderProps) {
-  const [selectedDropboxLocation, setSelectedDropboxLocation] = useState("");
-
-  const handleDropboxLocationChange = (path: string) => {
-    setSelectedDropboxLocation(path);
-    ipcRenderer.invoke("app:set-dropbox-folder", path);
-  };
-
-  useEffect(() => {
-    (async () => {
-      const savedLocation = await ipcRenderer.invoke("app:get-dropbox-folder");
-      if (savedLocation) {
-        setSelectedDropboxLocation(savedLocation);
-      }
-    })();
-  }, []);
-
-  useEffect(() => {
-    setPath(selectedDropboxLocation);
-  }, [selectedDropboxLocation]);
-
-  useEffect(() => {
-    setSelectedDropboxLocation(selectedPath);
-  }, [selectedPath]);
+export default function Header() {
+  const [reportsFolder, setReportsFolder] = useMainStore(
+    (state) => [state.reportsFolder, state.setReportsFolder],
+    shallow
+  );
 
   return (
     <header className="bg-white shadow">
       <div className="flex justify-between h-16 px-2 mx-auto max-w-7xl sm:px-4 lg:px-8">
         <div className="flex flex-shrink-0 px-2 lg:px-0">
+          Current version 1.0.13
           {/* <nav
             aria-label="Global"
             className="hidden md:ml-6 md:flex md:items-center md:space-x-4"
@@ -57,8 +35,8 @@ export default function Header({ setPath, selectedPath }: HeaderProps) {
         </div>
         <div className="flex items-center flex-shrink min-w-0 gap-4">
           <FolderSelector
-            folderLocation={selectedDropboxLocation}
-            setFolderLocation={handleDropboxLocationChange}
+            folderLocation={reportsFolder}
+            setFolderLocation={setReportsFolder}
           />
         </div>
       </div>
