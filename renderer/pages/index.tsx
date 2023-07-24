@@ -48,7 +48,7 @@ export default function Home() {
   useEffect(() => {
     if (selectedDateReport) {
       const activities = parseReport(selectedDateReport);
-      setSelectedDateActivities(activities.filter((act) => !act.isBreak));
+      setSelectedDateActivities(activities?.filter((act) => !act.isBreak));
       return;
     }
     setSelectedDateActivities([]);
