@@ -45,7 +45,12 @@ export function parseReport(fileContent: string) {
 function parseReportFields(line: string) {
   const [from, ...fields] = line.split(" - ");
 
-  if (!from || !fields.length) return null;
+  if (!from) return null;
+
+  if (!fields[0]) {
+    fields[0] = "!";
+    return { from: from.slice(0, 5), activity: fields[0], isBreak: true };
+  }
 
   if (fields[0]?.startsWith("!")) {
     return { from, activity: fields[0], isBreak: true };
