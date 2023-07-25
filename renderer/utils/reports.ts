@@ -10,24 +10,35 @@ export type ReportActivity = {
   description: string;
   isBreak?: boolean;
 };
+export type ReportAndNotes = [Array<Partial<ReportActivity>>, string];
 
 export function parseReport(fileContent: string) {
   if (!fileContent) return [];
 
+  let reportComments = "\n";
+  let reportCount = 0;
   const lines = fileContent.split("\n").filter(Boolean);
   const reportItems: Array<Partial<ReportActivity>> = [];
+  const reportAndNotes: ReportAndNotes = [reportItems, reportComments];
+  const timePattern = /\b(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]\b/;
 
   for (const [i, line] of lines.entries()) {
-    const fields = parseReportFields(line);
-    if (fields === null) return null;
-    reportItems.push({
-      id: i,
-      ...fields,
-    });
-    if (i > 0) {
-      reportItems[i - 1].to = fields.from;
+    if (timePattern.test(line)) {
+      const fields = parseReportFields(line);
+      if (fields === null) return null;
+      reportItems.push({
+        id: reportCount,
+        ...fields,
+      });
+      if (reportCount > 0) {
+        reportItems[reportCount - 1].to = fields.from;
+      }
+      reportCount++;
+    } else {
+      reportComments += line + "\n";
     }
   }
+  reportAndNotes[1] = reportComments;
 
   if (reportItems[reportItems.length - 1].isBreak) {
     reportItems.pop();
@@ -39,7 +50,7 @@ export function parseReport(fileContent: string) {
     item.duration = calcDurationBetweenTimes(item.from, item.to);
   }
 
-  return reportItems as Array<ReportActivity>;
+  return reportAndNotes as ReportAndNotes;
 }
 
 function parseReportFields(line: string) {
@@ -75,7 +86,7 @@ function parseReportFields(line: string) {
   }
 }
 
-export function serializeReport(activities: Array<ReportActivity>) {
+export function serializeReport(activities: Array<Partial<ReportActivity>>) {
   let report = "";
   for (const [i, activity] of activities.entries()) {
     const parts: Array<string> = [activity.from];
@@ -107,6 +118,11 @@ function parseIntOrZero(value: string) {
 }
 
 export function calcDurationBetweenTimes(from: string, to: string): number {
+  // console.log("from " + from);
+  // console.log("to " + to);
+  if (from == undefined || to == undefined) {
+    return null;
+  }
   const startParts = from.split(":");
   const endParts = to.split(":");
 
