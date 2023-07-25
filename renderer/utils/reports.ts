@@ -10,39 +10,50 @@ export type ReportActivity = {
   description?: string;
   isBreak?: boolean;
 };
+export type ReportAndNotes = [Array<Partial<ReportActivity>>, string];
 
 export function parseReport(fileContent: string) {
   if (!fileContent) return [];
 
+  let reportComments = "\n";
+  let reportCount = 0;
   const lines = fileContent.split("\n").filter(Boolean);
   const reportItems: Array<Partial<ReportActivity>> = [];
+  const reportAndNotes: ReportAndNotes = [reportItems, reportComments];
+  const timePattern = /\b(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]\b/;
 
   for (const [i, line] of lines.entries()) {
-    const [from, ...fields] = line.split(" - ");
+    if (timePattern.test(line)) {
+      const [from, ...fields] = line.split(" - ");
 
-    if (!from || !fields.length) return null;
+      if (!from || !fields.length) return null;
 
-    if (fields[0]?.startsWith("!")) {
-      reportItems.push({
-        id: i,
-        from,
-        activity: fields[0],
-        isBreak: true,
-      });
+      if (fields[0]?.startsWith("!")) {
+        reportItems.push({
+          id: reportCount,
+          from,
+          activity: fields[0],
+          isBreak: true,
+        });
+      } else {
+        const [project, activity, description] = fields;
+        reportItems.push({
+          id: reportCount,
+          from,
+          project,
+          activity,
+          description,
+        });
+      }
+      if (reportCount > 0) {
+        reportItems[reportCount - 1].to = from;
+      }
+      reportCount++;
     } else {
-      const [project, activity, description] = fields;
-      reportItems.push({
-        id: i,
-        from,
-        project,
-        activity,
-        description,
-      });
-    }
-    if (i > 0) {
-      reportItems[i - 1].to = from;
+      reportComments += line + "\n";
     }
   }
+  reportAndNotes[1] = reportComments;
 
   if (reportItems[reportItems.length - 1].isBreak) {
     reportItems.pop();
@@ -54,10 +65,10 @@ export function parseReport(fileContent: string) {
     item.duration = calcDurationBetweenTimes(item.from, item.to);
   }
 
-  return reportItems as Array<ReportActivity>;
+  return reportAndNotes as ReportAndNotes;
 }
 
-export function serializeReport(activities: Array<ReportActivity>) {
+export function serializeReport(activities: Array<Partial<ReportActivity>>) {
   let report = "";
   for (const [i, activity] of activities.entries()) {
     const parts: Array<string> = [activity.from];
@@ -87,6 +98,11 @@ function parseIntOrZero(value: string) {
 }
 
 export function calcDurationBetweenTimes(from: string, to: string): number {
+  // console.log("from " + from);
+  // console.log("to " + to);
+  if (from == undefined || to == undefined) {
+    return null;
+  }
   const startParts = from.split(":");
   const endParts = to.split(":");
 
