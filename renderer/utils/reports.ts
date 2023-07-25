@@ -6,8 +6,8 @@ export type ReportActivity = {
   to: string;
   duration: number;
   project?: string;
-  activity: string;
-  description?: string;
+  activity?: string;
+  description: string;
   isBreak?: boolean;
 };
 
@@ -18,29 +18,14 @@ export function parseReport(fileContent: string) {
   const reportItems: Array<Partial<ReportActivity>> = [];
 
   for (const [i, line] of lines.entries()) {
-    const [from, ...fields] = line.split(" - ");
-
-    if (!from || !fields.length) return null;
-
-    if (fields[0]?.startsWith("!")) {
-      reportItems.push({
-        id: i,
-        from,
-        activity: fields[0],
-        isBreak: true,
-      });
-    } else {
-      const [project, activity, description] = fields;
-      reportItems.push({
-        id: i,
-        from,
-        project,
-        activity,
-        description,
-      });
-    }
+    const fields = parseReportFields(line);
+    if (fields === null) return null;
+    reportItems.push({
+      id: i,
+      ...fields,
+    });
     if (i > 0) {
-      reportItems[i - 1].to = from;
+      reportItems[i - 1].to = fields.from;
     }
   }
 
@@ -57,6 +42,39 @@ export function parseReport(fileContent: string) {
   return reportItems as Array<ReportActivity>;
 }
 
+function parseReportFields(line: string) {
+  const [from, ...fields] = line.split(" - ");
+
+  if (!from) return null;
+
+  if (!fields[0]) {
+    fields[0] = "!";
+    return { from: from.slice(0, 5), activity: fields[0], isBreak: true };
+  }
+
+  if (fields[0]?.startsWith("!")) {
+    return { from, activity: fields[0], isBreak: true };
+  }
+
+  if (fields.length === 2) {
+    const [project, description] = fields;
+    return {
+      from,
+      project,
+      description,
+    };
+  }
+  if (fields.length === 3) {
+    const [project, activity, description] = fields;
+    return {
+      from,
+      project,
+      activity,
+      description,
+    };
+  }
+}
+
 export function serializeReport(activities: Array<ReportActivity>) {
   let report = "";
   for (const [i, activity] of activities.entries()) {
@@ -66,7 +84,9 @@ export function serializeReport(activities: Array<ReportActivity>) {
       parts.push(activity.project);
     }
 
-    parts.push(activity.activity);
+    if (activity.activity) {
+      parts.push(activity.activity);
+    }
 
     if (activity.description) {
       parts.push(activity.description);
