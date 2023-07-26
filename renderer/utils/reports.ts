@@ -7,7 +7,7 @@ export type ReportActivity = {
   duration: number;
   project?: string;
   activity?: string;
-  description: string;
+  description?: string;
   isBreak?: boolean;
 };
 export type ReportAndNotes = [Array<Partial<ReportActivity>>, string];
@@ -17,14 +17,14 @@ export function parseReport(fileContent: string) {
 
   let reportComments = "\n";
   let reportCount = 0;
+  const timeRegex = /^[0-9]+:[0-9]+/;
   const lines = fileContent.split("\n").filter(Boolean);
   const reportItems: Array<Partial<ReportActivity>> = [];
   const reportAndNotes: ReportAndNotes = [reportItems, reportComments];
-  const timePattern = /\b(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]\b/;
 
   for (const [i, line] of lines.entries()) {
-    if (timePattern.test(line)) {
-      const fields = parseReportFields(line);
+    if (timeRegex.test(line.slice(0, 5))) {
+      const fields = parseReportFields(line.replace(/�/g, "-"));
       if (fields === null) return null;
       reportItems.push({
         id: reportCount,
@@ -54,23 +54,46 @@ export function parseReport(fileContent: string) {
 }
 
 function parseReportFields(line: string) {
+  const timeRegex = /^[0-9]+:[0-9]+/;
   const [from, ...fields] = line.split(" - ");
 
   if (!from) return null;
+  let fromTime = timeRegex.exec(from)[0];
+
+  if (Number(fromTime.slice(0, 2)) > 23) {
+    fromTime = "23:59";
+  }
+  if (Number(fromTime.slice(3, 5)) > 59) {
+    fromTime = fromTime.slice(0, -2) + "59";
+  }
 
   if (!fields[0]) {
     fields[0] = "!";
-    return { from: from.slice(0, 5), activity: fields[0], isBreak: true };
+    return {
+      from: fromTime,
+      activity: fields[0],
+      isBreak: true,
+    };
   }
 
   if (fields[0]?.startsWith("!")) {
-    return { from, activity: fields[0], isBreak: true };
+    return {
+      from: fromTime,
+      activity: fields[0],
+      isBreak: true,
+    };
   }
-
+  if (fields.length === 1) {
+    const [project] = fields;
+    return {
+      from: fromTime,
+      project,
+    };
+  }
   if (fields.length === 2) {
     const [project, description] = fields;
     return {
-      from,
+      from: fromTime,
       project,
       description,
     };
@@ -78,7 +101,7 @@ function parseReportFields(line: string) {
   if (fields.length === 3) {
     const [project, activity, description] = fields;
     return {
-      from,
+      from: fromTime,
       project,
       activity,
       description,
@@ -118,8 +141,6 @@ function parseIntOrZero(value: string) {
 }
 
 export function calcDurationBetweenTimes(from: string, to: string): number {
-  // console.log("from " + from);
-  // console.log("to " + to);
   if (from == undefined || to == undefined) {
     return null;
   }
