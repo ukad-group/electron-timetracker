@@ -18,12 +18,6 @@ export function parseReport(fileContent: string) {
   let reportComments = "\n";
   let reportCount = 0;
   const timeRegex = /^[0-9]+:[0-9]+/;
-  const hoursRegex = /^[0-9]+/;
-  const minutesRegex = /[0-9]+$/;
-  const dateRegex = /^\s*[0-9]{4}-[0-9]{2}-[0-9]{2}\s*/;
-  const separatorRegex = /^[\\s]*-[\\s]*/;
-  const workingTimeRegex = /^![\\w]*\s/;
-  const textRegex = /^[\\w+\\s*\\w*\\.]+/;
   const lines = fileContent.split("\n").filter(Boolean);
   const reportItems: Array<Partial<ReportActivity>> = [];
   const reportAndNotes: ReportAndNotes = [reportItems, reportComments];
