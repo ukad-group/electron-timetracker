@@ -6,43 +6,45 @@ export type ReportActivity = {
   to: string;
   duration: number;
   project?: string;
-  activity: string;
+  activity?: string;
   description?: string;
   isBreak?: boolean;
 };
+export type ReportAndNotes = [Array<Partial<ReportActivity>>, string];
 
 export function parseReport(fileContent: string) {
   if (!fileContent) return [];
 
+  let reportComments = "\n";
+  let reportCount = 0;
+  const timeRegex = /^[0-9]+:[0-9]+/;
+  const hoursRegex = /^[0-9]+/;
+  const minutesRegex = /[0-9]+$/;
+  const dateRegex = /^\s*[0-9]{4}-[0-9]{2}-[0-9]{2}\s*/;
+  const separatorRegex = /^[\\s]*-[\\s]*/;
+  const workingTimeRegex = /^![\\w]*\s/;
+  const textRegex = /^[\\w+\\s*\\w*\\.]+/;
   const lines = fileContent.split("\n").filter(Boolean);
   const reportItems: Array<Partial<ReportActivity>> = [];
+  const reportAndNotes: ReportAndNotes = [reportItems, reportComments];
 
   for (const [i, line] of lines.entries()) {
-    const [from, ...fields] = line.split(" - ");
-
-    if (!from || !fields.length) return null;
-
-    if (fields[0]?.startsWith("!")) {
+    if (timeRegex.test(line.slice(0, 5))) {
+      const fields = parseReportFields(line.replace(/�/g, "-"));
+      if (fields === null) return null;
       reportItems.push({
-        id: i,
-        from,
-        activity: fields[0],
-        isBreak: true,
+        id: reportCount,
+        ...fields,
       });
+      if (reportCount > 0) {
+        reportItems[reportCount - 1].to = fields.from;
+      }
+      reportCount++;
     } else {
-      const [project, activity, description] = fields;
-      reportItems.push({
-        id: i,
-        from,
-        project,
-        activity,
-        description,
-      });
-    }
-    if (i > 0) {
-      reportItems[i - 1].to = from;
+      reportComments += line + "\n";
     }
   }
+  reportAndNotes[1] = reportComments;
 
   if (reportItems[reportItems.length - 1].isBreak) {
     reportItems.pop();
@@ -54,10 +56,66 @@ export function parseReport(fileContent: string) {
     item.duration = calcDurationBetweenTimes(item.from, item.to);
   }
 
-  return reportItems as Array<ReportActivity>;
+  return reportAndNotes as ReportAndNotes;
 }
 
-export function serializeReport(activities: Array<ReportActivity>) {
+function parseReportFields(line: string) {
+  const timeRegex = /^[0-9]+:[0-9]+/;
+  const [from, ...fields] = line.split(" - ");
+
+  if (!from) return null;
+  let fromTime = timeRegex.exec(from)[0];
+
+  if (Number(fromTime.slice(0, 2)) > 23) {
+    fromTime = "23:59";
+  }
+  if (Number(fromTime.slice(3, 5)) > 59) {
+    fromTime = fromTime.slice(0, -2) + "59";
+  }
+
+  if (!fields[0]) {
+    fields[0] = "!";
+    return {
+      from: fromTime,
+      activity: fields[0],
+      isBreak: true,
+    };
+  }
+
+  if (fields[0]?.startsWith("!")) {
+    return {
+      from: fromTime,
+      activity: fields[0],
+      isBreak: true,
+    };
+  }
+  if (fields.length === 1) {
+    const [project] = fields;
+    return {
+      from: fromTime,
+      project,
+    };
+  }
+  if (fields.length === 2) {
+    const [project, description] = fields;
+    return {
+      from: fromTime,
+      project,
+      description,
+    };
+  }
+  if (fields.length === 3) {
+    const [project, activity, description] = fields;
+    return {
+      from: fromTime,
+      project,
+      activity,
+      description,
+    };
+  }
+}
+
+export function serializeReport(activities: Array<Partial<ReportActivity>>) {
   let report = "";
   for (const [i, activity] of activities.entries()) {
     const parts: Array<string> = [activity.from];
@@ -66,7 +124,9 @@ export function serializeReport(activities: Array<ReportActivity>) {
       parts.push(activity.project);
     }
 
-    parts.push(activity.activity);
+    if (activity.activity) {
+      parts.push(activity.activity);
+    }
 
     if (activity.description) {
       parts.push(activity.description);
@@ -87,6 +147,9 @@ function parseIntOrZero(value: string) {
 }
 
 export function calcDurationBetweenTimes(from: string, to: string): number {
+  if (from == undefined || to == undefined) {
+    return null;
+  }
   const startParts = from.split(":");
   const endParts = to.split(":");
 

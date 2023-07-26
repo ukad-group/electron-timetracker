@@ -3,7 +3,12 @@ import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
 import Header from "../components/Header";
-import { ReportActivity, parseReport, serializeReport } from "../utils/reports";
+import {
+  ReportActivity,
+  parseReport,
+  serializeReport,
+  ReportAndNotes,
+} from "../utils/reports";
 import TrackTimeModal from "../components/TrackTimeModal";
 import ManualInputForm from "../components/ManualInputForm";
 import ActivitiesSection from "../components/ActivitiesSection";
@@ -25,6 +30,9 @@ export default function Home() {
     ReportActivity | "new"
   >(null);
   const [latestProjects, setLatestProjects] = useState<Array<string>>([]);
+  const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
+    []
+  );
 
   useEffect(() => {
     (async () => {
@@ -47,8 +55,9 @@ export default function Home() {
 
   useEffect(() => {
     if (selectedDateReport) {
-      const activities = parseReport(selectedDateReport);
-      setSelectedDateActivities(activities?.filter((act) => !act.isBreak));
+      setReportAndNotes(parseReport(selectedDateReport));
+      const activities = parseReport(selectedDateReport)[0];
+      setSelectedDateActivities(activities.filter((act) => !act.isBreak));
       return;
     }
     setSelectedDateActivities([]);
@@ -57,7 +66,8 @@ export default function Home() {
   // Save report on change
   useEffect(() => {
     if (shouldAutosave) {
-      const serializedReport = serializeReport(selectedDateActivities);
+      const serializedReport =
+        serializeReport(selectedDateActivities) + reportAndNotes[1];
       saveSerializedReport(serializedReport);
       setShouldAutosave(false);
     }
