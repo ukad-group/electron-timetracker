@@ -7,8 +7,8 @@ import {
 } from "../utils/reports";
 
 type ActivitiesTableProps = {
-  activities: Array<ReportActivity>;
-  onEditActivity: (activity: ReportActivity) => void;
+  activities: Array<Partial<ReportActivity>>;
+  onEditActivity: (activity: Partial<ReportActivity>) => void;
 };
 const msPerHour = 60 * 60 * 1000;
 export default function ActivitiesTable({

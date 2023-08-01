@@ -11,37 +11,114 @@ export type ReportActivity = {
   isBreak?: boolean;
   isRightTime?: boolean;
 };
-export type ReportAndNotes = [Array<Partial<ReportActivity>>, string];
 
 export function parseReport(fileContent: string) {
   if (!fileContent) return [];
 
-  let reportComments = "\n";
   let reportCount = 0;
-  const timeRegex =
-    /^[0-9]+:[0-9]+[\ \t]-[\ \t]*$|^[0-9]+:[0-9]+[\ \t]-[\ \t].*/;
+  const timeRegex = /^[0-9]+:[0-9]+/;
+  const hoursRegex = /^[0-9]+/;
+  const minutesRegex = /[0-9]+$/;
+  const dateRegex = /^\s*[0-9]{4}-[0-9]{2}-[0-9]{2}\s*/;
+  const separatorRegex = /^[\s]*-[\s]*/;
+  const workingTimeRegex = /^![\w]*/;
+  const textRegex = /^[\w+\s*\w*\.]+/;
   const lines = fileContent.split("\n").filter(Boolean);
   const reportItems: Array<Partial<ReportActivity>> = [];
-  const reportAndNotes: ReportAndNotes = [reportItems, reportComments];
 
-  for (const [i, line] of lines.entries()) {
-    if (timeRegex.test(line.slice(0, 8))) {
-      const fields = parseReportFields(line);
-      if (fields === null) return null;
-      reportItems.push({
-        id: reportCount,
-        ...fields,
-      });
-      if (reportCount > 0) {
-        reportItems[reportCount - 1].to = fields.from;
-      }
-
-      reportCount++;
-    } else {
-      reportComments += line + "\n";
+  for (const line of lines) {
+    if (!timeRegex.test(line.slice(0, 8))) {
+      continue;
     }
+    const registration = {
+      id: reportCount,
+      from: "",
+      project: "",
+      activity: "",
+      description: "",
+      isBreak: false,
+      isRightTime: true,
+    };
+
+    // This code uses the string type to write the time.
+    const timeMatch = line.match(timeRegex);
+    const hours = parseInt(timeMatch[0].match(hoursRegex)[0]);
+    const minutes = parseInt(timeMatch[0].match(minutesRegex)[0]);
+    const startTime = new Date();
+    startTime.setHours(hours);
+    startTime.setMinutes(minutes);
+    // const from = startTime;
+
+    registration.from = timeRegex.exec(line)[0];
+    if (reportCount > 0) {
+      reportItems[reportCount - 1].to = registration.from;
+
+      //This code uses another function in the api.
+      // reportItems[reportCount - 1].duration = Math.floor((reportItems[reportCount - 1].to - reportItems[reportCount - 1].from) / (1000 * 60));
+
+      reportItems[reportCount - 1].duration = calcDurationBetweenTimes(
+        reportItems[reportCount - 1].from,
+        reportItems[reportCount - 1].to
+      );
+    }
+    // removing time
+    let currentLine = line.replace(timeRegex, "");
+
+    // removing registrationDate if exists. Request from Denys Denysenko
+    if (dateRegex.test(currentLine)) {
+      const dateAsString = currentLine.match(dateRegex)[0];
+      currentLine = currentLine.replace(dateAsString, "");
+    }
+
+    // removing ' - '
+    currentLine = currentLine.replace(separatorRegex, "");
+
+    // should skip registraion when task starts from !
+    const isBreak = workingTimeRegex.test(currentLine) || !currentLine;
+    if (isBreak) {
+      registration.description = currentLine;
+      registration.isBreak = isBreak;
+      reportItems.push(registration);
+      reportCount++;
+      continue;
+    }
+    let projectName = currentLine.match(textRegex)[0];
+
+    if (projectName) {
+      registration.project = projectName.trim().toLowerCase();
+
+      // removing project name
+      const index = currentLine.indexOf(projectName);
+      currentLine =
+        index < 0
+          ? currentLine
+          : currentLine.slice(0, index) +
+            currentLine.slice(index + projectName.length);
+      // removing ' - '
+      currentLine = currentLine.replace(separatorRegex, "");
+    }
+
+    const activityInTheLinePattern =
+      startTime > new Date(2016, 7, 23) ? /(.+?)\s-\s+/ : /(.+?)-\s*/;
+    const activityInTheLineRegex = new RegExp(activityInTheLinePattern);
+
+    if (activityInTheLineRegex.test(currentLine)) {
+      let activityName = currentLine.match(activityInTheLineRegex)[1];
+
+      registration.activity =
+        startTime > new Date(2016, 7, 26)
+          ? activityName.trim()
+          : activityName.trim().toLowerCase();
+
+      // removing activity with '-'
+      currentLine = currentLine.replace(activityInTheLineRegex, "");
+    }
+    registration.description = currentLine.replace(/�/g, "-");
+
+    reportItems.push(registration);
+
+    reportCount++;
   }
-  reportAndNotes[1] = reportComments;
 
   if (reportItems[reportItems.length - 1].isBreak) {
     reportItems.pop();
@@ -49,96 +126,7 @@ export function parseReport(fileContent: string) {
     reportItems[reportItems.length - 1].to = "23:59";
   }
 
-  for (const item of reportItems) {
-    item.duration = calcDurationBetweenTimes(item.from, item.to);
-  }
-
-  return reportAndNotes as ReportAndNotes;
-}
-
-function parseReportFields(line: string) {
-  const [from, ...fields] = line
-    .replace(/�/g, "-")
-    .trim()
-    .split(/[\ \t]-[\ \t]/);
-
-  if (!from) return null;
-  const fromTime = timeParsing(from);
-
-  if (!fields[0]) {
-    fields[0] = "!";
-    return {
-      from: fromTime.time,
-      activity: fields[0],
-      isBreak: true,
-      isRightTime: fromTime.isRightTime,
-    };
-  }
-
-  if (fields[0]?.startsWith("!")) {
-    return {
-      from: fromTime.time,
-      activity: fields[0],
-      isBreak: true,
-      isRightTime: fromTime.isRightTime,
-    };
-  }
-  if (fields.length === 1) {
-    const [project] = fields;
-    return {
-      from: fromTime.time,
-      project,
-      isRightTime: fromTime.isRightTime,
-    };
-  }
-  if (fields.length === 2) {
-    const [project, description] = fields;
-    return {
-      from: fromTime.time,
-      project,
-      description,
-      isRightTime: fromTime.isRightTime,
-    };
-  }
-  if (fields.length === 3) {
-    const [project, activity, description] = fields;
-    return {
-      from: fromTime.time,
-      project,
-      activity,
-      description,
-      isRightTime: fromTime.isRightTime,
-    };
-  }
-}
-
-function timeParsing(time: string) {
-  const timeRegex = /^[0-9]+:[0-9]+/;
-  const strictRegex = /^(0[0-9]|1[0-9]|2[0-3]):([0-5][0-9])$/;
-  let isRightTime = true;
-
-  time = timeRegex.exec(time)[0];
-
-  if (!strictRegex.test(time)) {
-    const [hours, minutes] = time.split(":");
-    if (minutes.length < 2) {
-      time = `${hours}:${minutes}0`;
-    }
-    if (hours.length < 2) {
-      time = `0${hours}:${minutes}`;
-    }
-    if (hours.length < 2 && minutes.length < 2) {
-      time = `0${hours}:${minutes}0`;
-    }
-  }
-
-  if (Number(time.slice(0, 2)) > 23) {
-    isRightTime = false;
-  }
-  if (Number(time.slice(3, 5)) > 59) {
-    isRightTime = false;
-  }
-  return { time, isRightTime };
+  return reportItems as Array<Partial<ReportActivity>>;
 }
 
 export function serializeReport(activities: Array<Partial<ReportActivity>>) {
