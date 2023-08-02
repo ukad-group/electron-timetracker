@@ -4,8 +4,8 @@ import { ReportActivity } from "../utils/reports";
 import { PlusIcon } from "@heroicons/react/24/solid";
 
 type ActivitiesSectionProps = {
-  activities: Array<ReportActivity>;
-  onEditActivity: (activity: ReportActivity | "new") => void;
+  activities: Array<Partial<ReportActivity>>;
+  onEditActivity: (activity: Partial<ReportActivity> | "new") => void;
 };
 
 type PlaceholderProps = Pick<ActivitiesSectionProps, "onEditActivity">;

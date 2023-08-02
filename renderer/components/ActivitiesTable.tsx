@@ -1,14 +1,10 @@
 import clsx from "clsx";
 import { useMemo, useEffect } from "react";
-import {
-  ReportActivity,
-  formatDuration,
-  checkIntersection,
-} from "../utils/reports";
+import { ReportActivity, formatDuration } from "../utils/reports";
 
 type ActivitiesTableProps = {
-  activities: Array<ReportActivity>;
-  onEditActivity: (activity: ReportActivity) => void;
+  activities: Array<Partial<ReportActivity>>;
+  onEditActivity: (activity: Partial<ReportActivity>) => void;
 };
 const msPerHour = 60 * 60 * 1000;
 export default function ActivitiesTable({
@@ -16,20 +12,12 @@ export default function ActivitiesTable({
   onEditActivity,
 }: ActivitiesTableProps) {
   const nonBreakActivities = useMemo(() => {
-    for (let i = 0; i < activities.length; i++) {
-      if (
-        i > 0 &&
-        checkIntersection(activities[i - 1].to, activities[i].from)
-      ) {
-        activities[i - 1].isRightTime = false;
-      }
-    }
     return activities.filter((activity) => !activity.isBreak);
   }, [activities]);
 
   const totalDuration = useMemo(() => {
     return nonBreakActivities.reduce((value, activity) => {
-      return value + activity.duration;
+      return value + (activity.duration ? activity.duration : 0);
     }, 0);
   }, [nonBreakActivities]);
 
@@ -79,7 +67,7 @@ export default function ActivitiesTable({
               <span
                 className={clsx({
                   "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800":
-                    !activity.isRightTime,
+                    Number(activity.duration) <= 0,
                 })}
               >
                 {activity.from} - {activity.to}
