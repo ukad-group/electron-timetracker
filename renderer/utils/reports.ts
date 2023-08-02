@@ -11,11 +11,12 @@ export type ReportActivity = {
   isBreak?: boolean;
   isRightTime?: boolean;
 };
-
+export type ReportAndNotes = [Array<Partial<ReportActivity>>, string];
 export function parseReport(fileContent: string) {
   if (!fileContent) return [];
 
   let reportCount = 0;
+  let reportComments = "";
   const timeRegex = /^[0-9]+:[0-9]+/;
   const hoursRegex = /^[0-9]+/;
   const minutesRegex = /[0-9]+$/;
@@ -23,11 +24,14 @@ export function parseReport(fileContent: string) {
   const separatorRegex = /^[\s]*-[\s]*/;
   const workingTimeRegex = /^![\w]*/;
   const textRegex = /^[\w+\s*\w*\.]+/;
-  const lines = fileContent.split("\n").filter(Boolean);
+  const lines = fileContent.split("\n");
   const reportItems: Array<Partial<ReportActivity>> = [];
+  const reportAndNotes: ReportAndNotes = [reportItems, reportComments];
 
   for (const line of lines) {
+    console.log(line);
     if (!timeRegex.test(line.slice(0, 8))) {
+      reportComments += line + "\n";
       continue;
     }
     const registration = {
@@ -121,8 +125,8 @@ export function parseReport(fileContent: string) {
 
     reportCount++;
   }
-
-  return reportItems as Array<Partial<ReportActivity>>;
+  reportAndNotes[1] = reportComments;
+  return reportAndNotes as ReportAndNotes;
 }
 
 export function serializeReport(activities: Array<Partial<ReportActivity>>) {

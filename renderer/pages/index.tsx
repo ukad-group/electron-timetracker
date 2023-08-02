@@ -3,7 +3,12 @@ import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
 import Header from "../components/Header";
-import { ReportActivity, parseReport, serializeReport } from "../utils/reports";
+import {
+  ReportActivity,
+  parseReport,
+  serializeReport,
+  ReportAndNotes,
+} from "../utils/reports";
 import TrackTimeModal from "../components/TrackTimeModal";
 import ManualInputForm from "../components/ManualInputForm";
 import ActivitiesSection from "../components/ActivitiesSection";
@@ -18,14 +23,16 @@ export default function Home() {
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDateReport, setSelectedDateReport] = useState("");
-  const [selectedDateActivities, setSelectedDateActivities] = useState<Array<
-    Partial<ReportActivity>
-  > | null>([]);
+  const [selectedDateActivities, setSelectedDateActivities] =
+    useState<Array<ReportActivity> | null>([]);
   const [shouldAutosave, setShouldAutosave] = useState(false);
   const [trackTimeModalActivity, setTrackTimeModalActivity] = useState<
     Partial<ReportActivity> | "new"
   >(null);
   const [latestProjects, setLatestProjects] = useState<Array<string>>([]);
+  const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
+    []
+  );
 
   useEffect(() => {
     (async () => {
@@ -48,7 +55,8 @@ export default function Home() {
 
   useEffect(() => {
     if (selectedDateReport) {
-      const activities = parseReport(selectedDateReport);
+      setReportAndNotes(parseReport(selectedDateReport));
+      const activities = parseReport(selectedDateReport)[0];
       setSelectedDateActivities(activities.filter((act) => !act.isBreak));
       return;
     }
@@ -58,7 +66,8 @@ export default function Home() {
   // Save report on change
   useEffect(() => {
     if (shouldAutosave) {
-      const serializedReport = serializeReport(selectedDateActivities);
+      const serializedReport =
+        serializeReport(selectedDateActivities) + reportAndNotes[1];
       saveSerializedReport(serializedReport);
       setShouldAutosave(false);
     }
