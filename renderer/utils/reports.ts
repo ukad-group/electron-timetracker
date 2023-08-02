@@ -9,7 +9,6 @@ export type ReportActivity = {
   activity?: string;
   description?: string;
   isBreak?: boolean;
-  isRightTime?: boolean;
 };
 export type ReportAndNotes = [Array<Partial<ReportActivity>>, string];
 export function parseReport(fileContent: string) {
@@ -167,11 +166,11 @@ export function calcDurationBetweenTimes(from: string, to: string): number {
   const startParts = from.split(":");
   const endParts = to.split(":");
 
-  const startHours = parseIntOrZero(startParts[0]);
-  const startMinutes = parseIntOrZero(startParts[1]);
+  const startHours = parseInt(startParts[0], 10) || 0;
+  const startMinutes = parseInt(startParts[1], 10) || 0;
 
-  const endHours = parseIntOrZero(endParts[0]);
-  const endMinutes = parseIntOrZero(endParts[1]);
+  const endHours = parseInt(endParts[0], 10) || 0;
+  const endMinutes = parseInt(endParts[1], 10) || 0;
 
   const startTotalMinutes = startHours * 60 + startMinutes;
   const endTotalMinutes = endHours * 60 + endMinutes;

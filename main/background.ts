@@ -1,10 +1,10 @@
 import fs from "fs";
 import { app, dialog, ipcMain } from "electron";
 import serve from "electron-serve";
+import { autoUpdater } from "electron-updater";
 import { createWindow } from "./helpers";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath } from "./helpers/fs";
-import { autoUpdater } from "electron-updater";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -120,7 +120,6 @@ ipcMain.handle(
   }
 );
 
-//Updater
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
