@@ -74,7 +74,7 @@ export function parseReport(fileContent: string) {
     currentLine = currentLine.replace(separatorRegex, "");
 
     // should skip registraion when task starts from !
-    const isBreak = workingTimeRegex.test(currentLine) || !currentLine;
+    const isBreak = workingTimeRegex.test(currentLine);
     if (isBreak) {
       registration.description = currentLine;
       registration.isBreak = isBreak;
@@ -82,7 +82,9 @@ export function parseReport(fileContent: string) {
       reportCount++;
       continue;
     }
-    let projectName = currentLine.match(textRegex)[0];
+    let projectName = currentLine.match(textRegex)
+      ? currentLine.match(textRegex)[0]
+      : "";
 
     if (projectName) {
       registration.project = projectName.trim().toLowerCase();
@@ -120,12 +122,6 @@ export function parseReport(fileContent: string) {
     reportCount++;
   }
 
-  if (reportItems[reportItems.length - 1].isBreak) {
-    reportItems.pop();
-  } else {
-    reportItems[reportItems.length - 1].to = "23:59";
-  }
-
   return reportItems as Array<Partial<ReportActivity>>;
 }
 
@@ -150,7 +146,7 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
 
     const nextActivity = activities[i + 1];
     if (!nextActivity || nextActivity.from !== activity.to) {
-      report += `${activity.to} - !\n`;
+      activity.to ? (report += `${activity.to} - !\n`) : "";
     }
   }
   return report;
@@ -184,20 +180,13 @@ export function calcDurationBetweenTimes(from: string, to: string): number {
 }
 
 export function formatDuration(ms: number): string {
+  if (ms == undefined) return;
   const minutes = ms / 1000 / 60;
   const hours = minutes / 60;
 
   if (Math.abs(hours) < 1) {
     const minutes = Math.round(ms / 1000 / 60);
     return `${minutes}m`;
-  } else {
-    return `${Math.floor(hours * 10) / 10}h`;
   }
-}
-export function checkIntersection(previousTo: string, currentFrom: string) {
-  const [hoursTo, minutesTo] = previousTo.split(":");
-  const [hoursFrom, minutesFrom] = currentFrom.split(":");
-  const toInMinutes = Number(hoursTo) * 60 + Number(minutesTo);
-  const fromInMinutes = Number(hoursFrom) * 60 + Number(minutesFrom);
-  return fromInMinutes < toInMinutes;
+  return `${Math.floor(hours * 10) / 10}h`;
 }
