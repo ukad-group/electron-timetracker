@@ -2,7 +2,7 @@
   "private": true,
   "name": "timetracker",
   "description": "Timetracker app",
-  "version": "0.0.18",
+  "version": "1.0.19",
   "author": "mmmykhailo <mmmykhailo@proton.me>",
   "main": "app/background.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "releaseType": "release"
   },
   "build": {
-    "appId": "com.timetracker.autoupdate",
+    "appId": "com.timetracker.autoupdater",
     "productName": "Timetracker",
     "win": {
       "target": "nsis"
