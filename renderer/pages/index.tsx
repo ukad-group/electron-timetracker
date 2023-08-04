@@ -84,29 +84,30 @@ export default function Home() {
   };
 
   const submitActivity = (activity: ReportActivity) => {
-    setShouldAutosave(true);
-    if (activity.id === null) {
-      setSelectedDateActivities((activities) => [
-        ...activities,
-        {
-          ...activity,
-          id: activities.reduce((id, curr) => {
-            if (curr.id >= id) return curr.id + 1;
-            return id;
-          }, 0),
-        },
-      ]);
-      return;
-    }
+    const tempActivities: Array<ReportActivity> = [];
+    const newActTime = stringToMinutes(activity.from);
 
-    setSelectedDateActivities((activities) => {
-      const activityIndex = activities.findIndex(
-        (act) => act.id === activity.id
-      );
-      activities[activityIndex] = activity;
-      return [...activities];
-    });
+    for (let i = 0; i < selectedDateActivities.length; i++) {
+      const indexActTime = stringToMinutes(selectedDateActivities[i].from);
+      if (newActTime < indexActTime) {
+        tempActivities.push(activity);
+      }
+      if (!i && newActTime < indexActTime) {
+        tempActivities.push(...selectedDateActivities);
+        break;
+      }
+      tempActivities.push(selectedDateActivities[i]);
+    }
+    tempActivities.forEach((act, i) => (act.id = i));
+    setShouldAutosave(true);
+    setSelectedDateActivities(tempActivities);
   };
+
+  const stringToMinutes = (string: string) => {
+    const [hours, minutes] = string.split(":");
+    return Number(hours) * 60 + Number(minutes);
+  };
+
   const handleSave = (report: string, shouldAutosave: boolean) => {
     setSelectedDateReport(report);
     setShouldAutosave(shouldAutosave);

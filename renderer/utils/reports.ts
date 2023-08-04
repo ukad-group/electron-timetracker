@@ -28,7 +28,6 @@ export function parseReport(fileContent: string) {
   const reportAndNotes: ReportAndNotes = [reportItems, reportComments];
 
   for (const line of lines) {
-    console.log(line);
     if (!timeRegex.test(line.slice(0, 8))) {
       reportComments += line + "\n";
       continue;
