@@ -1,0 +1,29 @@
+name: publish release
+on:
+  push:
+    # Sequence of patterns matched against refs/heads
+    branches:
+      - main
+      - master
+    tags:
+      - v*
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # container:
+    #     image: node:20.5.0
+    #     # env:
+    #     #   NODE_ENV: development
+    #     # ports:
+    #     #   - 80
+    #     volumes:
+    #       - ./:/app
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      - run: npm install
+      - run: npm run build
+      - run: npm run dist
