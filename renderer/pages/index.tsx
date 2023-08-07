@@ -51,6 +51,13 @@ export default function Home() {
         )
       );
     })();
+
+    ipcRenderer.send("start-file-watcher", reportsFolder, selectedDate);
+    ipcRenderer.on("file-changed", (event, data) => {
+      if (selectedDateReport != data) {
+        setSelectedDateReport(data || "");
+      }
+    });
   }, [selectedDate]);
 
   useEffect(() => {
