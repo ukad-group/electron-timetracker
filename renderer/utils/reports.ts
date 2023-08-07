@@ -5,7 +5,7 @@ export type ReportActivity = {
   from: string;
   to: string;
   duration: number;
-  project?: string;
+  project: string;
   activity?: string;
   description?: string;
   isBreak?: boolean;
@@ -28,7 +28,6 @@ export function parseReport(fileContent: string) {
   const reportAndNotes: ReportAndNotes = [reportItems, reportComments];
 
   for (const line of lines) {
-    console.log(line);
     if (!timeRegex.test(line.slice(0, 8))) {
       reportComments += line + "\n";
       continue;

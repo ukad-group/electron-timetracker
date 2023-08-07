@@ -12,11 +12,11 @@ import {
 
 type TrackTimeModalProps = {
   isOpen: boolean;
-  editedActivity: Partial<ReportActivity> | "new";
+  editedActivity: ReportActivity | "new";
   latestProjects: Array<string>;
   close: () => void;
   submitActivity: (
-    activity: Omit<ReportActivity, "id"> & Partial<Pick<ReportActivity, "id">>
+    activity: Omit<ReportActivity, "id"> & Pick<ReportActivity, "id">
   ) => void;
 };
 

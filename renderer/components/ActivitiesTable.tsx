@@ -3,8 +3,8 @@ import { useMemo, useEffect } from "react";
 import { ReportActivity, formatDuration } from "../utils/reports";
 
 type ActivitiesTableProps = {
-  activities: Array<Partial<ReportActivity>>;
-  onEditActivity: (activity: Partial<ReportActivity>) => void;
+  activities: Array<ReportActivity>;
+  onEditActivity: (activity: ReportActivity) => void;
 };
 const msPerHour = 60 * 60 * 1000;
 export default function ActivitiesTable({

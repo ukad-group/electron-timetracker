@@ -27,7 +27,7 @@ export default function Home() {
     useState<Array<ReportActivity> | null>([]);
   const [shouldAutosave, setShouldAutosave] = useState(false);
   const [trackTimeModalActivity, setTrackTimeModalActivity] = useState<
-    Partial<ReportActivity> | "new"
+    ReportActivity | "new"
   >(null);
   const [latestProjects, setLatestProjects] = useState<Array<string>>([]);
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
