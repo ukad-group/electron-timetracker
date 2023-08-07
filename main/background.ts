@@ -7,7 +7,7 @@ import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath } from "./helpers/fs";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
-
+type Callback = (data: string | null) => void;
 if (isProd) {
   serve({ directory: "app" });
 } else {
@@ -32,6 +32,26 @@ const userDataDirectory = app.getPath("userData");
     await mainWindow.loadURL(`http://localhost:${port}/`);
     mainWindow.webContents.openDevTools();
   }
+
+  ipcMain.on(
+    "start-file-watcher",
+    (event, reportsFolder: string, selectedDate: Date) => {
+      const timereportPath = getPathFromDate(selectedDate, reportsFolder);
+
+      if (fs.existsSync(timereportPath)) {
+        fs.watch(timereportPath, (eventType, filename) => {
+          if (eventType === "change") {
+            readDataFromFile(timereportPath, (data: string) => {
+              mainWindow.webContents.send("file-changed", data);
+            });
+          }
+        });
+      }
+    }
+  );
+  ipcMain.on("file-changed", (event, data: string) => {
+    mainWindow.webContents.send("file-changed", data);
+  });
 })();
 
 app.on("window-all-closed", () => {
@@ -58,6 +78,16 @@ ipcMain.handle("app:select-folder", async () => {
   }
   return null;
 });
+const readDataFromFile = (timereportPath: string, callback: Callback) => {
+  if (!fs.existsSync(timereportPath)) return callback(null);
+  try {
+    const data = fs.readFileSync(timereportPath, "utf8");
+    callback(data);
+  } catch (err) {
+    console.error(err);
+    callback(null);
+  }
+};
 
 ipcMain.handle(
   "app:read-day-report",
@@ -66,12 +96,11 @@ ipcMain.handle(
 
     const timereportPath = getPathFromDate(date, reportsFolder);
 
-    try {
-      const data = fs.readFileSync(timereportPath, "utf8");
-      return data;
-    } catch (err) {
-      return null;
-    }
+    return new Promise((resolve) => {
+      readDataFromFile(timereportPath, (data) => {
+        resolve(data);
+      });
+    });
   }
 );
 
