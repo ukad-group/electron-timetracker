@@ -9,7 +9,7 @@
     "dev": "nextron",
     "build": "nextron build",
     "postinstall": "electron-builder install-app-deps",
-    "dist": "electron-builder"
+    "dist": "electron-builder --win"
   },
   "repository": "https://github.com/ukad-group/electron-timetracker",
   "publish": {
