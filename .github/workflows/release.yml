@@ -39,12 +39,14 @@ jobs:
       - name: Get previous tag
         id: get_previous_tag
         # run: echo "::set-output name=previous_tag::$(git describe --tags --abbrev=0)"
-        run: echo "$(git describe --tags --abbrev=0)" >> "$previous_tag"
+        # run: echo "$(git describe --tags --abbrev=0)" >> "$previous_tag" # for Linux
+        run: $env:previous_tag = "$(git describe --tags --abbrev=0)" # for Windows
 
       - name: Determine new version
         id: determine_version
         # run: echo "::set-output name=version::$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})"
-        run: echo "$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" >> "$version"
+        # run: echo "$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" >> "$version"
+        run: $env:version = "$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" # for Windows
 
       - uses: marvinpinto/action-automatic-releases@latest
         with:
