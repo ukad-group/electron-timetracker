@@ -20,6 +20,7 @@
   "build": {
     "appId": "com.timetracker.autoupdater",
     "productName": "Timetracker",
+    "artifactName": "${productName}-Setup-${version}.${ext}",
     "win": {
       "target": "nsis"
     },
