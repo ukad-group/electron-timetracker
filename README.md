@@ -60,7 +60,7 @@ npm run build
 
 ## Github Actions (CI/CD)
 
-Generate token with permission `Contents` - RW, `Secrets` - RO, `Metadata` - RO,
+App version in `package.json` modify using tag version (tag`v0.0.1` -> `0.0.1`)
 
 ## Contact
 

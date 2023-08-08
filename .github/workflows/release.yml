@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - master
-      - feature/*
     tags:
       - v*
 jobs:
@@ -31,7 +30,7 @@ jobs:
 
       - name: Set version in package.json
         shell: bash
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/v')
         run: |
           sed -i 's|"version":.*|"version":"${{ steps.findandreplace.outputs.value }}",|g' package.json
           cat package.json
