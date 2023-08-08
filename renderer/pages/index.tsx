@@ -84,13 +84,26 @@ export default function Home() {
   };
 
   const submitActivity = (activity: ReportActivity) => {
+    let isEdit = false;
     const tempActivities: Array<ReportActivity> = [];
     const newActTime = stringToMinutes(activity.from);
+    const activityIndex = selectedDateActivities.findIndex(
+      (act) => act.id === activity.id
+    );
     if (!selectedDateActivities.length) {
+      activity.id = 1;
       tempActivities.push(activity);
       setSelectedDateActivities(tempActivities);
-      return;
     }
+
+    if (activityIndex >= 0) {
+      setSelectedDateActivities((activities) => {
+        activities[activityIndex] = activity;
+        return [...activities];
+      });
+      isEdit = true;
+    }
+
     for (let i = 0; i < selectedDateActivities.length; i++) {
       const indexActTime = stringToMinutes(selectedDateActivities[i].from);
       if (newActTime < indexActTime) {
@@ -102,10 +115,11 @@ export default function Home() {
       }
       tempActivities.push(selectedDateActivities[i]);
     }
-    if (tempActivities.length === selectedDateActivities.length) {
+    if (tempActivities.length === selectedDateActivities.length && !isEdit) {
       tempActivities.push(activity);
     }
-    tempActivities.forEach((act, i) => (act.id = i));
+
+    tempActivities.forEach((act, i) => (act.id = i + 1));
     setShouldAutosave(true);
     setSelectedDateActivities(tempActivities);
   };
