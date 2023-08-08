@@ -28,7 +28,6 @@ The file name is the date in the format yyyymmdd. The data in the file is stored
 - Nextron
 - Tailwind
 
-
 ## Getting Started
 
 To get a local copy up and running follow these simple example steps.
@@ -59,11 +58,13 @@ Production build
 npm run build
 ```
 
+## Github Actions (CI/CD)
+
+App version in `package.json` modify using tag version (tag`v0.0.1` -> `0.0.1`)
+
 ## Contact
 
 Telegram: [@mrdr_scn](https://t.me/mrdr_scn)
-
-
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
