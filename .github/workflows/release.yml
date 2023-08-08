@@ -25,28 +25,28 @@ jobs:
     #       - ./:/app
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-      - run: npm install
-      - run: npm run build
+      #   - uses: actions/setup-node@v3
+      #     with:
+      #       node-version: "16"
+      #   - run: npm install
+      #   - run: npm run build
       #      - run: npm run dist
-      - run: npm run dist-win
-      # env:
-      #   #   releaseType: release
-      #   releaseType: draft
+      #   - run: npm run dist-win
 
       - name: Get previous tag
         id: get_previous_tag
         # run: echo "::set-output name=previous_tag::$(git describe --tags --abbrev=0)"
         # run: echo "$(git describe --tags --abbrev=0)" >> "$previous_tag" # for Linux
-        run: $env:previous_tag = "$(git describe --tags --abbrev=0)" # for Windows
+        # run: $env:previous_tag = "$(git describe --tags --abbrev=0)" # for Windows
+        # run: echo "action_state=yellow" >> $previous_tag
+        run: echo "{previous_tag}=$(git describe --tags --abbrev=0)" >> "$GITHUB_ENV"
 
       - name: Determine new version
         id: determine_version
         # run: echo "::set-output name=version::$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})"
         # run: echo "$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" >> "$version"
-        run: $env:version = "$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" # for Windows
+        # run: $env:version = "$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" # for Windows
+        run: echo "{version}=$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" >> "$GITHUB_ENV"
 
       - uses: marvinpinto/action-automatic-releases@latest
         with:
