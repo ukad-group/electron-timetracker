@@ -10,7 +10,8 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
       GITHUB_TOKEN: ${{ github.token }}
       DEBUG: electron-builder
@@ -29,11 +30,11 @@ jobs:
           node-version: "16"
       - run: npm install
       - run: npm run build
-      #   - run: npm run dist
+      #      - run: npm run dist
       - run: npm run dist-win
-        # env:
-        #   #   releaseType: release
-        #   releaseType: draft
+      # env:
+      #   #   releaseType: release
+      #   releaseType: draft
 
       #   - name: Run tmate
       #     uses: mxschmitt/action-tmate@v2
