@@ -24,7 +24,8 @@ jobs:
           node-version: "16"
 
       - name: set Ver value
-        run: echo "ver=${{ github.ref.release('refs/tags/v', '') }}" >> "$GITHUB_ENV"
+        shell: bash
+        run: echo "ver=${{ github.ref.replace('refs/tags/v', '') }}" >> "$GITHUB_ENV"
 
       - name: Set version in package.json
         shell: bash
