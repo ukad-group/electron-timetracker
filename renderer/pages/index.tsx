@@ -57,7 +57,7 @@ export default function Home() {
         setSelectedDateReport(data || "");
       }
     });
-  }, [selectedDate]);
+  }, [selectedDate, reportsFolder]);
 
   useEffect(() => {
     if (selectedDateReport) {
