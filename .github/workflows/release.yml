@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ github.token }}
+      DEBUG: electron-builder
     # container:
     #     image: node:20.5.0
     #     # env:
@@ -32,11 +33,11 @@ jobs:
         # env:
         #   #   releaseType: release
         #   releaseType: draft
-      - run: npm run  release
-        env:
-          DEBUG: electron-builder
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: my-artifact
-          path: /home/runner/work/tt-test/tt-test/app/
+      - name: Run tmate
+        uses: mxschmitt/action-tmate@v2
+
+    #   - uses: actions/upload-artifact@v3
+    #     with:
+    #       name: my-artifact
+    #       path: /home/runner/work/tt-test/tt-test/app/
