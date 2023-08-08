@@ -39,14 +39,14 @@ jobs:
         # run: echo "$(git describe --tags --abbrev=0)" >> "$previous_tag" # for Linux
         # run: $env:previous_tag = "$(git describe --tags --abbrev=0)" # for Windows
         # run: echo "action_state=yellow" >> $previous_tag
-        run: echo "{previous_tag}=$(git describe --tags --abbrev=0)" >> "$GITHUB_ENV"
+        run: echo "previous_tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_ENV"
 
       - name: Determine new version
         id: determine_version
         # run: echo "::set-output name=version::$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})"
         # run: echo "$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" >> "$version"
         # run: $env:version = "$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" # for Windows
-        run: echo "{version}=$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" >> "$GITHUB_ENV"
+        run: echo "version=$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" >> "$GITHUB_ENV"
 
       - uses: marvinpinto/action-automatic-releases@latest
         with:
