@@ -44,28 +44,35 @@ jobs:
         id: determine_version
         run: echo "::set-output name=version::$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})"
 
-      - name: Create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: marvinpinto/action-automatic-releases@latest
         with:
-          files: dist/*.exe # Change this to the path of your build artifacts
-          tag_name: ${{ steps.determine_version.outputs.version }}
-          release_name: Release ${{ steps.determine_version.outputs.version }}
-          draft: false
+          repo_token: "${{ env.GITHUB_TOKEN }}"
           prerelease: false
+          files: |
+            ./dist/*.exe
 
-      - name: Upload release assets
-        id: upload_release_assets
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/*.exe # Change this to the path of your build artifacts
-          asset_name: asset.zip # Change this to the desired asset name
-          asset_content_type: application/zip
+      #   - name: Create release
+      #     id: create_release
+      #     uses: actions/create-release@v1
+      #     env:
+      #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     with:
+      #       files: dist/*.exe # Change this to the path of your build artifacts
+      #       tag_name: ${{ steps.determine_version.outputs.version }}
+      #       release_name: Release ${{ steps.determine_version.outputs.version }}
+      #       draft: false
+      #       prerelease: false
+
+      #   - name: Upload release assets
+      #     id: upload_release_assets
+      #     uses: actions/upload-release-asset@v1
+      #     env:
+      #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     with:
+      #       upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #       asset_path: dist/*.exe # Change this to the path of your build artifacts
+      #       asset_name: asset.zip # Change this to the desired asset name
+      #       asset_content_type: application/zip
 
       #   - name: Run tmate
       #     uses: mxschmitt/action-tmate@v2
