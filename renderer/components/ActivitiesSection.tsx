@@ -1,8 +1,8 @@
+import { useEffect } from "react";
 import { ClockIcon } from "@heroicons/react/24/outline";
 import ActivitiesTable from "./ActivitiesTable";
 import { ReportActivity } from "../utils/reports";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { useEffect } from "react";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
