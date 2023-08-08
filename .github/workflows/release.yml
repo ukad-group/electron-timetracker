@@ -26,8 +26,8 @@ jobs:
     #       - ./:/app
     steps:
       - uses: actions/checkout@v3
-        # with:
-        #   fetch-depth: 0 # need to get tag
+        with:
+          fetch-depth: 0 # need to get tag
       #   - uses: actions/setup-node@v3
       #     with:
       #       node-version: "16"
@@ -36,18 +36,18 @@ jobs:
       #      - run: npm run dist
       - run: npm run dist-win
 
-      #   - run: echo "$(git describe --tags --abbrev=0)"
-      #   - name: Get previous tag
-      #     id: get_previous_tag
-      #     # run: echo "::set-output name=previous_tag::$(git describe --tags --abbrev=0)"
-      #     # run: echo "$(git describe --tags --abbrev=0)" >> "$previous_tag" # for Linux
-      #     # run: $env:previous_tag = "$(git describe --tags --abbrev=0)" # for Windows
-      #     # run: echo "action_state=yellow" >> $previous_tag
-      #     run: echo "previous_tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_ENV"
-      #     # run: |
-      #     #   $env:previous_tag = "$(git describe --tags --abbrev=0)"
-      #     #   echo "Previous tag: $env:previous_tag"
-      #     # shell: pwsh
+      - run: echo "$(git describe --tags --abbrev=0)"
+      - name: Get previous tag
+        id: get_previous_tag
+        # run: echo "::set-output name=previous_tag::$(git describe --tags --abbrev=0)"
+        # run: echo "$(git describe --tags --abbrev=0)" >> "$previous_tag" # for Linux
+        # run: $env:previous_tag = "$(git describe --tags --abbrev=0)" # for Windows
+        # run: echo "action_state=yellow" >> $previous_tag
+        run: echo "previous_tag=$(git describe --tags --abbrev=0)" >> "$GITHUB_ENV"
+        # run: |
+        #   $env:previous_tag = "$(git describe --tags --abbrev=0)"
+        #   echo "Previous tag: $env:previous_tag"
+        # shell: pwsh
 
       #   - name: Determine new version
       #     id: determine_version
@@ -59,7 +59,8 @@ jobs:
       - uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ env.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
+          #   automatic_release_tag: "latest"
+          automatic_release_tag: "${{ steps.get_previous_tag.outputs.previous_tag }}"
           prerelease: false
           files: |
             ./dist/*.exe
