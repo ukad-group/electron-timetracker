@@ -31,8 +31,10 @@ jobs:
       - name: Set version in package.json
         shell: bash
         run: |
-          sed -i 's|"version":.*|"version":"${{ github.ref.replace(\'refs/tags/v\', \'\')  }}",|g' package.json
+          sed -i 's|"version":.*|"version":"${{ env.ver }}",|g' package.json
           cat package.json
+        env:
+          ver: github.ref.replace("refs/tags/v", "")
 
       - name: Release
         uses: softprops/action-gh-release@v1
