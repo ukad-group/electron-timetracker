@@ -37,7 +37,11 @@ jobs:
       - name: Run tmate
         uses: mxschmitt/action-tmate@v2
 
-    #   - uses: actions/upload-artifact@v3
-    #     with:
-    #       name: my-artifact
-    #       path: /home/runner/work/tt-test/tt-test/app/
+      #   - uses: actions/upload-artifact@v3
+      #     with:
+      #       name: my-artifact
+      #       path: /home/runner/work/tt-test/tt-test/app/
+      - uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: ./dist/
