@@ -1,12 +1,12 @@
 name: publish release
 on:
   push:
-    # Sequence of patterns matched against refs/heads
-    branches:
-      - main
-      - master
-    tags:
-      - v*
+    # # Sequence of patterns matched against refs/heads
+    # branches:
+    #   - main
+    #   - master
+    # tags:
+    #   - v*
   workflow_dispatch:
 jobs:
   build:
