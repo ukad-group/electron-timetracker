@@ -14,7 +14,7 @@ jobs:
     runs-on: windows-latest
     env:
       GITHUB_TOKEN: ${{ github.token }}
-      DEBUG: electron-builder
+    #   DEBUG: electron-builder
     # container:
     #     image: node:20.5.0
     #     # env:
@@ -58,6 +58,7 @@ jobs:
       - uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ env.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
           prerelease: false
           files: |
             ./dist/*.exe
