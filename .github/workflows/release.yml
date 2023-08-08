@@ -30,7 +30,8 @@ jobs:
       - run: npm run build
       - run: npm run dist
         env:
-          releaseType: release
+          #   releaseType: release
+          releaseType: draft
       - uses: actions/upload-artifact@v3
         with:
           name: my-artifact
