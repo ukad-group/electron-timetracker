@@ -29,6 +29,8 @@ jobs:
       - run: npm install
       - run: npm run build
       - run: npm run dist
+        env:
+          releaseType: release
       - uses: actions/upload-artifact@v3
         with:
           name: my-artifact
