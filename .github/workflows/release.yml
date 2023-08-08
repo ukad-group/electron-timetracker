@@ -26,4 +26,6 @@ jobs:
           node-version: "16"
       - run: npm install
       - run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - run: npm run dist
