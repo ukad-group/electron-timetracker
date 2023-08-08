@@ -13,7 +13,8 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write
-    # env:
+    env:
+      GH_TOKEN: ${{ github.token }}
     #   GITHUB_TOKEN: ${{ github.token }}
     #   GITHUB_TOKEN: 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 # used for npm run build
     steps:
@@ -23,8 +24,8 @@ jobs:
           node-version: "16"
       - run: npm install
       - run: npm run build
-        env:
-          GH_TOKEN: ${{ github.token }}
+        # env:
+        #   GH_TOKEN: ${{ github.token }}
       - run: npm run dist-win
 
       - name: Release
