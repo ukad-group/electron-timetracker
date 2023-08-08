@@ -10,6 +10,7 @@ type ProjectSelectorProps = {
   setSelectedProject: Dispatch<SetStateAction<string>>;
   isValidationEnabled: boolean;
   required?: boolean;
+  tabIndex?: number;
 };
 
 export default function ProjectSelector({
@@ -19,6 +20,7 @@ export default function ProjectSelector({
   setSelectedProject,
   isValidationEnabled,
   required = false,
+  tabIndex,
 }: ProjectSelectorProps) {
   const filteredProjects =
     selectedProject === ""
@@ -49,6 +51,7 @@ export default function ProjectSelector({
             }
           )}
           onChange={(event) => setSelectedProject(event.target.value)}
+          tabIndex={tabIndex}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center px-2 rounded-r-md focus:outline-none">
           <ChevronUpDownIcon

@@ -51,6 +51,12 @@ export default function Home() {
         )
       );
     })();
+    ipcRenderer.send("start-file-watcher", reportsFolder, selectedDate);
+    ipcRenderer.on("file-changed", (event, data) => {
+      if (selectedDateReport != data) {
+        setSelectedDateReport(data || "");
+      }
+    });
   }, [selectedDate]);
 
   useEffect(() => {
@@ -84,8 +90,25 @@ export default function Home() {
   };
 
   const submitActivity = (activity: ReportActivity) => {
+    let isEdit = false;
     const tempActivities: Array<ReportActivity> = [];
     const newActTime = stringToMinutes(activity.from);
+    const activityIndex = selectedDateActivities.findIndex(
+      (act) => act.id === activity.id
+    );
+    if (!selectedDateActivities.length) {
+      activity.id = 1;
+      tempActivities.push(activity);
+      setSelectedDateActivities(tempActivities);
+    }
+
+    if (activityIndex >= 0) {
+      setSelectedDateActivities((activities) => {
+        activities[activityIndex] = activity;
+        return [...activities];
+      });
+      isEdit = true;
+    }
 
     for (let i = 0; i < selectedDateActivities.length; i++) {
       const indexActTime = stringToMinutes(selectedDateActivities[i].from);
@@ -98,7 +121,11 @@ export default function Home() {
       }
       tempActivities.push(selectedDateActivities[i]);
     }
-    tempActivities.forEach((act, i) => (act.id = i));
+    if (tempActivities.length === selectedDateActivities.length && !isEdit) {
+      tempActivities.push(activity);
+    }
+
+    tempActivities.forEach((act, i) => (act.id = i + 1));
     setShouldAutosave(true);
     setSelectedDateActivities(tempActivities);
   };
