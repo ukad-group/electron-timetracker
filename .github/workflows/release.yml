@@ -13,9 +13,11 @@ jobs:
   build:
     # runs-on: ubuntu-latest
     runs-on: windows-latest
-    env:
-      #   GITHUB_TOKEN: ${{ github.token }}
-      GITHUB_TOKEN: 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
+    permissions:
+      contents: write
+    # env:
+    #   GITHUB_TOKEN: ${{ github.token }}
+    #   GITHUB_TOKEN: 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
     #   DEBUG: electron-builder
     # container:
     #     image: node:20.5.0
@@ -56,7 +58,6 @@ jobs:
       #     # run: echo "$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" >> "$version"
       #     # run: $env:version = "$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" # for Windows
       #     run: echo "version=$(npx semver -i patch ${{ steps.get_previous_tag.outputs.previous_tag }})" >> "$GITHUB_ENV"
-
       #   - uses: marvinpinto/action-automatic-releases@latest
       #     with:
       #       repo_token: "${{ env.GITHUB_TOKEN }}"
@@ -67,7 +68,6 @@ jobs:
       #       files: |
       #         ./dist/*.exe
       #         ./json
-
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
@@ -75,8 +75,9 @@ jobs:
           files: |
             ./dist/*.exe
             ./json
-        env:
-          token: ${{ env.GITHUB_TOKEN }}
+        # env:
+        #   token: ${{ env.GITHUB_TOKEN }}
+
       #   - name: Run tmate
       #     uses: mxschmitt/action-tmate@v2
 
