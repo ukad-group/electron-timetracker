@@ -23,15 +23,19 @@ jobs:
         with:
           node-version: "16"
 
-      - name: set Ver value
-        shell: bash
-        run: echo "ver=${{ github.ref.replace('refs/tags/v', '') }}" >> "$GITHUB_ENV"
+      - name: Run find-and-replace to remove 'refs/tags/v'
+        uses: mad9000/actions-find-and-replace-string@3
+        id: findandreplace
+        with:
+          source: ${{ github.ref }}
+          find: "refs/tags/v"
+          replace: ""
 
       - name: Set version in package.json
         shell: bash
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          sed -i 's|"version":.*|"version":"${{ env.ver }}",|g' package.json
+          sed -i 's|"version":.*|"version":"${{ steps.findandreplace.outputs.value }}",|g' package.json
           cat package.json
 
       #   - run: npm install
