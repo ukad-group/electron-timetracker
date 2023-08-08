@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
     # container:
     #     image: node:20.5.0
     #     # env:
@@ -26,6 +28,4 @@ jobs:
           node-version: "16"
       - run: npm install
       - run: npm run build
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
       - run: npm run dist
