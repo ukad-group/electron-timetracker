@@ -92,7 +92,11 @@ export default function Home() {
   const submitActivity = (activity: ReportActivity) => {
     const tempActivities: Array<ReportActivity> = [];
     const newActTime = stringToMinutes(activity.from);
-
+    if (!selectedDateActivities.length) {
+      tempActivities.push(activity);
+      setSelectedDateActivities(tempActivities);
+      return;
+    }
     for (let i = 0; i < selectedDateActivities.length; i++) {
       const indexActTime = stringToMinutes(selectedDateActivities[i].from);
       if (newActTime < indexActTime) {
@@ -103,6 +107,9 @@ export default function Home() {
         break;
       }
       tempActivities.push(selectedDateActivities[i]);
+    }
+    if (tempActivities.length === selectedDateActivities.length) {
+      tempActivities.push(activity);
     }
     tempActivities.forEach((act, i) => (act.id = i));
     setShouldAutosave(true);
