@@ -32,10 +32,10 @@ jobs:
       #   - uses: actions/setup-node@v3
       #     with:
       #       node-version: "16"
-      #   - run: npm install
-      #   - run: npm run build
+      - run: npm install
+      - run: npm run build
       #      - run: npm run dist
-      #   - run: npm run dist-win
+      - run: npm run dist-win
 
       - run: echo "$(git describe --tags --abbrev=0)"
       - name: Get previous tag
@@ -61,8 +61,8 @@ jobs:
         with:
           repo_token: "${{ env.GITHUB_TOKEN }}"
           #   automatic_release_tag: "latest"
-          #   automatic_release_tag: "${{ env.previous_tag }}"
-          automatic_release_tag: "${{ github.ref_name }}"
+          automatic_release_tag: "${{ env.previous_tag }}"
+          #   automatic_release_tag: "${{ github.ref_name }}"
           prerelease: false
           files: |
             ./dist/*.exe
