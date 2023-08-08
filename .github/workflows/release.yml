@@ -33,6 +33,8 @@ jobs:
         #   #   releaseType: release
         #   releaseType: draft
       - run: npm run  release
+        env:
+          DEBUG: electron-builder
 
       - uses: actions/upload-artifact@v3
         with:
