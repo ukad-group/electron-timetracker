@@ -13,7 +13,8 @@ jobs:
     # runs-on: ubuntu-latest
     runs-on: windows-latest
     env:
-      GITHUB_TOKEN: ${{ github.token }}
+      #   GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: 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
     #   DEBUG: electron-builder
     # container:
     #     image: node:20.5.0
