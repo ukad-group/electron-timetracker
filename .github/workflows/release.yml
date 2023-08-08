@@ -22,21 +22,23 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: "16"
-      - run: npm install
-      - run: npm run build
-        # env:
-        #   GH_TOKEN: ${{ github.token }}
-      - run: npm run dist-win
 
       - name: Set version in package.json
         shell: bash
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
           sed -i 's|"version":.*|"version":"${{ env.ver }}",|g' package.json
           cat package.json
         env:
-          ver: github.ref.replace("refs/tags/v", "")
+          ver: ${{ github.ref.replace('refs/tags/v', '') }}
 
-      - name: Release
+      #   - run: npm install
+      #   - run: npm run build
+      #     # env:
+      #     #   GH_TOKEN: ${{ github.token }}
+      #   - run: npm run dist-win
+
+      - name: Publish release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
