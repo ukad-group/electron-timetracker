@@ -34,8 +34,8 @@ jobs:
         #   #   releaseType: release
         #   releaseType: draft
 
-      - name: Run tmate
-        uses: mxschmitt/action-tmate@v2
+      #   - name: Run tmate
+      #     uses: mxschmitt/action-tmate@v2
 
       #   - uses: actions/upload-artifact@v3
       #     with:
