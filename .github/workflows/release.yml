@@ -23,14 +23,15 @@ jobs:
         with:
           node-version: "16"
 
+      - name: set Ver value
+        run: echo "ver=${{ github.ref.release('refs/tags/v', '') }}" >> "$GITHUB_ENV"
+
       - name: Set version in package.json
         shell: bash
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           sed -i 's|"version":.*|"version":"${{ env.ver }}",|g' package.json
           cat package.json
-        env:
-          ver: ${{ github.ref.replace('refs/tags/v', '') }}
 
       #   - run: npm install
       #   - run: npm run build
