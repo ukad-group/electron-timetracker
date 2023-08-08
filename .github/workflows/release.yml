@@ -15,8 +15,6 @@ jobs:
       contents: write
     env:
       GH_TOKEN: ${{ github.token }}
-    #   GITHUB_TOKEN: ${{ github.token }}
-    #   GITHUB_TOKEN: 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 # used for npm run build
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -38,11 +36,9 @@ jobs:
           sed -i 's|"version":.*|"version":"${{ steps.findandreplace.outputs.value }}",|g' package.json
           cat package.json
 
-      #   - run: npm install
-      #   - run: npm run build
-      #     # env:
-      #     #   GH_TOKEN: ${{ github.token }}
-      #   - run: npm run dist-win
+      - run: npm install
+      - run: npm run build
+      - run: npm run dist-win
 
       - name: Publish release
         uses: softprops/action-gh-release@v1
@@ -50,4 +46,3 @@ jobs:
         with:
           files: |
             ./dist/*.exe
-            ./json
