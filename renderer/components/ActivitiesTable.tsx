@@ -39,15 +39,10 @@ export default function ActivitiesTable({
           </th>
           <th
             scope="col"
-            className="pb-3.5 px-3 text-left text-sm font-semibold text-gray-900"
+            className="pb-3.5 px-3 text-left text-sm font-semibold text-gray-900 relative
+            after:content-['activity*'] after:block after:absolute after:text-xs after:text-gray-500 after:top-[18px]"
           >
             Project
-          </th>
-          <th
-            scope="col"
-            className="pb-3.5 px-3 text-left text-sm font-semibold text-gray-900"
-          >
-            Activity
           </th>
           <th
             scope="col"
@@ -76,11 +71,9 @@ export default function ActivitiesTable({
             <td className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
               {formatDuration(activity.duration)}
             </td>
-            <td className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
-              {activity.project}
-            </td>
             <td className="px-3 py-4 text-sm font-medium text-gray-900">
-              {activity.activity}
+              {activity.project}
+              <span className="block text-xs text-gray-500 mt-1">{activity.activity}</span>
             </td>
             <td className="px-3 py-4 text-sm text-gray-500">
               {activity.description}
