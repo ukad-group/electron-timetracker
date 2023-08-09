@@ -91,6 +91,7 @@ export default function Home() {
 
   const submitActivity = (activity: ReportActivity) => {
     let isEdit = false;
+    let isPastTime = false;
     const tempActivities: Array<ReportActivity> = [];
     const newActTime = stringToMinutes(activity.from);
     const activityIndex = selectedDateActivities.findIndex(
@@ -114,6 +115,7 @@ export default function Home() {
       const indexActTime = stringToMinutes(selectedDateActivities[i].from);
       if (newActTime < indexActTime) {
         tempActivities.push(activity);
+        isPastTime = true;
       }
       if (!i && newActTime < indexActTime) {
         tempActivities.push(...selectedDateActivities);
@@ -121,13 +123,17 @@ export default function Home() {
       }
       tempActivities.push(selectedDateActivities[i]);
     }
-    if (tempActivities.length === selectedDateActivities.length && !isEdit) {
-      tempActivities.push(activity);
-    }
 
     tempActivities.forEach((act, i) => (act.id = i + 1));
+    if (tempActivities.length === selectedDateActivities.length && !isEdit) {
+      tempActivities.push(activity);
+      setSelectedDateActivities(tempActivities.filter((act) => act.duration));
+    }
+    if (isPastTime && !isEdit) {
+      setSelectedDateActivities(tempActivities);
+    }
+
     setShouldAutosave(true);
-    setSelectedDateActivities(tempActivities);
   };
 
   const stringToMinutes = (string: string) => {
