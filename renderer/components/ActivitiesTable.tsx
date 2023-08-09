@@ -40,7 +40,7 @@ export default function ActivitiesTable({
           <th
             scope="col"
             className="pb-3.5 px-3 text-left text-sm font-semibold text-gray-900 relative
-            after:content-['activity*'] after:block after:absolute after:text-xs after:text-gray-500 after:top-[18px]"
+            after:content-['activity'] after:block after:absolute after:text-xs after:text-gray-500 after:top-[18px]"
           >
             Project
           </th>

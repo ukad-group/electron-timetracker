@@ -46,7 +46,6 @@ export default function ActivitiesSection({
           activities={activities}
         />
       </div>
-      <span className="text-xs text-gray-500 pl-6">* - optional field</span>
       <div>
         <a
           href="#"
