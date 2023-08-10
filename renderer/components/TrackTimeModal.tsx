@@ -9,8 +9,10 @@ import {
   calcDurationBetweenTimes,
   formatDuration,
 } from "../utils/reports";
+import { electron } from "process";
 
 type TrackTimeModalProps = {
+  activities: Array<ReportActivity> | null;
   isOpen: boolean;
   editedActivity: ReportActivity | "new";
   latestProjects: Array<string>;
@@ -21,6 +23,7 @@ type TrackTimeModalProps = {
 };
 
 export default function TrackTimeModal({
+  activities,
   isOpen,
   editedActivity,
   latestProjects,
@@ -62,6 +65,36 @@ export default function TrackTimeModal({
     setActivity(editedActivity.activity || "");
     setDescription(editedActivity.description || "");
   }, [editedActivity]);
+
+  useEffect(() => {
+    if (editedActivity !== "new") {
+      return;
+    }
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const floorMinutes = (Math.floor(Number(minutes) / 15) * 15)
+      .toString()
+      .padStart(2, "0");
+    const ceilMinutes = (
+      Math.ceil(Number(minutes) / 15 > 3 ? 0 : Number(minutes) / 15) * 15
+    )
+      .toString()
+      .padStart(2, "0");
+    const ceilHours = Math.ceil(
+      Number(minutes) / 15 > 3 ? Number(hours) + 1 : Number(hours)
+    );
+
+    if (activities.length && activities[activities.length - 1].to) {
+      setFrom(activities[activities.length - 1].to);
+    } else if (activities.length && !activities[activities.length - 1].to) {
+      setFrom(activities[activities.length - 1].from);
+    } else {
+      setFrom(`${hours}:${floorMinutes}`);
+    }
+
+    setTo(`${ceilHours}:${ceilMinutes}`);
+  }, [isOpen]);
 
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
