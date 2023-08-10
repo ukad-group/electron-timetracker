@@ -136,7 +136,7 @@ ipcMain.handle(
         const lines = fs.readFileSync(timereportPath, "utf8").split("\n");
         for (const line of lines) {
           const parts = line.split(" - ");
-          if (parts.length > 2 && parts[1]) {
+          if (parts.length > 1 && parts[1] && parts[1] !== "!") {
             latestProjects.add(parts[1]);
           }
         }

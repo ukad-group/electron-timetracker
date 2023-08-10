@@ -24,10 +24,14 @@ export default function ProjectSelector({
 }: ProjectSelectorProps) {
   const filteredProjects =
     selectedProject === ""
-      ? availableProjects
-      : availableProjects.filter((project) => {
-          return project.toLowerCase().includes(selectedProject.toLowerCase());
-        });
+      ? availableProjects.sort()
+      : availableProjects
+          .filter((project) => {
+            return project
+              .toLowerCase()
+              .includes(selectedProject.toLowerCase());
+          })
+          .sort();
 
   return (
     <Combobox
