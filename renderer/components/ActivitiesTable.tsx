@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useMemo, useEffect } from "react";
+import { useMemo } from "react";
 import { ReportActivity, formatDuration } from "../utils/reports";
 
 type ActivitiesTableProps = {
@@ -73,7 +73,9 @@ export default function ActivitiesTable({
             </td>
             <td className="px-3 py-4 text-sm font-medium text-gray-900">
               {activity.project}
-              <span className="block text-xs text-gray-500 mt-1">{activity.activity}</span>
+              <span className="block text-xs text-gray-500 mt-1">
+                {activity.activity}
+              </span>
             </td>
             <td className="px-3 py-4 text-sm text-gray-500">
               {activity.description}

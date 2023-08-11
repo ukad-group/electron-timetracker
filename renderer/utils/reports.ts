@@ -154,10 +154,6 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
   return report;
 }
 
-function parseIntOrZero(value: string) {
-  return parseInt(value, 10) || 0;
-}
-
 export function calcDurationBetweenTimes(from: string, to: string): number {
   if (from == undefined || to == undefined) {
     return null;
@@ -190,5 +186,5 @@ export function formatDuration(ms: number): string {
     const minutes = Math.round(ms / 1000 / 60);
     return `${minutes}m`;
   }
-  return `${Math.floor(hours * 10) / 10}h`;
+  return `${Math.floor(hours * 100) / 100}h`;
 }
