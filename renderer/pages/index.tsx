@@ -29,7 +29,9 @@ export default function Home() {
   const [trackTimeModalActivity, setTrackTimeModalActivity] = useState<
     ReportActivity | "new"
   >(null);
-  const [latestProjects, setLatestProjects] = useState<Array<string>>([]);
+  const [latestProjAndAct, setLatestProjAndAct] = useState<
+    Record<string, [string]>
+  >({});
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
@@ -43,7 +45,7 @@ export default function Home() {
       );
       setSelectedDateReport(dayReport || "");
 
-      setLatestProjects(
+      setLatestProjAndAct(
         await ipcRenderer.invoke(
           "app:find-latest-projects",
           reportsFolder,
@@ -194,7 +196,7 @@ export default function Home() {
         activities={selectedDateActivities}
         isOpen={trackTimeModalActivity !== null}
         editedActivity={trackTimeModalActivity}
-        latestProjects={latestProjects}
+        latestProjAndAct={latestProjAndAct}
         close={() => setTrackTimeModalActivity(null)}
         submitActivity={submitActivity}
       />
