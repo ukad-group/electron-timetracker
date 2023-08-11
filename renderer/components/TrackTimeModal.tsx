@@ -9,7 +9,6 @@ import {
   calcDurationBetweenTimes,
   formatDuration,
 } from "../utils/reports";
-import { electron } from "process";
 
 type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -76,14 +75,14 @@ export default function TrackTimeModal({
     const floorMinutes = (Math.floor(Number(minutes) / 15) * 15)
       .toString()
       .padStart(2, "0");
+    const ceilHours = Math.ceil(
+      Number(minutes) / 15 > 3 ? Number(hours) + 1 : Number(hours)
+    );
     const ceilMinutes = (
       Math.ceil(Number(minutes) / 15 > 3 ? 0 : Number(minutes) / 15) * 15
     )
       .toString()
       .padStart(2, "0");
-    const ceilHours = Math.ceil(
-      Number(minutes) / 15 > 3 ? Number(hours) + 1 : Number(hours)
-    );
 
     if (activities.length && activities[activities.length - 1].to) {
       setFrom(activities[activities.length - 1].to);
