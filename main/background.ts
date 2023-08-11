@@ -145,7 +145,7 @@ ipcMain.handle(
       }
     }
 
-    return [...latestProjects];
+    return [...latestProjects].sort();
   }
 );
 
