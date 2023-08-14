@@ -12,6 +12,7 @@ export default function DateSelector({
   selectedDate,
   setSelectedDate,
 }: DateSelectorProps) {
+  const today = new Date();
   const increaseDate = () => {
     setSelectedDate((date) => new Date(date.getTime() + day));
   };
@@ -31,7 +32,9 @@ export default function DateSelector({
           </time>
         </h1>
         <p className="mt-1 text-sm text-gray-500">
-          {selectedDate?.toLocaleDateString("en-US", { weekday: "long" })}
+          {selectedDate.getDay() === today.getDay()
+            ? "Today"
+            : selectedDate?.toLocaleDateString("en-US", { weekday: "long" })}
         </p>
       </div>
       <div className="flex items-center rounded-md shadow-sm">
