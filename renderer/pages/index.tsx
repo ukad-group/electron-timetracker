@@ -73,7 +73,8 @@ export default function Home() {
   useEffect(() => {
     if (shouldAutosave) {
       const serializedReport =
-        serializeReport(selectedDateActivities) + reportAndNotes[1];
+        serializeReport(selectedDateActivities) +
+        (reportAndNotes[1].startsWith("undefined") ? "" : reportAndNotes[1]);
       saveSerializedReport(serializedReport);
       setShouldAutosave(false);
     }
