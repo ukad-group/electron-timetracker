@@ -32,15 +32,19 @@ const userDataDirectory = app.getPath("userData");
     await mainWindow.loadURL(`http://localhost:${port}/`);
     mainWindow.webContents.openDevTools();
   }
-
+  let currentSelectedDate = "";
   ipcMain.on(
     "start-file-watcher",
     (event, reportsFolder: string, selectedDate: Date) => {
       const timereportPath = getPathFromDate(selectedDate, reportsFolder);
 
+      currentSelectedDate = selectedDate.toDateString();
       if (fs.existsSync(timereportPath)) {
         fs.watch(timereportPath, (eventType, filename) => {
-          if (eventType === "change") {
+          if (
+            eventType === "change" &&
+            currentSelectedDate === selectedDate.toDateString()
+          ) {
             readDataFromFile(timereportPath, (data: string) => {
               mainWindow.webContents.send("file-changed", data);
             });
@@ -49,9 +53,6 @@ const userDataDirectory = app.getPath("userData");
       }
     }
   );
-  ipcMain.on("file-changed", (event, data: string) => {
-    mainWindow.webContents.send("file-changed", data);
-  });
 })();
 
 app.on("window-all-closed", () => {
