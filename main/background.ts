@@ -136,28 +136,33 @@ ipcMain.handle(
         const lines = fs.readFileSync(timereportPath, "utf8").split("\n");
         for (const line of lines) {
           const parts = line.split(" - ");
-          if (
-            !latesProjAndAct.hasOwnProperty(parts[1]) &&
-            parts[1] &&
-            !parts[1].startsWith("!")
-          ) {
-            latesProjAndAct[parts[1].trim()] = [""];
+          const project = parts[1].trim();
+          const activity = parts[2].trim();
+
+          if (!project || project.startsWith("!")) continue;
+
+          if (!latesProjAndAct.hasOwnProperty(project)) {
+            latesProjAndAct[project] = [""];
           }
           if (
             parts.length > 3 &&
-            parts[1] &&
-            parts[1] !== "!" &&
-            !latesProjAndAct[parts[1]].includes(parts[2].trim())
+            !latesProjAndAct[project].includes(activity)
           ) {
-            latesProjAndAct[parts[1]].push(parts[2].trim());
+            latesProjAndAct[project].push(activity);
           }
         }
       } catch {
         continue;
       }
     }
+    const sortedProjAndAct = Object.keys(latesProjAndAct)
+      .sort()
+      .reduce((accumulator, key) => {
+        accumulator[key] = latesProjAndAct[key]?.sort();
 
-    return latesProjAndAct;
+        return accumulator;
+      }, {});
+    return sortedProjAndAct;
   }
 );
 
