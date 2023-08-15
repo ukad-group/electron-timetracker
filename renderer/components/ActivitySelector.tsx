@@ -22,7 +22,9 @@ export default function ActivitySelector({
 }: ActivitySelectorProps) {
   const filteredActivities =
     selectedActivity === ""
-      ? availableActivities
+      ? availableActivities?.filter((activity) => {
+          return activity !== "";
+        })
       : availableActivities?.filter((activity) => {
           return activity
             .toLowerCase()

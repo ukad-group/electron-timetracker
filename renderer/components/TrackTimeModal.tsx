@@ -258,7 +258,7 @@ export default function TrackTimeModal({
                   <div className="col-span-6">
                     <ProjectSelector
                       required
-                      availableProjects={Object.keys(latestProjAndAct).sort()}
+                      availableProjects={Object.keys(latestProjAndAct)?.sort()}
                       selectedProject={project}
                       setSelectedProject={setProject}
                       isValidationEnabled={isValidationEnabled}
@@ -267,7 +267,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <ActivitySelector
-                      availableActivities={latestProjAndAct[project]}
+                      availableActivities={latestProjAndAct[project]?.sort()}
                       selectedActivity={activity}
                       setSelectedActivity={setActivity}
                       tabIndex={5}

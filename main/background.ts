@@ -139,9 +139,9 @@ ipcMain.handle(
           if (
             !latesProjAndAct.hasOwnProperty(parts[1]) &&
             parts[1] &&
-            parts[1] !== "!"
+            !parts[1].startsWith("!")
           ) {
-            latesProjAndAct[parts[1]] = [parts[2]];
+            latesProjAndAct[parts[1].trim()] = [""];
           }
           if (
             parts.length > 3 &&
