@@ -141,7 +141,7 @@ ipcMain.handle(
         const lines = fs.readFileSync(timereportPath, "utf8").split("\n");
 
         for (const line of lines) {
-          if (!timeRegex.test(line.slice(0, 8))) continue;
+          if (!timeRegex.test(line)) continue;
           const parts = line.split(" - ");
           const project = parts[1]?.trim();
           const activity = parts[2]?.trim();
