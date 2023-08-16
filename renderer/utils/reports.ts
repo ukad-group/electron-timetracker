@@ -213,6 +213,9 @@ export function validation(activities: Array<ReportActivity>) {
     if (activities[i].description.startsWith("!")) {
       activities[i].mistakes += " startsWith!";
     }
+    if (i > 0 && activities[i].to && !activities[i].project) {
+      activities[i].isValid = false;
+    }
   }
   return activities;
 }
