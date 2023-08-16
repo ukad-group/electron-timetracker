@@ -127,15 +127,21 @@ ipcMain.handle(
   (event, reportsFolder: string, date: Date) => {
     if (!reportsFolder || !date) return [];
 
-    const latesProjAndAct: Record<string, [string]> = {};
+    const latesProjAndAct: Record<string, [string]> = {
+      internal: [""],
+      hr: [""],
+    };
     let currentDate = new Date(date);
 
     for (let i = 0; i < 31; i++) {
       currentDate.setDate(currentDate.getDate() - 1);
       const timereportPath = getPathFromDate(currentDate, reportsFolder);
+      const timeRegex = /^[0-9]+:[0-9]+/;
       try {
         const lines = fs.readFileSync(timereportPath, "utf8").split("\n");
+
         for (const line of lines) {
+          if (!timeRegex.test(line.slice(0, 8))) continue;
           const parts = line.split(" - ");
           const project = parts[1]?.trim();
           const activity = parts[2]?.trim();
