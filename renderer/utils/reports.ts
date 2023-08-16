@@ -123,7 +123,7 @@ export function parseReport(fileContent: string) {
 
     reportCount++;
   }
-  reportAndNotes[1] = reportComments;
+  reportAndNotes[1] = reportComments.trimEnd();
   return reportAndNotes as ReportAndNotes;
 }
 
