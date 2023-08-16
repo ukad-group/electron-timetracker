@@ -136,8 +136,8 @@ ipcMain.handle(
         const lines = fs.readFileSync(timereportPath, "utf8").split("\n");
         for (const line of lines) {
           const parts = line.split(" - ");
-          const project = parts[1].trim();
-          const activity = parts[2].trim();
+          const project = parts[1]?.trim();
+          const activity = parts[2]?.trim();
 
           if (!project || project.startsWith("!")) continue;
 
@@ -151,7 +151,8 @@ ipcMain.handle(
             latesProjAndAct[project].push(activity);
           }
         }
-      } catch {
+      } catch (e) {
+        console.error(e);
         continue;
       }
     }
