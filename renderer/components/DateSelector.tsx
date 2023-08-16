@@ -20,7 +20,7 @@ export default function DateSelector({
   };
 
   const moveOnPressHandler = (e: KeyboardEvent) => {
-    if (e.code === "Arromoveht" && e.ctrlKey) {
+    if (e.code === "ArrowRight" && e.ctrlKey) {
       increaseDate();
     } else if (e.code === "ArrowLeft" && e.ctrlKey) {
       descreaseDate();
