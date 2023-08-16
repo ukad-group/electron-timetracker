@@ -127,7 +127,7 @@ ipcMain.handle(
   (event, reportsFolder: string, date: Date) => {
     if (!reportsFolder || !date) return [];
 
-    const latestProjects = new Set<string>();
+    const latesProjAndAct: Record<string, [string]> = {};
     let currentDate = new Date(date);
 
     for (let i = 0; i < 31; i++) {
@@ -137,16 +137,34 @@ ipcMain.handle(
         const lines = fs.readFileSync(timereportPath, "utf8").split("\n");
         for (const line of lines) {
           const parts = line.split(" - ");
-          if (parts.length > 1 && parts[1] && parts[1] !== "!") {
-            latestProjects.add(parts[1]);
+          const project = parts[1]?.trim();
+          const activity = parts[2]?.trim();
+
+          if (!project || project.startsWith("!")) continue;
+
+          if (!latesProjAndAct.hasOwnProperty(project)) {
+            latesProjAndAct[project] = [""];
+          }
+          if (
+            parts.length > 3 &&
+            !latesProjAndAct[project].includes(activity)
+          ) {
+            latesProjAndAct[project].push(activity);
           }
         }
-      } catch {
+      } catch (e) {
+        console.error(e);
         continue;
       }
     }
+    const sortedProjAndAct = Object.keys(latesProjAndAct)
+      .sort()
+      .reduce((accumulator, key) => {
+        accumulator[key] = latesProjAndAct[key]?.sort();
 
-    return [...latestProjects].sort();
+        return accumulator;
+      }, {});
+    return sortedProjAndAct;
   }
 );
 
