@@ -65,7 +65,7 @@ export default function Home() {
     if (selectedDateReport) {
       setReportAndNotes(parseReport(selectedDateReport));
       const activities = parseReport(selectedDateReport)[0];
-      setSelectedDateActivities(activities.filter((act) => !act.isBreak));
+      setSelectedDateActivities(activities);
       return;
     }
     setSelectedDateActivities([]);
