@@ -12,7 +12,7 @@ export default function Header() {
     <header className="bg-white shadow">
       <div className="flex justify-between h-16 px-2 mx-auto max-w-7xl sm:px-4 lg:px-8">
         <div className="flex flex-shrink-0 px-2 lg:px-0">
-          Current version 1.0.31
+          Current version 1.0.35
         </div>
         <div className="flex items-center flex-shrink min-w-0 gap-4">
           <FolderSelector
