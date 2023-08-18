@@ -35,7 +35,31 @@ export default function Home() {
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [isDownload, setIsDownload] = useState(false);
 
+  useEffect(() => {
+    ipcRenderer.send("start-update-watcher");
+    ipcRenderer.on("update-available", (event, data, info) => {
+      setIsUpdate(data);
+      console.log(info);
+    });
+    ipcRenderer.on("downloaded", (event, data, info) => {
+      setIsDownload(data);
+      console.log("downloaded ", info);
+    });
+  }, []);
+
+  const install = () => {
+    ipcRenderer.send("install");
+  };
+
+  // const findUp = () => {
+  //   (async () => {
+  //     const update = await ipcRenderer.invoke("app:find-update");
+  //     setIsUpdate(update);
+  //   })();
+  // };
   useEffect(() => {
     (async () => {
       const dayReport = await ipcRenderer.invoke(
@@ -155,6 +179,10 @@ export default function Home() {
 
       <main className="py-10">
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
+          {isUpdate && !isDownload && "UPDATE HERE"}
+
+          {isDownload && "UPDATE DOWNLOADED"}
+          <button onClick={install}>Force install</button>
           {reportsFolder ? (
             <>
               <div className="space-y-6 lg:col-start-1 lg:col-span-2">

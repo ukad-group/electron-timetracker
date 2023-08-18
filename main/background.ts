@@ -53,6 +53,27 @@ const userDataDirectory = app.getPath("userData");
       }
     }
   );
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  ipcMain.on("start-update-watcher", (event) => {
+    app.whenReady().then(() => {
+      autoUpdater.checkForUpdates();
+    });
+
+    autoUpdater.on("update-available", (info) => {
+      autoUpdater.downloadUpdate();
+      mainWindow.webContents.send("update-available", true, info);
+    });
+
+    autoUpdater.on("update-downloaded", (info) => {
+      mainWindow.webContents.send("downloaded", true, info);
+      // autoUpdater.quitAndInstall();
+    });
+  });
+  ipcMain.on("install", (event) => {
+    autoUpdater.quitAndInstall();
+  });
 })();
 
 app.on("window-all-closed", () => {
@@ -167,9 +188,6 @@ ipcMain.handle(
     return sortedProjAndAct;
   }
 );
-
-autoUpdater.autoDownload = false;
-autoUpdater.autoInstallOnAppQuit = true;
 
 app.whenReady().then(() => {
   autoUpdater.checkForUpdates();
