@@ -1,8 +1,13 @@
-import {calcDurationBetweenTimes, formatDuration, parseReport, serializeReport} from './reports';
+import {
+    calcDurationBetweenTimes,
+    formatDuration,
+    parseReport,
+    serializeReport,
+    ReportActivity
+} from './reports';
 
-const parsedReport = (activity) => {
-    return parseReport(activity)[0];
-}
+const parsedReport = (activity) => (parseReport(activity)[0]);
+const useFakeTime = () => jest.useFakeTimers().setSystemTime(new Date('2013-05-05'));
 
 describe('parseReport function', () => {
 
@@ -13,7 +18,7 @@ describe('parseReport function', () => {
     });
 
     test('should skip lines which are not started from time pattern hh:mm', () => {
-        expect(parsedReport('skip this line/nand this line')).toStrictEqual([]);
+        expect(parsedReport('skip this line\nand this line')).toStrictEqual([]);
     });
 
     test('should extract [project name], [activity name] and [description] from registration', () => {
@@ -62,6 +67,14 @@ describe('parseReport function', () => {
     });
 
     // should lowercase activity name before 26 Aug 2016 - is it actual?
+    test('should lowercase activity name before 26 Aug 2016', () => {
+        useFakeTime();
+        const dayReport = parsedReport('18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05');
+        const registration = dayReport[0];
+
+        expect(dayReport.length).toBeGreaterThan(0);
+        expect(registration).toHaveProperty('activity', 'activity');
+    });
 
     test('should keep activity name case sensitive after 26 Aug 2016', () => {
         const dayReport = parsedReport('18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05');
@@ -125,11 +138,83 @@ describe('parseReport function', () => {
 
     // should set StartTime and EndTime in date when registration was made - is it actual?
 
+    test('it should nonletter symbols in description support in description', () => {
+        const descriptions = [
+            'des.cription',
+            'des1cription',
+            '(',
+            ')',
+            '\'',
+            '\\',
+            ':',
+            '&',
+            '<',
+            '>',
+            '#',
+            'https://trello.com/c/lU3qqXF0/1145-if-drop-box-file-exceeds-the-limitation-no-alert-is-shown-works-well-if-upload-file-from-desktop',
+            'https://trello.com/c/lU3qqXF0'
+        ];
 
+        for (let description of descriptions) {
+            const dayReport = parsedReport('18:00 2013-05-05 - pro.ject - act.ivity - ' + description + '\n19:00 2013-05-05');
+            const registration = dayReport[0];
+
+            expect(dayReport.length).toBeGreaterThan(0);
+            expect(registration).toHaveProperty('description', description);
+        }
+    });
+
+    test('it should undefined symbols in description not show in description', () => {
+        const dayReport = parsedReport('18:00 - project - activity - description � description\n19:00 - !\n20:00');
+        const registration = dayReport[0];
+
+        expect(registration).toHaveProperty('description', 'description - description');
+    });
+
+    test('it should undefined symbols in activity and project name skip in description', () => {
+        const dayReport = parsedReport('18:00 - project - acti�vity - description � description\n19:00 - !\n20:00');
+        const registration = dayReport[0];
+
+        expect(registration).toHaveProperty('activity', 'acti�vity');
+    });
+
+    test('parser should recognize 3rd dash as separator before 23 Aug 2016', () => {
+        useFakeTime();
+        const dayReport = parsedReport('18:00 - project - description with some -dash- delimited-text\n19:00 - !\n20:00');
+        const registration = dayReport[0];
+
+        expect(registration).toHaveProperty('activity', 'description with some');
+        expect(registration).toHaveProperty('description', 'dash- delimited-text');
+    });
+
+    test('parser should recognize 3rd dash surrounded by spaces as separator after 23 Aug 2016', () => {
+        const dayReport = parsedReport('18:00 - project - description with some -dash- delimited-text\n19:00 - !\n20:00');
+        const registration = dayReport[0];
+
+        expect(dayReport.length).toBeGreaterThan(0);
+        expect(registration).toHaveProperty('activity', '');
+        expect(registration).toHaveProperty('description', 'description with some -dash- delimited-text');
+    });
+
+    test('parser should not delete [project name] from start [description]', () => {
+        const dayReport = parsedReport('18:00 - projectName - projectName description with some delimited-text\n19:00 -');
+        const registration = dayReport[0];
+
+        expect(dayReport.length).toBeGreaterThan(0);
+        expect(registration).toHaveProperty('description', 'projectName description with some delimited-text');
+    });
+
+    test('parser should not delete [project name] from middle [description]', () => {
+        const dayReport = parsedReport('18:00 - projectName - description with projectName some delimited-text\n19:00 -');
+        const registration = dayReport[0];
+
+        expect(dayReport.length).toBeGreaterThan(0);
+        expect(registration).toHaveProperty('description', 'description with projectName some delimited-text');
+    });
 });
 
 describe('serializeReport function', () => {
-    const activities = [{
+    const activities: ReportActivity[] = [{
         id: 1,
         activity: 'meeting',
         description: 'calendar discussion',
@@ -139,7 +224,7 @@ describe('serializeReport function', () => {
         to: '12:00'
     }];
 
-    const report = '11:30 - timetracker - meeting - calendar discussion\n' + '12:00 - !\n';
+    const report: string = '11:30 - timetracker - meeting - calendar discussion\n12:00 - !\n';
 
     test('should return serialized report', () => {
         expect(serializeReport(activities)).toBe(report);
@@ -169,14 +254,14 @@ describe('formatDuration function', () => {
     });
 
     test('should return minutes when ms < 1h', () => {
-        const ms = 2000000;
-        const minutes = ms / 1000 / 60;
+        const ms: number = 2000000;
+        const minutes: number = ms / 1000 / 60;
         expect(formatDuration(ms)).toBe(Math.round(minutes) + 'm');
     });
 
     test('should return hours when ms > 1h', () => {
-        const ms = 20000000;
-        const hours = ms / 1000 / 60 / 60;
+        const ms: number = 20000000;
+        const hours: number = ms / 1000 / 60 / 60;
         expect(formatDuration(ms)).toBe(Math.floor(hours * 100) / 100 + 'h');
     });
 });
