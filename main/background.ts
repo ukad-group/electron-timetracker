@@ -146,7 +146,7 @@ ipcMain.handle(
           const project = parts[1]?.trim();
           const activity = parts[2]?.trim();
 
-          if (!project || project.startsWith("!")) continue;
+          if (!project || project?.startsWith("!")) continue;
 
           if (!latesProjAndAct.hasOwnProperty(project)) {
             latesProjAndAct[project] = [""];

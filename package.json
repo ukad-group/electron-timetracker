@@ -10,7 +10,10 @@
     "build": "nextron build",
     "postinstall": "electron-builder install-app-deps",
     "dist": "electron-builder",
-    "dist-win": "electron-builder --win"
+    "dist-win": "electron-builder --win",
+    "build-client": "run-script-os",
+    "build-client:win32": "electron-builder --win",
+    "build-client:darwin": "npm list -g dmg-license || sudo npm i -g dmg-license && electron-builder --mac"
   },
   "repository": "https://github.com/ukad-group/electron-timetracker",
   "publish": {
@@ -26,6 +29,9 @@
     },
     "directories": {
       "output": "dist"
+    },
+    "mac": {
+      "target": "dmg"
     }
   },
   "dependencies": {
@@ -39,6 +45,7 @@
     "zustand": "^4.3.9"
   },
   "devDependencies": {
+    "@babel/core": "^7.22.10",
     "@types/node": "^18.11.18",
     "@types/react": "^18.0.26",
     "autoprefixer": "^10.4.7",
@@ -49,6 +56,7 @@
     "postcss": "^8.4.13",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "run-script-os": "^1.1.6",
     "tailwindcss": "^3.1.8",
     "typescript": "^4.9.4"
   }
