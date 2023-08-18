@@ -76,7 +76,9 @@ export default function Home() {
     if (shouldAutosave) {
       const serializedReport =
         serializeReport(selectedDateActivities) +
-        (reportAndNotes[1].startsWith("undefined") ? "" : reportAndNotes[1]);
+        (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined")
+          ? ""
+          : reportAndNotes[1]);
       saveSerializedReport(serializedReport);
       setShouldAutosave(false);
     }
