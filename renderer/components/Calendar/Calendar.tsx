@@ -94,21 +94,20 @@ export function Calendar({
     setMonthWorkHoursReports(monthWorkHours);
   }, [monthReportsFromServer]);
 
+  const getCalendarApi = () => (calendarRef.current.getApi());
+
   const prevButtonHandle = () => {
-    const calendarApi = calendarRef.current.getApi();
-    calendarApi.prev();
+    getCalendarApi().prev();
     setCalendarDate((date) => new Date(date.setMonth(date.getMonth() - 1)));
   };
 
   const nextButtonHandle = () => {
-    const calendarApi = calendarRef.current.getApi();
-    calendarApi.next();
+    getCalendarApi().next()
     setCalendarDate((date) => new Date(date.setMonth(date.getMonth() + 1)));
   };
 
   const todayButtonHandle = () => {
-    const calendarApi = calendarRef.current.getApi();
-    calendarApi.today();
+    getCalendarApi().today()
     setCalendarDate(new Date());
   };
 

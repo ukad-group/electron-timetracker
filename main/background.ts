@@ -178,9 +178,7 @@ ipcMain.handle(
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const query = year + month;
 
-    const readMonthReports = searchReadFile(reportsFolder, query, monthReports);
-
-    return readMonthReports;
+    return searchReadFile(reportsFolder, query, monthReports);;
   }
 );
 
