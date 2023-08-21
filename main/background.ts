@@ -4,7 +4,7 @@ import serve from "electron-serve";
 import { autoUpdater } from "electron-updater";
 import { createWindow } from "./helpers";
 import { getPathFromDate } from "./helpers/datetime";
-import { createDirByPath } from "./helpers/fs";
+import { createDirByPath, searchReadFile } from "./helpers/fs";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 type Callback = (data: string | null) => void;
@@ -165,6 +165,22 @@ ipcMain.handle(
         return accumulator;
       }, {});
     return sortedProjAndAct;
+  }
+);
+
+ipcMain.handle(
+  "app:find-month-projects",
+  (event, reportsFolder: string, date: Date) => {
+    if (!reportsFolder || !date) return [];
+
+    const monthReports = [];
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const query = year + month;
+
+    const readMonthReports = searchReadFile(reportsFolder, query, monthReports);
+
+    return readMonthReports;
   }
 );
 

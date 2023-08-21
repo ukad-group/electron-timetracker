@@ -1,0 +1,7 @@
+.fc-daygrid-day {
+  @apply hover:bg-gray-200 cursor-pointer;
+}
+
+.fc-custom-today-date {
+  @apply bg-sky-100;
+}
