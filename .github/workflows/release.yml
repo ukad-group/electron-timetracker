@@ -1,14 +1,15 @@
 name: publish release
 on:
   push:
-    branches:
-      - main
-      - master
+    # branches:
+    #   - main
+    #   - master
     tags:
       - v*
 jobs:
   build:
     runs-on: windows-latest
+    # macos-latest
     permissions:
       contents: write
     env:
@@ -43,7 +44,8 @@ jobs:
 
       - run: npm install
       - run: npm run build
-      - run: npm run dist-win
+      # - run: npm run dist-win
+      - run: npm run dist-masos
 
       - name: Publish release
         uses: softprops/action-gh-release@v1
@@ -52,3 +54,4 @@ jobs:
           files: |
             ./dist/*.exe
             ./dist/latest.yml
+            ./dist/*

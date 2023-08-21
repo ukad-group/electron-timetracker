@@ -11,6 +11,7 @@
     "postinstall": "electron-builder install-app-deps",
     "dist": "electron-builder",
     "dist-win": "electron-builder --win",
+    "dist-macos": "electron-builder  --macos",
     "build-client": "run-script-os",
     "build-client:win32": "electron-builder --win",
     "build-client:darwin": "npm list -g dmg-license || sudo npm i -g dmg-license && electron-builder --mac"
