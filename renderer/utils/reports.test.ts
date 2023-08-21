@@ -1,9 +1,11 @@
 import {
+    ReportActivity,
     calcDurationBetweenTimes,
     formatDuration,
     parseReport,
     serializeReport,
-    ReportActivity
+    checkIntersection,
+    validation
 } from './reports';
 
 const parsedReport = (activity) => (parseReport(activity)[0]);
@@ -67,14 +69,6 @@ describe('parseReport function', () => {
     });
 
     // should lowercase activity name before 26 Aug 2016 - is it actual?
-    test('should lowercase activity name before 26 Aug 2016', () => {
-        useFakeTime();
-        const dayReport = parsedReport('18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05');
-        const registration = dayReport[0];
-
-        expect(dayReport.length).toBeGreaterThan(0);
-        expect(registration).toHaveProperty('activity', 'activity');
-    });
 
     test('should keep activity name case sensitive after 26 Aug 2016', () => {
         const dayReport = parsedReport('18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05');
@@ -178,15 +172,6 @@ describe('parseReport function', () => {
         expect(registration).toHaveProperty('activity', 'acti�vity');
     });
 
-    test('parser should recognize 3rd dash as separator before 23 Aug 2016', () => {
-        useFakeTime();
-        const dayReport = parsedReport('18:00 - project - description with some -dash- delimited-text\n19:00 - !\n20:00');
-        const registration = dayReport[0];
-
-        expect(registration).toHaveProperty('activity', 'description with some');
-        expect(registration).toHaveProperty('description', 'dash- delimited-text');
-    });
-
     test('parser should recognize 3rd dash surrounded by spaces as separator after 23 Aug 2016', () => {
         const dayReport = parsedReport('18:00 - project - description with some -dash- delimited-text\n19:00 - !\n20:00');
         const registration = dayReport[0];
@@ -211,6 +196,24 @@ describe('parseReport function', () => {
         expect(dayReport.length).toBeGreaterThan(0);
         expect(registration).toHaveProperty('description', 'description with projectName some delimited-text');
     });
+
+    test('parser should recognize 3rd dash as separator before 23 Aug 2016', () => {
+        useFakeTime();
+        const dayReport = parsedReport('18:00 - project - description with some -dash- delimited-text\n19:00 - !\n20:00');
+        const registration = dayReport[0];
+
+        expect(registration).toHaveProperty('activity', 'description with some');
+        expect(registration).toHaveProperty('description', 'dash- delimited-text');
+    });
+
+    test('should lowercase activity name before 26 Aug 2016', () => {
+        useFakeTime();
+        const dayReport = parsedReport('18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05');
+        const registration = dayReport[0];
+
+        expect(dayReport.length).toBeGreaterThan(0);
+        expect(registration).toHaveProperty('activity', 'activity');
+    });
 });
 
 describe('serializeReport function', () => {
@@ -232,36 +235,171 @@ describe('serializeReport function', () => {
 });
 
 describe('calcDurationBetweenTimes function', () => {
-    test('should return null when from or/and to properties is undefined', () => {
+
+    test('should return null when [from] or/and [to] properties are undefined', () => {
         expect(calcDurationBetweenTimes(undefined, '10:00')).toBeNull();
         expect(calcDurationBetweenTimes('10:00', undefined)).toBeNull();
         expect(calcDurationBetweenTimes(undefined, undefined)).toBeNull();
     });
 
-    test('should return result of to - from in milliseconds', () => {
+    test('should return result of [to] - [from] in milliseconds', () => {
         expect(calcDurationBetweenTimes('10:00', '10:10')).toBe(600000);
     });
 });
 
 describe('formatDuration function', () => {
 
-    test('should return undefined when ms = undefined', () => {
+    test('should return undefined when [ms] = undefined', () => {
         expect(formatDuration(undefined)).toBeUndefined();
     });
 
-    test('should return 0m when ms < 1m', () => {
+    test('should return 0m when [ms] < 1m', () => {
         expect(formatDuration(1000)).toBe('0m');
     });
 
-    test('should return minutes when ms < 1h', () => {
+    test('should return minutes when [ms] < 1h', () => {
         const ms: number = 2000000;
         const minutes: number = ms / 1000 / 60;
         expect(formatDuration(ms)).toBe(Math.round(minutes) + 'm');
     });
 
-    test('should return hours when ms > 1h', () => {
+    test('should return hours when [ms] > 1h', () => {
         const ms: number = 20000000;
         const hours: number = ms / 1000 / 60 / 60;
         expect(formatDuration(ms)).toBe(Math.floor(hours * 100) / 100 + 'h');
+    });
+});
+
+describe('checkIntersection function', () => {
+
+    test('should return false when [previousTo] lower than [currentFrom]', () => {
+        expect(checkIntersection('10:00', '11:00')).toBeFalsy();
+    });
+
+    test('should return true when [previousTo] higher than [currentFrom]', () => {
+        expect(checkIntersection('11:00', '10:00')).toBeTruthy();
+    });
+});
+
+describe('validation function', () => {
+
+    test('should fail validation when [activity[i - 1].to < activity[i].from]', () => {
+        const activities: ReportActivity[] = [
+            {
+                id: 1,
+                activity: 'activity from',
+                description: 'activity from description',
+                duration: 3600000,
+                from: '12:00',
+                project: 'timetracker',
+                to: '13:00'
+            },
+            {
+                id: 2,
+                activity: 'activity to',
+                description: 'activity to description',
+                duration: 3600000,
+                from: '12:00',
+                project: 'timetracker',
+                to: '13:00'
+            }
+        ];
+        const activity: ReportActivity = validation(activities)[0];
+
+        expect(activity).toHaveProperty('isValid', false);
+    });
+
+    test('should fail validation when [duration] = 0', () => {
+        const activities: ReportActivity[] = [
+            {
+                id: 1,
+                activity: 'activity from',
+                description: 'activity from description',
+                duration: 0,
+                from: '12:00',
+                project: 'timetracker',
+                to: '13:00'
+            }
+        ];
+        const activity: ReportActivity = validation(activities)[0];
+
+        expect(activity).toHaveProperty('isValid', false);
+    });
+
+    test('should fail validation when [duration] < 0', () => {
+        const activities: ReportActivity[] = [
+            {
+                id: 1,
+                activity: 'activity from',
+                description: 'activity from description',
+                duration: -1,
+                from: '12:00',
+                project: 'timetracker',
+                to: '13:00'
+            }
+        ];
+        const activity: ReportActivity = validation(activities)[0];
+
+        expect(activity).toHaveProperty('isValid', false);
+    });
+
+    test('should fail validation when is [project] and no [to] property', () => {
+        const activities: ReportActivity[] = [
+            {
+                id: 1,
+                activity: 'activity from',
+                description: 'activity from description',
+                duration: 3600000,
+                from: '12:00',
+                project: 'timetracker',
+                to: ''
+            }
+        ];
+        const activity: ReportActivity = validation(activities)[0];
+
+        expect(activity).toHaveProperty('isValid', false);
+    });
+
+    test('should add mistake when [description] starts with "!"', () => {
+        const activities: ReportActivity[] = [
+            {
+                id: 1,
+                activity: 'activity from',
+                description: '!activity from description',
+                duration: 3600000,
+                from: '12:00',
+                project: 'timetracker',
+                to: '13:00'
+            }
+        ];
+        const activity: ReportActivity = validation(activities)[0];
+
+        expect(activity).toHaveProperty('mistakes', ' startsWith!');
+    });
+
+    test('should fail validation when there no [project] and is [to] property', () => {
+        const activities: ReportActivity[] = [
+            {
+                id: 1,
+                activity: 'activity from',
+                description: 'activity from description',
+                duration: 3600000,
+                from: '12:00',
+                project: 'timetracker',
+                to: '13:00'
+            },
+            {
+                id: 2,
+                activity: 'activity to',
+                description: 'activity to description',
+                duration: 3600000,
+                from: '12:00',
+                project: '',
+                to: '13:00'
+            }
+        ];
+        const activity: ReportActivity = validation(activities)[1];
+
+        expect(activity).toHaveProperty('isValid', false);
     });
 });
