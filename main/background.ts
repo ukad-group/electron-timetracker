@@ -57,6 +57,8 @@ const userDataDirectory = app.getPath("userData");
   autoUpdater.autoInstallOnAppQuit = true;
 
   ipcMain.on("start-update-watcher", (event) => {
+    mainWindow.webContents.send("current-version", app.getVersion());
+
     app.whenReady().then(() => {
       autoUpdater.checkForUpdates();
     });
