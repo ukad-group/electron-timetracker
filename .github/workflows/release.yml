@@ -62,12 +62,11 @@ jobs:
   #           ./dist/*
 
   build-macos:
-    runs-on: macos-latest
-    # strategy:
-    #   matrix:
-    #     # version: [10, 12, 14]
-    #     os: [windows-latest, windows-latest]
-    # macos-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # os: [macos-latest, windows-latest]
+        os: [macos-latest]
     permissions:
       contents: write
     env:
@@ -88,17 +87,37 @@ jobs:
 
       - name: Set version in package.json
         shell: bash
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && runner.os != 'macOS'
+        run: |
+          sed -i 's|"version":.*|"version":"${{ steps.findandreplace.outputs.value }}",|g' package.json
+          cat package.json
+
+      - name: Set version in package.json
+        shell: bash
+        if: startsWith(github.ref, 'refs/tags/v') && runner.os == 'macOS'
         run: |
           sed -i '' 's|"version":.*|"version":"${{ steps.findandreplace.outputs.value }}",|g' package.json
           cat package.json
 
       - name: Set repo URL in package.json
         shell: bash
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && runner.os != 'macOS'
+        run: |
+          sed -i 's|"repository":.*|"repository":"${{ github.server_url }}/${{ github.repository }}",|g' package.json
+          cat package.json
+
+      - name: Set repo URL in package.json
+        shell: bash
+        if: startsWith(github.ref, 'refs/tags/v') && runner.os == 'macOS'
         run: |
           sed -i '' 's|"repository":.*|"repository":"${{ github.server_url }}/${{ github.repository }}",|g' package.json
           cat package.json
+
+      - name: Install dmg-license for MacOS
+        if: runner.os != 'macOS'
+        run: |
+          brew update
+          brew install dmg-license
 
       - run: npm install
       - run: npm run build
