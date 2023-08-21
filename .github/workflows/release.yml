@@ -113,13 +113,18 @@ jobs:
           sed -i '' 's|"repository":.*|"repository":"${{ github.server_url }}/${{ github.repository }}",|g' package.json
           cat package.json
 
-      - name: Install dmg-license for MacOS
-        if: runner.os != 'macOS'
-        run: |
-          brew update
-          brew install dmg-license
+      # - name: Install dmg-license for MacOS
+      #   if: runner.os == 'macOS'
+      #   run: |
+      #     brew update
+      #     brew install dmg-license
 
       - run: npm install
+
+      - name: install dmg-license
+        if: runner.os == 'macOS'
+        run: npm i dmg-license
+
       - run: npm run build
       # - run: npm run dist-win
       # - run: npm run dist-masos
