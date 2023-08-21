@@ -77,51 +77,19 @@ export function Calendar({
   }, [calendarDate, shouldAutosave]);
 
   useEffect(() => {
-    const parsedMonthReports = monthReportsFromServer.map((report) => {
+    const monthWorkHours = monthReportsFromServer.map((report) => {
+      const { reportDate, data } = report;
+      const activities: ReportActivity[] = validation((parseReport(data)[0] || []).filter(
+        (activity: ReportActivity) => !activity.isBreak
+      ));
+      const workDurationMs = activities.reduce((acc, { duration }) => acc + (duration || 0), 0);
+     
       return {
-        date: report.reportDate,
-        activities: parseReport(report.data)[0],
+       date: reportDate,
+       workDurationHours: formatDuration(workDurationMs),
+       isValid: activities.every((report: ReportActivity) => report.isValid === true),
       };
-    });
-
-    const nonBreakMonthReports = parsedMonthReports.map((report) => {
-      if (report.activities === undefined) {
-        report.activities = [];
-      }
-
-      return {
-        date: report.date,
-        activities: report.activities.filter(
-          (activity: ReportActivity) => !activity.isBreak
-        ),
-      };
-    });
-
-    const validatedMonthReports = nonBreakMonthReports.map((report) => {
-      return {
-        date: report.date,
-        activities: validation(report.activities),
-      };
-    });
-
-    const monthWorkMs = validatedMonthReports.map((report) => {
-      return {
-        date: report.date,
-        workDurationMs: report.activities.reduce(
-          (acc, item) => acc + (item.duration ? item.duration : 0),
-          0
-        ),
-        isValid: report.activities.every((report) => report.isValid === true),
-      };
-    });
-
-    const monthWorkHours = monthWorkMs.map((report) => {
-      return {
-        date: report.date,
-        workDurationHours: formatDuration(report.workDurationMs),
-        isValid: report.isValid,
-      };
-    });
+     });
 
     setMonthWorkHoursReports(monthWorkHours);
   }, [monthReportsFromServer]);
