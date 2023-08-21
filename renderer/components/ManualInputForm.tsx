@@ -1,5 +1,5 @@
 import { SetStateAction, useEffect, useState } from "react";
-import Button from "./Button";
+import Button from "./ui/Button";
 
 type ManualInputFormProps = {
   selectedDateReport: string;

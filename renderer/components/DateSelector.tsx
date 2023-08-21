@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import NavButtons from "./NavButtons";
+import NavButtons from "./ui/NavButtons";
 
 type DateSelectorProps = {
   selectedDate: Date;

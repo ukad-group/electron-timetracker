@@ -11,8 +11,8 @@ import {
   validation,
   ReportActivity,
 } from "../../utils/reports";
-import NavButtons from "../NavButtons";
-import Button from "../Button";
+import NavButtons from "../ui/NavButtons";
+import Button from "../ui/Button";
 
 const months = [
   "January",
