@@ -7,66 +7,11 @@ on:
     tags:
       - v*
 jobs:
-  # build-win:
-  #   runs-on: windows-latest
-  #   # strategy:
-  #   #   matrix:
-  #   #     # version: [10, 12, 14]
-  #   #     os: [windows-latest, windows-latest]
-  #   # macos-latest
-  #   permissions:
-  #     contents: write
-  #   env:
-  #     GH_TOKEN: ${{ github.token }}
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: "16"
-
-  #     - name: Run find-and-replace to remove 'refs/tags/v'
-  #       uses: mad9000/actions-find-and-replace-string@3
-  #       id: findandreplace
-  #       with:
-  #         source: ${{ github.ref }}
-  #         find: "refs/tags/v"
-  #         replace: ""
-
-  #     - name: Set version in package.json
-  #       shell: bash
-  #       if: startsWith(github.ref, 'refs/tags/v')
-  #       run: |
-  #         sed -i 's|"version":.*|"version":"${{ steps.findandreplace.outputs.value }}",|g' package.json
-  #         cat package.json
-
-  #     - name: Set repo URL in package.json
-  #       shell: bash
-  #       if: startsWith(github.ref, 'refs/tags/v')
-  #       run: |
-  #         sed -i 's|"repository":.*|"repository":"${{ github.server_url }}/${{ github.repository }}",|g' package.json
-  #         cat package.json
-
-  #     - run: npm install
-  #     - run: npm run build
-  #     # - run: npm run dist-win
-  #     # - run: npm run dist-masos
-  #     - run: npm run dist
-
-  #     - name: Publish release
-  #       uses: softprops/action-gh-release@v1
-  #       if: startsWith(github.ref, 'refs/tags/')
-  #       with:
-  #         files: |
-  #           ./dist/*.exe
-  #           ./dist/latest.yml
-  #           ./dist/*
-
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [macos-latest, windows-latest]
-        # os: [macos-latest]
     permissions:
       contents: write
     env:
@@ -92,7 +37,7 @@ jobs:
           sed -i 's|"version":.*|"version":"${{ steps.findandreplace.outputs.value }}",|g' package.json
           cat package.json
 
-      - name: Set version in package.json
+      - name: Set version in package.json (macOS)
         shell: bash
         if: startsWith(github.ref, 'refs/tags/v') && runner.os == 'macOS'
         run: |
@@ -106,18 +51,12 @@ jobs:
           sed -i 's|"repository":.*|"repository":"${{ github.server_url }}/${{ github.repository }}",|g' package.json
           cat package.json
 
-      - name: Set repo URL in package.json
+      - name: Set repo URL in package.json (macOS)
         shell: bash
         if: startsWith(github.ref, 'refs/tags/v') && runner.os == 'macOS'
         run: |
           sed -i '' 's|"repository":.*|"repository":"${{ github.server_url }}/${{ github.repository }}",|g' package.json
           cat package.json
-
-      # - name: Install dmg-license for MacOS
-      #   if: runner.os == 'macOS'
-      #   run: |
-      #     brew update
-      #     brew install dmg-license
 
       - run: npm install
 
@@ -126,8 +65,6 @@ jobs:
         run: npm i dmg-license
 
       - run: npm run build
-      # - run: npm run dist-win
-      # - run: npm run dist-masos
       - run: npm run dist
 
       - name: Publish release
