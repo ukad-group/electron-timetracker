@@ -68,8 +68,6 @@ describe('parseReport function', () => {
         expect(registration).toHaveProperty('project', 'project');
     });
 
-    // should lowercase activity name before 26 Aug 2016 - is it actual?
-
     test('should keep activity name case sensitive after 26 Aug 2016', () => {
         const dayReport = parsedReport('18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05');
         const registration = dayReport[0];
@@ -86,11 +84,11 @@ describe('parseReport function', () => {
         expect(registration).toHaveProperty('description', 'dEscrIptIOn');
     });
 
-    // test('should skip the latest time line when it is only contains time "19:00" without project name', () => {
-    //     const dayReport = parsedReport('18:00 2013-05-05 - project - activity - description\n19:00');
-    //
-    //     expect(dayReport.length).toBe(1);
-    // });
+    test('should skip the latest time line when it is only contains time "19:00" without project name', () => {
+        const dayReport = parsedReport('18:00 2013-05-05 - project - activity - description\n19:00');
+
+        expect(dayReport.length).toBe(1);
+    });
 
     test('should parse the line when backslash "/" or slash "\\" are used in description', () => {
         const dayReport = parsedReport('18:00 2013-05-05 - project - activity - de \\ scription /\n19:00 2013-05-05');
@@ -217,19 +215,34 @@ describe('parseReport function', () => {
 });
 
 describe('serializeReport function', () => {
-    const activities: ReportActivity[] = [{
-        id: 1,
-        activity: 'meeting',
-        description: 'calendar discussion',
-        duration: 1800000,
-        from: '11:30',
-        project: 'timetracker',
-        to: '12:00'
-    }];
-
-    const report: string = '11:30 - timetracker - meeting - calendar discussion\n12:00 - !\n';
 
     test('should return serialized report', () => {
+        const activities: ReportActivity[] = [{
+            id: 1,
+            activity: 'meeting',
+            description: 'calendar discussion',
+            duration: 1800000,
+            from: '11:30',
+            project: 'timetracker',
+            to: '12:00'
+        }];
+
+        const report: string = '11:30 - timetracker - meeting - calendar discussion\n12:00 - !\n';
+        expect(serializeReport(activities)).toBe(report);
+    });
+
+    test('should return serialized report when [to] = ""', () => {
+        const activities: ReportActivity[] = [{
+            id: 1,
+            activity: 'meeting',
+            description: 'calendar discussion',
+            duration: 1800000,
+            from: '11:30',
+            project: 'timetracker',
+            to: ''
+        }];
+
+        const report: string = '11:30 - timetracker - meeting - calendar discussion\n';
         expect(serializeReport(activities)).toBe(report);
     });
 });
@@ -244,6 +257,10 @@ describe('calcDurationBetweenTimes function', () => {
 
     test('should return result of [to] - [from] in milliseconds', () => {
         expect(calcDurationBetweenTimes('10:00', '10:10')).toBe(600000);
+    });
+
+    test('should return result [to] - [from] in milliseconds when hour = 0', () => {
+        expect(calcDurationBetweenTimes('00:10', '00:20')).toBe(600000);
     });
 });
 
