@@ -5,3 +5,5 @@ app
 dist
 .DS_Store
 .idea
+/coverage.data
+/coverage/
