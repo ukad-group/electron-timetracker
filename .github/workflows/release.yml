@@ -65,6 +65,7 @@ jobs:
         run: npm i dmg-license
 
       - run: npm run build
+      - run: npm run test
       - run: npm run dist
 
       - name: Publish release
