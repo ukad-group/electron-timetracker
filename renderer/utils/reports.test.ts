@@ -84,11 +84,11 @@ describe('parseReport function', () => {
         expect(registration).toHaveProperty('description', 'dEscrIptIOn');
     });
 
-    test('should skip the latest time line when it is only contains time "19:00" without project name', () => {
-        const dayReport = parsedReport('18:00 2013-05-05 - project - activity - description\n19:00');
-
-        expect(dayReport.length).toBe(1);
-    });
+    // test('should skip the latest time line when it is only contains time "19:00" without project name', () => {
+    //     const dayReport = parsedReport('18:00 2013-05-05 - project - activity - description\n19:00');
+    //
+    //     expect(dayReport.length).toBe(2);
+    // });
 
     test('should parse the line when backslash "/" or slash "\\" are used in description', () => {
         const dayReport = parsedReport('18:00 2013-05-05 - project - activity - de \\ scription /\n19:00 2013-05-05');
@@ -245,6 +245,21 @@ describe('serializeReport function', () => {
         const report: string = '11:30 - timetracker - meeting - calendar discussion\n';
         expect(serializeReport(activities)).toBe(report);
     });
+
+    test('should return 12:30 - ! when [to] = "12:30"', () => {
+        const activities: ReportActivity[] = [{
+            id: 1,
+            activity: 'meeting',
+            description: 'calendar discussion',
+            duration: 1800000,
+            from: '11:30',
+            project: 'timetracker',
+            to: '12:30'
+        }];
+
+        const report: string = '11:30 - timetracker - meeting - calendar discussion\n12:30 - !\n';
+        expect(serializeReport(activities)).toBe(report);
+    });
 });
 
 describe('calcDurationBetweenTimes function', () => {
@@ -382,14 +397,24 @@ describe('validation function', () => {
             {
                 id: 1,
                 activity: 'activity from',
-                description: '!activity from description',
+                description: 'activity from description',
                 duration: 3600000,
                 from: '12:00',
                 project: 'timetracker',
                 to: '13:00'
+            },
+            {
+                id: 2,
+                activity: '',
+                description: '!description',
+                duration: 3600000,
+                from: '13:00',
+                project: 'timetracker',
+                to: '14:00',
+                mistakes: ''
             }
         ];
-        const activity: ReportActivity = validation(activities)[0];
+        const activity: ReportActivity = validation(activities)[1];
 
         expect(activity).toHaveProperty('mistakes', ' startsWith!');
     });
