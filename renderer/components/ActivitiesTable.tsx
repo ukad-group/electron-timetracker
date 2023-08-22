@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useMemo } from "react";
-import { ReportActivity, formatDuration } from "../utils/reports";
+import { ReportActivity, formatDuration, validation } from "../utils/reports";
 
 type ActivitiesTableProps = {
   activities: Array<ReportActivity>;
@@ -12,7 +12,7 @@ export default function ActivitiesTable({
   onEditActivity,
 }: ActivitiesTableProps) {
   const nonBreakActivities = useMemo(() => {
-    return activities.filter((activity) => !activity.isBreak);
+    return validation(activities).filter((activity) => !activity.isBreak);
   }, [activities]);
 
   const totalDuration = useMemo(() => {
@@ -62,7 +62,7 @@ export default function ActivitiesTable({
               <span
                 className={clsx({
                   "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800":
-                    Number(activity.duration) <= 0,
+                    !activity.isValid,
                 })}
               >
                 {activity.from} - {activity.to}
@@ -78,7 +78,19 @@ export default function ActivitiesTable({
               </span>
             </td>
             <td className="px-3 py-4 text-sm text-gray-500">
-              {activity.description}
+              <span
+                className={clsx({
+                  "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800":
+                    activity.mistakes?.includes("startsWith!"),
+                })}
+              >
+                {activity.description}
+              </span>
+              {activity.mistakes?.includes("startsWith!") && (
+                <span className="block text-xs text-gray-500 mt-1">
+                  Perhaps you wanted to report a break
+                </span>
+              )}
             </td>
             <td className="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-6 md:pr-0">
               <a
