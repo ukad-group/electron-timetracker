@@ -194,7 +194,7 @@ export default function Home() {
         </div>
       </main>
       <TrackTimeModal
-        activities={selectedDateActivities}
+        activities={parseReport(selectedDateReport)[0]}
         isOpen={trackTimeModalActivity !== null}
         editedActivity={trackTimeModalActivity}
         latestProjAndAct={latestProjAndAct}
