@@ -6,18 +6,7 @@ module.exports = {
     "./renderer/components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {
-      keyframes: {
-        dropdown: {
-          "0%": { height: "56px" },
-          "100%": { height: "200px" },
-        },
-        dropup: {
-          "0%": { height: "200px" },
-          "100%": { height: "56px" },
-        },
-      },
-    },
+    extend: {},
   },
   plugins: [require("@tailwindcss/forms")],
 };
