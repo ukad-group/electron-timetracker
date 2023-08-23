@@ -81,7 +81,7 @@ export function parseReport(fileContent: string) {
     // should skip registraion when task starts from !
     const isBreak = workingTimeRegex.test(currentLine);
     if (isBreak) {
-      registration.description = currentLine;
+      registration.project = currentLine;
       registration.isBreak = isBreak;
       reportItems.push(registration);
       reportCount++;
@@ -134,10 +134,7 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
   let report = "";
   for (const [i, activity] of activities.entries()) {
     const parts: Array<string> = [activity.from];
-
-    if (!activity.isBreak) {
-      parts.push(activity.project);
-    }
+    parts.push(activity.project);
 
     if (activity.activity) {
       parts.push(activity.activity);
