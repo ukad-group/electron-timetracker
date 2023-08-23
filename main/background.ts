@@ -70,11 +70,10 @@ const userDataDirectory = app.getPath("userData");
 
     autoUpdater.on("update-downloaded", (info) => {
       mainWindow.webContents.send("downloaded", true, info);
-      // autoUpdater.quitAndInstall();
     });
   });
   ipcMain.on("install", (event) => {
-    autoUpdater.quitAndInstall();
+    autoUpdater.quitAndInstall(true);
   });
 })();
 
@@ -190,11 +189,3 @@ ipcMain.handle(
     return sortedProjAndAct;
   }
 );
-
-app.whenReady().then(() => {
-  autoUpdater.checkForUpdates();
-});
-
-autoUpdater.on("update-available", (info) => {
-  autoUpdater.downloadUpdate();
-});
