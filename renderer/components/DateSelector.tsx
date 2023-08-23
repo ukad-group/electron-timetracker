@@ -45,7 +45,7 @@ export default function DateSelector({
           <time dateTime="2022-01-22" className="hidden sm:inline">
             {formatDate(selectedDate, "long")}
           </time>
-          {selectedDate.getDay() === today.getDay() && (
+          {selectedDate.toLocaleDateString() === today.toLocaleDateString() && (
             <span className="inline-flex  px-2.5 py-0.5 ml-3 rounded-full text-xs font-medium bg-green-100 text-green-800">
               Today
             </span>
@@ -60,7 +60,8 @@ export default function DateSelector({
           <button
             type="button"
             className="flex items-center justify-center py-2 pl-3 pr-4 text-gray-400 bg-white border border-r-0 border-gray-300 rounded-l-md hover:text-gray-500 md:w-9 md:px-2 md:hover:bg-gray-50"
-            onClick={descreaseDate}>
+            onClick={descreaseDate}
+          >
             <span className="sr-only">Previous day</span>
             <ChevronLeftIcon className="w-5 h-5" aria-hidden="true" />
           </button>
@@ -68,7 +69,8 @@ export default function DateSelector({
           <button
             type="button"
             className="flex items-center justify-center py-2 pl-4 pr-3 text-gray-400 bg-white border border-l-0 border-gray-300 rounded-r-md hover:text-gray-500 md:w-9 md:px-2 md:hover:bg-gray-50"
-            onClick={increaseDate}>
+            onClick={increaseDate}
+          >
             <span className="sr-only">Next day</span>
             <ChevronRightIcon className="w-5 h-5" aria-hidden="true" />
           </button>
