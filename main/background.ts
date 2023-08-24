@@ -4,7 +4,7 @@ import serve from "electron-serve";
 import { autoUpdater } from "electron-updater";
 import { createWindow } from "./helpers";
 import { getPathFromDate } from "./helpers/datetime";
-import { createDirByPath, searchReadFile } from "./helpers/fs";
+import { createDirByPath, searchReadFiles } from "./helpers/fs";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 type Callback = (data: string | null) => void;
@@ -173,12 +173,11 @@ ipcMain.handle(
   (event, reportsFolder: string, date: Date) => {
     if (!reportsFolder || !date) return [];
 
-    const monthReports = [];
-    const year = date.getFullYear();
+    const year = date.getFullYear().toString();
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const query = year + month;
 
-    return searchReadFile(reportsFolder, query, monthReports);
+    return searchReadFiles(reportsFolder, query, year);
   }
 );
 

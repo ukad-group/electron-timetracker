@@ -18,22 +18,46 @@ type Report = {
   reportDate: string;
 };
 
-export function searchReadFile(
+export function searchReadFiles(
   directory: string,
   query: string,
-  reportsArr: Report[]
+  year: string
+) {
+  const initialReportsArr: Report[] = [];
+  const yearFolders = fs.readdirSync(directory);
+  const currentYearFolder = yearFolders.find(
+    (folderName) => folderName === year
+  );
+
+  if (!currentYearFolder) return [];
+
+  const currentYearPath = `${directory}/${currentYearFolder}`;
+
+  const filledReportsArr = searchFilesWithSubfolders(
+    currentYearPath,
+    query,
+    initialReportsArr
+  );
+
+  return filledReportsArr;
+}
+
+function searchFilesWithSubfolders(
+  currentYearFolder: string,
+  query: string,
+  initialReportsArr: Report[]
 ) {
   try {
-    const files = fs.readdirSync(directory);
+    const files = fs.readdirSync(currentYearFolder);
 
     files.forEach((file) => {
-      const filePath = path.join(directory, file);
+      const filePath = path.join(currentYearFolder, file);
       const stats = fs.statSync(filePath);
 
       if (stats.isDirectory()) {
-        searchReadFile(filePath, query, reportsArr);
+        searchFilesWithSubfolders(filePath, query, initialReportsArr);
       } else if (file.includes(query)) {
-        reportsArr.push({
+        initialReportsArr.push({
           data: fs.readFileSync(filePath, "utf8"),
           reportDate: filePath.split(" - ")[1],
         });
@@ -43,5 +67,5 @@ export function searchReadFile(
     console.error("Error:", err);
   }
 
-  return reportsArr;
+  return initialReportsArr;
 }

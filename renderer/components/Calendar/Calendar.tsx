@@ -74,8 +74,9 @@ export function Calendar({
         )
       );
     })();
-  }, [calendarDate, shouldAutosave]);
+  }, [calendarDate, shouldAutosave, reportsFolder]);
 
+  // prettier-ignore
   useEffect(() => {
     const monthWorkHours = monthReportsFromServer.map((report) => {
       const { reportDate, data } = report;
@@ -94,7 +95,7 @@ export function Calendar({
     setMonthWorkHoursReports(monthWorkHours);
   }, [monthReportsFromServer]);
 
-  const getCalendarApi = () => (calendarRef.current.getApi());
+  const getCalendarApi = () => calendarRef.current.getApi();
 
   const prevButtonHandle = () => {
     getCalendarApi().prev();
@@ -102,12 +103,12 @@ export function Calendar({
   };
 
   const nextButtonHandle = () => {
-    getCalendarApi().next()
+    getCalendarApi().next();
     setCalendarDate((date) => new Date(date.setMonth(date.getMonth() + 1)));
   };
 
   const todayButtonHandle = () => {
-    getCalendarApi().today()
+    getCalendarApi().today();
     setCalendarDate(new Date());
   };
 
