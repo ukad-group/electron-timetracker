@@ -45,7 +45,7 @@ export default function DateSelector({
           <time dateTime="2022-01-22" className="hidden sm:inline">
             {formatDate(selectedDate, "long")}
           </time>
-          {selectedDate.getDate() === today.getDate() && (
+          {selectedDate.toLocaleDateString() === today.toLocaleDateString() && (
             <span className="inline-flex  px-2.5 py-0.5 ml-3 rounded-full text-xs font-medium bg-green-100 text-green-800">
               Today
             </span>
