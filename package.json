@@ -6,11 +6,16 @@
   "author": "mmmykhailo <mmmykhailo@proton.me>",
   "main": "app/background.js",
   "scripts": {
+    "test": "jest --coverage",
     "dev": "nextron",
     "build": "nextron build",
     "postinstall": "electron-builder install-app-deps",
     "dist": "electron-builder",
-    "dist-win": "electron-builder --win"
+    "dist-win": "electron-builder --win",
+    "dist-macos": "electron-builder  --macos",
+    "build-client": "run-script-os",
+    "build-client:win32": "electron-builder --win",
+    "build-client:darwin": "npm list -g dmg-license || sudo npm i -g dmg-license && electron-builder --mac"
   },
   "repository": "https://github.com/ukad-group/electron-timetracker",
   "publish": {
@@ -26,6 +31,9 @@
     },
     "directories": {
       "output": "dist"
+    },
+    "mac": {
+      "target": "dmg"
     }
   },
   "dependencies": {
@@ -43,17 +51,22 @@
     "zustand": "^4.3.9"
   },
   "devDependencies": {
+    "@babel/core": "^7.22.10",
+    "@types/jest": "^29.5.3",
     "@types/node": "^18.11.18",
     "@types/react": "^18.0.26",
     "autoprefixer": "^10.4.7",
     "electron": "^21.3.3",
     "electron-builder": "^23.6.0",
+    "jest": "^29.6.2",
     "next": "^12.3.4",
     "nextron": "^8.5.0",
     "postcss": "^8.4.13",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "run-script-os": "^1.1.6",
     "tailwindcss": "^3.1.8",
+    "ts-jest": "^29.1.1",
     "typescript": "^4.9.4"
   }
 }
