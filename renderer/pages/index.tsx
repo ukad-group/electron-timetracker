@@ -32,6 +32,9 @@ export default function Home() {
   const [latestProjAndAct, setLatestProjAndAct] = useState<
     Record<string, [string]>
   >({});
+  const [latestProjAndDesc, setLatestProjAndDesc] = useState<
+    Record<string, [string]>
+  >({});
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
@@ -45,13 +48,13 @@ export default function Home() {
       );
       setSelectedDateReport(dayReport || "");
 
-      setLatestProjAndAct(
-        await ipcRenderer.invoke(
-          "app:find-latest-projects",
-          reportsFolder,
-          selectedDate
-        )
+      const sortedActAndDesc = await ipcRenderer.invoke(
+        "app:find-latest-projects",
+        reportsFolder,
+        selectedDate
       );
+      setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct);
+      setLatestProjAndDesc(sortedActAndDesc.sortedProjAndDesc);
     })();
     ipcRenderer.send("start-file-watcher", reportsFolder, selectedDate);
     ipcRenderer.on("file-changed", (event, data) => {
@@ -200,6 +203,7 @@ export default function Home() {
         isOpen={trackTimeModalActivity !== null}
         editedActivity={trackTimeModalActivity}
         latestProjAndAct={latestProjAndAct}
+        latestProjAndDesc={latestProjAndDesc}
         close={() => setTrackTimeModalActivity(null)}
         submitActivity={submitActivity}
       />

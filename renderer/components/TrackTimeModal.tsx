@@ -4,6 +4,7 @@ import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import ProjectSelector from "./ProjectSelector";
 import ActivitySelector from "./ActivitySelector";
+import DescriptionSelector from "./DescriptionSelector";
 import useTimeInput from "../hooks/useTimeInput";
 import {
   ReportActivity,
@@ -16,6 +17,7 @@ type TrackTimeModalProps = {
   isOpen: boolean;
   editedActivity: ReportActivity | "new";
   latestProjAndAct: Record<string, [string]>;
+  latestProjAndDesc: Record<string, [string]>;
   close: () => void;
   submitActivity: (
     activity: Omit<ReportActivity, "id"> & Pick<ReportActivity, "id">
@@ -27,6 +29,7 @@ export default function TrackTimeModal({
   isOpen,
   editedActivity,
   latestProjAndAct,
+  latestProjAndDesc,
   close,
   submitActivity,
 }: TrackTimeModalProps) {
@@ -162,7 +165,7 @@ export default function TrackTimeModal({
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <form
-              className="relative inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+              className="relative inline-block px-4 pt-5 pb-4  text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
               onSubmit={onSave}
             >
               <div className="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
@@ -273,21 +276,12 @@ export default function TrackTimeModal({
                       tabIndex={5}
                     />
                   </div>
-
                   <div className="col-span-6">
-                    <label
-                      htmlFor="description"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Description
-                    </label>
-                    <input
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      id="description"
-                      type="text"
+                    <DescriptionSelector
+                      availableDescriptions={latestProjAndDesc[project]}
+                      selectedDescription={description}
+                      setSelectedDescription={setDescription}
                       tabIndex={4}
-                      className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                   </div>
                 </div>

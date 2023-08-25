@@ -121,16 +121,54 @@ ipcMain.handle(
     }
   }
 );
+function calcDurationBetweenTimes(from: string, to: string): number {
+  if (from == undefined || to == undefined) {
+    return null;
+  }
+  const startParts = from.split(":");
+  const endParts = to.split(":");
 
+  const startHours = parseInt(startParts[0], 10) || 0;
+  const startMinutes = parseInt(startParts[1], 10) || 0;
+
+  const endHours = parseInt(endParts[0], 10) || 0;
+  const endMinutes = parseInt(endParts[1], 10) || 0;
+
+  const startTotalMinutes = startHours * 60 + startMinutes;
+  const endTotalMinutes = endHours * 60 + endMinutes;
+
+  const totalMinutes = endTotalMinutes - startTotalMinutes;
+
+  const hours = Math.round((totalMinutes / 60) * 100) / 100;
+
+  return hours;
+}
 ipcMain.handle(
   "app:find-latest-projects",
   (event, reportsFolder: string, date: Date) => {
     if (!reportsFolder || !date) return [];
 
+    type Activity = {
+      acti: string;
+      desc: string;
+      dur: number;
+    };
+
+    type AllActivities = {
+      internal: Activity[];
+      hr: Activity[];
+    };
+
+    const parsedProjects: AllActivities = {
+      internal: [],
+      hr: [],
+    };
+
     const latesProjAndAct: Record<string, [string]> = {
       internal: [""],
       hr: [""],
     };
+
     let currentDate = new Date(date);
 
     for (let i = 0; i < 31; i++) {
@@ -140,37 +178,102 @@ ipcMain.handle(
       try {
         const lines = fs.readFileSync(timereportPath, "utf8").split("\n");
 
-        for (const line of lines) {
-          if (!timeRegex.test(line)) continue;
-          const parts = line.split(" - ");
+        for (let j = 0; j < lines.length; j++) {
+          if (!timeRegex.test(lines[j])) continue;
+          const parts = lines[j].split(" - ");
+          const from = parts[0]?.trim();
+          const to = lines[j + 1]?.split(" - ")[0];
           const project = parts[1]?.trim();
           const activity = parts[2]?.trim();
+          const description = parts[3]?.trim();
 
           if (!project || project?.startsWith("!")) continue;
 
-          if (!latesProjAndAct.hasOwnProperty(project)) {
-            latesProjAndAct[project] = [""];
+          if (!parsedProjects.hasOwnProperty(project) && parts.length === 2) {
+            parsedProjects[project] = [
+              {
+                acti: "",
+                desc: "",
+                dur: to ? calcDurationBetweenTimes(from, to) : 0,
+              },
+            ];
+            continue;
           }
-          if (
-            parts.length > 3 &&
-            !latesProjAndAct[project].includes(activity)
-          ) {
-            latesProjAndAct[project].push(activity);
+
+          if (!parsedProjects.hasOwnProperty(project) && parts.length === 3) {
+            parsedProjects[project] = [
+              {
+                acti: "",
+                desc: activity,
+                dur: to ? calcDurationBetweenTimes(from, to) : 0,
+              },
+            ];
+            continue;
           }
+          if (!parsedProjects.hasOwnProperty(project) && parts.length === 4) {
+            parsedProjects[project] = [
+              {
+                acti: activity,
+                desc: description,
+                dur: to ? calcDurationBetweenTimes(from, to) : 0,
+              },
+            ];
+            continue;
+          }
+          const newctivity: Activity = {
+            acti: "",
+            desc: "",
+            dur: to ? calcDurationBetweenTimes(from, to) : 0,
+          };
+          if (parts.length === 3) {
+            newctivity.desc = activity;
+          }
+
+          if (parts.length === 4) {
+            newctivity.acti = activity;
+            newctivity.desc = description;
+          }
+
+          parsedProjects[project].push(newctivity);
         }
       } catch (e) {
-        console.error(e);
         continue;
       }
     }
-    const sortedProjAndAct = Object.keys(latesProjAndAct)
+
+    const sortedProjAndAct: Record<string, string[]> = Object.keys(
+      parsedProjects
+    )
       .sort()
       .reduce((accumulator, key) => {
-        accumulator[key] = latesProjAndAct[key]?.sort();
+        const activitySet = new Set<string>();
 
+        parsedProjects[key]?.forEach((activity: Activity) => {
+          if (activity.acti) {
+            activitySet.add(activity.acti);
+          }
+        });
+
+        accumulator[key] = Array.from(activitySet).sort();
         return accumulator;
       }, {});
-    return sortedProjAndAct;
+
+    const sortedProjAndDesc: Record<string, string[]> = Object.keys(
+      parsedProjects
+    ).reduce((accumulator, key) => {
+      const activitySet = new Set<string>();
+
+      parsedProjects[key]?.forEach((activity: Activity) => {
+        if (activity.desc) {
+          activitySet.add(activity.desc);
+        }
+      });
+
+      accumulator[key] = Array.from(activitySet);
+      return accumulator;
+    }, {});
+
+    return { sortedProjAndAct, sortedProjAndDesc };
   }
 );
 
