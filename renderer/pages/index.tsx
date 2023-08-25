@@ -65,7 +65,7 @@ export default function Home() {
     if (selectedDateReport) {
       setReportAndNotes(parseReport(selectedDateReport));
       const activities = parseReport(selectedDateReport)[0];
-      setSelectedDateActivities(activities.filter((act) => !act.isBreak));
+      setSelectedDateActivities(activities);
       return;
     }
     setSelectedDateActivities([]);
@@ -76,7 +76,9 @@ export default function Home() {
     if (shouldAutosave) {
       const serializedReport =
         serializeReport(selectedDateActivities) +
-        (reportAndNotes[1].startsWith("undefined") ? "" : reportAndNotes[1]);
+        (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined")
+          ? ""
+          : reportAndNotes[1]);
       saveSerializedReport(serializedReport);
       setShouldAutosave(false);
     }
