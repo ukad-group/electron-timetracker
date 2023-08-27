@@ -9,6 +9,7 @@ import {
   ReportActivity,
   calcDurationBetweenTimes,
   formatDuration,
+  addDurationToTime,
 } from "../utils/reports";
 
 type TrackTimeModalProps = {
@@ -32,9 +33,11 @@ export default function TrackTimeModal({
 }: TrackTimeModalProps) {
   const [from, onFromChange, onFromBlur, setFrom] = useTimeInput();
   const [to, onToChange, onToBlur, setTo] = useTimeInput();
+  const [modalDuration, setModalDuration] = useState(""); //dwdawdawdaw
   const [project, setProject] = useState("");
   const [activity, setActivity] = useState("");
   const [description, setDescription] = useState("");
+  const [isTypingFromDuration, setIsTypingFromDuration] = useState(false);
 
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
 
@@ -96,6 +99,11 @@ export default function TrackTimeModal({
     setTo(`${ceilHours}:${ceilMinutes}`);
   }, [isOpen]);
 
+  useEffect(() => {
+    if (isTypingFromDuration) return;
+    setModalDuration(formattedDuration);
+  }, [from, to]);
+
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
 
@@ -123,6 +131,22 @@ export default function TrackTimeModal({
     setDescription("");
 
     setIsValidationEnabled(false);
+  };
+
+  const onDurationChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const value = e.target.value;
+    const formatDurationRegex = /^-?(\d*\.?\d*)?[hm]?$|^-?[hm](?![hm.])$/i;
+
+    if (formatDurationRegex.test(value)) {
+      setIsTypingFromDuration(true);
+      setModalDuration(value);
+      setTo(addDurationToTime(from, value));
+    }
+  };
+
+  const onDurationBlur = () => {
+    setIsTypingFromDuration(false);
+    setModalDuration(formattedDuration);
   };
 
   return (
@@ -241,10 +265,10 @@ export default function TrackTimeModal({
                       Duration
                     </label>
                     <input
-                      value={formattedDuration}
+                      onChange={onDurationChange}
+                      onBlur={onDurationBlur}
+                      value={modalDuration}
                       type="text"
-                      readOnly
-                      disabled
                       className={clsx(
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
                         {
