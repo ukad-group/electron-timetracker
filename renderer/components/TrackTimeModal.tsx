@@ -191,7 +191,7 @@ export default function TrackTimeModal({
                   type="button"
                   className="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                   onClick={close}
-                  tabIndex={8}
+                  tabIndex={9}
                 >
                   <span className="sr-only">Close</span>
                   <XMarkIcon className="w-6 h-6" aria-hidden="true" />
@@ -266,6 +266,7 @@ export default function TrackTimeModal({
                       onBlur={onDurationBlur}
                       value={formattedDuration}
                       type="text"
+                      tabIndex={3}
                       className={clsx(
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
                         {
@@ -283,7 +284,7 @@ export default function TrackTimeModal({
                       selectedProject={project}
                       setSelectedProject={setProject}
                       isValidationEnabled={isValidationEnabled}
-                      tabIndex={3}
+                      tabIndex={4}
                     />
                   </div>
                   <div className="col-span-6">
@@ -291,7 +292,7 @@ export default function TrackTimeModal({
                       availableActivities={latestProjAndAct[project]}
                       selectedActivity={activity}
                       setSelectedActivity={setActivity}
-                      tabIndex={5}
+                      tabIndex={6}
                     />
                   </div>
 
@@ -307,7 +308,7 @@ export default function TrackTimeModal({
                       onChange={(e) => setDescription(e.target.value)}
                       id="description"
                       type="text"
-                      tabIndex={4}
+                      tabIndex={5}
                       className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                   </div>
@@ -318,7 +319,7 @@ export default function TrackTimeModal({
                   <button
                     onClick={close}
                     type="button"
-                    tabIndex={7}
+                    tabIndex={8}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Cancel
@@ -326,7 +327,7 @@ export default function TrackTimeModal({
                   <button
                     onClick={onSave}
                     type="submit"
-                    tabIndex={6}
+                    tabIndex={7}
                     className="inline-flex justify-center px-4 py-2 ml-3 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Save
