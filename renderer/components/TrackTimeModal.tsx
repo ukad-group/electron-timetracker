@@ -33,7 +33,7 @@ export default function TrackTimeModal({
 }: TrackTimeModalProps) {
   const [from, onFromChange, onFromBlur, setFrom] = useTimeInput();
   const [to, onToChange, onToBlur, setTo] = useTimeInput();
-  const [modalDuration, setModalDuration] = useState(""); //dwdawdawdaw
+  const [formattedDuration, setFormattedDuration] = useState("");
   const [project, setProject] = useState("");
   const [activity, setActivity] = useState("");
   const [description, setDescription] = useState("");
@@ -46,11 +46,6 @@ export default function TrackTimeModal({
 
     return calcDurationBetweenTimes(from, to);
   }, [from, to]);
-
-  const formattedDuration = useMemo(() => {
-    if (duration === null) return "";
-    return formatDuration(duration);
-  }, [duration]);
 
   const isFormInvalid = useMemo(() => {
     return !from || !to || !duration || duration < 0 || !project;
@@ -101,7 +96,9 @@ export default function TrackTimeModal({
 
   useEffect(() => {
     if (isTypingFromDuration) return;
-    setModalDuration(formattedDuration);
+    if (duration === null) setFormattedDuration("");
+
+    setFormattedDuration(formatDuration(duration));
   }, [from, to]);
 
   const onSave = (e: FormEvent | MouseEvent) => {
@@ -139,14 +136,14 @@ export default function TrackTimeModal({
 
     if (formatDurationRegex.test(value)) {
       setIsTypingFromDuration(true);
-      setModalDuration(value);
+      setFormattedDuration(value);
       setTo(addDurationToTime(from, value));
     }
   };
 
   const onDurationBlur = () => {
     setIsTypingFromDuration(false);
-    setModalDuration(formattedDuration);
+    setFormattedDuration(formatDuration(duration));
   };
 
   return (
@@ -267,7 +264,7 @@ export default function TrackTimeModal({
                     <input
                       onChange={onDurationChange}
                       onBlur={onDurationBlur}
-                      value={modalDuration}
+                      value={formattedDuration}
                       type="text"
                       className={clsx(
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
