@@ -10,7 +10,7 @@ export default function Header() {
 
   return (
     <header className="bg-white shadow">
-      <div className="flex justify-between h-16 px-2 mx-auto max-w-7xl sm:px-4 lg:px-8">
+      <div className="flex justify-between h-16 px-2 mx-auto max-w-[1350px] sm:px-4 lg:px-8">
         <div className="flex flex-shrink-0 px-2 lg:px-0">
           Current version 1.0.36
         </div>

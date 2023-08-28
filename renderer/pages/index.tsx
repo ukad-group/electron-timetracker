@@ -157,7 +157,7 @@ export default function Home() {
       <Header />
 
       <main className="py-10">
-        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-cols-3">
+        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1350px] lg:grid-cols-[31%_31%_34%]">
           {reportsFolder ? (
             <>
               <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">
