@@ -10,6 +10,7 @@ import {
   calcDurationBetweenTimes,
   formatDuration,
 } from "../../utils/reports";
+import { checkIsToday } from "../../utils/datetime-ui";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -86,8 +87,7 @@ export default function TrackTimeModal({
     )
       .toString()
       .padStart(2, "0");
-    const isToday =
-      now.setHours(0, 0, 0, 0) === selectedDate.setHours(0, 0, 0, 0);
+    const isToday = checkIsToday(selectedDate);
 
     if (activities.length && activities[activities.length - 1].to) {
       setFrom(activities[activities.length - 1].to);
