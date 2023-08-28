@@ -2,16 +2,16 @@ import clsx from "clsx";
 import { FormEvent, Fragment, useEffect, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
-import ProjectSelector from "./ProjectSelector";
-import ActivitySelector from "./ActivitySelector";
-import useTimeInput from "../hooks/useTimeInput";
+import ProjectSelector from "../ProjectSelector";
+import ActivitySelector from "../ActivitySelector";
+import useTimeInput from "../../hooks/useTimeInput";
 import {
   ReportActivity,
   calcDurationBetweenTimes,
   formatDuration,
-} from "../utils/reports";
+} from "../../utils/reports";
 
-type TrackTimeModalProps = {
+export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
   isOpen: boolean;
   editedActivity: ReportActivity | "new";
@@ -20,6 +20,7 @@ type TrackTimeModalProps = {
   submitActivity: (
     activity: Omit<ReportActivity, "id"> & Pick<ReportActivity, "id">
   ) => void;
+  selectedDate: Date;
 };
 
 export default function TrackTimeModal({
@@ -29,6 +30,7 @@ export default function TrackTimeModal({
   latestProjAndAct,
   close,
   submitActivity,
+  selectedDate,
 }: TrackTimeModalProps) {
   const [from, onFromChange, onFromBlur, setFrom] = useTimeInput();
   const [to, onToChange, onToBlur, setTo] = useTimeInput();
@@ -84,6 +86,8 @@ export default function TrackTimeModal({
     )
       .toString()
       .padStart(2, "0");
+    const isToday =
+      now.setHours(0, 0, 0, 0) === selectedDate.setHours(0, 0, 0, 0);
 
     if (activities.length && activities[activities.length - 1].to) {
       setFrom(activities[activities.length - 1].to);
@@ -93,7 +97,7 @@ export default function TrackTimeModal({
       setFrom(`${hours}:${floorMinutes}`);
     }
 
-    setTo(`${ceilHours}:${ceilMinutes}`);
+    isToday ? setTo(`${ceilHours}:${ceilMinutes}`) : setTo("");
   }, [isOpen]);
 
   const onSave = (e: FormEvent | MouseEvent) => {
