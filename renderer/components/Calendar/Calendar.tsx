@@ -113,11 +113,13 @@ export function Calendar({
   };
 
   const dateClickHandle = (info) => {
+    info.date.setHours(1); // by default info.date is 00:00, sometimes it can cause a bug, considering the date as the previous day
     setSelectedDate(info.date);
   };
 
   const addCellClassNameHandle = (info) => {
-    if (info.date.setHours(0, 0, 0, 0) === selectedDate.setHours(0, 0, 0, 0)) {
+    const chosenDate = new Date(selectedDate); // just avoid mutating
+    if (info.date.setHours(1, 1, 1, 1) === chosenDate.setHours(1, 1, 1, 1)) {
       return "fc-custom-today-date";
     }
     return "";
