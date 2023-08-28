@@ -15,6 +15,7 @@ import ActivitiesSection from "../components/ActivitiesSection";
 import SelectFolderPlaceholder from "../components/SelectFolderPlaceholder";
 import { useMainStore } from "../store/mainStore";
 import { Calendar } from "../components/Calendar/Calendar";
+import PageLoadingSpinner from "../components/ui/PageLoadingSpinner/PageLoadingSpinner";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -36,6 +37,13 @@ export default function Home() {
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
+
+  const [ spinner, setSpinner ] = useState(true);
+
+  useEffect(() => {
+    document.onvisibilitychange = () => window.location.reload();
+    setTimeout(() => setSpinner(false), 1000);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -212,6 +220,7 @@ export default function Home() {
         close={() => setTrackTimeModalActivity(null)}
         submitActivity={submitActivity}
       />
+      { spinner && <PageLoadingSpinner/> }
     </div>
   );
 }
