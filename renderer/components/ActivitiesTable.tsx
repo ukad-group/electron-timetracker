@@ -24,10 +24,11 @@ export default function ActivitiesTable({
   const copyToClipboardHandle = (e) => {
     const cell = e.target;
     const originaValue = cell.textContent;
-    let modifiedValue: string | number;
     const cellColumnName = cell.getAttribute("data-column");
+    let modifiedValue: string | number;
 
-    if (cellColumnName === "duration") {
+    if (cellColumnName === "duration" || cellColumnName === "total") {
+      console.log("trigger");
       if (originaValue.includes("h")) {
         modifiedValue = originaValue.slice(0, -1);
       } else if (originaValue.includes("m")) {
@@ -62,27 +63,25 @@ export default function ActivitiesTable({
         <tr>
           <th
             scope="col"
-            className="w-24 pb-6 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0"
-          >
+            className="w-24 pb-6 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0">
             Interval
           </th>
           <th
             scope="col"
-            className="w-24 pb-6 px-3 text-left text-sm font-semibold text-gray-900"
-          >
+            className="w-24 pb-6 px-3 text-left text-sm font-semibold text-gray-900">
             Duration
           </th>
           <th
             scope="col"
-            className="pb-6 px-3 text-left text-sm font-semibold text-gray-900 relative"
-          >
-            <span className="block absolute text-xs text-gray-500 top-[22px]">activity</span>
+            className="pb-6 px-3 text-left text-sm font-semibold text-gray-900 relative">
+            <span className="block absolute text-xs text-gray-500 top-[22px]">
+              activity
+            </span>
             Project
           </th>
           <th
             scope="col"
-            className="pb-6 px-3 text-left text-sm font-semibold text-gray-900"
-          >
+            className="pb-6 px-3 text-left text-sm font-semibold text-gray-900">
             Description
           </th>
           <th scope="col" className="relative pb-6 pl-3 pr-4 sm:pr-6 md:pr-0">
@@ -98,8 +97,7 @@ export default function ActivitiesTable({
                 className={clsx({
                   "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800":
                     !activity.isValid,
-                })}
-              >
+                })}>
                 {activity.from} - {activity.to}
               </span>
             </td>
@@ -115,7 +113,8 @@ export default function ActivitiesTable({
                 onClick={copyToClipboardHandle}>
                 {activity.project}
               </p>
-              <span className="px-3 pb-4 block text-xs text-gray-500 font-semibold mt-1 cursor-pointer" 
+              <span
+                className="px-3 pb-4 block text-xs text-gray-500 font-semibold mt-1 cursor-pointer"
                 onClick={copyToClipboardHandle}>
                 {activity.activity}
               </span>
@@ -127,8 +126,7 @@ export default function ActivitiesTable({
                 className={clsx({
                   "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800":
                     activity.mistakes?.includes("startsWith!"),
-                })}
-              >
+                })}>
                 {activity.description}
               </span>
               {activity.mistakes?.includes("startsWith!") && (
@@ -141,8 +139,7 @@ export default function ActivitiesTable({
               <a
                 href="#"
                 className="text-blue-600 hover:text-blue-900"
-                onClick={() => onEditActivity(activity)}
-              >
+                onClick={() => onEditActivity(activity)}>
                 Edit
               </a>
             </td>
@@ -152,13 +149,15 @@ export default function ActivitiesTable({
           <td className="py-4 pl-4 pr-3 text-sm text-gray-500 whitespace-nowrap sm:pl-6 md:pl-0">
             Total
           </td>
-          <td className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap cursor-pointer" onClick={copyToClipboardHandle}>
+          <td
+            className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap cursor-pointer"
+            onClick={copyToClipboardHandle}
+            data-column="total">
             {formatDuration(totalDuration)}
           </td>
           <td
             className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
-            colSpan={4}
-          >
+            colSpan={4}>
             {totalDuration < 8 * msPerHour && getLackBadge(totalDuration)}
           </td>
         </tr>
