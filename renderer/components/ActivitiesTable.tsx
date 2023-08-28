@@ -12,7 +12,7 @@ export default function ActivitiesTable({
   onEditActivity,
 }: ActivitiesTableProps) {
   const nonBreakActivities = useMemo(() => {
-    return validation(activities).filter((activity) => !activity.isBreak);
+    return validation(activities.filter((activity) => !activity.isBreak));
   }, [activities]);
 
   const totalDuration = useMemo(() => {

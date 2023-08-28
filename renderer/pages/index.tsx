@@ -14,6 +14,7 @@ import ManualInputForm from "../components/ManualInputForm";
 import ActivitiesSection from "../components/ActivitiesSection";
 import SelectFolderPlaceholder from "../components/SelectFolderPlaceholder";
 import { useMainStore } from "../store/mainStore";
+import { Calendar } from "../components/Calendar/Calendar";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -65,7 +66,7 @@ export default function Home() {
     if (selectedDateReport) {
       setReportAndNotes(parseReport(selectedDateReport));
       const activities = parseReport(selectedDateReport)[0];
-      setSelectedDateActivities(activities.filter((act) => !act.isBreak));
+      setSelectedDateActivities(activities);
       return;
     }
     setSelectedDateActivities([]);
@@ -76,7 +77,9 @@ export default function Home() {
     if (shouldAutosave) {
       const serializedReport =
         serializeReport(selectedDateActivities) +
-        (reportAndNotes[1]?.startsWith("undefined") ? "" : reportAndNotes[1]);
+        (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined")
+          ? ""
+          : reportAndNotes[1]);
       saveSerializedReport(serializedReport);
       setShouldAutosave(false);
     }
@@ -154,10 +157,10 @@ export default function Home() {
       <Header />
 
       <main className="py-10">
-        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
+        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-cols-3">
           {reportsFolder ? (
             <>
-              <div className="space-y-6 lg:col-start-1 lg:col-span-2">
+              <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">
                 <section>
                   <div className="bg-white shadow sm:rounded-lg">
                     <DateSelector
@@ -166,8 +169,8 @@ export default function Home() {
                     />
                   </div>
                 </section>
-                <section>
-                  <div className="bg-white shadow sm:rounded-lg">
+                <section className="flex-grow">
+                  <div className="bg-white shadow sm:rounded-lg h-full">
                     <ActivitiesSection
                       activities={selectedDateActivities}
                       onEditActivity={setTrackTimeModalActivity}
@@ -191,6 +194,14 @@ export default function Home() {
           ) : (
             <SelectFolderPlaceholder setFolder={setReportsFolder} />
           )}
+          <section className="lg:col-span-2">
+            <Calendar
+              reportsFolder={reportsFolder}
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              shouldAutosave={shouldAutosave}
+            />
+          </section>
         </div>
       </main>
       <TrackTimeModal
