@@ -13,6 +13,7 @@ import {
 } from "../../utils/reports";
 import NavButtons from "../ui/NavButtons";
 import Button from "../ui/Button";
+import { isTheSameDates } from "../../utils/datetime-ui";
 
 const months = [
   "January",
@@ -118,8 +119,8 @@ export function Calendar({
   };
 
   const addCellClassNameHandle = (info) => {
-    const chosenDate = new Date(selectedDate); // just avoid mutating
-    if (info.date.setHours(1, 1, 1, 1) === chosenDate.setHours(1, 1, 1, 1)) {
+    const isToday = isTheSameDates(info.date, selectedDate);
+    if (isToday) {
       return "fc-custom-today-date";
     }
     return "";
