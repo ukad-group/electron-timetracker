@@ -38,7 +38,7 @@ export default function ManualInputForm({
     setSaveBtnStatus('inprogress');
     setTimeout(() => {
       setSaveBtnStatus('disabled');
-    }, 1000);
+    }, 1200);
   }
 
   const setReportHandler = (report) => {

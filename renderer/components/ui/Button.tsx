@@ -1,3 +1,5 @@
+import Loader from "./Loader";
+
 type ButtonProps = {
   text: string;
   callback: () => void;
@@ -30,9 +32,8 @@ export default function Button({ callback, text, disabled, status }: ButtonProps
       type="button"
       className={ styles }
       disabled={disabled ? disabled : false}>
-      {status && status === "inprogress" && <span className="loader mr-2"></span>}
+      {status && status === "inprogress" && <Loader/>}
       { saveBtnStatuses[status] ? saveBtnStatuses[status].text : text }
-      {  }
     </button>
   );
 }
