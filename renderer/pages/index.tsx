@@ -124,23 +124,31 @@ export default function Home() {
       });
       isEdit = true;
     }
-
     for (let i = 0; i < selectedDateActivities.length; i++) {
-      const indexActTime = stringToMinutes(selectedDateActivities[i].from);
-      if (newActFrom < indexActTime) {
+      const indexActFrom = stringToMinutes(selectedDateActivities[i].from);
+
+      if (newActFrom < indexActFrom && !isPastTime) {
         tempActivities.push(activity);
         isPastTime = true;
       }
-      if (!i && newActFrom < indexActTime) {
+      if (!i && newActFrom < indexActFrom) {
         tempActivities.push(...selectedDateActivities);
         break;
       }
+      if (newActFrom === indexActFrom) {
+        tempActivities.push(activity);
+        isPastTime = true;
+        continue;
+      }
       tempActivities.push(selectedDateActivities[i]);
     }
-
-    tempActivities.forEach((act, i) => (act.id = i + 1));
+    console.log(tempActivities);
+    tempActivities.forEach(
+      (act, i) => (
+        (act.id = i + 1), act.isBreak ? (act.to = "") : (act.to = act.to)
+      )
+    );
     if (tempActivities.length === selectedDateActivities.length && !isEdit) {
-      tempActivities.push(activity);
       setSelectedDateActivities(tempActivities.filter((act) => act.duration));
     }
     if (isPastTime && !isEdit) {
