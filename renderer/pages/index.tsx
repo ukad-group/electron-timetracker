@@ -1,4 +1,4 @@
-import { app, ipcRenderer } from "electron";
+import { ipcRenderer } from "electron";
 import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
@@ -16,7 +16,6 @@ import SelectFolderPlaceholder from "../components/SelectFolderPlaceholder";
 import VersionMessage from "../components/ui/VersionMessages";
 import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
-import { useUpdateStore } from "../store/updateStore";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -39,34 +38,6 @@ export default function Home() {
     []
   );
 
-  const [update, setUpdate] = useUpdateStore(
-    (state) => [state.update, state.setUpdate],
-    shallow
-  );
-  const [isUpdate, setIsUpdate] = useState(false);
-  const [isDownload, setIsDownload] = useState(false);
-  const [version, setVersion] = useState("");
-  const [currentVersion, setCurrentVersion] = useState(app?.getVersion());
-
-  useEffect(() => {
-    ipcRenderer.send("start-update-watcher");
-    ipcRenderer.on("update-available", (event, data, info) => {
-      setIsUpdate(data);
-      setVersion(info.version);
-    });
-    ipcRenderer.on("downloaded", (event, data, info) => {
-      setIsDownload(data);
-      setVersion(info.version);
-    });
-    ipcRenderer.on("current-version", (event, data) => {
-      setCurrentVersion(data);
-    });
-  }, []);
-
-  const install = () => {
-    setUpdate("new");
-    ipcRenderer.send("install");
-  };
   useEffect(() => {
     (async () => {
       const dayReport = await ipcRenderer.invoke(
@@ -180,26 +151,10 @@ export default function Home() {
     setShouldAutosave(shouldAutosave);
   };
 
-  const isUpdateToggle = () => {
-    if (update === "old") {
-      setUpdate("new");
-    } else {
-      setUpdate("old");
-    }
-  };
-
   return (
     <div className="min-h-full">
       <Header />
-      <div className="absolute items-center flex-shrink-0 pl-2 text-xs text-gray-700 font-semibold">
-        Current version {currentVersion} {!isUpdate && "(latest)"}
-      </div>
-      <VersionMessage
-        isUpdate={isUpdate}
-        isDownload={isDownload}
-        version={version}
-        install={install}
-      />
+      <VersionMessage />
       <main className="py-5">
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
           {reportsFolder ? (
@@ -233,10 +188,7 @@ export default function Home() {
                     selectedDateReport={selectedDateReport}
                   />
                 </div>
-                <UpdateDescription
-                  update={update}
-                  isUpdateToggle={isUpdateToggle}
-                />
+                <UpdateDescription />
               </section>
             </>
           ) : (
