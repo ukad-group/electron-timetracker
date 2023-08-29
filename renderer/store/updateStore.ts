@@ -8,8 +8,8 @@ import {
 } from "zustand/middleware";
 
 export type UpdateStore = {
-  update: "old" | "new";
-  setUpdate: (theme: "old" | "new") => void;
+  update: { age: "old" | "new"; description: string };
+  setUpdate: (update: { age: "old" | "new"; description: string }) => void;
 };
 
 const storage: StateStorage = {
@@ -28,8 +28,13 @@ export const useUpdateStore = create<UpdateStore>()(
   devtools(
     persist(
       (set) => ({
-        update: "new",
-        setUpdate: (update: "old" | "new") => set({ update: update }),
+        update: {
+          age: "new",
+          description:
+            "Added informative messages about the update status and a button for manual installation of the downloaded version. Added panel with logs up to the last update",
+        },
+        setUpdate: (update: { age: "old" | "new"; description: string }) =>
+          set({ update: { age: update.age, description: update.description } }),
       }),
       {
         name: "update-storage",
