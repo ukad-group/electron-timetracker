@@ -85,8 +85,10 @@ export default function UpdateDescription() {
             </svg>
           </button>
         </div>
-
-        <div className="mt-3 h-32  overflow-y-auto">{update.description}</div>
+        <div
+          className="flex flex-col gap-2 mt-3 h-32 overflow-y-auto"
+          dangerouslySetInnerHTML={{ __html: update.description }}
+        ></div>
       </div>
     </div>
   );
