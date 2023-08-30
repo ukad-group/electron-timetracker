@@ -142,7 +142,6 @@ export default function Home() {
       }
       tempActivities.push(selectedDateActivities[i]);
     }
-    console.log(tempActivities);
     tempActivities.forEach(
       (act, i) => (
         (act.id = i + 1), act.isBreak ? (act.to = "") : (act.to = act.to)
