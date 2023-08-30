@@ -99,7 +99,8 @@ export default function Home() {
     let isEdit = false;
     let isPastTime = false;
     const tempActivities: Array<ReportActivity> = [];
-    const newActTime = stringToMinutes(activity.from);
+    const newActFrom = stringToMinutes(activity.from);
+    const newActTo = stringToMinutes(activity.to);
     const activityIndex = selectedDateActivities.findIndex(
       (act) => act.id === activity.id
     );
@@ -112,27 +113,41 @@ export default function Home() {
     if (activityIndex >= 0) {
       setSelectedDateActivities((activities) => {
         activities[activityIndex] = activity;
+        if (
+          newActTo > stringToMinutes(activities[activityIndex + 1].from) &&
+          activities[activityIndex + 1].isBreak
+        ) {
+          activities.splice(activityIndex + 1, 1);
+        }
+
         return [...activities];
       });
       isEdit = true;
     }
-
     for (let i = 0; i < selectedDateActivities.length; i++) {
-      const indexActTime = stringToMinutes(selectedDateActivities[i].from);
-      if (newActTime < indexActTime) {
+      const indexActFrom = stringToMinutes(selectedDateActivities[i].from);
+
+      if (newActFrom < indexActFrom && !isPastTime) {
         tempActivities.push(activity);
         isPastTime = true;
       }
-      if (!i && newActTime < indexActTime) {
+      if (!i && newActFrom < indexActFrom) {
         tempActivities.push(...selectedDateActivities);
         break;
       }
+      if (newActFrom === indexActFrom) {
+        tempActivities.push(activity);
+        isPastTime = true;
+        continue;
+      }
       tempActivities.push(selectedDateActivities[i]);
     }
-
-    tempActivities.forEach((act, i) => (act.id = i + 1));
+    tempActivities.forEach(
+      (act, i) => (
+        (act.id = i + 1), act.isBreak ? (act.to = "") : (act.to = act.to)
+      )
+    );
     if (tempActivities.length === selectedDateActivities.length && !isEdit) {
-      tempActivities.push(activity);
       setSelectedDateActivities(tempActivities.filter((act) => act.duration));
     }
     if (isPastTime && !isEdit) {
