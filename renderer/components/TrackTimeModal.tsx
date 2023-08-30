@@ -127,10 +127,36 @@ export default function TrackTimeModal({
         });
         continue;
       }
-      if (Object.keys(latestDescription).length && activities[i].description) {
+      if (
+        Object.keys(latestDescription).length &&
+        activities[i].description &&
+        !latestDescription[activities[i].project.trim()].includes(
+          activities[i].description
+        )
+      ) {
         setLatestDescription((latestDescription) => {
-          latestActivities[activities[i].project.trim()]?.splice(
-            latestActivities[activities[i].project.trim()].indexOf(
+          latestDescription[activities[i].project.trim()].unshift(
+            activities[i].description
+          );
+          return latestDescription;
+        });
+        setLatestActivities((latestActivities) => {
+          latestActivities[activities[i].project.trim()].unshift(
+            activities[i].description
+          );
+          return latestActivities;
+        });
+      }
+      if (
+        Object.keys(latestDescription).length &&
+        activities[i].description &&
+        latestDescription[activities[i].project.trim()].includes(
+          activities[i].description
+        )
+      ) {
+        setLatestDescription((latestDescription) => {
+          latestDescription[activities[i].project.trim()].splice(
+            latestDescription[activities[i].project.trim()].indexOf(
               activities[i].description
             ),
             1
@@ -141,7 +167,7 @@ export default function TrackTimeModal({
           return latestDescription;
         });
         setLatestActivities((latestActivities) => {
-          latestActivities[activities[i].project.trim()]?.splice(
+          latestActivities[activities[i].project.trim()].splice(
             latestActivities[activities[i].project.trim()].indexOf(
               activities[i].description
             ),
