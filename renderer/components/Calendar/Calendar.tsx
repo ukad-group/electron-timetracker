@@ -13,6 +13,7 @@ import {
 } from "../../utils/reports";
 import NavButtons from "../ui/NavButtons";
 import Button from "../ui/Button";
+import { isTheSameDates } from "../../utils/datetime-ui";
 
 const months = [
   "January",
@@ -113,11 +114,13 @@ export function Calendar({
   };
 
   const dateClickHandle = (info) => {
+    info.date.setHours(1); // by default info.date is 00:00, sometimes it can cause a bug, considering the date as the previous day
     setSelectedDate(info.date);
   };
 
   const addCellClassNameHandle = (info) => {
-    if (info.date.setHours(0, 0, 0, 0) === selectedDate.setHours(0, 0, 0, 0)) {
+    const isToday = isTheSameDates(info.date, selectedDate);
+    if (isToday) {
       return "fc-custom-today-date";
     }
     return "";

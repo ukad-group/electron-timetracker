@@ -9,7 +9,7 @@ import {
   serializeReport,
   ReportAndNotes,
 } from "../utils/reports";
-import TrackTimeModal from "../components/TrackTimeModal";
+import TrackTimeModal from "../components/TrackTimeModal/TrackTimeModal";
 import ManualInputForm from "../components/ManualInputForm";
 import ActivitiesSection from "../components/ActivitiesSection";
 import SelectFolderPlaceholder from "../components/SelectFolderPlaceholder";
@@ -226,6 +226,7 @@ export default function Home() {
         latestProjAndAct={latestProjAndAct}
         close={() => setTrackTimeModalActivity(null)}
         submitActivity={submitActivity}
+        selectedDate={selectedDate}
       />
     </div>
   );
