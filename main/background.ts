@@ -164,11 +164,6 @@ ipcMain.handle(
       hr: [],
     };
 
-    const latesProjAndAct: Record<string, [string]> = {
-      internal: [""],
-      hr: [""],
-    };
-
     let currentDate = new Date(date);
 
     for (let i = 0; i < 31; i++) {
@@ -258,7 +253,7 @@ ipcMain.handle(
         return accumulator;
       }, {});
 
-    const sortedProjAndDesc: Record<string, string[]> = Object.keys(
+    const descriptionsSet: Record<string, string[]> = Object.keys(
       parsedProjects
     ).reduce((accumulator, key) => {
       const activitySet = new Set<string>();
@@ -273,7 +268,7 @@ ipcMain.handle(
       return accumulator;
     }, {});
 
-    return { sortedProjAndAct, sortedProjAndDesc };
+    return { sortedProjAndAct, descriptionsSet };
   }
 );
 
