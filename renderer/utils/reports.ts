@@ -194,7 +194,7 @@ export function addDurationToTime(fromTime: string, duration: string) {
 
   let totalMinutes = fromHours * 60 + fromMinutes;
 
-  if (duration.includes("m")) {
+  if (duration.includes("m") || parseInt(duration) > 24) {
     const durationMinutes = parseInt(duration);
     if (durationMinutes) totalMinutes += durationMinutes;
   } else {
@@ -202,7 +202,11 @@ export function addDurationToTime(fromTime: string, duration: string) {
     if (durationHours) totalMinutes += durationHours * 60;
   }
 
-  if (totalMinutes >= 1440 || totalMinutes < 0) totalMinutes = 1439;
+  if (totalMinutes >= 1440) {
+    totalMinutes = 1439;
+  } else if (totalMinutes < 0) {
+    totalMinutes = 0;
+  }
 
   const toHours = Math.floor(totalMinutes / 60);
   const toMinutes = Math.round(totalMinutes % 60);
