@@ -127,20 +127,26 @@ export default function TrackTimeModal({
         });
         continue;
       }
-      if (
-        Object.keys(latestDescription).length &&
-        activities[i].description &&
-        !latestDescription[activities[i].project.trim()].includes(
-          activities[i].description
-        )
-      ) {
+      if (Object.keys(latestDescription).length && activities[i].description) {
         setLatestDescription((latestDescription) => {
+          latestActivities[activities[i].project.trim()]?.splice(
+            latestActivities[activities[i].project.trim()].indexOf(
+              activities[i].description
+            ),
+            1
+          );
           latestDescription[activities[i].project.trim()].unshift(
             activities[i].description
           );
           return latestDescription;
         });
         setLatestActivities((latestActivities) => {
+          latestActivities[activities[i].project.trim()]?.splice(
+            latestActivities[activities[i].project.trim()].indexOf(
+              activities[i].description
+            ),
+            1
+          );
           latestActivities[activities[i].project.trim()].unshift(
             activities[i].description
           );
