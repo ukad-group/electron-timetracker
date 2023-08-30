@@ -3,7 +3,7 @@ import { app, dialog, ipcMain } from "electron";
 import serve from "electron-serve";
 import { autoUpdater } from "electron-updater";
 import { createWindow } from "./helpers";
-import { getPathFromDate } from "./helpers/datetime";
+import { getPathFromDate, calcDurationBetweenTimes } from "./helpers/datetime";
 import { createDirByPath } from "./helpers/fs";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
@@ -121,28 +121,7 @@ ipcMain.handle(
     }
   }
 );
-function calcDurationBetweenTimes(from: string, to: string): number {
-  if (from == undefined || to == undefined) {
-    return null;
-  }
-  const startParts = from.split(":");
-  const endParts = to.split(":");
 
-  const startHours = parseInt(startParts[0], 10) || 0;
-  const startMinutes = parseInt(startParts[1], 10) || 0;
-
-  const endHours = parseInt(endParts[0], 10) || 0;
-  const endMinutes = parseInt(endParts[1], 10) || 0;
-
-  const startTotalMinutes = startHours * 60 + startMinutes;
-  const endTotalMinutes = endHours * 60 + endMinutes;
-
-  const totalMinutes = endTotalMinutes - startTotalMinutes;
-
-  const hours = Math.round((totalMinutes / 60) * 100) / 100;
-
-  return hours;
-}
 ipcMain.handle(
   "app:find-latest-projects",
   (event, reportsFolder: string, date: Date) => {
