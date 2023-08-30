@@ -30,7 +30,7 @@ export default function UpdateDescription() {
 
   ipcRenderer.on("downloaded", (event, data, info) => {
     setRelease(info);
-    setUpdate({ age: "new", description: release?.releaseNotes });
+    setUpdate({ age: "new", description: info?.releaseNotes });
   });
   ipcRenderer.on("current-version", (event, data) => {
     setCurrentVersion(data);
@@ -86,9 +86,7 @@ export default function UpdateDescription() {
           </button>
         </div>
 
-        <ul className="mt-3 h-32  overflow-y-auto">
-          <li>{update.description}</li>
-        </ul>
+        <div className="mt-3 h-32  overflow-y-auto">{update.description}</div>
       </div>
     </div>
   );

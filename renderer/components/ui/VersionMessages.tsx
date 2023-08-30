@@ -30,7 +30,6 @@ export default function VersionMessage() {
     ipcRenderer.on("downloaded", (event, data, info) => {
       setIsDownload(data);
       setVersion(info.version);
-      console.log("Downloaded");
     });
     ipcRenderer.on("current-version", (event, data) => {
       setCurrentVersion(data);
