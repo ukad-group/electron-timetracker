@@ -22,6 +22,21 @@ jobs:
         with:
           node-version: "16"
 
+      - name: Get Tag Info
+        id: tag_info
+        shell: bash
+        run: |
+          TAG_REF=$(git ls-remote origin ${GITHUB_REF} | awk '{ print $1 }')
+          echo "TAG_REF = ${TAG_REF}"
+          TAG_MESSAGE=$(curl -s -H "Authorization: Bearer ${GH_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY}/git/tags/${TAG_REF}" | jq -r '.message')
+
+          echo "tag_message=${TAG_MESSAGE}" >> $GITHUB_OUTPUT
+          echo "TAG_MESSAGE = ${TAG_MESSAGE}"
+
+      - name: Print Tag Message
+        shell: bash
+        run: echo "Tag message is '${{ steps.tag_info.outputs.tag_message }}'"
+
       - name: Run find-and-replace to remove 'refs/tags/v'
         uses: mad9000/actions-find-and-replace-string@3
         id: findandreplace
@@ -70,8 +85,11 @@ jobs:
 
       - name: Publish release
         uses: softprops/action-gh-release@v1
+        id: release
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          body: "${{ steps.tag_info.outputs.tag_message }}"
+          generate_release_notes: true
           files: |
             ./dist/*.exe
             ./dist/*.dmg
