@@ -254,7 +254,7 @@ ipcMain.handle(
           }
         });
 
-        accumulator[key] = Array.from(activitySet).sort();
+        accumulator[key] = Array.from(activitySet);
         return accumulator;
       }, {});
 

@@ -22,14 +22,18 @@ export default function ActivitySelector({
 }: ActivitySelectorProps) {
   const filteredActivities =
     selectedActivity === ""
-      ? availableActivities?.filter((activity) => {
-          return activity !== "";
-        })
-      : availableActivities?.filter((activity) => {
-          return activity
-            .toLowerCase()
-            .includes(selectedActivity.toLowerCase());
-        });
+      ? availableActivities
+          ?.filter((activity) => {
+            return activity !== "";
+          })
+          .sort()
+      : availableActivities
+          ?.filter((activity) => {
+            return activity
+              .toLowerCase()
+              .includes(selectedActivity.toLowerCase());
+          })
+          .sort();
 
   return (
     <Combobox

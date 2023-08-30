@@ -38,9 +38,9 @@ export default function TrackTimeModal({
   const [project, setProject] = useState("");
   const [activity, setActivity] = useState("");
   const [description, setDescription] = useState("");
-
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
-
+  const [latestActivities, setLatestActivities] = useState(latestProjAndAct);
+  const [latestDescription, setLatestDescription] = useState(latestProjAndDesc);
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
 
@@ -98,6 +98,57 @@ export default function TrackTimeModal({
 
     setTo(`${ceilHours}:${ceilMinutes}`);
   }, [isOpen]);
+
+  useEffect(() => {
+    setLatestActivities(latestProjAndAct);
+    setLatestDescription(latestProjAndDesc);
+
+    for (let i = 0; i < activities.length; i++) {
+      if (!activities[i].project || activities[i].project?.startsWith("!")) {
+        continue;
+      }
+      if (
+        Object.keys(latestDescription).length &&
+        !latestDescription.hasOwnProperty(activities[i].project.trim()) &&
+        activities[i].description
+      ) {
+        setLatestDescription((latestDescription) => {
+          latestDescription[activities[i].project.trim()] = [
+            activities[i].description,
+          ];
+          return latestDescription;
+        });
+
+        setLatestActivities((latestActivities) => {
+          latestActivities[activities[i].project.trim()] = [
+            activities[i].description,
+          ];
+          return latestActivities;
+        });
+        continue;
+      }
+      if (
+        Object.keys(latestDescription).length &&
+        activities[i].description &&
+        !latestDescription[activities[i].project.trim()].includes(
+          activities[i].description
+        )
+      ) {
+        setLatestDescription((latestDescription) => {
+          latestDescription[activities[i].project.trim()].unshift(
+            activities[i].description
+          );
+          return latestDescription;
+        });
+        setLatestActivities((latestActivities) => {
+          latestActivities[activities[i].project.trim()].unshift(
+            activities[i].description
+          );
+          return latestActivities;
+        });
+      }
+    }
+  }, [isOpen, latestProjAndDesc, latestProjAndAct]);
 
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
@@ -261,7 +312,7 @@ export default function TrackTimeModal({
                   <div className="col-span-6">
                     <ProjectSelector
                       required
-                      availableProjects={Object.keys(latestProjAndAct)}
+                      availableProjects={Object.keys(latestActivities)}
                       selectedProject={project}
                       setSelectedProject={setProject}
                       isValidationEnabled={isValidationEnabled}
@@ -270,7 +321,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <ActivitySelector
-                      availableActivities={latestProjAndAct[project]}
+                      availableActivities={latestActivities[project]}
                       selectedActivity={activity}
                       setSelectedActivity={setActivity}
                       tabIndex={5}
@@ -278,7 +329,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <DescriptionSelector
-                      availableDescriptions={latestProjAndDesc[project]}
+                      availableDescriptions={latestDescription[project]}
                       selectedDescription={description}
                       setSelectedDescription={setDescription}
                       tabIndex={4}
