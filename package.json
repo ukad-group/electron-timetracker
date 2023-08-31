@@ -20,7 +20,8 @@
   "repository": "https://github.com/ukad-group/electron-timetracker",
   "publish": {
     "provider": "github",
-    "releaseType": "release"
+    "releaseType": "release",
+    "branch": "feature/beta-channel"
   },
   "build": {
     "appId": "com.timetracker.autoupdater",
