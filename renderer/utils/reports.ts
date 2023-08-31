@@ -217,64 +217,55 @@ export function validation(activities: Array<ReportActivity>) {
   return activities;
 }
 
-export function addingSuggestions(
+export function addSuggestions(
   activities: Array<ReportActivity> | null,
   latestProjAndDesc: Record<string, [string]>,
   latestProjAndAct: Record<string, [string]>
 ) {
   for (let i = 0; i < activities.length; i++) {
-    if (!activities[i].project || activities[i].project?.startsWith("!")) {
+    if (!Object.keys(latestProjAndDesc).length) break;
+
+    if (
+      !activities[i].project ||
+      activities[i].project?.startsWith("!") ||
+      (!activities[i].description && !activities[i].activity)
+    ) {
       continue;
     }
+
     const projectKey = activities[i].project.trim();
 
     if (
-      Object.keys(latestProjAndDesc).length &&
-      !latestProjAndDesc.hasOwnProperty(projectKey) &&
-      activities[i].description &&
+      !latestProjAndDesc.hasOwnProperty(projectKey) ||
       !latestProjAndAct.hasOwnProperty(projectKey)
     ) {
       latestProjAndDesc[projectKey] = [activities[i].description];
       latestProjAndAct[projectKey] = [activities[i].activity];
       continue;
     }
-    if (
-      Object.keys(latestProjAndDesc).length &&
-      activities[i].description &&
-      !latestProjAndDesc[projectKey].includes(activities[i].description)
-    ) {
-      latestProjAndDesc[projectKey].unshift(activities[i].description);
+
+    if (activities[i].description) {
+      if (!latestProjAndDesc[projectKey].includes(activities[i].description)) {
+        latestProjAndDesc[projectKey].unshift(activities[i].description);
+      } else {
+        latestProjAndDesc[projectKey]?.splice(
+          latestProjAndDesc[projectKey].indexOf(activities[i].description),
+          1
+        );
+        latestProjAndDesc[projectKey]?.unshift(activities[i].description);
+      }
     }
 
-    if (
-      Object.keys(latestProjAndDesc).length &&
-      activities[i].description &&
-      !latestProjAndAct[projectKey].includes(activities[i].activity)
-    ) {
-      latestProjAndAct[projectKey].unshift(activities[i].activity);
-    }
-
-    if (
-      Object.keys(latestProjAndDesc).length &&
-      activities[i].description &&
-      latestProjAndDesc[projectKey].includes(activities[i].description)
-    ) {
-      latestProjAndDesc[projectKey]?.splice(
-        latestProjAndDesc[projectKey].indexOf(activities[i].description),
-        1
-      );
-      latestProjAndDesc[projectKey]?.unshift(activities[i].description);
-    }
-    if (
-      Object.keys(latestProjAndDesc).length &&
-      activities[i].description &&
-      latestProjAndAct[projectKey].includes(activities[i].activity)
-    ) {
-      latestProjAndAct[projectKey]?.splice(
-        latestProjAndAct[projectKey].indexOf(activities[i].activity),
-        1
-      );
-      latestProjAndAct[projectKey]?.unshift(activities[i].activity);
+    if (activities[i].activity) {
+      if (!latestProjAndAct[projectKey].includes(activities[i].activity)) {
+        latestProjAndAct[projectKey].unshift(activities[i].activity);
+      } else {
+        latestProjAndAct[projectKey]?.splice(
+          latestProjAndAct[projectKey].indexOf(activities[i].activity),
+          1
+        );
+        latestProjAndAct[projectKey]?.unshift(activities[i].activity);
+      }
     }
   }
 }

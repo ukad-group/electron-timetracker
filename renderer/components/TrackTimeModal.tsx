@@ -10,7 +10,7 @@ import {
   ReportActivity,
   calcDurationBetweenTimes,
   formatDuration,
-  addingSuggestions,
+  addSuggestions,
 } from "../utils/reports";
 
 type TrackTimeModalProps = {
@@ -100,7 +100,7 @@ export default function TrackTimeModal({
   }, [isOpen]);
 
   useEffect(() => {
-    addingSuggestions(activities, latestProjAndDesc, latestProjAndAct);
+    addSuggestions(activities, latestProjAndDesc, latestProjAndAct);
   }, [isOpen, latestProjAndDesc, latestProjAndAct]);
 
   const onSave = (e: FormEvent | MouseEvent) => {

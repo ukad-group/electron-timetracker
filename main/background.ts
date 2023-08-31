@@ -128,7 +128,7 @@ ipcMain.handle(
   (event, reportsFolder: string, date: Date) => {
     if (!reportsFolder || !date) return [];
 
-    const parsedProjects: AllActivities = fileParser(reportsFolder, date);
+    const parsedProjects = fileParser(reportsFolder, date);
 
     const sortedProjAndAct: Record<string, string[]> = Object.keys(
       parsedProjects
@@ -150,15 +150,15 @@ ipcMain.handle(
     const descriptionsSet: Record<string, string[]> = Object.keys(
       parsedProjects
     ).reduce((accumulator, key) => {
-      const activitySet = new Set<string>();
+      const descriptionsSet = new Set<string>();
 
       parsedProjects[key]?.forEach((activity: Activity) => {
         if (activity.desc) {
-          activitySet.add(activity.desc);
+          descriptionsSet.add(activity.desc);
         }
       });
 
-      accumulator[key] = Array.from(activitySet);
+      accumulator[key] = Array.from(descriptionsSet);
       return accumulator;
     }, {});
 
