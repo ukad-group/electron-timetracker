@@ -100,12 +100,12 @@ export function Calendar({
 
   const prevButtonHandle = () => {
     getCalendarApi().prev();
-    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() - 1)));
+    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() - 1, 1)));
   };
 
   const nextButtonHandle = () => {
     getCalendarApi().next();
-    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() + 1)));
+    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() + 1, 1)));
   };
 
   const todayButtonHandle = () => {
