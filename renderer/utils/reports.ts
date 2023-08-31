@@ -145,10 +145,12 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
     }
 
     report += `${parts.join(" - ")}\n`;
-
     const nextActivity = activities[i + 1];
-    if (!nextActivity || nextActivity.from !== activity.to) {
+    if (nextActivity && nextActivity.from !== activity.to) {
       activity.to ? (report += `${activity.to} - !\n`) : "";
+    }
+    if (!nextActivity) {
+      activity.to ? (report += `${activity.to} - \n`) : "";
     }
   }
   return report;
