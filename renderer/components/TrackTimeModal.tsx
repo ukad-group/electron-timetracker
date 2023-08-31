@@ -39,8 +39,7 @@ export default function TrackTimeModal({
   const [activity, setActivity] = useState("");
   const [description, setDescription] = useState("");
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
-  const [latestActivities, setLatestActivities] = useState(latestProjAndAct);
-  const [latestDescription, setLatestDescription] = useState(latestProjAndDesc);
+
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
 
@@ -100,84 +99,48 @@ export default function TrackTimeModal({
   }, [isOpen]);
 
   useEffect(() => {
-    setLatestActivities(latestProjAndAct);
-    setLatestDescription(latestProjAndDesc);
-
     for (let i = 0; i < activities.length; i++) {
       if (!activities[i].project || activities[i].project?.startsWith("!")) {
         continue;
       }
-      if (
-        Object.keys(latestDescription).length &&
-        !latestDescription.hasOwnProperty(activities[i].project.trim()) &&
-        activities[i].description
-      ) {
-        setLatestDescription((latestDescription) => {
-          latestDescription[activities[i].project.trim()] = [
-            activities[i].description,
-          ];
-          return latestDescription;
-        });
+      const projectKey = activities[i].project.trim();
 
-        setLatestActivities((latestActivities) => {
-          latestActivities[activities[i].project.trim()] = [
-            activities[i].description,
-          ];
-          return latestActivities;
-        });
+      if (
+        Object.keys(latestProjAndDesc).length &&
+        !latestProjAndDesc.hasOwnProperty(projectKey) &&
+        activities[i].description &&
+        !latestProjAndAct.hasOwnProperty(projectKey)
+      ) {
+        latestProjAndDesc[projectKey] = [activities[i].description];
+        latestProjAndAct[projectKey] = [activities[i].activity];
         continue;
       }
       if (
-        Object.keys(latestDescription).length &&
+        Object.keys(latestProjAndDesc).length &&
         activities[i].description &&
-        !latestDescription[activities[i].project.trim()].includes(
-          activities[i].description
-        )
+        !latestProjAndDesc[projectKey].includes(activities[i].description)
       ) {
-        setLatestDescription((latestDescription) => {
-          latestDescription[activities[i].project.trim()].unshift(
-            activities[i].description
-          );
-          return latestDescription;
-        });
-        setLatestActivities((latestActivities) => {
-          latestActivities[activities[i].project.trim()].unshift(
-            activities[i].description
-          );
-          return latestActivities;
-        });
+        latestProjAndDesc[projectKey].unshift(activities[i].description);
+        latestProjAndAct[projectKey].unshift(activities[i].activity);
+        continue;
       }
+
       if (
-        Object.keys(latestDescription).length &&
+        Object.keys(latestProjAndDesc).length &&
         activities[i].description &&
-        latestDescription[activities[i].project.trim()].includes(
-          activities[i].description
-        )
+        latestProjAndDesc[projectKey].includes(activities[i].description)
       ) {
-        setLatestDescription((latestDescription) => {
-          latestDescription[activities[i].project.trim()].splice(
-            latestDescription[activities[i].project.trim()].indexOf(
-              activities[i].description
-            ),
-            1
-          );
-          latestDescription[activities[i].project.trim()].unshift(
-            activities[i].description
-          );
-          return latestDescription;
-        });
-        setLatestActivities((latestActivities) => {
-          latestActivities[activities[i].project.trim()].splice(
-            latestActivities[activities[i].project.trim()].indexOf(
-              activities[i].description
-            ),
-            1
-          );
-          latestActivities[activities[i].project.trim()].unshift(
-            activities[i].description
-          );
-          return latestActivities;
-        });
+        latestProjAndDesc[projectKey]?.splice(
+          latestProjAndDesc[projectKey].indexOf(activities[i].description),
+          1
+        );
+        latestProjAndDesc[projectKey]?.unshift(activities[i].description);
+
+        latestProjAndAct[projectKey]?.splice(
+          latestProjAndAct[projectKey].indexOf(activities[i].activity),
+          1
+        );
+        latestProjAndAct[projectKey]?.unshift(activities[i].activity);
       }
     }
   }, [isOpen, latestProjAndDesc, latestProjAndAct]);
@@ -344,7 +307,7 @@ export default function TrackTimeModal({
                   <div className="col-span-6">
                     <ProjectSelector
                       required
-                      availableProjects={Object.keys(latestActivities)}
+                      availableProjects={Object.keys(latestProjAndAct)}
                       selectedProject={project}
                       setSelectedProject={setProject}
                       isValidationEnabled={isValidationEnabled}
@@ -353,7 +316,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <ActivitySelector
-                      availableActivities={latestActivities[project]}
+                      availableActivities={latestProjAndAct[project]}
                       selectedActivity={activity}
                       setSelectedActivity={setActivity}
                       tabIndex={5}
@@ -361,7 +324,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <DescriptionSelector
-                      availableDescriptions={latestDescription[project]}
+                      availableDescriptions={latestProjAndDesc[project]}
                       selectedDescription={description}
                       setSelectedDescription={setDescription}
                       tabIndex={4}
