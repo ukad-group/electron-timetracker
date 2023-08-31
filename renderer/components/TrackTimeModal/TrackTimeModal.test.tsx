@@ -44,6 +44,10 @@ const mockedProps: TrackTimeModalProps = {
     internal: [""],
     hr: [""],
   },
+  latestProjAndDesc: {
+    internal: [""],
+    hr: [""],
+  },
   close: jest.fn(),
   submitActivity: jest.fn(),
   selectedDate: new Date(),
