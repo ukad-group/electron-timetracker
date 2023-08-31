@@ -4,8 +4,8 @@ import serve from "electron-serve";
 import { autoUpdater } from "electron-updater";
 import { createWindow } from "./helpers";
 import { getPathFromDate } from "./helpers/datetime";
-import { createDirByPath } from "./helpers/fs";
-import { fileParser, Activity, AllActivities } from "./helpers/fileParser";
+import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
+import { createDirByPath, searchReadFiles } from "./helpers/fs";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 type Callback = (data: string | null) => void;
@@ -128,7 +128,7 @@ ipcMain.handle(
   (event, reportsFolder: string, date: Date) => {
     if (!reportsFolder || !date) return [];
 
-    const parsedProjects = fileParser(reportsFolder, date);
+    const parsedProjects = parseReportsInfo(reportsFolder, date);
 
     const sortedProjAndAct: Record<string, string[]> = Object.keys(
       parsedProjects
@@ -163,6 +163,19 @@ ipcMain.handle(
     }, {});
 
     return { sortedProjAndAct, descriptionsSet };
+  }
+);
+
+ipcMain.handle(
+  "app:find-month-projects",
+  (event, reportsFolder: string, date: Date) => {
+    if (!reportsFolder || !date) return [];
+
+    const year = date.getFullYear().toString();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const query = year + month;
+
+    return searchReadFiles(reportsFolder, query, year);
   }
 );
 

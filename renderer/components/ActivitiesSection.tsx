@@ -15,19 +15,18 @@ export default function ActivitiesSection({
   onEditActivity,
   activities,
 }: ActivitiesSectionProps) {
-
   const keydownHandler = (e: KeyboardEvent) => {
-    if (e.code === 'Space' && e.ctrlKey) {
-      onEditActivity("new")
-    } 
+    if (e.code === "Space" && e.ctrlKey) {
+      onEditActivity("new");
+    }
   };
 
   useEffect(() => {
-    document.addEventListener('keydown', keydownHandler);
+    document.addEventListener("keydown", keydownHandler);
 
     return () => {
-      document.removeEventListener('keydown', keydownHandler);
-    }
+      document.removeEventListener("keydown", keydownHandler);
+    };
   }, []);
 
   if (!activities?.length) {
@@ -49,11 +48,13 @@ export default function ActivitiesSection({
       <div>
         <a
           href="#"
-          className="block px-4 py-4 text-sm font-medium text-center text-gray-500 bg-gray-50 hover:text-gray-700 sm:rounded-b-lg"
+          className="block px-4 py-4 text-sm font-medium text-center text-blue-600 bg-blue-200 hover:bg-blue-300  sm:rounded-b-lg"
           onClick={() => onEditActivity("new")}
         >
-          Track more time 
-          <span className="block text-gray-400 text-xs">click or press ctrl + space</span>
+          Track more time
+          <span className="block text-blue-500 text-xs">
+            click or press ctrl + space
+          </span>
         </a>
       </div>
     </div>
@@ -83,7 +84,9 @@ function Placeholder({ onEditActivity }: PlaceholderProps) {
           <PlusIcon className="w-5 h-5 mr-2 -ml-1" aria-hidden="true" />
           New activity
         </button>
-        <span className="block text-gray-500 text-xs">or press ctrl + space</span>
+        <span className="block text-gray-500 text-xs">
+          or press ctrl + space
+        </span>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { SetStateAction, useEffect, useState } from "react";
+import Button from "./ui/Button";
 
 type ManualInputFormProps = {
   selectedDateReport: string;
@@ -31,6 +32,10 @@ export default function ManualInputForm({
     setReport(selectedDateReport);
   }, [selectedDateReport]);
 
+  const onSaveHandler = () => {
+    onSave(report, true);
+  };
+
   return (
     <div>
       <h2 id="manual-input-title" className="text-lg font-medium text-gray-900">
@@ -45,12 +50,7 @@ export default function ManualInputForm({
         spellCheck={false}
       />
       <div className="flex flex-col mt-6 justify-stretch">
-        <button
-          onClick={() => onSave(report, true)}
-          type="button"
-          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          Save
-        </button>
+        <Button text="Save" callback={onSaveHandler} />
         <span className="block text-xs text-gray-500 text-center">
           or press ctrl + s
         </span>

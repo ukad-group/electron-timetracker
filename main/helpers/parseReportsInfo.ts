@@ -1,5 +1,5 @@
 import fs from "fs";
-import { getPathFromDate, calcDurationBetweenTimes } from "../helpers/datetime";
+import { getPathFromDate, calcDurationBetweenTimes } from "./datetime";
 export type Activity = {
   acti: string;
   desc: string;
@@ -11,7 +11,10 @@ export type AllActivities = {
   hr: Activity[];
 };
 
-export function fileParser(reportsFolder: string, date: Date): AllActivities {
+export function parseReportsInfo(
+  reportsFolder: string,
+  date: Date
+): AllActivities {
   const parsedProjects: AllActivities = {
     internal: [],
     hr: [],

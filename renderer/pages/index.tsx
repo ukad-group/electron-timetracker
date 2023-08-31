@@ -9,11 +9,12 @@ import {
   serializeReport,
   ReportAndNotes,
 } from "../utils/reports";
-import TrackTimeModal from "../components/TrackTimeModal";
+import TrackTimeModal from "../components/TrackTimeModal/TrackTimeModal";
 import ManualInputForm from "../components/ManualInputForm";
 import ActivitiesSection from "../components/ActivitiesSection";
 import SelectFolderPlaceholder from "../components/SelectFolderPlaceholder";
 import { useMainStore } from "../store/mainStore";
+import { Calendar } from "../components/Calendar/Calendar";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -101,7 +102,8 @@ export default function Home() {
     let isEdit = false;
     let isPastTime = false;
     const tempActivities: Array<ReportActivity> = [];
-    const newActTime = stringToMinutes(activity.from);
+    const newActFrom = stringToMinutes(activity.from);
+    const newActTo = stringToMinutes(activity.to);
     const activityIndex = selectedDateActivities.findIndex(
       (act) => act.id === activity.id
     );
@@ -114,27 +116,46 @@ export default function Home() {
     if (activityIndex >= 0) {
       setSelectedDateActivities((activities) => {
         activities[activityIndex] = activity;
+        if (activities[activityIndex + 1].isBreak) {
+          activities.splice(activityIndex + 1, 1);
+        } else if (
+          newActTo > stringToMinutes(activities[activityIndex + 1].from)
+        ) {
+          activities[activityIndex + 1].from = activities[activityIndex].to;
+        }
+
         return [...activities];
       });
       isEdit = true;
     }
 
     for (let i = 0; i < selectedDateActivities.length; i++) {
-      const indexActTime = stringToMinutes(selectedDateActivities[i].from);
-      if (newActTime < indexActTime) {
+      const indexActFrom = stringToMinutes(selectedDateActivities[i].from);
+
+      if (newActFrom < indexActFrom && !isPastTime) {
         tempActivities.push(activity);
         isPastTime = true;
       }
-      if (!i && newActTime < indexActTime) {
+      if (!i && newActFrom < indexActFrom) {
         tempActivities.push(...selectedDateActivities);
         break;
       }
+      if (newActFrom === indexActFrom) {
+        tempActivities.push(activity);
+        isPastTime = true;
+        continue;
+      }
+
       tempActivities.push(selectedDateActivities[i]);
     }
+    tempActivities.forEach(
+      (act, i) => (
+        (act.id = i + 1), act.isBreak ? (act.to = "") : (act.to = act.to)
+      )
+    );
 
-    tempActivities.forEach((act, i) => (act.id = i + 1));
     if (tempActivities.length === selectedDateActivities.length && !isEdit) {
-      tempActivities.push(activity);
+      !isPastTime && tempActivities.push(activity);
       setSelectedDateActivities(tempActivities.filter((act) => act.duration));
     }
     if (isPastTime && !isEdit) {
@@ -159,10 +180,10 @@ export default function Home() {
       <Header />
 
       <main className="py-10">
-        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
+        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-cols-3">
           {reportsFolder ? (
             <>
-              <div className="space-y-6 lg:col-start-1 lg:col-span-2">
+              <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">
                 <section>
                   <div className="bg-white shadow sm:rounded-lg">
                     <DateSelector
@@ -171,8 +192,8 @@ export default function Home() {
                     />
                   </div>
                 </section>
-                <section>
-                  <div className="bg-white shadow sm:rounded-lg">
+                <section className="flex-grow">
+                  <div className="bg-white shadow sm:rounded-lg h-full">
                     <ActivitiesSection
                       activities={selectedDateActivities}
                       onEditActivity={setTrackTimeModalActivity}
@@ -196,6 +217,14 @@ export default function Home() {
           ) : (
             <SelectFolderPlaceholder setFolder={setReportsFolder} />
           )}
+          <section className="lg:col-span-2">
+            <Calendar
+              reportsFolder={reportsFolder}
+              selectedDate={selectedDate}
+              setSelectedDate={setSelectedDate}
+              shouldAutosave={shouldAutosave}
+            />
+          </section>
         </div>
       </main>
       <TrackTimeModal
@@ -206,6 +235,7 @@ export default function Home() {
         latestProjAndDesc={latestProjAndDesc}
         close={() => setTrackTimeModalActivity(null)}
         submitActivity={submitActivity}
+        selectedDate={selectedDate}
       />
     </div>
   );

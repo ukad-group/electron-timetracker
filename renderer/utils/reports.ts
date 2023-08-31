@@ -79,7 +79,7 @@ export function parseReport(fileContent: string) {
     currentLine = currentLine.replace(separatorRegex, "");
 
     // should skip registraion when task starts from !
-    const isBreak = workingTimeRegex.test(currentLine);
+    const isBreak = workingTimeRegex.test(currentLine) || !currentLine;
     if (isBreak) {
       registration.project = currentLine;
       registration.isBreak = isBreak;
@@ -145,10 +145,12 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
     }
 
     report += `${parts.join(" - ")}\n`;
-
     const nextActivity = activities[i + 1];
-    if (!nextActivity || nextActivity.from !== activity.to) {
+    if (nextActivity && nextActivity.from !== activity.to) {
       activity.to ? (report += `${activity.to} - !\n`) : "";
+    }
+    if (!nextActivity) {
+      activity.to ? (report += `${activity.to} - \n`) : "";
     }
   }
   return report;
@@ -189,6 +191,34 @@ export function formatDuration(ms: number): string {
   return `${Math.floor(hours * 100) / 100}h`;
 }
 
+export function addDurationToTime(fromTime: string, duration: string) {
+  const [fromHours, fromMinutes] = fromTime.split(":").map(Number);
+
+  let totalMinutes = fromHours * 60 + fromMinutes;
+
+  if (duration.includes("m") || parseInt(duration) > 24) {
+    const durationMinutes = parseInt(duration);
+    if (durationMinutes) totalMinutes += durationMinutes;
+  } else {
+    const durationHours = parseFloat(duration);
+    if (durationHours) totalMinutes += durationHours * 60;
+  }
+
+  if (totalMinutes >= 1440) {
+    totalMinutes = 1439;
+  } else if (totalMinutes < 0) {
+    totalMinutes = 0;
+  }
+
+  const toHours = Math.floor(totalMinutes / 60);
+  const toMinutes = Math.round(totalMinutes % 60);
+
+  const h = String(toHours).padStart(2, "0");
+  const m = String(toMinutes).padStart(2, "0");
+
+  return `${h}:${m}`;
+}
+
 export function checkIntersection(previousTo: string, currentFrom: string) {
   const [hoursTo, minutesTo] = previousTo.split(":");
   const [hoursFrom, minutesFrom] = currentFrom.split(":");
@@ -196,6 +226,7 @@ export function checkIntersection(previousTo: string, currentFrom: string) {
   const fromInMinutes = Number(hoursFrom) * 60 + Number(minutesFrom);
   return fromInMinutes < toInMinutes;
 }
+
 export function validation(activities: Array<ReportActivity>) {
   for (let i = 0; i < activities.length; i++) {
     if (i > 0 && checkIntersection(activities[i - 1].to, activities[i].from)) {
