@@ -54,6 +54,28 @@ const userDataDirectory = app.getPath("userData");
       }
     }
   );
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  ipcMain.on("start-update-watcher", (event) => {
+    mainWindow.webContents.send("current-version", app.getVersion());
+
+    app.whenReady().then(() => {
+      autoUpdater.checkForUpdates();
+    });
+
+    autoUpdater.on("update-available", (info) => {
+      autoUpdater.downloadUpdate();
+      mainWindow.webContents.send("update-available", true, info);
+    });
+
+    autoUpdater.on("update-downloaded", (info) => {
+      mainWindow.webContents.send("downloaded", true, info);
+    });
+  });
+  ipcMain.on("install", (event) => {
+    autoUpdater.quitAndInstall(true);
+  });
 })();
 
 app.on("window-all-closed", () => {
@@ -178,14 +200,3 @@ ipcMain.handle(
     return searchReadFiles(reportsFolder, query, year);
   }
 );
-
-autoUpdater.autoDownload = false;
-autoUpdater.autoInstallOnAppQuit = true;
-
-app.whenReady().then(() => {
-  autoUpdater.checkForUpdates();
-});
-
-autoUpdater.on("update-available", (info) => {
-  autoUpdater.downloadUpdate();
-});

@@ -13,6 +13,8 @@ import TrackTimeModal from "../components/TrackTimeModal/TrackTimeModal";
 import ManualInputForm from "../components/ManualInputForm";
 import ActivitiesSection from "../components/ActivitiesSection";
 import SelectFolderPlaceholder from "../components/SelectFolderPlaceholder";
+import VersionMessage from "../components/ui/VersionMessages";
+import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
 import { Calendar } from "../components/Calendar/Calendar";
 
@@ -178,9 +180,9 @@ export default function Home() {
   return (
     <div className="min-h-full">
       <Header />
-
-      <main className="py-10">
-        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-cols-3">
+      <VersionMessage />
+      <main className="py-5">
+        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
           {reportsFolder ? (
             <>
               <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">
@@ -212,6 +214,7 @@ export default function Home() {
                     selectedDateReport={selectedDateReport}
                   />
                 </div>
+                <UpdateDescription />
               </section>
             </>
           ) : (
