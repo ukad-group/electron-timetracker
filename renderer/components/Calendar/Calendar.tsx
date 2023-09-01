@@ -13,7 +13,7 @@ import {
 } from "../../utils/reports";
 import NavButtons from "../ui/NavButtons";
 import Button from "../ui/Button";
-import { isTheSameDates } from "../../utils/datetime-ui";
+import { getWeekNumber, isTheSameDates } from "../../utils/datetime-ui";
 
 const months = [
   "January",
@@ -44,7 +44,8 @@ type ReportFromServer = {
 
 type WorkHoursReport = {
   date: string;
-  workDurationHours: string;
+  week: number;
+  workDurationMs: number;
   isValid: boolean;
 };
 
@@ -88,7 +89,8 @@ export function Calendar({
      
       return {
        date: reportDate,
-       workDurationHours: formatDuration(workDurationMs),
+       week: getWeekNumber(reportDate),
+       workDurationMs: workDurationMs,
        isValid: activities.every((report: ReportActivity) => report.isValid === true),
       };
      });
@@ -126,6 +128,24 @@ export function Calendar({
     return "";
   };
 
+  const weekNumberContent = (options) => {
+    const weekTotalHours = formatDuration(
+      monthWorkHoursReports.reduce((acc, report) => {
+        if (report.week === options.num) {
+          acc += report.workDurationMs;
+        }
+        return acc;
+      }, 0)
+    );
+
+    return (
+      <div className="flex flex-col text-xs">
+        <span>week {options.num}</span>
+        <span className="self-start">{weekTotalHours}</span>
+      </div>
+    );
+  };
+
   return (
     <div className="wrapper bg-white p-4 rounded-lg shadow">
       <div className="calendar-header h-10 flex items-center justify-between mb-4">
@@ -154,6 +174,8 @@ export function Calendar({
         eventContent={renderEventContent}
         dateClick={dateClickHandle}
         dayCellClassNames={addCellClassNameHandle}
+        weekNumbers={true}
+        weekNumberContent={weekNumberContent}
       />
     </div>
   );
@@ -162,9 +184,11 @@ export function Calendar({
 function renderEventContent(eventInfo) {
   return (
     <>
-      <p>Logged: {eventInfo.event.extendedProps.workDurationHours}</p>
+      <p>
+        Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}
+      </p>
       {eventInfo.event.extendedProps.isValid === false && (
-        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-7 left-0" />
+        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-[170%] left-[60%]" />
       )}
     </>
   );

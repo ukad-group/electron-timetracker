@@ -19,3 +19,21 @@ export function isTheSameDates(date1: Date, date2: Date): boolean {
     return false;
   }
 }
+
+export function getWeekNumber(dateString: string) {
+  const dateObj = getDateFromString(dateString);
+  const startOfYear = new Date(dateObj.getFullYear(), 0, 1);
+  const days = Math.floor(
+    (dateObj.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000)
+  );
+
+  return Math.ceil((days + startOfYear.getDay() + 1) / 7);
+}
+
+export function getDateFromString(dateString: string) {
+  const year = parseInt(dateString.slice(0, 4), 10);
+  const month = parseInt(dateString.slice(4, 6), 10) - 1;
+  const day = parseInt(dateString.slice(6, 8), 10);
+
+  return new Date(year, month, day);
+}

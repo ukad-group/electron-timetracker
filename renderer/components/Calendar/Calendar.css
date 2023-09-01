@@ -2,6 +2,10 @@
   @apply hover:bg-gray-200 cursor-pointer;
 }
 
+.fc-daygrid-day-top {
+  @apply mb-2;
+}
+
 .fc-event {
   @apply pointer-events-none;
 }
