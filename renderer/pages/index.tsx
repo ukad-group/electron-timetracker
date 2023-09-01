@@ -13,6 +13,8 @@ import TrackTimeModal from "../components/TrackTimeModal/TrackTimeModal";
 import ManualInputForm from "../components/ManualInputForm";
 import ActivitiesSection from "../components/ActivitiesSection";
 import SelectFolderPlaceholder from "../components/SelectFolderPlaceholder";
+import VersionMessage from "../components/ui/VersionMessages";
+import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
 import { Calendar } from "../components/Calendar/Calendar";
 
@@ -178,7 +180,7 @@ export default function Home() {
   return (
     <div className="min-h-full">
       <Header />
-
+      <VersionMessage />
       <main className="py-10">
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-cols-3">
           {reportsFolder ? (
@@ -204,7 +206,7 @@ export default function Home() {
 
               <section
                 aria-labelledby="manual-input-title"
-                className="lg:col-start-3 lg:col-span-1"
+                className="lg:col-start-3 lg:col-span-1 relative"
               >
                 <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6">
                   <ManualInputForm
@@ -212,6 +214,7 @@ export default function Home() {
                     selectedDateReport={selectedDateReport}
                   />
                 </div>
+                <UpdateDescription />
               </section>
             </>
           ) : (
