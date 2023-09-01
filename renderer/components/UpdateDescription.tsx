@@ -46,7 +46,7 @@ export default function UpdateDescription() {
   return (
     <div
       className={clsx(
-        "h-16 px-4 py-5 my-6 bg-white shadow overflow-hidden transition-all ease-linear duration-300 sm:rounded-lg sm:px-6",
+        "lg:absolute h-16 px-4 py-5 my-6 bg-white shadow overflow-hidden transition-all ease-linear duration-300 sm:rounded-lg sm:px-6",
         {
           "h-52": update.age === "new",
         }
