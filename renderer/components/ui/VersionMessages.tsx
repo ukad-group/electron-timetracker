@@ -3,13 +3,6 @@ import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import { useUpdateStore } from "../../store/updateStore";
 
-type VersionMessageProps = {
-  isUpdate: boolean;
-  isDownload: boolean;
-  version: string;
-  install: () => void;
-};
-
 export default function VersionMessage() {
   const [isUpdate, setIsUpdate] = useState(false);
   const [isDownload, setIsDownload] = useState(false);
@@ -37,7 +30,6 @@ export default function VersionMessage() {
   }, []);
 
   const install = () => {
-    // setUpdate("new");
     ipcRenderer.send("install");
   };
   return (
