@@ -12,7 +12,9 @@ export default function ActivitiesTable({
   onEditActivity,
 }: ActivitiesTableProps) {
   const nonBreakActivities = useMemo(() => {
-    return validation(activities.filter((activity) => !activity.isBreak));
+    return validation(
+      activities.filter((activity) => !activity.isBreak && activity.project)
+    );
   }, [activities]);
 
   const totalDuration = useMemo(() => {
@@ -63,17 +65,20 @@ export default function ActivitiesTable({
         <tr>
           <th
             scope="col"
-            className="w-24 pb-6 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0">
+            className="w-24 pb-6 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0"
+          >
             Interval
           </th>
           <th
             scope="col"
-            className="w-24 pb-6 px-3 text-left text-sm font-semibold text-gray-900">
+            className="w-24 pb-6 px-3 text-left text-sm font-semibold text-gray-900"
+          >
             Duration
           </th>
           <th
             scope="col"
-            className="pb-6 px-3 text-left text-sm font-semibold text-gray-900 relative">
+            className="pb-6 px-3 text-left text-sm font-semibold text-gray-900 relative"
+          >
             <span className="block absolute text-xs text-gray-500 top-[22px]">
               activity
             </span>
@@ -81,7 +86,8 @@ export default function ActivitiesTable({
           </th>
           <th
             scope="col"
-            className="pb-6 px-3 text-left text-sm font-semibold text-gray-900">
+            className="pb-6 px-3 text-left text-sm font-semibold text-gray-900"
+          >
             Description
           </th>
           <th scope="col" className="relative pb-6 pl-3 pr-4 sm:pr-6 md:pr-0">
@@ -97,36 +103,42 @@ export default function ActivitiesTable({
                 className={clsx({
                   "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800":
                     !activity.isValid,
-                })}>
+                })}
+              >
                 {activity.from} - {activity.to}
               </span>
             </td>
             <td
               className={`px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap cursor-pointer`}
               onClick={copyToClipboardHandle}
-              data-column="duration">
+              data-column="duration"
+            >
               {formatDuration(activity.duration)}
             </td>
             <td>
               <p
                 className="px-3 pt-4 text-sm font-medium text-gray-900 cursor-pointer"
-                onClick={copyToClipboardHandle}>
+                onClick={copyToClipboardHandle}
+              >
                 {activity.project}
               </p>
               <span
                 className="px-3 pb-4 block text-xs text-gray-500 font-semibold mt-1 cursor-pointer"
-                onClick={copyToClipboardHandle}>
+                onClick={copyToClipboardHandle}
+              >
                 {activity.activity}
               </span>
             </td>
             <td
               className="px-3 py-4 text-sm text-gray-500 cursor-pointer"
-              onClick={copyToClipboardHandle}>
+              onClick={copyToClipboardHandle}
+            >
               <span
                 className={clsx({
                   "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800":
                     activity.mistakes?.includes("startsWith!"),
-                })}>
+                })}
+              >
                 {activity.description}
               </span>
               {activity.mistakes?.includes("startsWith!") && (
@@ -139,7 +151,8 @@ export default function ActivitiesTable({
               <a
                 href="#"
                 className="text-blue-600 hover:text-blue-900"
-                onClick={() => onEditActivity(activity)}>
+                onClick={() => onEditActivity(activity)}
+              >
                 Edit
               </a>
             </td>
@@ -152,12 +165,14 @@ export default function ActivitiesTable({
           <td
             className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap cursor-pointer"
             onClick={copyToClipboardHandle}
-            data-column="total">
+            data-column="total"
+          >
             {formatDuration(totalDuration)}
           </td>
           <td
             className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
-            colSpan={4}>
+            colSpan={4}
+          >
             {totalDuration < 8 * msPerHour && getLackBadge(totalDuration)}
           </td>
         </tr>

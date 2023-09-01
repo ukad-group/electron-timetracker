@@ -4,6 +4,7 @@ import serve from "electron-serve";
 import { autoUpdater } from "electron-updater";
 import { createWindow } from "./helpers";
 import { getPathFromDate } from "./helpers/datetime";
+import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
@@ -127,50 +128,41 @@ ipcMain.handle(
   (event, reportsFolder: string, date: Date) => {
     if (!reportsFolder || !date) return [];
 
-    const latesProjAndAct: Record<string, [string]> = {
-      internal: [""],
-      hr: [""],
-    };
-    let currentDate = new Date(date);
+    const parsedProjects = parseReportsInfo(reportsFolder, date);
 
-    for (let i = 0; i < 31; i++) {
-      currentDate.setDate(currentDate.getDate() - 1);
-      const timereportPath = getPathFromDate(currentDate, reportsFolder);
-      const timeRegex = /^[0-9]+:[0-9]+/;
-      try {
-        const lines = fs.readFileSync(timereportPath, "utf8").split("\n");
-
-        for (const line of lines) {
-          if (!timeRegex.test(line)) continue;
-          const parts = line.split(" - ");
-          const project = parts[1]?.trim();
-          const activity = parts[2]?.trim();
-
-          if (!project || project?.startsWith("!")) continue;
-
-          if (!latesProjAndAct.hasOwnProperty(project)) {
-            latesProjAndAct[project] = [""];
-          }
-          if (
-            parts.length > 3 &&
-            !latesProjAndAct[project].includes(activity)
-          ) {
-            latesProjAndAct[project].push(activity);
-          }
-        }
-      } catch (e) {
-        console.error(e);
-        continue;
-      }
-    }
-    const sortedProjAndAct = Object.keys(latesProjAndAct)
+    const sortedProjAndAct: Record<string, string[]> = Object.keys(
+      parsedProjects
+    )
       .sort()
       .reduce((accumulator, key) => {
-        accumulator[key] = latesProjAndAct[key]?.sort();
+        const activitySet = new Set<string>();
 
+        parsedProjects[key]?.forEach((activity: Activity) => {
+          if (activity.acti) {
+            activitySet.add(activity.acti);
+          }
+        });
+
+        accumulator[key] = Array.from(activitySet);
         return accumulator;
       }, {});
-    return sortedProjAndAct;
+
+    const descriptionsSet: Record<string, string[]> = Object.keys(
+      parsedProjects
+    ).reduce((accumulator, key) => {
+      const descriptionsSet = new Set<string>();
+
+      parsedProjects[key]?.forEach((activity: Activity) => {
+        if (activity.desc) {
+          descriptionsSet.add(activity.desc);
+        }
+      });
+
+      accumulator[key] = Array.from(descriptionsSet);
+      return accumulator;
+    }, {});
+
+    return { sortedProjAndAct, descriptionsSet };
   }
 );
 

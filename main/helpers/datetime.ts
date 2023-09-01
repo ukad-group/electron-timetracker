@@ -25,3 +25,26 @@ export function getPathFromDate(date: Date, reportsFolder: string): string {
 
   return `${reportsFolder}/${year}/week ${week}/timereport - ${timereportDate}`;
 }
+
+export function calcDurationBetweenTimes(from: string, to: string): number {
+  if (from == undefined || to == undefined) {
+    return null;
+  }
+  const startParts = from.split(":");
+  const endParts = to.split(":");
+
+  const startHours = parseInt(startParts[0], 10) || 0;
+  const startMinutes = parseInt(startParts[1], 10) || 0;
+
+  const endHours = parseInt(endParts[0], 10) || 0;
+  const endMinutes = parseInt(endParts[1], 10) || 0;
+
+  const startTotalMinutes = startHours * 60 + startMinutes;
+  const endTotalMinutes = endHours * 60 + endMinutes;
+
+  const totalMinutes = endTotalMinutes - startTotalMinutes;
+
+  const hours = Math.round((totalMinutes / 60) * 100) / 100;
+
+  return hours;
+}
