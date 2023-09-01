@@ -181,8 +181,8 @@ export default function Home() {
     <div className="min-h-full">
       <Header />
       <VersionMessage />
-      <main className="py-5">
-        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
+      <main className="py-10">
+        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-cols-3">
           {reportsFolder ? (
             <>
               <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">
@@ -214,7 +214,6 @@ export default function Home() {
                     selectedDateReport={selectedDateReport}
                   />
                 </div>
-                <UpdateDescription />
               </section>
             </>
           ) : (
@@ -228,6 +227,7 @@ export default function Home() {
               shouldAutosave={shouldAutosave}
             />
           </section>
+          <UpdateDescription />
         </div>
       </main>
       <TrackTimeModal

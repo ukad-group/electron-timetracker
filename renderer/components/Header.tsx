@@ -21,16 +21,15 @@ export default function Header() {
     <header className="bg-white shadow">
       <div className="flex justify-between h-16 px-2 mx-auto max-w-7xl sm:px-4 lg:px-8">
         <div className="flex w-full justify-between items-center flex-shrink min-w-0 gap-4">
-          <label>
+          <label className="flex gap-2 items-center">
             <input
               type="checkbox"
               value="Give me beta diablo"
               defaultChecked={isBeta}
               onChange={() => setIsBeta(!isBeta)}
             />
-            Give me beta diablo
+            Give me beta version
           </label>
-          {isBeta && "true"}
           <FolderSelector
             folderLocation={reportsFolder}
             setFolderLocation={setReportsFolder}
