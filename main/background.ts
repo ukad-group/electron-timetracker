@@ -172,10 +172,12 @@ ipcMain.handle(
     if (!reportsFolder || !date) return [];
 
     const year = date.getFullYear().toString();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const query = year + month;
+    const prevMonth = date.getMonth().toString().padStart(2, "0");
+    const currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
+    const nextMonth = (date.getMonth() + 2).toString().padStart(2, "0");
+    const queries = [year + currentMonth, year + prevMonth, year + nextMonth];
 
-    return searchReadFiles(reportsFolder, query, year);
+    return searchReadFiles(reportsFolder, queries, year);
   }
 );
 

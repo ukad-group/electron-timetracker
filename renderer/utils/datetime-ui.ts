@@ -1,3 +1,5 @@
+import { WorkHoursReport } from "../components/Calendar/Calendar";
+
 export function checkIsToday(date: Date): boolean {
   const now = new Date();
   const chosenDate = new Date(date);
@@ -36,4 +38,21 @@ export function getDateFromString(dateString: string) {
   const day = parseInt(dateString.slice(6, 8), 10);
 
   return new Date(year, month, day);
+}
+
+export function getMonthWorkHours(
+  monthReports: WorkHoursReport[],
+  calendarDate: Date
+) {
+  const currentYear = calendarDate.getFullYear();
+  const currentMonth = (calendarDate.getMonth() + 1)
+    .toString()
+    .padStart(2, "0");
+
+  const query = currentYear + currentMonth;
+
+  return monthReports.reduce((acc, report) => {
+    if (report.date.includes(query)) acc += report.workDurationMs;
+    return acc;
+  }, 0);
 }
