@@ -2,7 +2,7 @@
   "private": true,
   "name": "timetracker",
   "description": "Timetracker app",
-  "version": "1.0.38",
+  "version": "1.0.41",
   "author": "mmmykhailo <mmmykhailo@proton.me>",
   "main": "app/background.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "build-client:win32": "electron-builder --win",
     "build-client:darwin": "npm list -g dmg-license || sudo npm i -g dmg-license && electron-builder --mac"
   },
-  "repository": "https://github.com/ukad-group/electron-timetracker",
+  "repository": "https://github.com/ukad-group/timetracker-desktop-client",
   "publish": {
     "provider": "github",
     "releaseType": "release"

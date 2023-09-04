@@ -79,7 +79,7 @@ export function parseReport(fileContent: string) {
     currentLine = currentLine.replace(separatorRegex, "");
 
     // should skip registraion when task starts from !
-    const isBreak = workingTimeRegex.test(currentLine);
+    const isBreak = workingTimeRegex.test(currentLine) || !currentLine;
     if (isBreak) {
       registration.project = currentLine;
       registration.isBreak = isBreak;
@@ -246,4 +246,57 @@ export function validation(activities: Array<ReportActivity>) {
     }
   }
   return activities;
+}
+
+export function addSuggestions(
+  activities: Array<ReportActivity> | null,
+  latestProjAndDesc: Record<string, [string]>,
+  latestProjAndAct: Record<string, [string]>
+) {
+  for (let i = 0; i < activities.length; i++) {
+    if (!Object.keys(latestProjAndDesc).length) break;
+
+    if (
+      !activities[i].project ||
+      activities[i].project?.startsWith("!") ||
+      (!activities[i].description && !activities[i].activity)
+    ) {
+      continue;
+    }
+
+    const projectKey = activities[i].project.trim();
+
+    if (
+      !latestProjAndDesc.hasOwnProperty(projectKey) ||
+      !latestProjAndAct.hasOwnProperty(projectKey)
+    ) {
+      latestProjAndDesc[projectKey] = [activities[i].description];
+      latestProjAndAct[projectKey] = [activities[i].activity];
+      continue;
+    }
+
+    if (activities[i].description) {
+      if (!latestProjAndDesc[projectKey].includes(activities[i].description)) {
+        latestProjAndDesc[projectKey].unshift(activities[i].description);
+      } else {
+        latestProjAndDesc[projectKey]?.splice(
+          latestProjAndDesc[projectKey].indexOf(activities[i].description),
+          1
+        );
+        latestProjAndDesc[projectKey]?.unshift(activities[i].description);
+      }
+    }
+
+    if (activities[i].activity) {
+      if (!latestProjAndAct[projectKey].includes(activities[i].activity)) {
+        latestProjAndAct[projectKey].unshift(activities[i].activity);
+      } else {
+        latestProjAndAct[projectKey]?.splice(
+          latestProjAndAct[projectKey].indexOf(activities[i].activity),
+          1
+        );
+        latestProjAndAct[projectKey]?.unshift(activities[i].activity);
+      }
+    }
+  }
 }
