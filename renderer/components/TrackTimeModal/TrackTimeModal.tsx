@@ -65,6 +65,7 @@ export default function TrackTimeModal({
 
     setFrom(editedActivity.from || "");
     setTo(editedActivity.to || "");
+    setFormattedDuration(formatDuration(editedActivity.duration) || "");
     setProject(editedActivity.project || "");
     setActivity(editedActivity.activity || "");
     setDescription(editedActivity.description || "");
@@ -133,6 +134,7 @@ export default function TrackTimeModal({
   const resetModal = () => {
     setFrom("");
     setTo("");
+    setFormattedDuration("");
     setProject("");
     setActivity("");
     setDescription("");

@@ -199,6 +199,7 @@ export default function Home() {
                     <ActivitiesSection
                       activities={selectedDateActivities}
                       onEditActivity={setTrackTimeModalActivity}
+                      selectedDate={selectedDate}
                     />
                   </div>
                 </section>
