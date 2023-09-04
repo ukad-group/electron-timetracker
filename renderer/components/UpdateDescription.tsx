@@ -59,10 +59,10 @@ export default function UpdateDescription() {
     }
   };
   return (
-    <div>
+    <div className="absolute mt-6">
       <div
         className={clsx(
-          " h-16 px-4 py-5 bg-white shadow overflow-hidden transition-all ease-linear duration-300 sm:rounded-lg sm:px-6",
+          "h-16 px-4 py-5 bg-white shadow overflow-hidden transition-all ease-linear duration-300 sm:rounded-lg sm:px-6",
           {
             "h-52": update.age === "new",
           }

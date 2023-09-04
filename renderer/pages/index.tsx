@@ -206,7 +206,7 @@ export default function Home() {
 
               <section
                 aria-labelledby="manual-input-title"
-                className="lg:col-start-3 lg:col-span-1"
+                className="lg:col-start-3 lg:col-span-1 relative"
               >
                 <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6">
                   <ManualInputForm
@@ -214,6 +214,7 @@ export default function Home() {
                     selectedDateReport={selectedDateReport}
                   />
                 </div>
+                <UpdateDescription />
               </section>
             </>
           ) : (
@@ -227,7 +228,6 @@ export default function Home() {
               shouldAutosave={shouldAutosave}
             />
           </section>
-          <UpdateDescription />
         </div>
       </main>
       <TrackTimeModal
