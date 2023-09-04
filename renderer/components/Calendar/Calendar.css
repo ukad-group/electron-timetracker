@@ -3,7 +3,7 @@
 }
 
 .fc-daygrid-day-top {
-  @apply mb-2;
+  @apply mb-8;
 }
 
 .fc-event {

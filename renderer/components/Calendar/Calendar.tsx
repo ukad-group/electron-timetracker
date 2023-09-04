@@ -192,6 +192,7 @@ export function Calendar({
         dayCellClassNames={addCellClassNameHandle}
         weekNumbers={true}
         weekNumberContent={weekNumberContent}
+        height="auto"
       />
     </div>
   );
