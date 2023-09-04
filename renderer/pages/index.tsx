@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
 import Header from "../components/Header";
@@ -41,6 +41,24 @@ export default function Home() {
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
+
+  const visibilitychangeHandler = useCallback(() => {
+    const currDate = new Date().toLocaleDateString();
+    const lastUsingDate = localStorage.getItem('lastUsingDate');
+    if (lastUsingDate && currDate !== lastUsingDate) {
+      localStorage.setItem('lastUsingDate', currDate);
+      window.location.reload();
+    }
+
+    localStorage.setItem('lastUsingDate', currDate);
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('visibilitychange', visibilitychangeHandler);
+    return () => {
+      document.removeEventListener('visibilitychange', visibilitychangeHandler);
+    };
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -182,7 +200,7 @@ export default function Home() {
       <Header />
       <VersionMessage />
       <main className="py-10">
-        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-cols-3">
+        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
           {reportsFolder ? (
             <>
               <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">

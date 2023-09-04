@@ -1,3 +1,5 @@
+import { WorkHoursReport } from "../components/Calendar/Calendar";
+
 export function checkIsToday(date: Date): boolean {
   const now = new Date();
   const chosenDate = new Date(date);
@@ -20,6 +22,39 @@ export function isTheSameDates(date1: Date, date2: Date): boolean {
   }
 }
 
+export function getWeekNumber(dateString: string) {
+  const dateObj = getDateFromString(dateString);
+  const startOfYear = new Date(dateObj.getFullYear(), 0, 1);
+  const days = Math.floor(
+    (dateObj.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000)
+  );
+
+  return Math.ceil((days + startOfYear.getDay() + 1) / 7);
+}
+
+export function getDateFromString(dateString: string) {
+  const year = parseInt(dateString.slice(0, 4), 10);
+  const month = parseInt(dateString.slice(4, 6), 10) - 1;
+  const day = parseInt(dateString.slice(6, 8), 10);
+
+  return new Date(year, month, day);
+}
+
+export function getMonthWorkHours(
+  monthReports: WorkHoursReport[],
+  calendarDate: Date
+) {
+  const currentYear = calendarDate.getFullYear();
+  const currentMonth = (calendarDate.getMonth() + 1)
+    .toString()
+    .padStart(2, "0");
+
+  const query = currentYear + currentMonth;
+
+  return monthReports.reduce((acc, report) => {
+    if (report.date.includes(query)) acc += report.workDurationMs;
+    return acc;
+  }, 0);
 export function getCeiledTime() {
   const now = new Date();
   const hours = now.getHours();
