@@ -3,35 +3,33 @@ import { Dispatch, SetStateAction } from "react";
 import { Combobox } from "@headlessui/react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 
-type ActivitySelectorProps = {
+type DescriptionSelectorProps = {
   className?: string;
-  selectedActivity: string;
-  availableActivities: Array<string>;
-  setSelectedActivity: Dispatch<SetStateAction<string>>;
+  selectedDescription: string;
+  availableDescriptions: Array<string>;
+  setSelectedDescription: Dispatch<SetStateAction<string>>;
   required?: boolean;
   tabIndex?: number;
 };
 
-export default function ActivitySelector({
+export default function DescriptionSelector({
   className,
-  selectedActivity,
-  availableActivities,
-  setSelectedActivity,
+  selectedDescription,
+  availableDescriptions,
+  setSelectedDescription,
   required = false,
   tabIndex,
-}: ActivitySelectorProps) {
-  const filteredActivities =
-    selectedActivity === ""
-      ? availableActivities
-          ?.filter((activity) => {
-            return activity !== "";
-          })
-          .sort()
-      : availableActivities
-          ?.filter((activity) => {
-            return activity
+}: DescriptionSelectorProps) {
+  const filteredDescriptions =
+    selectedDescription === ""
+      ? availableDescriptions?.filter((description, i) => {
+          return description !== "" && i < 3;
+        })
+      : availableDescriptions
+          ?.filter((description) => {
+            return description
               .toLowerCase()
-              .includes(selectedActivity.toLowerCase());
+              .includes(selectedDescription.toLowerCase());
           })
           .sort();
 
@@ -39,11 +37,11 @@ export default function ActivitySelector({
     <Combobox
       className={className}
       as="div"
-      value={selectedActivity}
-      onChange={setSelectedActivity}
+      value={selectedDescription}
+      onChange={setSelectedDescription}
     >
       <Combobox.Label className="block text-sm font-medium text-gray-700">
-        Activity
+        Description
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
@@ -52,7 +50,7 @@ export default function ActivitySelector({
           className={
             "w-full py-2 pl-3 pr-10 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm"
           }
-          onChange={(event) => setSelectedActivity(event.target.value)}
+          onChange={(event) => setSelectedDescription(event.target.value)}
           tabIndex={tabIndex}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center px-2 rounded-r-md focus:outline-none">
@@ -62,12 +60,12 @@ export default function ActivitySelector({
           />
         </Combobox.Button>
 
-        {filteredActivities?.length > 0 && (
+        {filteredDescriptions?.length > 0 && (
           <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-            {filteredActivities?.map((activity, i) => (
+            {filteredDescriptions?.map((description, i) => (
               <Combobox.Option
                 key={i}
-                value={activity}
+                value={description}
                 className={({ active }) =>
                   clsx(
                     "relative cursor-default select-none py-2 pl-3 pr-9",
@@ -83,7 +81,7 @@ export default function ActivitySelector({
                         selected && "font-semibold"
                       )}
                     >
-                      {activity}
+                      {description}
                     </span>
 
                     {selected && (

@@ -98,6 +98,7 @@ export default function ProjectSelector({
                 )}
               </Combobox.Option>
             ))}
+            <div className="block text-xs text-gray-500 text-center">tab to choose</div>
           </Combobox.Options>
         )}
       </div>

@@ -100,12 +100,12 @@ export function Calendar({
 
   const prevButtonHandle = () => {
     getCalendarApi().prev();
-    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() - 1)));
+    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() - 1, 1)));
   };
 
   const nextButtonHandle = () => {
     getCalendarApi().next();
-    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() + 1)));
+    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() + 1, 1)));
   };
 
   const todayButtonHandle = () => {
@@ -131,13 +131,9 @@ export function Calendar({
       <div className="calendar-header h-10 flex items-center justify-between mb-4">
         <p className="text-lg font-semibold">{`${currentMonth} ${currentYear}`}</p>
         <div className="flex gap-4">
-          <Button
-            callback={todayButtonHandle}
-            text="Go to current month"
-            disabled={
-              calendarDate.getMonth() === new Date().getMonth() ? true : false
-            }
-          />
+          {calendarDate.getMonth() !== new Date().getMonth() && (
+            <Button text="Go to current month" callback={todayButtonHandle} />
+          )}
           <NavButtons
             prevCallback={prevButtonHandle}
             nextCallback={nextButtonHandle}
