@@ -17,3 +17,7 @@
 .fc-day-other .fc-event {
   @apply bg-gray-200 border-gray-200 text-black;
 }
+
+.fc .fc-daygrid-body-natural .fc-daygrid-day-events {
+  @apply mb-0;
+}
