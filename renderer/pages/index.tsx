@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
 import Header from "../components/Header";
@@ -41,6 +41,24 @@ export default function Home() {
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
+
+  const visibilitychangeHandler = useCallback(() => {
+    const currDate = new Date().toLocaleDateString();
+    const lastUsingDate = localStorage.getItem('lastUsingDate');
+    if (lastUsingDate && currDate !== lastUsingDate) {
+      localStorage.setItem('lastUsingDate', currDate);
+      window.location.reload();
+    }
+
+    localStorage.setItem('lastUsingDate', currDate);
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('visibilitychange', visibilitychangeHandler);
+    return () => {
+      document.removeEventListener('visibilitychange', visibilitychangeHandler);
+    };
+  }, []);
 
   useEffect(() => {
     (async () => {
