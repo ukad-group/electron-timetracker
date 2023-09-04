@@ -56,3 +56,19 @@ export function getMonthWorkHours(
     return acc;
   }, 0);
 }
+
+export function getCeiledTime() {
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+
+  const ceilHours = Math.ceil(minutes / 15 > 3 ? hours + 1 : hours)
+    .toString()
+    .padStart(2, "0");
+
+  const ceilMinutes = (Math.ceil(minutes / 15 > 3 ? 0 : minutes / 15) * 15)
+    .toString()
+    .padStart(2, "0");
+
+  return `${ceilHours}:${ceilMinutes}`;
+}
