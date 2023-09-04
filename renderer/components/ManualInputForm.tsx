@@ -14,7 +14,7 @@ export default function ManualInputForm({
   onSave,
 }: ManualInputFormProps) {
   const [report, setReport] = useState("");
-  const [saveBtnStatus, setSaveBtnStatus] = useState("enabled");
+  const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if (e.code === "KeyS" && e.ctrlKey) {
@@ -38,7 +38,7 @@ export default function ManualInputForm({
     setSaveBtnStatus('inprogress');
     setTimeout(() => {
       setSaveBtnStatus('disabled');
-    }, 1200);
+    }, 800);
   }
 
   const setReportHandler = (report) => {
