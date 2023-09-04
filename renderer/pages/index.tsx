@@ -181,7 +181,7 @@ export default function Home() {
     <div className="min-h-full">
       <Header />
       <VersionMessage />
-      <main className="py-10">
+      <main className="py-6">
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-7xl lg:grid-cols-3">
           {reportsFolder ? (
             <>
