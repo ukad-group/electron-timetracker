@@ -171,13 +171,9 @@ export function Calendar({
           <p className="text-xs text-gray-500">Total: {monthTotalHours}</p>
         </div>
         <div className="flex gap-4">
-          <Button
-            callback={todayButtonHandle}
-            text="Go to current month"
-            disabled={
-              calendarDate.getMonth() === new Date().getMonth() ? true : false
-            }
-          />
+          {calendarDate.getMonth() !== new Date().getMonth() && (
+            <Button text="Go to current month" callback={todayButtonHandle} />
+          )}
           <NavButtons
             prevCallback={prevButtonHandle}
             nextCallback={nextButtonHandle}
