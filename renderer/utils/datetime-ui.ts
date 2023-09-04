@@ -55,6 +55,8 @@ export function getMonthWorkHours(
     if (report.date.includes(query)) acc += report.workDurationMs;
     return acc;
   }, 0);
+}
+
 export function getCeiledTime() {
   const now = new Date();
   const hours = now.getHours();
