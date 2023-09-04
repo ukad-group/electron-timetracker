@@ -1,5 +1,5 @@
 import { ipcRenderer } from "electron";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
 import Header from "../components/Header";
@@ -17,7 +17,6 @@ import VersionMessage from "../components/ui/VersionMessages";
 import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
 import { Calendar } from "../components/Calendar/Calendar";
-import PageLoadingSpinner from "../components/ui/PageLoadingSpinner/PageLoadingSpinner";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -43,19 +42,22 @@ export default function Home() {
     []
   );
 
-  const [ spinner, setSpinner ] = useState(true);
-
-  useEffect(() => {
+  const visibilitychangeHandler = useCallback(() => {
     const currDate = new Date().toLocaleDateString();
     const lastUsingDate = localStorage.getItem('lastUsingDate');
     if (lastUsingDate && currDate !== lastUsingDate) {
-      document.onvisibilitychange = () => window.location.reload();
-      setTimeout(() => setSpinner(false), 1000);
-    } else {
-      setSpinner(false);
+      localStorage.setItem('lastUsingDate', currDate);
+      window.location.reload();
     }
 
     localStorage.setItem('lastUsingDate', currDate);
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('visibilitychange', visibilitychangeHandler);
+    return () => {
+      document.removeEventListener('visibilitychange', visibilitychangeHandler);
+    };
   }, []);
 
   useEffect(() => {
@@ -256,7 +258,6 @@ export default function Home() {
         submitActivity={submitActivity}
         selectedDate={selectedDate}
       />
-      { spinner && <PageLoadingSpinner/> }
     </div>
   );
 }
