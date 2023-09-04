@@ -205,7 +205,7 @@ function renderEventContent(eventInfo) {
         Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}
       </p>
       {eventInfo.event.extendedProps.isValid === false && (
-        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-[170%] left-[60%]" />
+        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-[290%] left-[60%]" />
       )}
     </>
   );
