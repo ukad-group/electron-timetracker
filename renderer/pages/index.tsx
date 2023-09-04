@@ -41,8 +41,16 @@ export default function Home() {
   const [ spinner, setSpinner ] = useState(true);
 
   useEffect(() => {
-    document.onvisibilitychange = () => window.location.reload();
-    setTimeout(() => setSpinner(false), 1000);
+    const currDate = new Date().toLocaleDateString();
+    const lastUsingDate = localStorage.getItem('lastUsingDate');
+    if (lastUsingDate && currDate !== lastUsingDate) {
+      document.onvisibilitychange = () => window.location.reload();
+      setTimeout(() => setSpinner(false), 1000);
+    } else {
+      setSpinner(false);
+    }
+
+    localStorage.setItem('lastUsingDate', currDate);
   }, []);
 
   useEffect(() => {
