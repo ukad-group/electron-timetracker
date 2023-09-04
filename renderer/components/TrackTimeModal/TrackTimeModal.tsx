@@ -140,6 +140,10 @@ export default function TrackTimeModal({
     setIsValidationEnabled(false);
   };
 
+  const disableTextDrag = (e) => {
+    e.preventDefault();
+  }
+
   const onDurationChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const value = e.target.value;
     const formatDurationRegex = /^-?(\d*\.?\d*)?[hm]?$|^-?[hm](?![hm.])$/i;
@@ -242,6 +246,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && !from,
                         }
                       )}
+                      onDragStart = { disableTextDrag }
                     />
                   </div>
 
@@ -268,6 +273,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && !to,
                         }
                       )}
+                      onDragStart = { disableTextDrag }
                     />
                   </div>
 
@@ -293,6 +299,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && (!duration || duration < 0),
                         }
                       )}
+                      onDragStart = { disableTextDrag }
                     />
                   </div>
 
