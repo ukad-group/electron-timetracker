@@ -1,0 +1,23 @@
+.fc-daygrid-day {
+  @apply hover:bg-gray-200 cursor-pointer;
+}
+
+.fc-daygrid-day-top {
+  @apply mb-8;
+}
+
+.fc-event {
+  @apply pointer-events-none;
+}
+
+.fc-day.fc-custom-today-date {
+  @apply bg-sky-100;
+}
+
+.fc-day-other .fc-event {
+  @apply bg-gray-200 border-gray-200 text-black;
+}
+
+.fc .fc-daygrid-body-natural .fc-daygrid-day-events {
+  @apply mb-0;
+}

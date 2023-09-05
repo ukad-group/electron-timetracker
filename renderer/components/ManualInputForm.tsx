@@ -1,4 +1,5 @@
 import { SetStateAction, useEffect, useState } from "react";
+import Button from "./ui/Button";
 
 type ManualInputFormProps = {
   selectedDateReport: string;
@@ -13,10 +14,11 @@ export default function ManualInputForm({
   onSave,
 }: ManualInputFormProps) {
   const [report, setReport] = useState("");
+  const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if (e.code === "KeyS" && e.ctrlKey) {
-      onSave(report, true);
+      saveReportHandler();
     }
   };
 
@@ -28,8 +30,23 @@ export default function ManualInputForm({
   }, [report]);
 
   useEffect(() => {
-    setReport(selectedDateReport);
+    setReportHandler(selectedDateReport);
   }, [selectedDateReport]);
+
+  const saveReportHandler = () => {
+    onSave(report, true);
+    setSaveBtnStatus('inprogress');
+    setTimeout(() => {
+      setSaveBtnStatus('disabled');
+    }, 800);
+  }
+
+  const setReportHandler = (report) => {
+    if (saveBtnStatus === 'disabled') {
+      setSaveBtnStatus('enabled');
+    }
+    setReport(report);
+  }
 
   return (
     <div>
@@ -39,18 +56,13 @@ export default function ManualInputForm({
 
       <textarea
         value={report}
-        onChange={(e) => setReport(e.target.value)}
+        onChange={(e) => setReportHandler(e.target.value)}
         rows={10}
         className="block w-full px-3 py-2 mt-3 border border-gray-300 rounded-md shadow-sm focus-visible:outline-blue-500 sm:text-sm"
         spellCheck={false}
       />
       <div className="flex flex-col mt-6 justify-stretch">
-        <button
-          onClick={() => onSave(report, true)}
-          type="button"
-          className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-          Save
-        </button>
+        <Button text="Save" callback={saveReportHandler} status={saveBtnStatus} disabled={saveBtnStatus === 'disabled'}/>
         <span className="block text-xs text-gray-500 text-center">
           or press ctrl + s
         </span>

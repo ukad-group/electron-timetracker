@@ -2,24 +2,30 @@ import clsx from "clsx";
 import { FormEvent, Fragment, useEffect, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
-import ProjectSelector from "./ProjectSelector";
-import ActivitySelector from "./ActivitySelector";
-import useTimeInput from "../hooks/useTimeInput";
+import ProjectSelector from "../ProjectSelector";
+import ActivitySelector from "../ActivitySelector";
+import DescriptionSelector from "../DescriptionSelector";
+import useTimeInput from "../../hooks/useTimeInput";
 import {
   ReportActivity,
   calcDurationBetweenTimes,
   formatDuration,
-} from "../utils/reports";
+  addSuggestions,
+  addDurationToTime,
+} from "../../utils/reports";
+import { checkIsToday } from "../../utils/datetime-ui";
 
-type TrackTimeModalProps = {
+export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
   isOpen: boolean;
   editedActivity: ReportActivity | "new";
   latestProjAndAct: Record<string, [string]>;
+  latestProjAndDesc: Record<string, [string]>;
   close: () => void;
   submitActivity: (
     activity: Omit<ReportActivity, "id"> & Pick<ReportActivity, "id">
   ) => void;
+  selectedDate: Date;
 };
 
 export default function TrackTimeModal({
@@ -27,15 +33,18 @@ export default function TrackTimeModal({
   isOpen,
   editedActivity,
   latestProjAndAct,
+  latestProjAndDesc,
   close,
   submitActivity,
+  selectedDate,
 }: TrackTimeModalProps) {
   const [from, onFromChange, onFromBlur, setFrom] = useTimeInput();
   const [to, onToChange, onToBlur, setTo] = useTimeInput();
+  const [formattedDuration, setFormattedDuration] = useState("");
   const [project, setProject] = useState("");
   const [activity, setActivity] = useState("");
   const [description, setDescription] = useState("");
-
+  const [isTypingFromDuration, setIsTypingFromDuration] = useState(false);
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
 
   const duration = useMemo(() => {
@@ -43,11 +52,6 @@ export default function TrackTimeModal({
 
     return calcDurationBetweenTimes(from, to);
   }, [from, to]);
-
-  const formattedDuration = useMemo(() => {
-    if (duration === null) return "";
-    return formatDuration(duration);
-  }, [duration]);
 
   const isFormInvalid = useMemo(() => {
     return !from || !to || !duration || duration < 0 || !project;
@@ -61,6 +65,7 @@ export default function TrackTimeModal({
 
     setFrom(editedActivity.from || "");
     setTo(editedActivity.to || "");
+    setFormattedDuration(formatDuration(editedActivity.duration) || "");
     setProject(editedActivity.project || "");
     setActivity(editedActivity.activity || "");
     setDescription(editedActivity.description || "");
@@ -84,6 +89,7 @@ export default function TrackTimeModal({
     )
       .toString()
       .padStart(2, "0");
+    const isToday = checkIsToday(selectedDate);
 
     if (activities.length && activities[activities.length - 1].to) {
       setFrom(activities[activities.length - 1].to);
@@ -93,8 +99,18 @@ export default function TrackTimeModal({
       setFrom(`${hours}:${floorMinutes}`);
     }
 
-    setTo(`${ceilHours}:${ceilMinutes}`);
+    isToday ? setTo(`${ceilHours}:${ceilMinutes}`) : setTo("");
   }, [isOpen]);
+
+  useEffect(() => {
+    addSuggestions(activities, latestProjAndDesc, latestProjAndAct);
+  }, [isOpen, latestProjAndDesc, latestProjAndAct]);
+
+  useEffect(() => {
+    if (duration === null || isTypingFromDuration) return;
+
+    setFormattedDuration(formatDuration(duration));
+  }, [from, to]);
 
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
@@ -118,11 +134,36 @@ export default function TrackTimeModal({
   const resetModal = () => {
     setFrom("");
     setTo("");
+    setFormattedDuration("");
     setProject("");
     setActivity("");
     setDescription("");
 
     setIsValidationEnabled(false);
+  };
+
+  const disableTextDrag = (e) => {
+    e.preventDefault();
+  }
+
+  const onDurationChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const value = e.target.value;
+    const formatDurationRegex = /^-?(\d*\.?\d*)?[hm]?$|^-?[hm](?![hm.])$/i;
+
+    if (formatDurationRegex.test(value)) {
+      setIsTypingFromDuration(true);
+      setFormattedDuration(value);
+      setTo(addDurationToTime(from, value));
+    }
+  };
+
+  const onDurationBlur = () => {
+    setIsTypingFromDuration(false);
+    setFormattedDuration(formatDuration(duration));
+  };
+
+  const selectText = (e) => {
+    e.target.select();
   };
 
   return (
@@ -162,7 +203,7 @@ export default function TrackTimeModal({
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <form
-              className="relative inline-block px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+              className="relative inline-block px-4 pt-5 pb-4  text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
               onSubmit={onSave}
             >
               <div className="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
@@ -170,7 +211,7 @@ export default function TrackTimeModal({
                   type="button"
                   className="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500"
                   onClick={close}
-                  tabIndex={8}
+                  tabIndex={9}
                 >
                   <span className="sr-only">Close</span>
                   <XMarkIcon className="w-6 h-6" aria-hidden="true" />
@@ -196,7 +237,7 @@ export default function TrackTimeModal({
                       value={from}
                       onChange={onFromChange}
                       onBlur={onFromBlur}
-                      onFocus={(e) => e.target.select()}
+                      onFocus={selectText}
                       type="text"
                       id="from"
                       tabIndex={1}
@@ -207,6 +248,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && !from,
                         }
                       )}
+                      onDragStart = { disableTextDrag }
                     />
                   </div>
 
@@ -222,7 +264,7 @@ export default function TrackTimeModal({
                       value={to}
                       onChange={onToChange}
                       onBlur={onToBlur}
-                      onFocus={(e) => e.target.select()}
+                      onFocus={selectText}
                       type="text"
                       id="to"
                       tabIndex={2}
@@ -233,18 +275,25 @@ export default function TrackTimeModal({
                             isValidationEnabled && !to,
                         }
                       )}
+                      onDragStart = { disableTextDrag }
                     />
                   </div>
 
                   <div className="col-span-6 sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label
+                      className="block text-sm font-medium text-gray-700"
+                      htmlFor="duration"
+                    >
                       Duration
                     </label>
                     <input
+                      onChange={onDurationChange}
+                      onBlur={onDurationBlur}
+                      onFocus={selectText}
                       value={formattedDuration}
                       type="text"
-                      readOnly
-                      disabled
+                      id="duration"
+                      tabIndex={3}
                       className={clsx(
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
                         {
@@ -252,6 +301,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && (!duration || duration < 0),
                         }
                       )}
+                      onDragStart = { disableTextDrag }
                     />
                   </div>
 
@@ -262,7 +312,7 @@ export default function TrackTimeModal({
                       selectedProject={project}
                       setSelectedProject={setProject}
                       isValidationEnabled={isValidationEnabled}
-                      tabIndex={3}
+                      tabIndex={4}
                     />
                   </div>
                   <div className="col-span-6">
@@ -270,24 +320,15 @@ export default function TrackTimeModal({
                       availableActivities={latestProjAndAct[project]}
                       selectedActivity={activity}
                       setSelectedActivity={setActivity}
-                      tabIndex={5}
+                      tabIndex={6}
                     />
                   </div>
-
                   <div className="col-span-6">
-                    <label
-                      htmlFor="description"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Description
-                    </label>
-                    <input
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      id="description"
-                      type="text"
+                    <DescriptionSelector
+                      availableDescriptions={latestProjAndDesc[project]}
+                      selectedDescription={description}
+                      setSelectedDescription={setDescription}
                       tabIndex={4}
-                      className="block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                   </div>
                 </div>
@@ -297,7 +338,7 @@ export default function TrackTimeModal({
                   <button
                     onClick={close}
                     type="button"
-                    tabIndex={7}
+                    tabIndex={8}
                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Cancel
@@ -305,7 +346,7 @@ export default function TrackTimeModal({
                   <button
                     onClick={onSave}
                     type="submit"
-                    tabIndex={6}
+                    tabIndex={7}
                     className="inline-flex justify-center px-4 py-2 ml-3 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     Save
