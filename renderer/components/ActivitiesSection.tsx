@@ -51,7 +51,7 @@ export default function ActivitiesSection({
       <div>
         <a
           href="#"
-          className="block px-4 py-4 text-sm font-medium text-center text-blue-600 bg-blue-200 hover:bg-blue-300  sm:rounded-b-lg"
+          className="block px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300  sm:rounded-b-lg"
           onClick={() => onEditActivity("new")}
         >
           Track more time

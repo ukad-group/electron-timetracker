@@ -33,6 +33,10 @@ export default function ManualInputForm({
     setReportHandler(selectedDateReport);
   }, [selectedDateReport]);
 
+  useEffect(() => {
+    setSaveBtnStatus('disabled');
+  }, []);
+
   const saveReportHandler = () => {
     onSave(report, true);
     setSaveBtnStatus('inprogress');
@@ -45,6 +49,11 @@ export default function ManualInputForm({
     if (saveBtnStatus === 'disabled') {
       setSaveBtnStatus('enabled');
     }
+
+    if (!report) {
+      setSaveBtnStatus('disabled');
+    }
+
     setReport(report);
   }
 
