@@ -17,6 +17,7 @@ import VersionMessage from "../components/ui/VersionMessages";
 import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
 import { Calendar } from "../components/Calendar/Calendar";
+import GoogleCalendar from "../components/google-calendar/GoogleCalendar";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -259,6 +260,7 @@ export default function Home() {
         submitActivity={submitActivity}
         selectedDate={selectedDate}
       />
+      <GoogleCalendar/>
     </div>
   );
 }
