@@ -67,7 +67,10 @@ export default function UpdateDescription() {
           }
         )}
       >
-        <div className="flex justify-between">
+        <div
+          className="flex justify-between  cursor-pointer"
+          onClick={isUpdateToggle}
+        >
           <h2
             id="manual-input-title"
             className="text-lg font-medium text-gray-900"
@@ -75,7 +78,6 @@ export default function UpdateDescription() {
             What's new?
           </h2>
           <button
-            onClick={isUpdateToggle}
             className={clsx(
               "transform transition-transform ease-linear duration-300",
               {

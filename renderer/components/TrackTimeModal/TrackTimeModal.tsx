@@ -65,6 +65,7 @@ export default function TrackTimeModal({
 
     setFrom(editedActivity.from || "");
     setTo(editedActivity.to || "");
+    setFormattedDuration(formatDuration(editedActivity.duration) || "");
     setProject(editedActivity.project || "");
     setActivity(editedActivity.activity || "");
     setDescription(editedActivity.description || "");
@@ -133,12 +134,17 @@ export default function TrackTimeModal({
   const resetModal = () => {
     setFrom("");
     setTo("");
+    setFormattedDuration("");
     setProject("");
     setActivity("");
     setDescription("");
 
     setIsValidationEnabled(false);
   };
+
+  const disableTextDrag = (e) => {
+    e.preventDefault();
+  }
 
   const onDurationChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const value = e.target.value;
@@ -242,6 +248,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && !from,
                         }
                       )}
+                      onDragStart = { disableTextDrag }
                     />
                   </div>
 
@@ -268,6 +275,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && !to,
                         }
                       )}
+                      onDragStart = { disableTextDrag }
                     />
                   </div>
 
@@ -293,6 +301,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && (!duration || duration < 0),
                         }
                       )}
+                      onDragStart = { disableTextDrag }
                     />
                   </div>
 

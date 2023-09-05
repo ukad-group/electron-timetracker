@@ -7,6 +7,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
   onEditActivity: (activity: ReportActivity | "new") => void;
+  selectedDate: Date;
 };
 
 type PlaceholderProps = Pick<ActivitiesSectionProps, "onEditActivity">;
@@ -14,6 +15,7 @@ type PlaceholderProps = Pick<ActivitiesSectionProps, "onEditActivity">;
 export default function ActivitiesSection({
   onEditActivity,
   activities,
+  selectedDate,
 }: ActivitiesSectionProps) {
   const keydownHandler = (e: KeyboardEvent) => {
     if (e.code === "Space" && e.ctrlKey) {
@@ -43,6 +45,7 @@ export default function ActivitiesSection({
         <ActivitiesTable
           onEditActivity={onEditActivity}
           activities={activities}
+          selectedDate={selectedDate}
         />
       </div>
       <div>

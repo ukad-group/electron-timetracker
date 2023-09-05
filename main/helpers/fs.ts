@@ -20,7 +20,7 @@ type Report = {
 
 export function searchReadFiles(
   directory: string,
-  query: string,
+  queries: string[],
   year: string
 ) {
   const initialReportsArr: Report[] = [];
@@ -35,7 +35,7 @@ export function searchReadFiles(
 
   const filledReportsArr = searchFilesWithSubfolders(
     currentYearPath,
-    query,
+    queries,
     initialReportsArr
   );
 
@@ -44,7 +44,7 @@ export function searchReadFiles(
 
 function searchFilesWithSubfolders(
   currentYearFolder: string,
-  query: string,
+  queries: string[],
   initialReportsArr: Report[]
 ) {
   try {
@@ -55,8 +55,8 @@ function searchFilesWithSubfolders(
       const stats = fs.statSync(filePath);
 
       if (stats.isDirectory()) {
-        searchFilesWithSubfolders(filePath, query, initialReportsArr);
-      } else if (file.includes(query)) {
+        searchFilesWithSubfolders(filePath, queries, initialReportsArr);
+      } else if (queries.some((query) => file.includes(query))) {
         initialReportsArr.push({
           data: fs.readFileSync(filePath, "utf8"),
           reportDate: filePath.split(" - ")[1],

@@ -1,15 +1,22 @@
 import clsx from "clsx";
 import { useMemo } from "react";
 import { ReportActivity, formatDuration, validation } from "../utils/reports";
+import { checkIsToday, getCeiledTime } from "../utils/datetime-ui";
+import {
+  Square2StackIcon,
+  PencilSquareIcon,
+} from "@heroicons/react/24/outline";
 
 type ActivitiesTableProps = {
   activities: Array<ReportActivity>;
   onEditActivity: (activity: ReportActivity) => void;
+  selectedDate: Date;
 };
 const msPerHour = 60 * 60 * 1000;
 export default function ActivitiesTable({
   activities,
   onEditActivity,
+  selectedDate,
 }: ActivitiesTableProps) {
   const nonBreakActivities = useMemo(() => {
     return validation(
@@ -30,7 +37,6 @@ export default function ActivitiesTable({
     let modifiedValue: string | number;
 
     if (cellColumnName === "duration" || cellColumnName === "total") {
-      console.log("trigger");
       if (originaValue.includes("h")) {
         modifiedValue = originaValue.slice(0, -1);
       } else if (originaValue.includes("m")) {
@@ -77,7 +83,7 @@ export default function ActivitiesTable({
           </th>
           <th
             scope="col"
-            className="pb-6 px-3 text-left text-sm font-semibold text-gray-900 relative"
+            className="w-8 pb-6 px-3 text-left text-sm font-semibold text-gray-900 relative"
           >
             <span className="block absolute text-xs text-gray-500 top-[22px]">
               activity
@@ -90,7 +96,16 @@ export default function ActivitiesTable({
           >
             Description
           </th>
-          <th scope="col" className="relative pb-6 pl-3 pr-4 sm:pr-6 md:pr-0">
+          <th
+            scope="col"
+            className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
+          >
+            <span className="sr-only">Copy</span>
+          </th>
+          <th
+            scope="col"
+            className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
+          >
             <span className="sr-only">Edit</span>
           </th>
         </tr>
@@ -151,9 +166,26 @@ export default function ActivitiesTable({
               <a
                 href="#"
                 className="text-blue-600 hover:text-blue-900"
+                onClick={() => {
+                  onEditActivity({
+                    ...activity,
+                    id: null,
+                    from: activities[activities.length - 2].to,
+                    to: checkIsToday(selectedDate) ? getCeiledTime() : "",
+                    duration: null,
+                  });
+                }}
+              >
+                <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 hover:text-gray-900" />
+              </a>
+            </td>
+            <td className="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-6 md:pr-0">
+              <a
+                href="#"
+                className="text-blue-600 hover:text-blue-900"
                 onClick={() => onEditActivity(activity)}
               >
-                Edit
+                <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 hover:text-gray-900" />
               </a>
             </td>
           </tr>
