@@ -23,7 +23,6 @@ export default function UpdateDescription() {
   };
   const [release, setRelease] = useState<Release | null>();
   const [currentVersion, setCurrentVersion] = useState(app?.getVersion());
-  const [isOpenVersion, setIsOpenVersion] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [update, setUpdate] = useUpdateStore(
     (state) => [state.update, state.setUpdate],
@@ -59,12 +58,12 @@ export default function UpdateDescription() {
     }
   };
   return (
-    <div className="absolute mt-6">
+    <div className="lg:absolute mt-6 ">
       <div
         className={clsx(
           "h-16 px-4 py-5 bg-white shadow overflow-hidden transition-all ease-linear duration-300 sm:rounded-lg sm:px-6",
           {
-            "h-52": update.age === "new",
+            "h-80 overflow-y-auto ": update.age === "new",
           }
         )}
       >
@@ -73,8 +72,7 @@ export default function UpdateDescription() {
             id="manual-input-title"
             className="text-lg font-medium text-gray-900"
           >
-            What's new in {release?.version ? release?.version : currentVersion}{" "}
-            version
+            What's new?
           </h2>
           <button
             onClick={isUpdateToggle}
@@ -100,30 +98,18 @@ export default function UpdateDescription() {
             </svg>
           </button>
         </div>
-        <div
-          className="flex flex-col gap-2 mt-3 h-32 overflow-y-auto"
-          dangerouslySetInnerHTML={{ __html: update.description }}
-        ></div>
-      </div>
-      <div className="overflow-hidden items-center left-1 flex-shrink-0 pl-2 text-xs text-gray-700 font-semibold">
-        <p
-          className=" cursor-pointer"
-          onClick={() => setIsOpenVersion(!isOpenVersion)}
-        >
+        <p className="text-xs text-gray-700 font-semibold">
           Current version {currentVersion} {!isUpdate && "(latest)"}
         </p>
-        <div
-          className={clsx(
-            "relative flex items-start transition-all transform -my-3 -z-10 opacity-0",
-            { "my-0 opacity-100 -z-0": isOpenVersion }
-          )}
-        >
+        <div className="relative flex items-start my-4">
           <div className="flex items-center h-5">
             <input
               id="comments"
               aria-describedby="comments-description"
               name="comments"
               type="checkbox"
+              defaultChecked={isBeta}
+              onChange={() => setIsBeta(!isBeta)}
               className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
             />
           </div>
@@ -136,6 +122,13 @@ export default function UpdateDescription() {
             </p>
           </div>
         </div>
+        <h2 className="font-bold">
+          In {release?.version ? release?.version : currentVersion} version
+        </h2>
+        <div
+          className="flex flex-col gap-2 mb-3"
+          dangerouslySetInnerHTML={{ __html: update.description }}
+        ></div>
       </div>
     </div>
   );
