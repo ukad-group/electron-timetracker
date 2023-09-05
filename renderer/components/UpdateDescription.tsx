@@ -1,9 +1,9 @@
 import clsx from "clsx";
 import { app, ipcRenderer } from "electron";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { shallow } from "zustand/shallow";
 import { useUpdateStore } from "../store/updateStore";
-
+import { useBetaStore } from "../store/betaUpdatesStore";
 export default function UpdateDescription() {
   type File = {
     url: string;
@@ -23,15 +23,29 @@ export default function UpdateDescription() {
   };
   const [release, setRelease] = useState<Release | null>();
   const [currentVersion, setCurrentVersion] = useState(app?.getVersion());
+  const [isUpdate, setIsUpdate] = useState(false);
   const [update, setUpdate] = useUpdateStore(
     (state) => [state.update, state.setUpdate],
     shallow
   );
+  const [isBeta, setIsBeta] = useBetaStore(
+    (state) => [state.isBeta, state.setIsBeta],
+    shallow
+  );
+
+  useEffect(() => {
+    ipcRenderer.send("beta-channel", isBeta);
+  }, [isBeta]);
+
+  ipcRenderer.on("update-available", (event, data, info) => {
+    setIsUpdate(data);
+  });
 
   ipcRenderer.on("downloaded", (event, data, info) => {
     setRelease(info);
     setUpdate({ age: "new", description: info?.releaseNotes });
   });
+
   ipcRenderer.on("current-version", (event, data) => {
     setCurrentVersion(data);
   });
@@ -44,25 +58,24 @@ export default function UpdateDescription() {
     }
   };
   return (
-    <div
-      className={clsx(
-        "lg:absolute h-16 px-4 py-5 my-6 bg-white shadow overflow-hidden transition-all ease-linear duration-300 sm:rounded-lg sm:px-6",
-        {
-          "h-52": update.age === "new",
-        }
-      )}
-    >
-      <div>
+    <div className="lg:absolute mt-6 ">
+      <div
+        className={clsx(
+          "h-16 px-4 py-5 bg-white shadow overflow-hidden transition-all ease-linear duration-300 sm:rounded-lg sm:px-6",
+          {
+            "h-80 overflow-y-auto ": update.age === "new",
+          }
+        )}
+      >
         <div
-          className="flex justify-between cursor-pointer"
+          className="flex justify-between  cursor-pointer"
           onClick={isUpdateToggle}
         >
           <h2
             id="manual-input-title"
             className="text-lg font-medium text-gray-900"
           >
-            What's new in {release?.version ? release?.version : currentVersion}{" "}
-            version
+            What's new?
           </h2>
           <button
             className={clsx(
@@ -87,8 +100,35 @@ export default function UpdateDescription() {
             </svg>
           </button>
         </div>
+        <p className="text-xs text-gray-700 font-semibold">
+          Current version {currentVersion} {!isUpdate && "(latest)"}
+        </p>
+        <div className="relative flex items-start my-4">
+          <div className="flex items-center h-5">
+            <input
+              id="comments"
+              aria-describedby="comments-description"
+              name="comments"
+              type="checkbox"
+              defaultChecked={isBeta}
+              onChange={() => setIsBeta(!isBeta)}
+              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+            />
+          </div>
+          <div className="ml-2 text-sm">
+            <label htmlFor="comments" className="font-medium text-gray-700">
+              Download beta version
+            </label>
+            <p id="comments-description" className="text-gray-500">
+              You need to restart the application
+            </p>
+          </div>
+        </div>
+        <h2 className="font-bold">
+          In {release?.version ? release?.version : currentVersion} version
+        </h2>
         <div
-          className="flex flex-col gap-2 mt-3 h-32 overflow-y-auto"
+          className="flex flex-col gap-2 mb-3"
           dangerouslySetInnerHTML={{ __html: update.description }}
         ></div>
       </div>

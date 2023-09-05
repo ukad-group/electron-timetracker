@@ -44,19 +44,19 @@ export default function Home() {
 
   const visibilitychangeHandler = useCallback(() => {
     const currDate = new Date().toLocaleDateString();
-    const lastUsingDate = localStorage.getItem('lastUsingDate');
+    const lastUsingDate = localStorage.getItem("lastUsingDate");
     if (lastUsingDate && currDate !== lastUsingDate) {
-      localStorage.setItem('lastUsingDate', currDate);
+      localStorage.setItem("lastUsingDate", currDate);
       window.location.reload();
     }
 
-    localStorage.setItem('lastUsingDate', currDate);
+    localStorage.setItem("lastUsingDate", currDate);
   }, []);
 
   useEffect(() => {
-    document.addEventListener('visibilitychange', visibilitychangeHandler);
+    document.addEventListener("visibilitychange", visibilitychangeHandler);
     return () => {
-      document.removeEventListener('visibilitychange', visibilitychangeHandler);
+      document.removeEventListener("visibilitychange", visibilitychangeHandler);
     };
   }, []);
 
