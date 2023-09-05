@@ -279,7 +279,7 @@ describe("serializeReport function", () => {
     ];
 
     const report: string =
-      "11:30 - timetracker - meeting - calendar discussion\n12:00 - \n";
+      "11:30 - timetracker - meeting - calendar discussion\n";
     expect(serializeReport(activities)).toBe(report);
   });
 
