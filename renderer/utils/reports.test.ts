@@ -315,7 +315,7 @@ describe("serializeReport function", () => {
     ];
 
     const report: string =
-      "11:30 - timetracker - meeting - calendar discussion\n12:30 - \n";
+      "11:30 - timetracker - meeting - calendar discussion\n";
     expect(serializeReport(activities)).toBe(report);
   });
 });
