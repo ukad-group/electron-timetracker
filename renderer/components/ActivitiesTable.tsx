@@ -165,7 +165,7 @@ export default function ActivitiesTable({
             <td className="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-6 md:pr-0">
               <a
                 href="#"
-                className="text-blue-600 hover:text-blue-900"
+                className="text-grey-300 hover:text-blue-600"
                 onClick={() => {
                   onEditActivity({
                     ...activity,
@@ -214,7 +214,11 @@ export default function ActivitiesTable({
 }
 
 function getLackBadge(hours: number) {
-  if (hours < 6 * msPerHour) {
+
+  const curDate = new Date();
+  const curTime = parseInt(curDate.getHours() + '' + ('0' + curDate.getMinutes()).substr(-2));
+
+  if (hours < 6 * msPerHour && curTime > 1600) {
     return (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
         less than 6h

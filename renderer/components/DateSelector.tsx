@@ -31,7 +31,7 @@ export default function DateSelector({
             {formatDate(selectedDate, "long")}
           </time>
           {selectedDate.toLocaleDateString() === today.toLocaleDateString() && (
-            <span className="inline-flex  px-2.5 py-0.5 ml-3 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <span className="inline-flex  px-2.5 py-0.5 ml-3 rounded-full text-xs font-medium bg-blue-300 text-white">
               Today
             </span>
           )}

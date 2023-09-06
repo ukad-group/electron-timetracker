@@ -21,3 +21,7 @@
 .fc .fc-daygrid-body-natural .fc-daygrid-day-events {
   @apply mb-0;
 }
+
+.fc-h-event {
+  @apply bg-blue-300 border-blue-300;
+}
