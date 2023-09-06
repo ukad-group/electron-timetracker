@@ -1,9 +1,10 @@
-import clsx from "clsx";
 import { app, ipcRenderer } from "electron";
 import { useState, useEffect } from "react";
 import { shallow } from "zustand/shallow";
 import { useUpdateStore } from "../store/updateStore";
 import { useBetaStore } from "../store/betaUpdatesStore";
+import DisclosureSection from "./ui/DisclosureSection";
+
 export default function UpdateDescription() {
   type File = {
     url: string;
@@ -32,6 +33,7 @@ export default function UpdateDescription() {
     (state) => [state.isBeta, state.setIsBeta],
     shallow
   );
+  const [isOpen, setIsOpen] = useState(update.age === "new");
 
   useEffect(() => {
     ipcRenderer.send("beta-channel", isBeta);
@@ -43,6 +45,7 @@ export default function UpdateDescription() {
 
   ipcRenderer.on("downloaded", (event, data, info) => {
     setRelease(info);
+    setIsOpen(true);
     setUpdate({ age: "new", description: info?.releaseNotes });
   });
 
@@ -50,88 +53,52 @@ export default function UpdateDescription() {
     setCurrentVersion(data);
   });
 
-  const isUpdateToggle = () => {
-    if (update.age === "old") {
-      setUpdate({ age: "new", description: update.description });
-    } else {
+  const isOpenToggle = () => {
+    if (isOpen) {
+      setIsOpen(false);
       setUpdate({ age: "old", description: update.description });
+    } else {
+      setIsOpen(true);
+      setUpdate({ age: "new", description: update.description });
     }
   };
   return (
-    <div className="lg:absolute mt-6 w-full">
-      <div
-        className={clsx(
-          "h-16 px-4 py-5 bg-white shadow overflow-hidden transition-all ease-linear duration-300 sm:rounded-lg sm:px-6",
-          {
-            "h-80 overflow-y-auto ": update.age === "new",
-          }
-        )}
-      >
-        <div
-          className="flex justify-between  cursor-pointer"
-          onClick={isUpdateToggle}
-        >
-          <h2
-            id="manual-input-title"
-            className="text-lg font-medium text-gray-900"
-          >
-            What's new?
-          </h2>
-          <button
-            className={clsx(
-              "transform transition-transform ease-linear duration-300",
-              {
-                "rotate-180": update.age === "new",
-              }
-            )}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#000000"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </button>
+    <DisclosureSection
+      toggleFunction={isOpenToggle}
+      isOpen={isOpen}
+      title="What's new?"
+    >
+      <p className="text-xs text-gray-700 font-semibold">
+        Current version {currentVersion} {!isUpdate && "(latest)"}
+      </p>
+      <div className="relative flex items-start my-4">
+        <div className="flex items-center h-5">
+          <input
+            id="comments"
+            aria-describedby="comments-description"
+            name="comments"
+            type="checkbox"
+            defaultChecked={isBeta}
+            onChange={() => setIsBeta(!isBeta)}
+            className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+          />
         </div>
-        <p className="text-xs text-gray-700 font-semibold">
-          Current version {currentVersion} {!isUpdate && "(latest)"}
-        </p>
-        <div className="relative flex items-start my-4">
-          <div className="flex items-center h-5">
-            <input
-              id="comments"
-              aria-describedby="comments-description"
-              name="comments"
-              type="checkbox"
-              defaultChecked={isBeta}
-              onChange={() => setIsBeta(!isBeta)}
-              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-            />
-          </div>
-          <div className="ml-2 text-sm">
-            <label htmlFor="comments" className="font-medium text-gray-700">
-              Download beta version
-            </label>
-            <p id="comments-description" className="text-gray-500">
-              You need to restart the application
-            </p>
-          </div>
+        <div className="ml-2 text-sm">
+          <label htmlFor="comments" className="font-medium text-gray-700">
+            Download beta version
+          </label>
+          <p id="comments-description" className="text-gray-500">
+            You need to restart the application
+          </p>
         </div>
-        <h2 className="font-bold">
-          In {release?.version ? release?.version : currentVersion} version
-        </h2>
-        <div
-          className="flex flex-col gap-2 mb-3"
-          dangerouslySetInnerHTML={{ __html: update.description }}
-        ></div>
       </div>
-    </div>
+      <h2 className="font-bold">
+        In {release?.version ? release?.version : currentVersion} version
+      </h2>
+      <div
+        className="flex flex-col gap-2 mb-3"
+        dangerouslySetInnerHTML={{ __html: update.description }}
+      ></div>
+    </DisclosureSection>
   );
 }

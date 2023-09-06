@@ -11,7 +11,7 @@ type ButtonProps = {
 
 const basicStyles =
   "inline-flex items-center justify-center px-4 py-2 text-sm font-medium border rounded-md shadow-sm  ";
-const defaultStyles = "bg-blue-600  text-white";
+const defaultStyles = "bg-blue-600 text-white ";
 const saveHoverStyles = "hover:bg-blue-700 ";
 const cancelHoverStyles = "hover:bg-gray-50 ";
 const focusStyles =
