@@ -1,11 +1,12 @@
 import fs from "fs";
-import { app, dialog, ipcMain } from "electron";
+import { app, dialog, ipcMain, Menu, Tray } from "electron";
 import serve from "electron-serve";
 import { autoUpdater } from "electron-updater";
 import { createWindow } from "./helpers";
 import { getPathFromDate } from "./helpers/datetime";
 import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
+import path from "path";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 type Callback = (data: string | null) => void;
@@ -17,74 +18,119 @@ if (isProd) {
 
 const userDataDirectory = app.getPath("userData");
 
-(async () => {
-  await app.whenReady();
+let mainWindow;
 
-  const mainWindow = createWindow({
+const generateWindow = () => {
+  mainWindow = createWindow({
     width: 1000,
     height: 600,
     autoHideMenuBar: true,
   });
 
+
   if (isProd) {
-    await mainWindow.loadURL("app://./home.html");
+    mainWindow.loadURL("app://./home.html");
+    mainWindow.webContents.openDevTools();
+
+    mainWindow.on("close", (event) => {
+      event.preventDefault();
+      mainWindow.hide();
+    });
   } else {
     const port = process.argv[2];
-    await mainWindow.loadURL(`http://localhost:${port}/`);
+    mainWindow.loadURL(`http://localhost:${port}/`);
     mainWindow.webContents.openDevTools();
   }
-  let currentSelectedDate = "";
-  ipcMain.on(
-    "start-file-watcher",
-    (event, reportsFolder: string, selectedDate: Date) => {
-      const timereportPath = getPathFromDate(selectedDate, reportsFolder);
+}
 
-      currentSelectedDate = selectedDate.toDateString();
-      if (fs.existsSync(timereportPath)) {
-        fs.watch(timereportPath, (eventType, filename) => {
-          if (
-            eventType === "change" &&
-            currentSelectedDate === selectedDate.toDateString()
-          ) {
-            readDataFromFile(timereportPath, (data: string) => {
-              mainWindow.webContents.send("file-changed", data);
-            });
-          }
-        });
+const generateTray = () => {
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Activate",
+      type: "normal",
+      click: () => {
+        if (isProd) {
+          mainWindow.show();
+        } else {
+          generateWindow();
+        }
       }
+    },
+    {
+      label: "Quit",
+      type: "normal",
+      accelerator: "CmdOrCtrl+Q",
+      click: () => app.quit()
     }
-  );
-  autoUpdater.autoDownload = false;
-  autoUpdater.autoInstallOnAppQuit = true;
-  ipcMain.on("beta-channel", (event, isBeta: boolean) => {
-    autoUpdater.allowPrerelease = isBeta;
-  });
+  ]);
 
-  autoUpdater.allowDowngrade = true;
+  const imagePath = path.join(__dirname, "/images/clock-16.png");
 
-  ipcMain.on("start-update-watcher", (event) => {
-    mainWindow.webContents.send("current-version", app.getVersion());
+  const tray = new Tray(imagePath);
+  tray.setContextMenu(contextMenu);
+}
 
-    app.whenReady().then(() => {
-      autoUpdater.checkForUpdates();
+app.on("ready", () => {
+  generateWindow();
+  generateTray();
+
+  let currentSelectedDate = "";
+
+  if (mainWindow) {
+    ipcMain.on(
+      "start-file-watcher",
+      (event, reportsFolder: string, selectedDate: Date) => {
+        const timereportPath = getPathFromDate(selectedDate, reportsFolder);
+
+        currentSelectedDate = selectedDate.toDateString();
+        if (fs.existsSync(timereportPath)) {
+          fs.watch(timereportPath, (eventType, filename) => {
+            if (
+              eventType === "change" &&
+              currentSelectedDate === selectedDate.toDateString()
+            ) {
+              readDataFromFile(timereportPath, (data: string) => {
+                mainWindow && mainWindow.webContents.send("file-changed", data);
+              });
+            }
+          });
+        }
+      }
+    );
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = true;
+    ipcMain.on("beta-channel", (event, isBeta: boolean) => {
+      autoUpdater.allowPrerelease = isBeta;
     });
 
-    autoUpdater.on("update-available", (info) => {
-      autoUpdater.downloadUpdate();
-      mainWindow.webContents.send("update-available", true, info);
-    });
+    autoUpdater.allowDowngrade = true;
 
-    autoUpdater.on("update-downloaded", (info) => {
-      mainWindow.webContents.send("downloaded", true, info);
+    ipcMain.on("start-update-watcher", (event) => {
+      mainWindow && mainWindow.webContents.send("current-version", app.getVersion());
+
+      app.whenReady().then(() => {
+        autoUpdater.checkForUpdates();
+      });
+
+      autoUpdater.on("update-available", (info) => {
+        autoUpdater.downloadUpdate();
+        mainWindow && mainWindow.webContents.send("update-available", true, info);
+      });
+
+      autoUpdater.on("update-downloaded", (info) => {
+        mainWindow && mainWindow.webContents.send("downloaded", true, info);
+      });
     });
-  });
-  ipcMain.on("install", (event) => {
-    autoUpdater.quitAndInstall(true);
-  });
-})();
+    ipcMain.on("install", (event) => {
+      autoUpdater.quitAndInstall(true);
+    });
+  }
+});
 
 app.on("window-all-closed", () => {
-  app.quit();
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
 
 ipcMain.handle("storage:get", (event, storageName: string) => {
