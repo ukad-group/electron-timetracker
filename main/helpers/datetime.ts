@@ -48,3 +48,13 @@ export function calcDurationBetweenTimes(from: string, to: string): number {
 
   return hours;
 }
+
+export function getDateFromFilename(filename: string) {
+  const dateString = filename.split(" - ")[1];
+
+  const year = parseInt(dateString.slice(0, 4), 10);
+  const month = parseInt(dateString.slice(4, 6), 10) - 1;
+  const day = parseInt(dateString.slice(6, 8), 10);
+
+  return new Date(year, month, day);
+}

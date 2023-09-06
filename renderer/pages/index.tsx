@@ -244,7 +244,6 @@ export default function Home() {
               reportsFolder={reportsFolder}
               selectedDate={selectedDate}
               setSelectedDate={setSelectedDate}
-              shouldAutosave={shouldAutosave}
             />
           </section>
         </div>
