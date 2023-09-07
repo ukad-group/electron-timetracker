@@ -14,6 +14,7 @@ import {
   addDurationToTime,
 } from "../../utils/reports";
 import { checkIsToday } from "../../utils/datetime-ui";
+import AutocompleteSelector from "../ui/AutocompleteSelector";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -306,35 +307,38 @@ export default function TrackTimeModal({
                   </div>
 
                   <div className="col-span-6">
-                    <ProjectSelector
+                    <AutocompleteSelector
+                      title="Project"
                       required
-                      availableProjects={
+                      availableItems={
                         latestProjAndAct ? Object.keys(latestProjAndAct) : []
                       }
-                      selectedProject={project}
-                      setSelectedProject={setProject}
+                      selectedItem={project}
+                      setSelectedItem={setProject}
                       isValidationEnabled={isValidationEnabled}
                       tabIndex={4}
                     />
                   </div>
                   <div className="col-span-6">
-                    <ActivitySelector
-                      availableActivities={
+                    <AutocompleteSelector
+                      title="Activity"
+                      availableItems={
                         latestProjAndAct ? latestProjAndAct[project] : []
                       }
-                      selectedActivity={activity}
-                      setSelectedActivity={setActivity}
-                      tabIndex={6}
+                      selectedItem={activity}
+                      setSelectedItem={setActivity}
+                      tabIndex={5}
                     />
                   </div>
                   <div className="col-span-6">
-                    <DescriptionSelector
-                      availableDescriptions={
+                    <AutocompleteSelector
+                      title="Description"
+                      availableItems={
                         latestProjAndDesc ? latestProjAndDesc[project] : []
                       }
-                      selectedDescription={description}
-                      setSelectedDescription={setDescription}
-                      tabIndex={4}
+                      selectedItem={description}
+                      setSelectedItem={setDescription}
+                      tabIndex={6}
                     />
                   </div>
                 </div>
