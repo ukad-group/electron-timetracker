@@ -5,23 +5,24 @@ import { useUpdateStore } from "../store/updateStore";
 import { useBetaStore } from "../store/betaUpdatesStore";
 import DisclosureSection from "./ui/DisclosureSection";
 
-export default function UpdateDescription() {
-  type File = {
-    url: string;
-    sha512: string;
-    size: number;
-  };
+type File = {
+  url: string;
+  sha512: string;
+  size: number;
+};
 
-  type Release = {
-    files: File[];
-    path: string;
-    releaseDate: string;
-    releaseName: string;
-    releaseNotes: string;
-    sha512: string;
-    tag: string;
-    version: string;
-  };
+type Release = {
+  files: File[];
+  path: string;
+  releaseDate: string;
+  releaseName: string;
+  releaseNotes: string;
+  sha512: string;
+  tag: string;
+  version: string;
+};
+
+export default function UpdateDescription() {
   const [release, setRelease] = useState<Release | null>();
   const [currentVersion, setCurrentVersion] = useState(app?.getVersion());
   const [isUpdate, setIsUpdate] = useState(false);

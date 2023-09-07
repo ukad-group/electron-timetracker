@@ -1,5 +1,6 @@
 import { app, ipcRenderer } from "electron";
 import { useEffect, useState } from "react";
+import { CheckIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
 
 export default function VersionMessage() {
   const [isUpdate, setIsUpdate] = useState(false);
@@ -26,39 +27,13 @@ export default function VersionMessage() {
       <div className="flex gap-2 items-center flex-shrink-0 px-2 lg:px-0">
         {isUpdate && !isDownload && (
           <span className="flex gap-2 items-center rounded-lg px-3 py-2 bg-blue-300 text-blue-800">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="#60A4FA"
-              viewBox="0 0 24 24"
-              strokeWidth="1"
-              stroke="white"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
-              />
-            </svg>
+            <ExclamationCircleIcon className="w-6 h-6 fill-blue-400 stroke-white" />
             The version {version} is loading
           </span>
         )}
         {isDownload && (
           <span className="flex gap-2 items-center rounded-lg px-3 py-2 text-sm bg-green-300 text-green-800">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="#166534"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4.5 12.75l6 6 9-13.5"
-              />
-            </svg>
+            <CheckIcon className="w-6 h-6 fill-green-800" />
             <p className="whitespace-normal">
               New version {version} is downloaded. Turn off the app, or click
               the Install button
