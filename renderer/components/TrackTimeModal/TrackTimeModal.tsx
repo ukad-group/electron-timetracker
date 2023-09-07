@@ -144,7 +144,7 @@ export default function TrackTimeModal({
 
   const disableTextDrag = (e) => {
     e.preventDefault();
-  }
+  };
 
   const onDurationChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const value = e.target.value;
@@ -248,7 +248,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && !from,
                         }
                       )}
-                      onDragStart = { disableTextDrag }
+                      onDragStart={disableTextDrag}
                     />
                   </div>
 
@@ -275,7 +275,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && !to,
                         }
                       )}
-                      onDragStart = { disableTextDrag }
+                      onDragStart={disableTextDrag}
                     />
                   </div>
 
@@ -301,7 +301,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && (!duration || duration < 0),
                         }
                       )}
-                      onDragStart = { disableTextDrag }
+                      onDragStart={disableTextDrag}
                     />
                   </div>
 
