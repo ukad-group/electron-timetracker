@@ -79,7 +79,7 @@ const userDataDirectory = app.getPath("userData");
     });
   });
   ipcMain.on("install", (event) => {
-    autoUpdater.quitAndInstall(true);
+    autoUpdater.quitAndInstall(true, true);
   });
 })();
 
