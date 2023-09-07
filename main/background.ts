@@ -56,6 +56,11 @@ const userDataDirectory = app.getPath("userData");
   );
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
+  ipcMain.on("beta-channel", (event, isBeta: boolean) => {
+    autoUpdater.allowPrerelease = isBeta;
+  });
+
+  autoUpdater.allowDowngrade = true;
 
   ipcMain.on("start-update-watcher", (event) => {
     mainWindow.webContents.send("current-version", app.getVersion());

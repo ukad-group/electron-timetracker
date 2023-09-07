@@ -308,7 +308,9 @@ export default function TrackTimeModal({
                   <div className="col-span-6">
                     <ProjectSelector
                       required
-                      availableProjects={Object.keys(latestProjAndAct)}
+                      availableProjects={
+                        latestProjAndAct ? Object.keys(latestProjAndAct) : []
+                      }
                       selectedProject={project}
                       setSelectedProject={setProject}
                       isValidationEnabled={isValidationEnabled}
@@ -317,7 +319,9 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <ActivitySelector
-                      availableActivities={latestProjAndAct[project]}
+                      availableActivities={
+                        latestProjAndAct ? latestProjAndAct[project] : []
+                      }
                       selectedActivity={activity}
                       setSelectedActivity={setActivity}
                       tabIndex={6}
@@ -325,7 +329,9 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <DescriptionSelector
-                      availableDescriptions={latestProjAndDesc[project]}
+                      availableDescriptions={
+                        latestProjAndDesc ? latestProjAndDesc[project] : []
+                      }
                       selectedDescription={description}
                       setSelectedDescription={setDescription}
                       tabIndex={4}
