@@ -39,7 +39,7 @@ const months = [
   "October",
   "November",
   "December",
-];
+] as const;
 
 type CalendarProps = {
   reportsFolder: string;
