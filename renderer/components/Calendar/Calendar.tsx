@@ -95,7 +95,6 @@ export function Calendar({
     ipcRenderer.send("start-folder-watcher", reportsFolder, calendarDate);
     ipcRenderer.on("any-file-changed", (event, data) => {
       (async () => {
-        console.log("trigger");
         setMonthReportsFromServer(
           await ipcRenderer.invoke(
             "app:find-month-projects",

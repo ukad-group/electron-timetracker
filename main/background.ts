@@ -59,7 +59,7 @@ const userDataDirectory = app.getPath("userData");
     "start-folder-watcher",
     (event, reportsFolder: string, calendarDate: Date) => {
       fs.watch(reportsFolder, { recursive: true }, (eventType, filename) => {
-        if (eventType === "change") {
+        if (eventType === "change" && filename) {
           const fileDate = getDateFromFilename(filename);
           const monthsBetweenDates = Math.abs(
             fileDate.getMonth() - calendarDate.getMonth()
