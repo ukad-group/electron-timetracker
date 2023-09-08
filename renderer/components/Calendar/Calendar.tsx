@@ -39,7 +39,7 @@ const months = [
   "October",
   "November",
   "December",
-];
+] as const;
 
 type CalendarProps = {
   reportsFolder: string;
@@ -172,7 +172,11 @@ export function Calendar({
         </div>
         <div className="flex gap-4">
           {calendarDate.getMonth() !== new Date().getMonth() && (
-            <Button text="Go to current month" callback={todayButtonHandle} />
+            <Button
+              text="Go to current month"
+              callback={todayButtonHandle}
+              type={"button"}
+            />
           )}
           <NavButtons
             prevCallback={prevButtonHandle}
