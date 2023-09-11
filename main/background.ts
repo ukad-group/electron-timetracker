@@ -18,7 +18,9 @@ if (isProd) {
 
 const userDataDirectory = app.getPath("userData");
 
-let mainWindow;
+let mainWindow = null;
+
+const gotTheLock = app.requestSingleInstanceLock();
 
 const generateWindow = () => {
   mainWindow = createWindow({
@@ -27,10 +29,8 @@ const generateWindow = () => {
     autoHideMenuBar: true,
   });
 
-
   if (isProd) {
     mainWindow.loadURL("app://./home.html");
-    mainWindow.webContents.openDevTools();
 
     mainWindow.on("close", (event) => {
       event.preventDefault();
@@ -41,7 +41,8 @@ const generateWindow = () => {
     mainWindow.loadURL(`http://localhost:${port}/`);
     mainWindow.webContents.openDevTools();
   }
-}
+};
+let tray: Tray = null;
 
 const generateTray = () => {
   const contextMenu = Menu.buildFromTemplate([
@@ -54,24 +55,42 @@ const generateTray = () => {
         } else {
           generateWindow();
         }
-      }
+      },
     },
     {
       label: "Quit",
       type: "normal",
       accelerator: "CmdOrCtrl+Q",
-      click: () => app.quit()
-    }
+      click: () => {
+        app.exit();
+      },
+    },
   ]);
 
   const imagePath = path.join(__dirname, "/images/clock-16.png");
 
-  const tray = new Tray(imagePath);
+  tray = new Tray(imagePath);
   tray.setContextMenu(contextMenu);
-}
+};
+
+app.on("before-quit", () => {
+  tray.destroy();
+});
 
 app.on("ready", () => {
-  generateWindow();
+  if (!gotTheLock) {
+    app.quit();
+  } else {
+    app.on("second-instance", (event, commandLine, workingDirectory) => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    });
+    generateWindow();
+  }
+
   generateTray();
 
   let currentSelectedDate = "";
@@ -106,7 +125,8 @@ app.on("ready", () => {
     autoUpdater.allowDowngrade = true;
 
     ipcMain.on("start-update-watcher", (event) => {
-      mainWindow && mainWindow.webContents.send("current-version", app.getVersion());
+      mainWindow &&
+        mainWindow.webContents.send("current-version", app.getVersion());
 
       app.whenReady().then(() => {
         autoUpdater.checkForUpdates();
@@ -114,7 +134,8 @@ app.on("ready", () => {
 
       autoUpdater.on("update-available", (info) => {
         autoUpdater.downloadUpdate();
-        mainWindow && mainWindow.webContents.send("update-available", true, info);
+        mainWindow &&
+          mainWindow.webContents.send("update-available", true, info);
       });
 
       autoUpdater.on("update-downloaded", (info) => {

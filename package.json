@@ -2,7 +2,7 @@
   "private": true,
   "name": "timetracker",
   "description": "Timetracker app",
-  "version": "1.0.41",
+  "version": "1.0.43",
   "author": "mmmykhailo <mmmykhailo@proton.me>",
   "main": "app/background.js",
   "scripts": {
