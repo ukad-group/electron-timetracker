@@ -34,28 +34,28 @@ export default function ManualInputForm({
   }, [selectedDateReport]);
 
   useEffect(() => {
-    setSaveBtnStatus('disabled');
+    setSaveBtnStatus("disabled");
   }, []);
 
   const saveReportHandler = () => {
     onSave(report, true);
-    setSaveBtnStatus('inprogress');
+    setSaveBtnStatus("inprogress");
     setTimeout(() => {
-      setSaveBtnStatus('disabled');
+      setSaveBtnStatus("disabled");
     }, 800);
-  }
+  };
 
   const setReportHandler = (report) => {
-    if (saveBtnStatus === 'disabled') {
-      setSaveBtnStatus('enabled');
+    if (saveBtnStatus === "disabled") {
+      setSaveBtnStatus("enabled");
     }
 
     if (!report) {
-      setSaveBtnStatus('disabled');
+      setSaveBtnStatus("disabled");
     }
 
     setReport(report);
-  }
+  };
 
   return (
     <div>
@@ -71,7 +71,13 @@ export default function ManualInputForm({
         spellCheck={false}
       />
       <div className="flex flex-col mt-6 justify-stretch">
-        <Button text="Save" callback={saveReportHandler} status={saveBtnStatus} disabled={saveBtnStatus === 'disabled'}/>
+        <Button
+          text="Save"
+          callback={saveReportHandler}
+          status={saveBtnStatus}
+          disabled={saveBtnStatus === "disabled"}
+          type={"button"}
+        />
         <span className="block text-xs text-gray-500 text-center">
           or press ctrl + s
         </span>

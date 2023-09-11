@@ -49,16 +49,15 @@ export default function ActivitiesSection({
         />
       </div>
       <div>
-        <a
-          href="#"
-          className="block px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300  sm:rounded-b-lg"
+        <button
+          className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300  sm:rounded-b-lg"
           onClick={() => onEditActivity("new")}
         >
           Track more time
           <span className="block text-blue-500 text-xs">
             click or press ctrl + space
           </span>
-        </a>
+        </button>
       </div>
     </div>
   );
