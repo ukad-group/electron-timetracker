@@ -30,7 +30,7 @@ export const useUpdateStore = create<UpdateStore>()(
   devtools(
     persist(
       (set) => ({
-        update: null,
+        update: { age: null, description: null },
         setUpdate: (update: Update) =>
           set({ update: { age: update.age, description: update.description } }),
       }),
