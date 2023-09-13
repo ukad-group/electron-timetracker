@@ -17,9 +17,9 @@ import VersionMessage from "../components/ui/VersionMessages";
 import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
 import { Calendar } from "../components/Calendar/Calendar";
-import GoogleCalendar from "../components/google-calendar/GoogleCalendar";
-import GoogleCalendar2 from "../components/google-calendar/GoogleCalendarAuth";
 import GoogleCalendarAuth from "../components/google-calendar/GoogleCalendarAuth";
+import CalendarsModal from "../components/calendars-modal/CalendarsModal";
+import { Provider } from "../context/calendars";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -199,70 +199,71 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-full">
-      <Header />
-      <VersionMessage />
-      <main className="py-10">
-        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
-          {reportsFolder ? (
-            <>
-              <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">
-                <section>
-                  <div className="bg-white shadow sm:rounded-lg">
-                    <DateSelector
-                      selectedDate={selectedDate}
-                      setSelectedDate={setSelectedDate}
-                    />
-                  </div>
-                </section>
-                <section className="flex-grow">
-                  <div className="bg-white shadow sm:rounded-lg h-full">
-                    <ActivitiesSection
-                      activities={selectedDateActivities}
-                      onEditActivity={setTrackTimeModalActivity}
-                      selectedDate={selectedDate}
-                    />
-                  </div>
-                </section>
-              </div>
-
-              <section
-                aria-labelledby="manual-input-title"
-                className="lg:col-start-3 lg:col-span-1 relative"
-              >
-                <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6">
-                  <ManualInputForm
-                    onSave={handleSave}
-                    selectedDateReport={selectedDateReport}
-                  />
+    <Provider>
+      <div className="min-h-full">
+        <Header />
+        <VersionMessage />
+        <main className="py-10">
+          <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
+            {reportsFolder ? (
+              <>
+                <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">
+                  <section>
+                    <div className="bg-white shadow sm:rounded-lg">
+                      <DateSelector
+                        selectedDate={selectedDate}
+                        setSelectedDate={setSelectedDate}
+                      />
+                    </div>
+                  </section>
+                  <section className="flex-grow">
+                    <div className="bg-white shadow sm:rounded-lg h-full">
+                      <ActivitiesSection
+                        activities={selectedDateActivities}
+                        onEditActivity={setTrackTimeModalActivity}
+                        selectedDate={selectedDate}
+                      />
+                    </div>
+                  </section>
                 </div>
-                <UpdateDescription />
-              </section>
-            </>
-          ) : (
-            <SelectFolderPlaceholder setFolder={setReportsFolder} />
-          )}
-          <section className="lg:col-span-2">
-            <Calendar
-              reportsFolder={reportsFolder}
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-              shouldAutosave={shouldAutosave}
-            />
-          </section>
-        </div>
-      </main>
-      <TrackTimeModal
-        activities={selectedDateActivities}
-        isOpen={trackTimeModalActivity !== null}
-        editedActivity={trackTimeModalActivity}
-        latestProjAndAct={latestProjAndAct}
-        latestProjAndDesc={latestProjAndDesc}
-        close={() => setTrackTimeModalActivity(null)}
-        submitActivity={submitActivity}
-        selectedDate={selectedDate}
-      />
-      <GoogleCalendarAuth/>
-    </div>
+
+                <section
+                  aria-labelledby="manual-input-title"
+                  className="lg:col-start-3 lg:col-span-1 relative"
+                >
+                  <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6">
+                    <ManualInputForm
+                      onSave={handleSave}
+                      selectedDateReport={selectedDateReport}
+                    />
+                  </div>
+                  <UpdateDescription />
+                </section>
+              </>
+            ) : (
+              <SelectFolderPlaceholder setFolder={setReportsFolder} />
+            )}
+            <section className="lg:col-span-2">
+              <Calendar
+                reportsFolder={reportsFolder}
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                shouldAutosave={shouldAutosave}
+              />
+            </section>
+          </div>
+        </main>
+        <TrackTimeModal
+          activities={selectedDateActivities}
+          isOpen={trackTimeModalActivity !== null}
+          editedActivity={trackTimeModalActivity}
+          latestProjAndAct={latestProjAndAct}
+          latestProjAndDesc={latestProjAndDesc}
+          close={() => setTrackTimeModalActivity(null)}
+          submitActivity={submitActivity}
+          selectedDate={selectedDate}
+        />
+      </div>
+    </Provider>
   );
 }

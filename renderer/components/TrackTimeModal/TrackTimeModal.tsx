@@ -15,6 +15,7 @@ import {
 } from "../../utils/reports";
 import { checkIsToday } from "../../utils/datetime-ui";
 import Button from "../ui/Button";
+import GoogleCalendarAddEventBtn from "../google-calendar/GoogleCalendarAddEventBtn";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -166,6 +167,14 @@ export default function TrackTimeModal({
   const selectText = (e) => {
     e.target.select();
   };
+
+  const addEventToList = (event) => {
+    const { from, to, summary } = event;
+    setFrom(from.time || "");
+    setTo(to.time || "");
+    setActivity("meeting");
+    setDescription(summary || "");
+  }
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
@@ -341,20 +350,28 @@ export default function TrackTimeModal({
                 </div>
               </div>
               <div className="mt-6">
-                <div className="flex gap-3 justify-end">
-                  <Button
-                    text="Cancel"
-                    type={"button"}
-                    callback={close}
-                    status={"cancel"}
-                    tabIndex={8}
-                  />
-                  <Button
-                    text="Save"
-                    type={"submit"}
-                    status={"enabled"}
-                    tabIndex={7}
-                  />
+                <div className="flex gap-3 justify-between">
+                  <div className="flex gap-3 justify-start">
+                    {
+                      checkIsToday(selectedDate) &&
+                      <GoogleCalendarAddEventBtn addEvent={addEventToList}/>
+                    }
+                  </div>
+                  <div className="flex gap-3 justify-end">
+                    <Button
+                      text="Cancel"
+                      type={"button"}
+                      callback={close}
+                      status={"cancel"}
+                      tabIndex={8}
+                    />
+                    <Button
+                      text="Save"
+                      type={"submit"}
+                      status={"enabled"}
+                      tabIndex={7}
+                    />
+                  </div>
                 </div>
               </div>
             </form>
