@@ -12,8 +12,8 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
       return events.map((event) => {
         const { id, from, to, summary } = event
         return (
-            <div className="">
-              <Menu.Item key={id}>
+            <div className="" key={id}>
+              <Menu.Item>
                 {({ active }) => (
                     <button type="button"
                         className={`${ active ? 'bg-blue-300 text-white' : 'text-gray-900'} 
