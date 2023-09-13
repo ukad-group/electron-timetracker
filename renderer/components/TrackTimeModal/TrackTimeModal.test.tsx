@@ -39,7 +39,7 @@ jest.mock("../google-calendar/GoogleCalendarAddEventBtn", () => {
     default: () => { // if you exporting component as default
       return <div/>;
     },
-    ChildWillBeIsolated: () => { // if you exporting component as not default
+    GoogleCalendarAddEventBtn: () => { // if you exporting component as not default
       return <div/>;
     },
   };
