@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import TrackTimeModal, { TrackTimeModalProps } from "./TrackTimeModal";
+import GoogleCalendarAddEventBtn from "../google-calendar/GoogleCalendarAddEventBtn";
 
 const mockedActivities = [
   {
@@ -31,6 +32,18 @@ const mockedActivities = [
     to: "12:00",
   },
 ];
+
+jest.mock("../google-calendar/GoogleCalendarAddEventBtn", () => {
+  return {
+    __esModule: true,
+    default: () => { // if you exporting component as default
+      return <div/>;
+    },
+    ChildWillBeIsolated: () => { // if you exporting component as not default
+      return <div/>;
+    },
+  };
+});
 
 const day = 60 * 60 * 24 * 1000;
 const today = new Date();
