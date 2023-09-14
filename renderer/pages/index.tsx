@@ -8,6 +8,7 @@ import {
   parseReport,
   serializeReport,
   ReportAndNotes,
+  stringToMinutes,
 } from "../utils/reports";
 import TrackTimeModal from "../components/TrackTimeModal/TrackTimeModal";
 import ManualInputForm from "../components/ManualInputForm";
@@ -183,11 +184,6 @@ export default function Home() {
     }
 
     setShouldAutosave(true);
-  };
-
-  const stringToMinutes = (string: string) => {
-    const [hours, minutes] = string.split(":");
-    return Number(hours) * 60 + Number(minutes);
   };
 
   const handleSave = (report: string, shouldAutosave: boolean) => {
