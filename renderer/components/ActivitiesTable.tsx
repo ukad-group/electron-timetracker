@@ -126,10 +126,9 @@ export default function ActivitiesTable({
             </td>
             <td
               className={`px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap `}
-              data-column="duration"
             >
               <Tooltip>
-                <p onClick={copyToClipboardHandle}>
+                <p data-column="duration" onClick={copyToClipboardHandle}>
                   {formatDuration(activity.duration)}
                 </p>
               </Tooltip>
@@ -207,10 +206,9 @@ export default function ActivitiesTable({
           <td
             className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
             onClick={copyToClipboardHandle}
-            data-column="total"
           >
             <Tooltip>
-              <p>{formatDuration(totalDuration)}</p>
+              <p data-column="total">{formatDuration(totalDuration)}</p>
             </Tooltip>
           </td>
           <td
