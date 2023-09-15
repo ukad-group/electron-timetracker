@@ -135,6 +135,16 @@ export default function Home() {
 
     if (activityIndex >= 0) {
       setSelectedDateActivities((activities) => {
+        const oldActivity = activities[activityIndex];
+
+        if (
+          Object.keys(activity).every((key) => {
+            return oldActivity[key] === activity[key];
+          })
+        ) {
+          return activities;
+        }
+
         activities[activityIndex] = activity;
         if (activities[activityIndex + 1].isBreak) {
           activities.splice(activityIndex + 1, 1);
