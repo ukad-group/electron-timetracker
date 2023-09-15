@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { checkIsSignedIn, getEventsList, signIn, signOut } from "../../API/googleCalendraAPI";
+import { checkIsSignedIn, getEventsList, signIn, signOut } from "../../API/googleCalendarAPI";
 import Button from "../ui/Button";
 import useCalendarsContext from "../../hooks/useCalendarsContext";
 

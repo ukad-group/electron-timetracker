@@ -1,6 +1,7 @@
 import { createContext, useState } from 'react';
 
-const CalendarsContext = createContext({});
+const context: any = {};
+const CalendarsContext = createContext(context);
 
 function Provider({ children }) {
   const [calendars, setCalendars] = useState({});
