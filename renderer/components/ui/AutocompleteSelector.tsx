@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, MutableRefObject } from "react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
@@ -12,33 +12,35 @@ type AutocompleteProps = {
   tabIndex?: number;
   isValidationEnabled?: boolean;
   className?: string;
+  isLastThree: boolean;
 };
 
 export default function AutocompleteSelector({
- title,
- className = "",
- selectedItem,
- availableItems,
- setSelectedItem,
- required = false,
- tabIndex,
- isValidationEnabled
+  title,
+  className = "",
+  selectedItem,
+  availableItems,
+  setSelectedItem,
+  required = false,
+  tabIndex,
+  isValidationEnabled,
+  isLastThree,
 }: AutocompleteProps) {
   const filteredList =
     selectedItem === ""
       ? availableItems
-        ?.filter((activity) => {
-          return activity !== "";
-        })
-        .sort()
+          ?.filter((activity, i) => {
+            if (isLastThree) {
+              return activity !== "" && i < 3;
+            }
+            return activity !== "";
+          })
+          .sort()
       : availableItems
-        ?.filter((activity) => {
-          return activity
-            .toLowerCase()
-            .includes(selectedItem.toLowerCase());
-        })
-        .sort();
-
+          ?.filter((activity) => {
+            return activity.toLowerCase().includes(selectedItem.toLowerCase());
+          })
+          .sort();
   return (
     <Combobox
       className={className}
@@ -85,14 +87,14 @@ export default function AutocompleteSelector({
               >
                 {({ active, selected }) => (
                   <>
-                      <span
-                        className={clsx(
-                          "block truncate",
-                          selected && "font-semibold"
-                        )}
-                      >
-                        {description}
-                      </span>
+                    <span
+                      className={clsx(
+                        "block truncate",
+                        selected && "font-semibold"
+                      )}
+                    >
+                      {description}
+                    </span>
 
                     {selected && (
                       <span
@@ -101,8 +103,8 @@ export default function AutocompleteSelector({
                           active ? "text-white" : "text-blue-600"
                         )}
                       >
-                          <CheckIcon className="w-5 h-5" aria-hidden="true" />
-                        </span>
+                        <CheckIcon className="w-5 h-5" aria-hidden="true" />
+                      </span>
                     )}
                   </>
                 )}
