@@ -34,7 +34,7 @@ export default function UpdateDescription() {
     (state) => [state.isBeta, state.setIsBeta],
     shallow
   );
-  const [isOpen, setIsOpen] = useState(update.age === "new");
+  const [isOpen, setIsOpen] = useState(update?.age === "new");
 
   useEffect(() => {
     ipcRenderer.send("beta-channel", isBeta);
@@ -57,10 +57,10 @@ export default function UpdateDescription() {
   const isOpenToggle = () => {
     if (isOpen) {
       setIsOpen(false);
-      setUpdate({ age: "old", description: update.description });
+      setUpdate({ age: "old", description: update?.description });
     } else {
       setIsOpen(true);
-      setUpdate({ age: "new", description: update.description });
+      setUpdate({ age: "new", description: update?.description });
     }
   };
   return (
@@ -96,10 +96,17 @@ export default function UpdateDescription() {
       <h2 className="font-bold">
         In {release?.version ? release?.version : currentVersion} version
       </h2>
-      <div
-        className="flex flex-col gap-2 mb-3"
-        dangerouslySetInnerHTML={{ __html: update.description }}
-      ></div>
+      {update?.description ? (
+        <div
+          className="flex flex-col gap-2 mb-3"
+          dangerouslySetInnerHTML={{ __html: update?.description }}
+        ></div>
+      ) : (
+        <div className="flex flex-col gap-2 mb-3">
+          Here you will receive notifications about the app's content updates
+          after downloading the new version.
+        </div>
+      )}
     </DisclosureSection>
   );
 }
