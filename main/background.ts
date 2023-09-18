@@ -57,6 +57,7 @@ const generateTray = () => {
       label: "Activate",
       type: "normal",
       click: () => {
+        autoUpdater.checkForUpdates();
         if (isProd) {
           mainWindow.show();
         } else {
@@ -80,6 +81,7 @@ const generateTray = () => {
   tray.setContextMenu(contextMenu);
 
   tray.on("click", () => {
+    autoUpdater.checkForUpdates();
     if (isProd) {
       mainWindow.show();
     } else {
