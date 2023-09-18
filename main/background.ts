@@ -41,6 +41,13 @@ const generateWindow = () => {
     mainWindow.loadURL(`http://localhost:${port}/`);
     mainWindow.webContents.openDevTools();
   }
+  mainWindow.on("click", () => {
+    if (isProd) {
+      mainWindow.show();
+    } else {
+      generateWindow();
+    }
+  });
 };
 let tray: Tray = null;
 
@@ -71,6 +78,14 @@ const generateTray = () => {
 
   tray = new Tray(imagePath);
   tray.setContextMenu(contextMenu);
+
+  tray.on("click", () => {
+    if (isProd) {
+      mainWindow.show();
+    } else {
+      generateWindow();
+    }
+  });
 };
 
 app.on("before-quit", () => {
