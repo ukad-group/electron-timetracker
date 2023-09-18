@@ -22,6 +22,23 @@ let mainWindow = null;
 
 const gotTheLock = app.requestSingleInstanceLock();
 
+const checkForUpdates = () => {
+  autoUpdater.checkForUpdates();
+
+  autoUpdater.on("update-available", (info) => {
+    autoUpdater.downloadUpdate();
+    if (mainWindow) {
+      mainWindow.webContents.send("update-available", true, info);
+    }
+  });
+
+  autoUpdater.on("update-downloaded", (info) => {
+    if (mainWindow) {
+      mainWindow.webContents.send("downloaded", true, info);
+    }
+  });
+};
+
 const generateWindow = () => {
   mainWindow = createWindow({
     width: 1000,
@@ -47,6 +64,7 @@ const generateWindow = () => {
     } else {
       generateWindow();
     }
+    checkForUpdates();
   });
 };
 let tray: Tray = null;
@@ -57,12 +75,12 @@ const generateTray = () => {
       label: "Activate",
       type: "normal",
       click: () => {
-        autoUpdater.checkForUpdates();
         if (isProd) {
           mainWindow.show();
         } else {
           generateWindow();
         }
+        checkForUpdates();
       },
     },
     {
@@ -81,12 +99,12 @@ const generateTray = () => {
   tray.setContextMenu(contextMenu);
 
   tray.on("click", () => {
-    autoUpdater.checkForUpdates();
     if (isProd) {
       mainWindow.show();
     } else {
       generateWindow();
     }
+    checkForUpdates();
   });
 };
 

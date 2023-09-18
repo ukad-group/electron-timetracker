@@ -1,4 +1,4 @@
-import { app, ipcRenderer } from "electron";
+import { ipcRenderer } from "electron";
 import { useEffect, useState } from "react";
 
 export default function VersionMessage() {
