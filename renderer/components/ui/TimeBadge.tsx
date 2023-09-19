@@ -22,7 +22,7 @@ export default function TimeBadge({
   ) {
     return (
       <span
-        data-testid="less6"
+        data-testid="sixHoursBadge"
         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
       >
         less than 6h
@@ -31,7 +31,7 @@ export default function TimeBadge({
   } else if (hours < 8) {
     return (
       <span
-        data-testid="less8"
+        data-testid="eightHoursBadge"
         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
       >
         less than 8h
