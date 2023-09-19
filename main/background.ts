@@ -1,11 +1,12 @@
 import fs from "fs";
-import { app, dialog, ipcMain } from "electron";
+import { app, dialog, ipcMain, Menu, Tray } from "electron";
 import serve from "electron-serve";
 import { autoUpdater } from "electron-updater";
 import { createWindow } from "./helpers";
 import { getDateFromFilename, getPathFromDate } from "./helpers/datetime";
 import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
+import path from "path";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 type Callback = (data: string | null) => void;
@@ -15,103 +16,188 @@ if (isProd) {
   app.setPath("userData", `${app.getPath("userData")} (development)`);
 }
 
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
+ipcMain.on("beta-channel", (event, isBeta: boolean) => {
+  autoUpdater.allowPrerelease = isBeta;
+});
+autoUpdater.allowDowngrade = true;
+autoUpdater.on("error", (e, message) => {
+  mainWindow.webContents.send("errorMes", e, message);
+});
+autoUpdater.on("update-available", (info) => {
+  autoUpdater.downloadUpdate();
+  if (mainWindow) {
+    mainWindow.webContents.send("update-available", true, info);
+  }
+});
+autoUpdater.on("update-downloaded", (info) => {
+  if (mainWindow) {
+    mainWindow.webContents.send("downloaded", true, info);
+  }
+});
+ipcMain.on("install", (event) => {
+  autoUpdater.quitAndInstall(true);
+});
+
 const userDataDirectory = app.getPath("userData");
 
-(async () => {
-  await app.whenReady();
+let mainWindow = null;
 
-  const mainWindow = createWindow({
+const gotTheLock = app.requestSingleInstanceLock();
+
+const generateWindow = () => {
+  mainWindow = createWindow({
     width: 1000,
     height: 600,
     autoHideMenuBar: true,
   });
 
   if (isProd) {
-    await mainWindow.loadURL("app://./home.html");
+    mainWindow.loadURL("app://./home.html");
+
+    mainWindow.on("close", (event) => {
+      event.preventDefault();
+      mainWindow.hide();
+    });
   } else {
     const port = process.argv[2];
-    await mainWindow.loadURL(`http://localhost:${port}/`);
+    mainWindow.loadURL(`http://localhost:${port}/`);
     mainWindow.webContents.openDevTools();
   }
-  let currentSelectedDate = "";
-  ipcMain.on(
-    "start-file-watcher",
-    (event, reportsFolder: string, selectedDate: Date) => {
-      const timereportPath = getPathFromDate(selectedDate, reportsFolder);
+  mainWindow.on("click", () => {
+    if (isProd) {
+      mainWindow.show();
+    } else {
+      generateWindow();
+    }
+  });
+};
+let tray: Tray = null;
 
-      currentSelectedDate = selectedDate.toDateString();
-      if (fs.existsSync(timereportPath)) {
-        fs.watch(timereportPath, (eventType, filename) => {
-          if (
-            eventType === "change" &&
-            currentSelectedDate === selectedDate.toDateString()
-          ) {
-            readDataFromFile(timereportPath, (data: string) => {
-              mainWindow.webContents.send("file-changed", data);
-            });
+const generateTray = () => {
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Activate",
+      type: "normal",
+      click: () => {
+        if (isProd) {
+          mainWindow.show();
+        } else {
+          generateWindow();
+        }
+        autoUpdater.checkForUpdates();
+      },
+    },
+    {
+      label: "Quit",
+      type: "normal",
+      accelerator: "CmdOrCtrl+Q",
+      click: () => {
+        app.exit();
+      },
+    },
+  ]);
+
+  const imagePath = path.join(__dirname, "/images/clock-16.png");
+
+  tray = new Tray(imagePath);
+  tray.setContextMenu(contextMenu);
+
+  tray.on("click", () => {
+    if (isProd) {
+      mainWindow.show();
+    } else {
+      generateWindow();
+    }
+    autoUpdater.checkForUpdates();
+  });
+};
+
+app.on("before-quit", () => {
+  tray.destroy();
+});
+
+app.on("ready", () => {
+  if (!gotTheLock) {
+    app.quit();
+  } else {
+    app.on("second-instance", (event, commandLine, workingDirectory) => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        mainWindow.show();
+        mainWindow.focus();
+      }
+    });
+    generateWindow();
+  }
+
+  generateTray();
+
+  let currentSelectedDate = "";
+
+  if (mainWindow) {
+    ipcMain.on(
+      "start-file-watcher",
+      (event, reportsFolder: string, selectedDate: Date) => {
+        const timereportPath = getPathFromDate(selectedDate, reportsFolder);
+
+        currentSelectedDate = selectedDate.toDateString();
+        if (fs.existsSync(timereportPath)) {
+          fs.watch(timereportPath, (eventType, filename) => {
+            if (
+              eventType === "change" &&
+              currentSelectedDate === selectedDate.toDateString()
+            ) {
+              readDataFromFile(timereportPath, (data: string) => {
+                mainWindow && mainWindow.webContents.send("file-changed", data);
+              });
+            }
+          });
+        }
+      }
+    );
+    ipcMain.on(
+      "start-folder-watcher",
+      (event, reportsFolder: string, calendarDate: Date) => {
+        fs.watch(reportsFolder, { recursive: true }, (eventType, filename) => {
+          if (eventType === "change" && filename) {
+            const fileDate = getDateFromFilename(filename);
+
+            if (fileDate === null) return;
+
+            const monthsBetweenDates = Math.abs(
+              fileDate.getMonth() - calendarDate.getMonth()
+            );
+
+            if (
+              monthsBetweenDates > 1 ||
+              fileDate.getFullYear() !== calendarDate.getFullYear()
+            ) {
+              return;
+            }
+
+            mainWindow.webContents.send("any-file-changed");
           }
         });
       }
-    }
-  );
+    );
 
-  ipcMain.on(
-    "start-folder-watcher",
-    (event, reportsFolder: string, calendarDate: Date) => {
-      fs.watch(reportsFolder, { recursive: true }, (eventType, filename) => {
-        if (eventType === "change" && filename) {
-          const fileDate = getDateFromFilename(filename);
+    ipcMain.on("start-update-watcher", (event) => {
+      mainWindow &&
+        mainWindow.webContents.send("current-version", app.getVersion());
 
-          if (fileDate === null) return;
-
-          const monthsBetweenDates = Math.abs(
-            fileDate.getMonth() - calendarDate.getMonth()
-          );
-
-          if (
-            monthsBetweenDates > 1 ||
-            fileDate.getFullYear() !== calendarDate.getFullYear()
-          ) {
-            return;
-          }
-
-          mainWindow.webContents.send("any-file-changed");
-        }
+      app.whenReady().then(() => {
+        autoUpdater.checkForUpdates();
       });
-    }
-  );
-
-  autoUpdater.autoDownload = false;
-  autoUpdater.autoInstallOnAppQuit = true;
-  ipcMain.on("beta-channel", (event, isBeta: boolean) => {
-    autoUpdater.allowPrerelease = isBeta;
-  });
-
-  autoUpdater.allowDowngrade = true;
-
-  ipcMain.on("start-update-watcher", (event) => {
-    mainWindow.webContents.send("current-version", app.getVersion());
-
-    app.whenReady().then(() => {
-      autoUpdater.checkForUpdates();
     });
-
-    autoUpdater.on("update-available", (info) => {
-      autoUpdater.downloadUpdate();
-      mainWindow.webContents.send("update-available", true, info);
-    });
-
-    autoUpdater.on("update-downloaded", (info) => {
-      mainWindow.webContents.send("downloaded", true, info);
-    });
-  });
-  ipcMain.on("install", (event) => {
-    autoUpdater.quitAndInstall(true);
-  });
-})();
+  }
+});
 
 app.on("window-all-closed", () => {
-  app.quit();
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
 });
 
 ipcMain.handle("storage:get", (event, storageName: string) => {

@@ -74,14 +74,18 @@ export default function Home() {
         reportsFolder,
         selectedDate
       );
-      setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct);
-      setLatestProjAndDesc(sortedActAndDesc.descriptionsSet);
+      setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct || {});
+      setLatestProjAndDesc(sortedActAndDesc.descriptionsSet || {});
     })();
     ipcRenderer.send("start-file-watcher", reportsFolder, selectedDate);
     ipcRenderer.on("file-changed", (event, data) => {
       if (selectedDateReport != data) {
         setSelectedDateReport(data || "");
       }
+    });
+    ipcRenderer.on("errorMes", (event, data) => {
+      console.log("event ", event);
+      console.log("data ", data);
     });
   }, [selectedDate, reportsFolder]);
 
