@@ -72,6 +72,9 @@ export default function AutocompleteSelector({
 
         {filteredList?.length > 0 ? (
           <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <div className="block text-xs text-gray-500 text-center">
+              tab to choose
+            </div>
             {filteredList?.map((item, i) => (
               <Combobox.Option
                 key={i}
@@ -108,9 +111,6 @@ export default function AutocompleteSelector({
                 )}
               </Combobox.Option>
             ))}
-            <div className="block text-xs text-gray-500 text-center">
-              tab to choose
-            </div>
           </Combobox.Options>
         ) : (
           <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
