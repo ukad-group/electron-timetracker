@@ -84,13 +84,29 @@ export default function UpdateDescription() {
             className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
           />
         </div>
-        <div className="ml-2 text-sm">
-          <label htmlFor="comments" className="font-medium text-gray-700">
-            Download beta version
-          </label>
-          <p id="comments-description" className="text-gray-500">
-            You need to restart the application
-          </p>
+        <p className="text-xs text-gray-700 font-semibold">
+          Current version {currentVersion} {!isUpdate && "(latest)"}
+        </p>
+        <div className="relative flex items-start my-4">
+          <div className="flex items-center h-5">
+            <input
+              id="comments"
+              aria-describedby="comments-description"
+              name="comments"
+              type="checkbox"
+              defaultChecked={isBeta}
+              onChange={() => setIsBeta(!isBeta)}
+              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+            />
+          </div>
+          <div className="ml-2 text-sm">
+            <label htmlFor="comments" className="font-medium text-gray-700">
+              Download beta version
+            </label>
+            <p id="comments-description" className="text-gray-500">
+              You need to restart the application (quit it in the tray)
+            </p>
+          </div>
         </div>
       </div>
       <h2 className="font-bold">
