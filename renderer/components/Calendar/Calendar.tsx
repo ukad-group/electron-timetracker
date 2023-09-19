@@ -39,13 +39,12 @@ const months = [
   "October",
   "November",
   "December",
-];
+] as const;
 
 type CalendarProps = {
   reportsFolder: string;
   selectedDate: Date;
   setSelectedDate: Dispatch<SetStateAction<Date>>;
-  shouldAutosave: boolean;
 };
 
 type ReportFromServer = {
@@ -64,7 +63,6 @@ export function Calendar({
   reportsFolder,
   selectedDate,
   setSelectedDate,
-  shouldAutosave,
 }: CalendarProps) {
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [monthReportsFromServer, setMonthReportsFromServer] = useState<
@@ -93,7 +91,24 @@ export function Calendar({
         )
       );
     })();
-  }, [calendarDate, shouldAutosave, reportsFolder]);
+
+    ipcRenderer.send("start-folder-watcher", reportsFolder, calendarDate);
+    ipcRenderer.on("any-file-changed", (event, data) => {
+      (async () => {
+        setMonthReportsFromServer(
+          await ipcRenderer.invoke(
+            "app:find-month-projects",
+            reportsFolder,
+            calendarDate
+          )
+        );
+      })();
+    });
+
+    return () => {
+      ipcRenderer.removeAllListeners("any-file-changed");
+    };
+  }, [calendarDate, reportsFolder]);
 
   // prettier-ignore
   useEffect(() => {
@@ -172,7 +187,11 @@ export function Calendar({
         </div>
         <div className="flex gap-4">
           {calendarDate.getMonth() !== new Date().getMonth() && (
-            <Button text="Go to current month" callback={todayButtonHandle} />
+            <Button
+              text="Go to current month"
+              callback={todayButtonHandle}
+              type={"button"}
+            />
           )}
           <NavButtons
             prevCallback={prevButtonHandle}

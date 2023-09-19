@@ -6,10 +6,7 @@ export type Activity = {
   dur: number;
 };
 
-export type AllActivities = {
-  internal: Activity[];
-  hr: Activity[];
-};
+export type AllActivities = Record<string, Activity[]>;
 
 export function parseReportsInfo(
   reportsFolder: string,

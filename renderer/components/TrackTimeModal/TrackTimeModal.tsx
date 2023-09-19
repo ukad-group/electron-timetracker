@@ -2,9 +2,6 @@ import clsx from "clsx";
 import { FormEvent, Fragment, useEffect, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
-import ProjectSelector from "../ProjectSelector";
-import ActivitySelector from "../ActivitySelector";
-import DescriptionSelector from "../DescriptionSelector";
 import useTimeInput from "../../hooks/useTimeInput";
 import {
   ReportActivity,
@@ -14,6 +11,8 @@ import {
   addDurationToTime,
 } from "../../utils/reports";
 import { checkIsToday } from "../../utils/datetime-ui";
+import AutocompleteSelector from "../ui/AutocompleteSelector";
+import Button from "../ui/Button";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -144,7 +143,7 @@ export default function TrackTimeModal({
 
   const disableTextDrag = (e) => {
     e.preventDefault();
-  }
+  };
 
   const onDurationChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const value = e.target.value;
@@ -248,7 +247,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && !from,
                         }
                       )}
-                      onDragStart = { disableTextDrag }
+                      onDragStart={disableTextDrag}
                     />
                   </div>
 
@@ -275,7 +274,7 @@ export default function TrackTimeModal({
                             isValidationEnabled && !to,
                         }
                       )}
-                      onDragStart = { disableTextDrag }
+                      onDragStart={disableTextDrag}
                     />
                   </div>
 
@@ -301,62 +300,65 @@ export default function TrackTimeModal({
                             isValidationEnabled && (!duration || duration < 0),
                         }
                       )}
-                      onDragStart = { disableTextDrag }
+                      onDragStart={disableTextDrag}
                     />
                   </div>
 
                   <div className="col-span-6">
-                    <ProjectSelector
+                    <AutocompleteSelector
+                      title="Project"
                       required
-                      availableProjects={
+                      availableItems={
                         latestProjAndAct ? Object.keys(latestProjAndAct) : []
                       }
-                      selectedProject={project}
-                      setSelectedProject={setProject}
+                      selectedItem={project}
+                      setSelectedItem={setProject}
                       isValidationEnabled={isValidationEnabled}
+                      isLastThree={false}
                       tabIndex={4}
                     />
                   </div>
                   <div className="col-span-6">
-                    <ActivitySelector
-                      availableActivities={
+                    <AutocompleteSelector
+                      title="Activity"
+                      availableItems={
                         latestProjAndAct ? latestProjAndAct[project] : []
                       }
-                      selectedActivity={activity}
-                      setSelectedActivity={setActivity}
-                      tabIndex={6}
+                      selectedItem={activity}
+                      setSelectedItem={setActivity}
+                      isLastThree={true}
+                      tabIndex={5}
                     />
                   </div>
                   <div className="col-span-6">
-                    <DescriptionSelector
-                      availableDescriptions={
+                    <AutocompleteSelector
+                      title="Description"
+                      availableItems={
                         latestProjAndDesc ? latestProjAndDesc[project] : []
                       }
-                      selectedDescription={description}
-                      setSelectedDescription={setDescription}
-                      tabIndex={4}
+                      selectedItem={description}
+                      setSelectedItem={setDescription}
+                      isLastThree={true}
+                      tabIndex={6}
                     />
                   </div>
                 </div>
               </div>
               <div className="mt-6">
-                <div className="flex justify-end">
-                  <button
-                    onClick={close}
-                    type="button"
+                <div className="flex gap-3 justify-end">
+                  <Button
+                    text="Cancel"
+                    type={"button"}
+                    callback={close}
+                    status={"cancel"}
                     tabIndex={8}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={onSave}
-                    type="submit"
+                  />
+                  <Button
+                    text="Save"
+                    type={"submit"}
+                    status={"enabled"}
                     tabIndex={7}
-                    className="inline-flex justify-center px-4 py-2 ml-3 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    Save
-                  </button>
+                  />
                 </div>
               </div>
             </form>

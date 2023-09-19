@@ -66,6 +66,11 @@ export default function ActivitiesTable({
       });
   };
 
+  const curDate = new Date();
+  const curTime = parseInt(
+    curDate.getHours() + "" + ("0" + curDate.getMinutes()).substr(-2)
+  );
+
   return (
     <table className="min-w-full divide-y divide-gray-300 table-fixed">
       <thead>
@@ -215,7 +220,9 @@ export default function ActivitiesTable({
             className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
             colSpan={4}
           >
-            {totalDuration < 8 * msPerHour && getLackBadge(totalDuration)}
+            {totalDuration < 8 * msPerHour &&
+              curTime > 1600 &&
+              getLackBadge(totalDuration)}
           </td>
         </tr>
       </tbody>
