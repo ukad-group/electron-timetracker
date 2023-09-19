@@ -6,6 +6,7 @@ import {
   Square2StackIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
+import Tooltip from "./ui/Tooltip/Tooltip";
 
 type ActivitiesTableProps = {
   activities: Array<ReportActivity>;
@@ -66,7 +67,9 @@ export default function ActivitiesTable({
   };
 
   const curDate = new Date();
-  const curTime = parseInt(curDate.getHours() + '' + ('0' + curDate.getMinutes()).substr(-2));
+  const curTime = parseInt(
+    curDate.getHours() + "" + ("0" + curDate.getMinutes()).substr(-2)
+  );
 
   return (
     <table className="min-w-full divide-y divide-gray-300 table-fixed">
@@ -86,7 +89,7 @@ export default function ActivitiesTable({
           </th>
           <th
             scope="col"
-            className="w-8 pb-6 px-3 text-left text-sm font-semibold text-gray-900 relative"
+            className="w-32 pb-6 px-3 text-left text-sm font-semibold text-gray-900 relative"
           >
             <span className="block absolute text-xs text-gray-500 top-[22px]">
               activity
@@ -127,43 +130,51 @@ export default function ActivitiesTable({
               </span>
             </td>
             <td
-              className={`px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap cursor-pointer`}
-              onClick={copyToClipboardHandle}
-              data-column="duration"
+              className={`px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap `}
             >
-              {formatDuration(activity.duration)}
+              <Tooltip>
+                <p data-column="duration" onClick={copyToClipboardHandle}>
+                  {formatDuration(activity.duration)}
+                </p>
+              </Tooltip>
             </td>
-            <td>
-              <p
-                className="px-3 pt-4 text-sm font-medium text-gray-900 cursor-pointer"
-                onClick={copyToClipboardHandle}
-              >
-                {activity.project}
-              </p>
-              <span
-                className="px-3 pb-4 block text-xs text-gray-500 font-semibold mt-1 cursor-pointer"
-                onClick={copyToClipboardHandle}
-              >
-                {activity.activity}
-              </span>
-            </td>
-            <td
-              className="px-3 py-4 text-sm text-gray-500 cursor-pointer"
-              onClick={copyToClipboardHandle}
-            >
-              <span
-                className={clsx({
-                  "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800":
-                    activity.mistakes?.includes("startsWith!"),
-                })}
-              >
-                {activity.description}
-              </span>
-              {activity.mistakes?.includes("startsWith!") && (
-                <span className="block text-xs text-gray-500 mt-1">
-                  Perhaps you wanted to report a break
-                </span>
+            <td className="px-3 py-4">
+              <Tooltip>
+                <p
+                  className="text-sm font-medium text-gray-900"
+                  onClick={copyToClipboardHandle}
+                >
+                  {activity.project}
+                </p>
+              </Tooltip>
+              {activity.activity && (
+                <Tooltip>
+                  <p
+                    className="block text-xs text-gray-500 font-semibold mt-1"
+                    onClick={copyToClipboardHandle}
+                  >
+                    {activity.activity}
+                  </p>
+                </Tooltip>
               )}
+            </td>
+            <td className="px-3 py-4 text-sm text-gray-500 ">
+              <Tooltip>
+                <p
+                  onClick={copyToClipboardHandle}
+                  className={clsx({
+                    "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800":
+                      activity.mistakes?.includes("startsWith!"),
+                  })}
+                >
+                  {activity.description}
+                </p>
+                {activity.mistakes?.includes("startsWith!") && (
+                  <span className="block text-xs text-gray-500 mt-1">
+                    Perhaps you wanted to report a break
+                  </span>
+                )}
+              </Tooltip>
             </td>
             <td className="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-6 md:pr-0">
               <a
@@ -195,20 +206,23 @@ export default function ActivitiesTable({
         ))}
         <tr>
           <td className="py-4 pl-4 pr-3 text-sm text-gray-500 whitespace-nowrap sm:pl-6 md:pl-0">
-            Total
+            <p>Total</p>
           </td>
           <td
-            className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap cursor-pointer"
+            className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
             onClick={copyToClipboardHandle}
-            data-column="total"
           >
-            {formatDuration(totalDuration)}
+            <Tooltip>
+              <p data-column="total">{formatDuration(totalDuration)}</p>
+            </Tooltip>
           </td>
           <td
             className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
             colSpan={4}
           >
-            {totalDuration < 8 * msPerHour && curTime > 1600 && getLackBadge(totalDuration)}
+            {totalDuration < 8 * msPerHour &&
+              curTime > 1600 &&
+              getLackBadge(totalDuration)}
           </td>
         </tr>
       </tbody>
@@ -217,7 +231,12 @@ export default function ActivitiesTable({
 }
 
 function getLackBadge(hours: number) {
-  if (hours < 6 * msPerHour) {
+  const curDate = new Date();
+  const curTime = parseInt(
+    curDate.getHours() + "" + ("0" + curDate.getMinutes()).substr(-2)
+  );
+
+  if (hours < 6 * msPerHour && curTime > 1600) {
     return (
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
         less than 6h
