@@ -166,6 +166,7 @@ app.on("ready", () => {
         autoUpdater.checkForUpdates();
       });
     });
+
   }
 });
 

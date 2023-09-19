@@ -74,8 +74,8 @@ export default function Home() {
         reportsFolder,
         selectedDate
       );
-      setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct);
-      setLatestProjAndDesc(sortedActAndDesc.descriptionsSet);
+      setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct || {});
+      setLatestProjAndDesc(sortedActAndDesc.descriptionsSet || {});
     })();
     ipcRenderer.send("start-file-watcher", reportsFolder, selectedDate);
     ipcRenderer.on("file-changed", (event, data) => {
