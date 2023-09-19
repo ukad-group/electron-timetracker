@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { useMemo } from "react";
 import { ReportActivity, formatDuration, validation } from "../utils/reports";
 import { checkIsToday, getCeiledTime } from "../utils/datetime-ui";
+import TimeBadge from "../components/ui/TimeBadge";
 import {
   Square2StackIcon,
   PencilSquareIcon,
@@ -220,33 +221,14 @@ export default function ActivitiesTable({
             className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
             colSpan={4}
           >
-            {totalDuration < 8 * msPerHour &&
-              curTime > 1600 &&
-              getLackBadge(totalDuration)}
+            <TimeBadge
+              hours={totalDuration / msPerHour}
+              startTime={nonBreakActivities[0].from}
+              selectedDate={selectedDate}
+            />
           </td>
         </tr>
       </tbody>
     </table>
-  );
-}
-
-function getLackBadge(hours: number) {
-  const curDate = new Date();
-  const curTime = parseInt(
-    curDate.getHours() + "" + ("0" + curDate.getMinutes()).substr(-2)
-  );
-
-  if (hours < 6 * msPerHour && curTime > 1600) {
-    return (
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-        less than 6h
-      </span>
-    );
-  }
-
-  return (
-    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-      less than 8h
-    </span>
   );
 }
