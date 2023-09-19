@@ -34,7 +34,7 @@ export default function UpdateDescription() {
     (state) => [state.isBeta, state.setIsBeta],
     shallow
   );
-  const [isOpen, setIsOpen] = useState(update.age === "new");
+  const [isOpen, setIsOpen] = useState(update?.age === "new");
 
   useEffect(() => {
     ipcRenderer.send("beta-channel", isBeta);
@@ -57,10 +57,10 @@ export default function UpdateDescription() {
   const isOpenToggle = () => {
     if (isOpen) {
       setIsOpen(false);
-      setUpdate({ age: "old", description: update.description });
+      setUpdate({ age: "old", description: update?.description });
     } else {
       setIsOpen(true);
-      setUpdate({ age: "new", description: update.description });
+      setUpdate({ age: "new", description: update?.description });
     }
   };
   return (
@@ -84,22 +84,45 @@ export default function UpdateDescription() {
             className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
           />
         </div>
-        <div className="ml-2 text-sm">
-          <label htmlFor="comments" className="font-medium text-gray-700">
-            Download beta version
-          </label>
-          <p id="comments-description" className="text-gray-500">
-            You need to restart the application
-          </p>
+        <p className="text-xs text-gray-700 font-semibold">
+          Current version {currentVersion} {!isUpdate && "(latest)"}
+        </p>
+        <div className="relative flex items-start my-4">
+          <div className="flex items-center h-5">
+            <input
+              id="comments"
+              aria-describedby="comments-description"
+              name="comments"
+              type="checkbox"
+              defaultChecked={isBeta}
+              onChange={() => setIsBeta(!isBeta)}
+              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+            />
+          </div>
+          <div className="ml-2 text-sm">
+            <label htmlFor="comments" className="font-medium text-gray-700">
+              Download beta version
+            </label>
+            <p id="comments-description" className="text-gray-500">
+              You need to restart the application (quit it in the tray)
+            </p>
+          </div>
         </div>
       </div>
       <h2 className="font-bold">
         In {release?.version ? release?.version : currentVersion} version
       </h2>
-      <div
-        className="flex flex-col gap-2 mb-3"
-        dangerouslySetInnerHTML={{ __html: update.description }}
-      ></div>
+      {update?.description ? (
+        <div
+          className="flex flex-col gap-2 mb-3"
+          dangerouslySetInnerHTML={{ __html: update?.description }}
+        ></div>
+      ) : (
+        <div className="flex flex-col gap-2 mb-3">
+          Here you will receive notifications about the app's content updates
+          after downloading the new version.
+        </div>
+      )}
     </DisclosureSection>
   );
 }
