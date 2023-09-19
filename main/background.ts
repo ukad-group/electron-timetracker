@@ -3,7 +3,7 @@ import { app, dialog, ipcMain, Menu, Tray } from "electron";
 import serve from "electron-serve";
 import { autoUpdater } from "electron-updater";
 import { createWindow } from "./helpers";
-import { getPathFromDate } from "./helpers/datetime";
+import { getDateFromFilename, getPathFromDate } from "./helpers/datetime";
 import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
 import path from "path";
@@ -157,6 +157,31 @@ app.on("ready", () => {
         }
       }
     );
+    ipcMain.on(
+      "start-folder-watcher",
+      (event, reportsFolder: string, calendarDate: Date) => {
+        fs.watch(reportsFolder, { recursive: true }, (eventType, filename) => {
+          if (eventType === "change" && filename) {
+            const fileDate = getDateFromFilename(filename);
+
+            if (fileDate === null) return;
+
+            const monthsBetweenDates = Math.abs(
+              fileDate.getMonth() - calendarDate.getMonth()
+            );
+
+            if (
+              monthsBetweenDates > 1 ||
+              fileDate.getFullYear() !== calendarDate.getFullYear()
+            ) {
+              return;
+            }
+
+            mainWindow.webContents.send("any-file-changed");
+          }
+        });
+      }
+    );
 
     ipcMain.on("start-update-watcher", (event) => {
       mainWindow &&
@@ -166,7 +191,6 @@ app.on("ready", () => {
         autoUpdater.checkForUpdates();
       });
     });
-
   }
 });
 
