@@ -28,14 +28,12 @@ export default function AutocompleteSelector({
 }: AutocompleteProps) {
   const filteredList =
     selectedItem === ""
-      ? availableItems
-          ?.filter((activity, i) => {
-            if (isLastThree) {
-              return activity !== "" && i < 3;
-            }
-            return activity !== "";
-          })
-          .sort()
+      ? availableItems?.filter((activity, i) => {
+          if (isLastThree) {
+            return activity !== "" && i < 3;
+          }
+          return activity !== "";
+        })
       : availableItems
           ?.filter((activity) => {
             return activity.toLowerCase().includes(selectedItem.toLowerCase());
@@ -110,7 +108,9 @@ export default function AutocompleteSelector({
                 )}
               </Combobox.Option>
             ))}
-            <div className="autoselect-container"></div>
+            <div className="block text-xs text-gray-500 text-center">
+              tab to choose
+            </div>
           </Combobox.Options>
         ) : (
           <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
