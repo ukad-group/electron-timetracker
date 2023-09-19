@@ -16,28 +16,35 @@ if (isProd) {
   app.setPath("userData", `${app.getPath("userData")} (development)`);
 }
 
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
+ipcMain.on("beta-channel", (event, isBeta: boolean) => {
+  autoUpdater.allowPrerelease = isBeta;
+});
+autoUpdater.allowDowngrade = true;
+autoUpdater.on("error", (e, message) => {
+  mainWindow.webContents.send("errorMes", e, message);
+});
+autoUpdater.on("update-available", (info) => {
+  autoUpdater.downloadUpdate();
+  if (mainWindow) {
+    mainWindow.webContents.send("update-available", true, info);
+  }
+});
+autoUpdater.on("update-downloaded", (info) => {
+  if (mainWindow) {
+    mainWindow.webContents.send("downloaded", true, info);
+  }
+});
+ipcMain.on("install", (event) => {
+  autoUpdater.quitAndInstall(true);
+});
+
 const userDataDirectory = app.getPath("userData");
 
 let mainWindow = null;
 
 const gotTheLock = app.requestSingleInstanceLock();
-
-const checkForUpdates = () => {
-  autoUpdater.checkForUpdates();
-
-  autoUpdater.on("update-available", (info) => {
-    autoUpdater.downloadUpdate();
-    if (mainWindow) {
-      mainWindow.webContents.send("update-available", true, info);
-    }
-  });
-
-  autoUpdater.on("update-downloaded", (info) => {
-    if (mainWindow) {
-      mainWindow.webContents.send("downloaded", true, info);
-    }
-  });
-};
 
 const generateWindow = () => {
   mainWindow = createWindow({
@@ -64,7 +71,6 @@ const generateWindow = () => {
     } else {
       generateWindow();
     }
-    checkForUpdates();
   });
 };
 let tray: Tray = null;
@@ -80,7 +86,7 @@ const generateTray = () => {
         } else {
           generateWindow();
         }
-        checkForUpdates();
+        autoUpdater.checkForUpdates();
       },
     },
     {
@@ -104,7 +110,7 @@ const generateTray = () => {
     } else {
       generateWindow();
     }
-    checkForUpdates();
+    autoUpdater.checkForUpdates();
   });
 };
 
@@ -151,13 +157,6 @@ app.on("ready", () => {
         }
       }
     );
-    autoUpdater.autoDownload = false;
-    autoUpdater.autoInstallOnAppQuit = true;
-    ipcMain.on("beta-channel", (event, isBeta: boolean) => {
-      autoUpdater.allowPrerelease = isBeta;
-    });
-
-    autoUpdater.allowDowngrade = true;
 
     ipcMain.on("start-update-watcher", (event) => {
       mainWindow &&
@@ -166,19 +165,6 @@ app.on("ready", () => {
       app.whenReady().then(() => {
         autoUpdater.checkForUpdates();
       });
-
-      autoUpdater.on("update-available", (info) => {
-        autoUpdater.downloadUpdate();
-        mainWindow &&
-          mainWindow.webContents.send("update-available", true, info);
-      });
-
-      autoUpdater.on("update-downloaded", (info) => {
-        mainWindow && mainWindow.webContents.send("downloaded", true, info);
-      });
-    });
-    ipcMain.on("install", (event) => {
-      autoUpdater.quitAndInstall(true);
     });
   }
 });

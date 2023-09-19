@@ -120,7 +120,7 @@ export default function UpdateDescription() {
               Download beta version
             </label>
             <p id="comments-description" className="text-gray-500">
-              You need to restart the application
+              You need to restart the application (quit it in the tray)
             </p>
           </div>
         </div>

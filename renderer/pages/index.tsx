@@ -83,6 +83,10 @@ export default function Home() {
         setSelectedDateReport(data || "");
       }
     });
+    ipcRenderer.on("errorMes", (event, data) => {
+      console.log("event ", event);
+      console.log("data ", data);
+    });
   }, [selectedDate, reportsFolder]);
 
   useEffect(() => {
