@@ -1,8 +1,15 @@
 import clsx from "clsx";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import React from "react";
+import React, { ReactNode } from "react";
 
-export default function DisclosureSection(props) {
+type DisclosureSectionProps = {
+  toggleFunction: () => void;
+  isOpen: boolean;
+  title: string;
+  children: ReactNode;
+};
+
+export default function DisclosureSection(props: DisclosureSectionProps) {
   return (
     <div className="lg:absolute mt-6 w-full">
       <div

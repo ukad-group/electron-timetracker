@@ -184,7 +184,7 @@ export function Calendar({
     <div className="wrapper bg-white p-4 rounded-lg shadow">
       <div className="calendar-header h-10 flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold">{`${currentReadableMonth} ${currentYear}`}</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{`${currentReadableMonth} ${currentYear}`}</h3>
           <p className="text-xs text-gray-500">Total: {monthTotalHours}</p>
         </div>
         <div className="flex gap-4">
