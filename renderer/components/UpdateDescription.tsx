@@ -73,20 +73,6 @@ export default function UpdateDescription() {
         Current version {currentVersion} {!isUpdate && "(latest)"}
       </p>
       <div className="relative flex items-start my-4">
-        <div className="flex items-center h-5">
-          <input
-            id="comments"
-            aria-describedby="comments-description"
-            name="comments"
-            type="checkbox"
-            defaultChecked={isBeta}
-            onChange={() => setIsBeta(!isBeta)}
-            className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-          />
-        </div>
-        <p className="text-xs text-gray-700 font-semibold">
-          Current version {currentVersion} {!isUpdate && "(latest)"}
-        </p>
         <div className="relative flex items-start my-4">
           <div className="flex items-center h-5">
             <input
