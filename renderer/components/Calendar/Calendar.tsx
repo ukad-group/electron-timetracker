@@ -119,14 +119,16 @@ export function Calendar({
       ));
       const workDurationMs = activities.reduce((acc, { duration }) => acc + (duration || 0), 0);
      
-      return {
-       date: reportDate,
-       week: getWeekNumber(reportDate),
-       workDurationMs: workDurationMs,
-       isValid: activities.every((report: ReportActivity) => report.isValid === true),
-      };
-     });
-
+      if(workDurationMs){
+        return {
+        date: reportDate,
+        week: getWeekNumber(reportDate),
+        workDurationMs: workDurationMs,
+        isValid: activities.every((report: ReportActivity) => report.isValid === true),
+        };
+      }
+      return undefined;
+     }).filter((report)=>report!==undefined);
     setMonthWorkHoursReports(monthWorkHours);
   }, [monthReportsFromServer]);
 
@@ -218,14 +220,16 @@ export function Calendar({
 }
 
 function renderEventContent(eventInfo) {
-  return (
-    <>
-      <p>
-        Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}
-      </p>
-      {eventInfo.event.extendedProps.isValid === false && (
-        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-[290%] left-[60%]" />
-      )}
-    </>
-  );
+  if (eventInfo.event.extendedProps.workDurationMs) {
+    return (
+      <>
+        {eventInfo.event.extendedProps.isValid === false && (
+          <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[290%]" />
+        )}
+        <p>
+          Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}
+        </p>
+      </>
+    );
+  }
 }
