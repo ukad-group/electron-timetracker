@@ -180,6 +180,7 @@ export default function ActivitiesTable({
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
               <button
                 className="group py-4 px-3"
+                title="Copy"
                 onClick={() => {
                   onEditActivity({
                     ...activity,
@@ -196,6 +197,7 @@ export default function ActivitiesTable({
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
               <button
                 className="group py-4 px-3"
+                title="Edit"
                 onClick={() => onEditActivity(activity)}
               >
                 <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
