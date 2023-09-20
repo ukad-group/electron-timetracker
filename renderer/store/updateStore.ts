@@ -7,7 +7,7 @@ import {
   persist,
 } from "zustand/middleware";
 
-type Update = { age: "old" | "new"; description: string };
+type Update = { age: "old" | "new"; description: string | null };
 
 export type UpdateStore = {
   update: Update | null;
@@ -30,7 +30,7 @@ export const useUpdateStore = create<UpdateStore>()(
   devtools(
     persist(
       (set) => ({
-        update: { age: null, description: null },
+        update: { age: "old", description: null },
         setUpdate: (update: Update) =>
           set({ update: { age: update.age, description: update.description } }),
       }),
