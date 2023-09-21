@@ -8,6 +8,7 @@ import {
   parseReport,
   serializeReport,
   ReportAndNotes,
+  stringToMinutes,
 } from "../utils/reports";
 import TrackTimeModal from "../components/TrackTimeModal/TrackTimeModal";
 import ManualInputForm from "../components/ManualInputForm";
@@ -83,6 +84,10 @@ export default function Home() {
         setSelectedDateReport(data || "");
       }
     });
+    ipcRenderer.on("errorMes", (event, data) => {
+      console.log("event ", event);
+      console.log("data ", data);
+    });
   }, [selectedDate, reportsFolder]);
 
   useEffect(() => {
@@ -135,6 +140,16 @@ export default function Home() {
 
     if (activityIndex >= 0) {
       setSelectedDateActivities((activities) => {
+        const oldActivity = activities[activityIndex];
+
+        if (
+          Object.keys(activity).every((key) => {
+            return oldActivity[key] === activity[key];
+          })
+        ) {
+          return activities;
+        }
+
         activities[activityIndex] = activity;
         if (activities[activityIndex + 1].isBreak) {
           activities.splice(activityIndex + 1, 1);
@@ -183,11 +198,6 @@ export default function Home() {
     }
 
     setShouldAutosave(true);
-  };
-
-  const stringToMinutes = (string: string) => {
-    const [hours, minutes] = string.split(":");
-    return Number(hours) * 60 + Number(minutes);
   };
 
   const handleSave = (report: string, shouldAutosave: boolean) => {
@@ -244,7 +254,6 @@ export default function Home() {
               reportsFolder={reportsFolder}
               selectedDate={selectedDate}
               setSelectedDate={setSelectedDate}
-              shouldAutosave={shouldAutosave}
             />
           </section>
         </div>

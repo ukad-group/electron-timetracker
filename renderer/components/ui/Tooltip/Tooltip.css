@@ -1,0 +1,13 @@
+.tooltip-wrapper {
+  @apply relative cursor-pointer inline-block;
+}
+
+.tooltip {
+  @apply absolute flex gap-1 text-white font-normal text-xs bottom-[130%] left-[50%] w-[70px] bg-blue-300 rounded-md p-[5px] transition -ml-[35px];
+}
+
+.tooltip::after {
+  content: "";
+
+  @apply absolute top-full left-1/2 -ml-[5px] border-[5px] border-t-blue-300 border-r-transparent border-b-transparent border-l-transparent;
+}

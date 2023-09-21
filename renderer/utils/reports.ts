@@ -304,3 +304,8 @@ export function addSuggestions(
     }
   }
 }
+
+export function stringToMinutes(str: string) {
+  const [hours, minutes] = str.split(":");
+  return Number(hours) * 60 + Number(minutes);
+}

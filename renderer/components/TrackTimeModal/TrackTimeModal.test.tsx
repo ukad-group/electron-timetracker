@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom";
 import TrackTimeModal, { TrackTimeModalProps } from "./TrackTimeModal";
 import GoogleCalendarAddEventBtn from "../google-calendar/GoogleCalendarAddEventBtn";
+import "@testing-library/jest-dom";
 
 const mockedActivities = [
   {
