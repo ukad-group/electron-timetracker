@@ -6,18 +6,21 @@ import TimeBadge from "../components/ui/TimeBadge";
 import {
   Square2StackIcon,
   PencilSquareIcon,
+  ArchiveBoxXMarkIcon,
 } from "@heroicons/react/24/outline";
 import Tooltip from "./ui/Tooltip/Tooltip";
 
 type ActivitiesTableProps = {
   activities: Array<ReportActivity>;
   onEditActivity: (activity: ReportActivity) => void;
+  onDeleteActivity: (id: number) => void;
   selectedDate: Date;
 };
 const msPerHour = 60 * 60 * 1000;
 export default function ActivitiesTable({
   activities,
   onEditActivity,
+  onDeleteActivity,
   selectedDate,
 }: ActivitiesTableProps) {
   const nonBreakActivities = useMemo(() => {
@@ -107,6 +110,12 @@ export default function ActivitiesTable({
             scope="col"
             className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
           >
+            <span className="sr-only">Delete</span>
+          </th>
+          <th
+            scope="col"
+            className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
+          >
             <span className="sr-only">Copy</span>
           </th>
           <th
@@ -139,7 +148,7 @@ export default function ActivitiesTable({
                 </p>
               </Tooltip>
             </td>
-            <td className="px-3 py-4">
+            <td className="flex flex-col px-3 py-4">
               <Tooltip>
                 <p
                   className="text-sm font-medium text-gray-900"
@@ -177,10 +186,21 @@ export default function ActivitiesTable({
                 )}
               </Tooltip>
             </td>
-            <td className="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-6 md:pr-0">
-              <a
-                href="#"
-                className="text-grey-300 hover:text-blue-600"
+            <td className="relative text-sm font-medium text-right whitespace-nowrap">
+              <button
+                className="group py-4 px-3"
+                title="Delete"
+                onClick={() => {
+                  onDeleteActivity(activity.id);
+                }}
+              >
+                <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+              </button>
+            </td>
+            <td className="relative text-sm font-medium text-right whitespace-nowrap">
+              <button
+                className="group py-4 px-3"
+                title="Copy"
                 onClick={() => {
                   onEditActivity({
                     ...activity,
@@ -191,17 +211,17 @@ export default function ActivitiesTable({
                   });
                 }}
               >
-                <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 hover:text-gray-900" />
-              </a>
+                <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+              </button>
             </td>
-            <td className="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-6 md:pr-0">
-              <a
-                href="#"
-                className="text-blue-600 hover:text-blue-900"
+            <td className="relative text-sm font-medium text-right whitespace-nowrap">
+              <button
+                className="group py-4 px-3"
+                title="Edit"
                 onClick={() => onEditActivity(activity)}
               >
-                <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 hover:text-gray-900" />
-              </a>
+                <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+              </button>
             </td>
           </tr>
         ))}

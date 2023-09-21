@@ -7,6 +7,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
   onEditActivity: (activity: ReportActivity | "new") => void;
+  onDeleteActivity: (id: number) => void;
   selectedDate: Date;
 };
 
@@ -15,6 +16,7 @@ type PlaceholderProps = Pick<ActivitiesSectionProps, "onEditActivity">;
 export default function ActivitiesSection({
   onEditActivity,
   activities,
+  onDeleteActivity,
   selectedDate,
 }: ActivitiesSectionProps) {
   const keydownHandler = (e: KeyboardEvent) => {
@@ -45,6 +47,7 @@ export default function ActivitiesSection({
         <ActivitiesTable
           onEditActivity={onEditActivity}
           activities={activities}
+          onDeleteActivity={onDeleteActivity}
           selectedDate={selectedDate}
         />
       </div>

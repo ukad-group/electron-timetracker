@@ -126,12 +126,36 @@ export default function Home() {
   const submitActivity = (activity: ReportActivity) => {
     let isEdit = false;
     let isPastTime = false;
-    const tempActivities: Array<ReportActivity> = [];
-    const newActFrom = stringToMinutes(activity.from);
-    const newActTo = stringToMinutes(activity.to);
     const activityIndex = selectedDateActivities.findIndex(
       (act) => act.id === activity.id
     );
+
+    if (activity.project === "delete") {
+      setSelectedDateActivities((activities) => {
+        const filtered = activities.filter((act) => act.id !== activity.id);
+        if (activityIndex) {
+          filtered[activityIndex - 1].to = filtered[activityIndex].from;
+        } else if (filtered[activityIndex].isBreak) {
+          return filtered.filter(
+            (act) => act.id !== filtered[activityIndex].id
+          );
+        }
+
+        if (filtered.length === activityIndex + 1) {
+          filtered[activityIndex - 2].to = filtered[activityIndex - 1].to;
+          return filtered.filter(
+            (act) => act.id !== filtered[activityIndex - 1].id
+          );
+        }
+        return filtered;
+      });
+      setShouldAutosave(true);
+      return;
+    }
+    const tempActivities: Array<ReportActivity> = [];
+    const newActFrom = stringToMinutes(activity.from);
+    const newActTo = stringToMinutes(activity.to);
+
     if (!selectedDateActivities.length) {
       activity.id = 1;
       tempActivities.push(activity);
@@ -205,6 +229,15 @@ export default function Home() {
     setShouldAutosave(shouldAutosave);
   };
 
+  const onDeleteActivity = (id: number) => {
+    submitActivity({
+      id: id,
+      from: "",
+      to: "",
+      duration: 0,
+      project: "delete",
+    });
+  };
   return (
     <div className="min-h-full">
       <Header />
@@ -227,6 +260,7 @@ export default function Home() {
                     <ActivitiesSection
                       activities={selectedDateActivities}
                       onEditActivity={setTrackTimeModalActivity}
+                      onDeleteActivity={onDeleteActivity}
                       selectedDate={selectedDate}
                     />
                   </div>
