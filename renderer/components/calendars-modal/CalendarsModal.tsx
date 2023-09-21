@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import GoogleCalendarAuth from "../google-calendar/GoogleCalendarAuth";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 
 export default function CalendarsModal() {
   let [isOpen, setIsOpen] = useState(false);
@@ -34,27 +35,20 @@ export default function CalendarsModal() {
             <Dialog.Title>
               <header className="bg-white shadow">
                 <div className="flex justify-between h-16 px-2 mx-auto max-w-[1400px] sm:px-4 lg:px-8">
-                  <div className="flex w-full justify-start items-center flex-shrink min-w-0 gap-4">
+                  <div className="flex items-center flex-shrink min-w-0 gap-4">
                     Calendars Integration
                   </div>
-                  <div
-                    className="flex w-full justify-end items-center flex-shrink min-w-0 gap-4"
+                  <button
+                    type="button"
+                    className="flex justify-end items-center flex-shrink min-w-0 gap-4"
                     onClick={() => setIsOpen(false)}
                   >
-                    <svg
-                      className="h-6 w-6 text-gray-500 cursor-pointer"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      {" "}
-                      <line x1="18" y1="6" x2="6" y2="18" />{" "}
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </div>
+                    <XMarkIcon
+                      className="w-6 h-6 cursor-pointer"
+                      aria-hidden="true"
+                    />
+                    <span className="sr-only">Close</span>
+                  </button>
                 </div>
               </header>
             </Dialog.Title>
