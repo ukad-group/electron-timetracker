@@ -50,7 +50,7 @@ export default function ManualInputForm({
       setSaveBtnStatus("enabled");
     }
 
-    if (!report) {
+    if (!report || selectedDateReport === report) {
       setSaveBtnStatus("disabled");
     }
 
