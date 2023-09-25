@@ -28,7 +28,12 @@ export default function TimeBadge({
         less than 6h
       </span>
     );
-  } else if (hours < 8) {
+  }
+  if (
+    (hours < 8 &&
+      selectedDate.toLocaleDateString() !== curDate.toLocaleDateString()) ||
+    (hours < 8 && curTime - stringToMinutes(startTime) > 480)
+  ) {
     return (
       <span
         data-testid="eightHoursBadge"
