@@ -102,6 +102,7 @@ const generateTray = () => {
   const imagePath = path.join(__dirname, "/images/clock-16.png");
 
   tray = new Tray(imagePath);
+  tray.setToolTip("Timetracker");
   tray.setContextMenu(contextMenu);
 
   tray.on("click", () => {
