@@ -23,7 +23,11 @@ ipcMain.on("beta-channel", (event, isBeta: boolean) => {
 });
 autoUpdater.allowDowngrade = true;
 autoUpdater.on("error", (e, message) => {
-  mainWindow.webContents.send("errorMes", e, message);
+  mainWindow.webContents.send(
+    "background error",
+    "Updater error. An error was encountered during the download of the latest version. ",
+    message
+  );
 });
 autoUpdater.on("update-available", (info) => {
   autoUpdater.downloadUpdate();
@@ -40,6 +44,9 @@ ipcMain.on("install", (event) => {
   autoUpdater.quitAndInstall(true);
 });
 
+ipcMain.on("front error", (event, errorTitle, errorMessage, data) => {
+  mainWindow.webContents.send("render error", errorTitle, errorMessage, data);
+});
 const userDataDirectory = app.getPath("userData");
 
 let mainWindow = null;
@@ -132,8 +139,6 @@ app.on("ready", () => {
     generateWindow();
   }
 
-  generateTray();
-
   let currentSelectedDate = "";
 
   if (mainWindow) {
@@ -141,45 +146,67 @@ app.on("ready", () => {
       "start-file-watcher",
       (event, reportsFolder: string, selectedDate: Date) => {
         const timereportPath = getPathFromDate(selectedDate, reportsFolder);
-
-        currentSelectedDate = selectedDate.toDateString();
-        if (fs.existsSync(timereportPath)) {
-          fs.watch(timereportPath, (eventType, filename) => {
-            if (
-              eventType === "change" &&
-              currentSelectedDate === selectedDate.toDateString()
-            ) {
-              readDataFromFile(timereportPath, (data: string) => {
-                mainWindow && mainWindow.webContents.send("file-changed", data);
-              });
-            }
-          });
+        try {
+          currentSelectedDate = selectedDate.toDateString();
+          if (fs.existsSync(timereportPath)) {
+            fs.watch(timereportPath, (eventType, filename) => {
+              if (
+                eventType === "change" &&
+                currentSelectedDate === selectedDate.toDateString()
+              ) {
+                readDataFromFile(timereportPath, (data: string) => {
+                  mainWindow &&
+                    mainWindow.webContents.send("file-changed", data);
+                });
+              }
+            });
+          }
+        } catch (err) {
+          console.log(err);
+          mainWindow.webContents.send(
+            "background error",
+            "Watcher error. Updates to files might not be accurately displayed within the application. ",
+            err
+          );
         }
       }
     );
     ipcMain.on(
       "start-folder-watcher",
       (event, reportsFolder: string, calendarDate: Date) => {
-        fs.watch(reportsFolder, { recursive: true }, (eventType, filename) => {
-          if (eventType === "change" && filename) {
-            const fileDate = getDateFromFilename(filename);
+        try {
+          fs.watch(
+            reportsFolder,
+            { recursive: true },
+            (eventType, filename) => {
+              if (eventType === "change" && filename) {
+                const fileDate = getDateFromFilename(filename);
 
-            if (fileDate === null) return;
+                if (fileDate === null) return;
 
-            const monthsBetweenDates = Math.abs(
-              fileDate.getMonth() - calendarDate.getMonth()
-            );
+                const monthsBetweenDates = Math.abs(
+                  fileDate.getMonth() - calendarDate.getMonth()
+                );
 
-            if (
-              monthsBetweenDates > 1 ||
-              fileDate.getFullYear() !== calendarDate.getFullYear()
-            ) {
-              return;
+                if (
+                  monthsBetweenDates > 1 ||
+                  fileDate.getFullYear() !== calendarDate.getFullYear()
+                ) {
+                  return;
+                }
+
+                mainWindow.webContents.send("any-file-changed");
+              }
             }
-
-            mainWindow.webContents.send("any-file-changed");
-          }
-        });
+          );
+        } catch (err) {
+          console.log(err);
+          mainWindow.webContents.send(
+            "background error",
+            "Watcher error. Updates to files might not be accurately displayed within the application. ",
+            err
+          );
+        }
       }
     );
 
@@ -189,6 +216,16 @@ app.on("ready", () => {
 
       app.whenReady().then(() => {
         autoUpdater.checkForUpdates();
+        try {
+          generateTray();
+        } catch (err) {
+          console.log(err);
+          mainWindow.webContents.send(
+            "background error",
+            "Tray error. Encountered errors while integrating the application into the system tray.",
+            err
+          );
+        }
       });
     });
   }
@@ -222,11 +259,17 @@ ipcMain.handle("app:select-folder", async () => {
 });
 const readDataFromFile = (timereportPath: string, callback: Callback) => {
   if (!fs.existsSync(timereportPath)) return callback(null);
+
   try {
     const data = fs.readFileSync(timereportPath, "utf8");
     callback(data);
   } catch (err) {
     console.error(err);
+    mainWindow.webContents.send(
+      "background error",
+      "File reading error. The file content display may be inaccurate or absent. ",
+      err
+    );
     callback(null);
   }
 };
@@ -258,6 +301,11 @@ ipcMain.handle(
       fs.writeFileSync(timereportPath, report);
     } catch (err) {
       console.log(err);
+      mainWindow.webContents.send(
+        "background error",
+        "Error in writing to file. The file writing process may be incorrect. ",
+        err
+      );
       return;
     }
   }
@@ -267,42 +315,59 @@ ipcMain.handle(
   "app:find-latest-projects",
   (event, reportsFolder: string, date: Date) => {
     if (!reportsFolder || !date) return [];
+    try {
+      const parsedProjects = parseReportsInfo(reportsFolder, date);
 
-    const parsedProjects = parseReportsInfo(reportsFolder, date);
+      const sortedProjAndAct: Record<string, string[]> = Object.keys(
+        parsedProjects
+      )
+        .sort()
+        .reduce((accumulator, key) => {
+          const activitySet = new Set<string>();
 
-    const sortedProjAndAct: Record<string, string[]> = Object.keys(
-      parsedProjects
-    )
-      .sort()
-      .reduce((accumulator, key) => {
-        const activitySet = new Set<string>();
+          parsedProjects[key].forEach((activity: Activity) => {
+            if (activity.acti) {
+              activitySet.add(activity.acti);
+            }
+          });
+
+          accumulator[key] = Array.from(activitySet);
+          return accumulator;
+        }, {});
+
+      const descriptionsSet: Record<string, string[]> = Object.keys(
+        parsedProjects
+      ).reduce((accumulator, key) => {
+        const descriptionsSet = new Set<string>();
 
         parsedProjects[key]?.forEach((activity: Activity) => {
-          if (activity.acti) {
-            activitySet.add(activity.acti);
+          if (activity.desc) {
+            descriptionsSet.add(activity.desc);
           }
         });
 
-        accumulator[key] = Array.from(activitySet);
+        accumulator[key] = Array.from(descriptionsSet);
         return accumulator;
       }, {});
 
-    const descriptionsSet: Record<string, string[]> = Object.keys(
-      parsedProjects
-    ).reduce((accumulator, key) => {
-      const descriptionsSet = new Set<string>();
-
-      parsedProjects[key]?.forEach((activity: Activity) => {
-        if (activity.desc) {
-          descriptionsSet.add(activity.desc);
-        }
-      });
-
-      accumulator[key] = Array.from(descriptionsSet);
-      return accumulator;
-    }, {});
-
-    return { sortedProjAndAct, descriptionsSet };
+      return { sortedProjAndAct, descriptionsSet };
+    } catch (err) {
+      console.log(err);
+      mainWindow.webContents.send(
+        "background error",
+        "Error reading past reports. Autocomplete suggestions will not appear in the form display. ",
+        err
+      );
+      const sortedProjAndAct: Record<string, string[]> = {
+        internal: [],
+        hr: [],
+      };
+      const descriptionsSet: Record<string, string[]> = {
+        internal: [],
+        hr: [],
+      };
+      return { sortedProjAndAct, descriptionsSet };
+    }
   }
 );
 
