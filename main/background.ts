@@ -160,26 +160,32 @@ app.on("ready", () => {
     ipcMain.on(
       "start-folder-watcher",
       (event, reportsFolder: string, calendarDate: Date) => {
-        fs.watch(reportsFolder, { recursive: true }, (eventType, filename) => {
-          if (eventType === "change" && filename) {
-            const fileDate = getDateFromFilename(filename);
+        if (fs.existsSync(reportsFolder)) {
+          fs.watch(
+            reportsFolder,
+            { recursive: true },
+            (eventType, filename) => {
+              if (eventType === "change" && filename) {
+                const fileDate = getDateFromFilename(filename);
 
-            if (fileDate === null) return;
+                if (fileDate === null) return;
 
-            const monthsBetweenDates = Math.abs(
-              fileDate.getMonth() - calendarDate.getMonth()
-            );
+                const monthsBetweenDates = Math.abs(
+                  fileDate.getMonth() - calendarDate.getMonth()
+                );
 
-            if (
-              monthsBetweenDates > 1 ||
-              fileDate.getFullYear() !== calendarDate.getFullYear()
-            ) {
-              return;
+                if (
+                  monthsBetweenDates > 1 ||
+                  fileDate.getFullYear() !== calendarDate.getFullYear()
+                ) {
+                  return;
+                }
+
+                mainWindow.webContents.send("any-file-changed");
+              }
             }
-
-            mainWindow.webContents.send("any-file-changed");
-          }
-        });
+          );
+        }
       }
     );
 
