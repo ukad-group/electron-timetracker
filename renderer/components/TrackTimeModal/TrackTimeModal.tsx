@@ -306,6 +306,7 @@ export default function TrackTimeModal({
 
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      onSave={onSave}
                       title="Project"
                       required
                       availableItems={
@@ -320,6 +321,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      onSave={onSave}
                       title="Activity"
                       availableItems={
                         latestProjAndAct ? latestProjAndAct[project] : []
@@ -332,6 +334,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      onSave={onSave}
                       title="Description"
                       availableItems={
                         latestProjAndDesc ? latestProjAndDesc[project] : []

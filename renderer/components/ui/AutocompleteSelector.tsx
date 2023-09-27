@@ -1,9 +1,10 @@
-import { Dispatch, SetStateAction, MutableRefObject } from "react";
+import { FormEvent, Dispatch, SetStateAction, useRef } from "react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
 
 type AutocompleteProps = {
+  onSave: (e: FormEvent | MouseEvent) => void;
   title: string;
   selectedItem: string;
   availableItems: Array<string>;
@@ -16,6 +17,7 @@ type AutocompleteProps = {
 };
 
 export default function AutocompleteSelector({
+  onSave,
   title,
   className = "",
   selectedItem,
@@ -26,6 +28,8 @@ export default function AutocompleteSelector({
   isValidationEnabled,
   isLastThree,
 }: AutocompleteProps) {
+  const inputRef = useRef(null);
+
   const filteredList =
     selectedItem === ""
       ? availableItems?.filter((activity, i) => {
@@ -39,6 +43,26 @@ export default function AutocompleteSelector({
             return activity.toLowerCase().includes(selectedItem.toLowerCase());
           })
           .sort();
+
+  const handleKey = (event) => {
+    if (event.key === "Home") {
+      event.preventDefault();
+      inputRef.current.selectionStart = 0;
+      inputRef.current.selectionEnd = 0;
+    }
+    if (event.key === "End") {
+      event.preventDefault();
+      const input = inputRef.current;
+      const length = input.value.length;
+      input.selectionStart = length;
+      input.selectionEnd = length;
+    }
+    if (event.ctrlKey && event.key === "Enter") {
+      event.preventDefault();
+      onSave(event);
+    }
+  };
+
   return (
     <Combobox
       className={className}
@@ -51,6 +75,8 @@ export default function AutocompleteSelector({
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
+          onKeyDown={(event: FormEvent) => handleKey(event)}
+          ref={inputRef}
           required={required}
           spellCheck={false}
           className={clsx(
