@@ -1,48 +1,47 @@
 import fs from "fs";
-import { app, dialog, ipcMain, Menu, Tray } from "electron";
-import serve from "electron-serve";
-import { autoUpdater } from "electron-updater";
-import { createWindow } from "./helpers";
-import { getDateFromFilename, getPathFromDate } from "./helpers/datetime";
-import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
-import { createDirByPath, searchReadFiles } from "./helpers/fs";
 import path from "path";
-
-const isProd: boolean = process.env.NODE_ENV === "production";
-type Callback = (data: string | null) => void;
-if (isProd) {
-  serve({ directory: "app" });
-} else {
-  app.setPath("userData", `${app.getPath("userData")} (development)`);
-}
+import next from "next";
+import { parse } from "url";
+import { createServer } from "http";
+import { app, dialog, ipcMain, Menu, Tray } from "electron";
+import { autoUpdater } from "electron-updater";
+import isDev from "electron-is-dev";
+import { createWindow } from "./helpers/create-window";
+import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
+import { getDateFromFilename, getPathFromDate } from "./helpers/datetime";
+import { createDirByPath, searchReadFiles } from "./helpers/fs";
 
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 ipcMain.on("beta-channel", (event, isBeta: boolean) => {
   autoUpdater.allowPrerelease = isBeta;
 });
+
 autoUpdater.allowDowngrade = true;
 autoUpdater.on("error", (e, message) => {
-  mainWindow.webContents.send("errorMes", e, message);
+  mainWindow?.webContents.send("errorMes", e, message);
 });
+
 autoUpdater.on("update-available", (info) => {
   autoUpdater.downloadUpdate();
   if (mainWindow) {
     mainWindow.webContents.send("update-available", true, info);
   }
 });
+
 autoUpdater.on("update-downloaded", (info) => {
   if (mainWindow) {
     mainWindow.webContents.send("downloaded", true, info);
   }
 });
+
 ipcMain.on("install", (event) => {
   autoUpdater.quitAndInstall(true);
 });
 
 const userDataDirectory = app.getPath("userData");
 
-let mainWindow = null;
+let mainWindow: Electron.CrossProcessExports.BrowserWindow | null = null;
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -53,27 +52,19 @@ const generateWindow = () => {
     autoHideMenuBar: true,
   });
 
-  if (isProd) {
-    mainWindow.loadURL("app://./home.html");
+  mainWindow.loadURL("http://localhost:8000/");
 
+  if (isDev) {
+    mainWindow.webContents.openDevTools();
+  } else {
     mainWindow.on("close", (event) => {
       event.preventDefault();
-      mainWindow.hide();
+      mainWindow?.hide();
     });
-  } else {
-    const port = process.argv[2];
-    mainWindow.loadURL(`http://localhost:${port}/`);
-    mainWindow.webContents.openDevTools();
   }
-  mainWindow.on("click", () => {
-    if (isProd) {
-      mainWindow.show();
-    } else {
-      generateWindow();
-    }
-  });
 };
-let tray: Tray = null;
+
+let tray: Tray | null = null;
 
 const generateTray = () => {
   const contextMenu = Menu.buildFromTemplate([
@@ -81,10 +72,10 @@ const generateTray = () => {
       label: "Activate",
       type: "normal",
       click: () => {
-        if (isProd) {
-          mainWindow.show();
-        } else {
+        if (isDev) {
           generateWindow();
+        } else {
+          mainWindow?.show();
         }
         autoUpdater.checkForUpdates();
       },
@@ -99,26 +90,45 @@ const generateTray = () => {
     },
   ]);
 
-  const imagePath = path.join(__dirname, "/images/clock-16.png");
+  const trayIconPath = path.join(
+    __dirname,
+    "../renderer/out/images/clock-16.png"
+  );
 
-  tray = new Tray(imagePath);
+  tray = new Tray(trayIconPath);
   tray.setContextMenu(contextMenu);
 
   tray.on("click", () => {
-    if (isProd) {
-      mainWindow.show();
-    } else {
+    if (isDev) {
       generateWindow();
+    } else {
+      mainWindow?.show();
     }
     autoUpdater.checkForUpdates();
   });
 };
 
 app.on("before-quit", () => {
-  tray.destroy();
+  tray?.destroy();
 });
 
-app.on("ready", () => {
+app.on("ready", async () => {
+  const nextApp = next({
+    dev: isDev,
+    dir: app.getAppPath() + "/renderer",
+  });
+
+  const requestHandler = nextApp.getRequestHandler();
+
+  await nextApp.prepare();
+
+  createServer((req: any, res: any) => {
+    const parsedUrl = parse(req.url, true);
+    requestHandler(req, res, parsedUrl);
+  }).listen(8000, () => {
+    console.log("> Ready on http://localhost:8000");
+  });
+
   if (!gotTheLock) {
     app.quit();
   } else {
@@ -149,7 +159,7 @@ app.on("ready", () => {
               eventType === "change" &&
               currentSelectedDate === selectedDate.toDateString()
             ) {
-              readDataFromFile(timereportPath, (data: string) => {
+              readDataFromFile(timereportPath, (data: string | null) => {
                 mainWindow && mainWindow.webContents.send("file-changed", data);
               });
             }
@@ -157,6 +167,7 @@ app.on("ready", () => {
         }
       }
     );
+
     ipcMain.on(
       "start-folder-watcher",
       (event, reportsFolder: string, calendarDate: Date) => {
@@ -177,7 +188,7 @@ app.on("ready", () => {
               return;
             }
 
-            mainWindow.webContents.send("any-file-changed");
+            mainWindow?.webContents.send("any-file-changed");
           }
         });
       }
@@ -203,9 +214,11 @@ app.on("window-all-closed", () => {
 ipcMain.handle("storage:get", (event, storageName: string) => {
   return fs.readFileSync(`${userDataDirectory}/${storageName}`, "utf8");
 });
+
 ipcMain.handle("storage:set", (event, storageName: string, value: string) => {
   fs.writeFileSync(`${userDataDirectory}/${storageName}`, value);
 });
+
 ipcMain.handle("storage:delete", (event, storageName: string) => {
   fs.unlinkSync(`${userDataDirectory}/${storageName}`);
 });
@@ -220,6 +233,8 @@ ipcMain.handle("app:select-folder", async () => {
   }
   return null;
 });
+
+type Callback = (data: string | null) => void;
 const readDataFromFile = (timereportPath: string, callback: Callback) => {
   if (!fs.existsSync(timereportPath)) return callback(null);
   try {
@@ -274,7 +289,7 @@ ipcMain.handle(
       parsedProjects
     )
       .sort()
-      .reduce((accumulator, key) => {
+      .reduce((accumulator: Record<string, string[]>, key) => {
         const activitySet = new Set<string>();
 
         parsedProjects[key]?.forEach((activity: Activity) => {
@@ -289,7 +304,7 @@ ipcMain.handle(
 
     const descriptionsSet: Record<string, string[]> = Object.keys(
       parsedProjects
-    ).reduce((accumulator, key) => {
+    ).reduce((accumulator: Record<string, string[]>, key) => {
       const descriptionsSet = new Set<string>();
 
       parsedProjects[key]?.forEach((activity: Activity) => {
