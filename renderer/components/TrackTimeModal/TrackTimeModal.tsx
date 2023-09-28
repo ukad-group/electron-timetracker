@@ -90,9 +90,9 @@ export default function TrackTimeModal({
       .padStart(2, "0");
     const isToday = checkIsToday(selectedDate);
 
-    if (activities.length && activities[activities.length - 1].to) {
+    if (activities?.length && activities[activities?.length - 1].to) {
       setFrom(activities[activities.length - 1].to);
-    } else if (activities.length && !activities[activities.length - 1].to) {
+    } else if (activities?.length && !activities[activities?.length - 1].to) {
       setFrom(activities[activities.length - 1].from);
     } else {
       setFrom(`${hours}:${floorMinutes}`);
