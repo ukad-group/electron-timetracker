@@ -222,6 +222,7 @@ ipcMain.handle("app:select-folder", async () => {
 });
 const readDataFromFile = (timereportPath: string, callback: Callback) => {
   if (!fs.existsSync(timereportPath)) return callback(null);
+  mainWindow.webContents.send("file exist", true);
   try {
     const data = fs.readFileSync(timereportPath, "utf8");
     callback(data);

@@ -275,6 +275,7 @@ export default function Home() {
                   <ManualInputForm
                     onSave={handleSave}
                     selectedDateReport={selectedDateReport}
+                    selectedDate={selectedDate}
                   />
                 </div>
                 <UpdateDescription />
