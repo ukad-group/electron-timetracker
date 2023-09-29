@@ -4,7 +4,7 @@ import next from "next";
 import { parse } from "url";
 import { createServer } from "http";
 import { app, dialog, ipcMain, Menu, Tray } from "electron";
-import { autoUpdater } from "electron-updater";
+import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
 import { createWindow } from "./helpers/create-window";
 import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
@@ -18,18 +18,18 @@ ipcMain.on("beta-channel", (event, isBeta: boolean) => {
 });
 
 autoUpdater.allowDowngrade = true;
-autoUpdater.on("error", (e, message) => {
+autoUpdater.on("error", (e: Error, message?: string) => {
   mainWindow?.webContents.send("errorMes", e, message);
 });
 
-autoUpdater.on("update-available", (info) => {
+autoUpdater.on("update-available", (info: UpdateInfo) => {
   autoUpdater.downloadUpdate();
   if (mainWindow) {
     mainWindow.webContents.send("update-available", true, info);
   }
 });
 
-autoUpdater.on("update-downloaded", (info) => {
+autoUpdater.on("update-downloaded", (info: UpdateInfo) => {
   if (mainWindow) {
     mainWindow.webContents.send("downloaded", true, info);
   }

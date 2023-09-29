@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { CheckIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
+import { UpdateInfo } from "electron-updater";
 
 export default function VersionMessage() {
   const [isUpdate, setIsUpdate] = useState(false);
@@ -8,14 +9,20 @@ export default function VersionMessage() {
 
   useEffect(() => {
     global.ipcRenderer.send("start-update-watcher");
-    global.ipcRenderer.on("update-available", (event, data, info) => {
-      setIsUpdate(data);
-      setVersion(info.version);
-    });
-    global.ipcRenderer.on("downloaded", (event, data, info) => {
-      setIsDownload(data);
-      setVersion(info.version);
-    });
+    global.ipcRenderer.on(
+      "update-available",
+      (event, data: boolean, info: UpdateInfo) => {
+        setIsUpdate(data);
+        setVersion(info.version);
+      }
+    );
+    global.ipcRenderer.on(
+      "downloaded",
+      (event, data: boolean, info: UpdateInfo) => {
+        setIsDownload(data);
+        setVersion(info.version);
+      }
+    );
   }, []);
 
   const install = () => {
