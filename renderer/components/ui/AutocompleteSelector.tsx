@@ -39,8 +39,7 @@ export default function AutocompleteSelector({
             return activity.toLowerCase().includes(selectedItem.toLowerCase());
           })
           .sort();
-  const onChangeHandeler = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log("filteredList ", filteredList);
+  const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.startsWith(" ")) {
       e.target.value = e.target.value.trim();
     }
@@ -67,7 +66,7 @@ export default function AutocompleteSelector({
                 required && isValidationEnabled && !selectedItem,
             }
           )}
-          onChange={onChangeHandeler}
+          onChange={onChangeHandler}
           tabIndex={tabIndex}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center px-2 rounded-r-md focus:outline-none">
