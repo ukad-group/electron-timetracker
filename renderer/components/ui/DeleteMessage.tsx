@@ -56,83 +56,6 @@ export default function DeleteMessage({
     !isCanceledDays[selectedDate.toDateString()]
   ) {
     return (
-      // <div className="flex justify-center pt-2">
-      //   <div className="flex gap-2 items-center flex-shrink-0 px-2 lg:px-0">
-      //     {!selectedDateReport && isFileExist && (
-      //       <span className="flex gap-2 items-center rounded-lg px-3 py-2 text-sm bg-yellow-100 border-2 border-yellow-300 text-yellow-800">
-      //         <ExclamationTriangleIcon className="w-6 h-6 fill-yellow-500" />
-      //         <p className="whitespace-normal">
-      //           The file is devoid of content or entries. Do you want to delete
-      //           it?
-      //         </p>
-      //         <button
-      //           className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-500 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-      //           onClick={deleteFile}
-      //         >
-      //           Delete
-      //         </button>
-      //       </span>
-      //     )}
-      //   </div>
-      // </div>
-      // <div
-      //   id="popover"
-      //   className="relative w-11/12 transition duration-150 ease-in-out mx-auto -mt-[76px] -top-2 left-0"
-      // >
-      //   <div className="w-full rounded-lg  text-sm bg-yellow-100 border-2 border-yellow-200 text-yellow-800  shadow-2xl">
-      //     <div className="relative rounded-t py-4 px-4 flex justify-center">
-      //       <svg
-      //         className="absolute -mb-6 transform -rotate-90  bottom-0"
-      //         width="30px"
-      //         height="30px"
-      //         viewBox="0 0 9 16"
-      //         version="1.1"
-      //         xmlns="http://www.w3.org/2000/svg"
-      //         xmlnsXlink="http://www.w3.org/1999/xlink"
-      //       >
-      //         <g
-      //           id="Page-1"
-      //           stroke="none"
-      //           strokeWidth={1}
-      //           fill="none"
-      //           fillRule="evenodd"
-      //         >
-      //           <g
-      //             id="Tooltips-"
-      //             transform="translate(-874.000000, -1029.000000)"
-      //             fill="rgb(254 249 195)"
-      //           >
-      //             <g
-      //               id="Group-3-Copy-16"
-      //               transform="translate(850.000000, 975.000000)"
-      //             >
-      //               <g id="Group-2" transform="translate(24.000000, 0.000000)">
-      //                 <polygon
-      //                   id="Triangle"
-      //                   transform="translate(4.500000, 62.000000) rotate(-90.000000) translate(-4.500000, -62.000000) "
-      //                   points="4.5 57.5 12.5 66.5 -3.5 66.5"
-      //                 />
-      //               </g>
-      //             </g>
-      //           </g>
-      //         </g>
-      //       </svg>
-      //       <span className="flex gap-2 ">
-      //         <p className="whitespace-normal">
-      //           The file is devoid of content or entries. Do you want to delete
-      //           it?
-      //         </p>
-      //         <button
-      //           className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-400 border border-transparent rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-      //           onClick={deleteFile}
-      //         >
-      //           Delete
-      //         </button>
-      //       </span>
-      //     </div>
-      //   </div>
-      // </div>
-
       <div className="absolute animate-[scaling_1s_ease-in-out_forwards] overflow-hidden rounded-lg bg-white text-left shadow-2xl left-[5%] bottom-24 sm:w-[90%]">
         <div className="bg-white px-4 pb-4 pt-5 sm:p-4 sm:pr-6">
           <div className="sm:flex sm:items-start">
@@ -141,13 +64,13 @@ export default function DeleteMessage({
                 className="h-6 w-6 text-red-600"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke-width="1.5"
+                strokeWidth="1.5"
                 stroke="currentColor"
                 aria-hidden="true"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
                 />
               </svg>

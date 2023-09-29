@@ -132,21 +132,27 @@ export default function Home() {
 
     if (activity.project === "delete") {
       setSelectedDateActivities((activities) => {
-        const filtered = activities.filter((act) => act.id !== activity.id);
+        if (activities.length === activityIndex + 2 && !activityIndex) {
+          return [];
+        }
         if (activityIndex) {
-          filtered[activityIndex - 1].to = filtered[activityIndex].from;
-        } else if (filtered[activityIndex].isBreak) {
-          return filtered.filter(
-            (act) => act.id !== filtered[activityIndex].id
+          activities[activityIndex - 1].to = activities[activityIndex + 1].from;
+        } else if (activities[activityIndex].isBreak) {
+          return activities.filter(
+            (act) => act.id !== activities[activityIndex].id
           );
         }
 
-        if (filtered.length === activityIndex + 1) {
-          filtered[activityIndex - 2].to = filtered[activityIndex - 1].to;
-          return filtered.filter(
-            (act) => act.id !== filtered[activityIndex - 1].id
+        if (activities.length === activityIndex + 2) {
+          activities[activityIndex - 1].to = activities[activityIndex].from;
+
+          return activities.filter(
+            (act) =>
+              act.id !== activities[activityIndex].id &&
+              act.id !== activities[activityIndex + 1].id
           );
         }
+        const filtered = activities.filter((act) => act.id !== activity.id);
         return filtered;
       });
       setShouldAutosave(true);
