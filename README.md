@@ -1,79 +1,48 @@
-[![Forks][forks-shield]][forks-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
+# Electron with Typescript application example
 
-# Timetracker
+This example show how you can use Next.js inside an Electron application to avoid a lot of configuration, use Next.js router as view and use server-render to speed up the initial render of the application. Both Next.js and Electron layers are written in TypeScript and compiled to JavaScript during the build process.
 
-## About The Project
+| Part       | Source code (Typescript) | Builds (JavaScript) |
+| ---------- | ------------------------ | ------------------- |
+| Next.js    | `/renderer`              | `/renderer/out`     |
+| Electron   | `/electron-src`          | `/main`             |
+| Production |                          | `/dist`             |
 
-This is an application for creating a reports of the time spent on activities across projects.
-Using this application, you can:
+For development it's going to run a HTTP server and let Next.js handle routing. In production it use `output: 'export'` to pre-generate HTML static files and use them in your app instead of running an HTTP server.
 
-- Choose the location for time tracker reports.
-- Select the date for the report.
-- Create activity reports using a form with relevant fields.
-- Format the reports within the form.
-- Create and edit reports in a text field.
+## How to use
 
-This application creates a file in plain text format with the data entered into the tracker.
-The file name is the date in the format yyyymmdd. The data in the file is stored in the format "hh:mm - project - activity - description", where hh:mm represents the start time of the activity. If there is no subsequent activity following the end of one, the end time of the activity is marked as "hh:mm - !"
+Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example:
 
-![Timetracker Screen Shot](resources/app-screenshot.png)
-
-### Built With
-
-- TypeScript
-- Next.js
-- Electron
-- Nextron
-- Tailwind
-
-## Getting Started
-
-To get a local copy up and running follow these simple example steps.
-
-### Installation
-
-1. Clone the repo
-   ```sh
-   git clone https://github.com/mmmykhailo/timetracker.git
-   ```
-2. Install packages
-
-   ```sh
-   pnpm i
-   ```
-
-## Usage
-
-Development mode
-
-```sh
-pnpm run dev
+```bash
+npx create-next-app --example with-electron-typescript with-electron-typescript-app
 ```
 
-Production build
-
-```sh
-npm run build
+```bash
+yarn create next-app --example with-electron-typescript with-electron-typescript-app
 ```
 
-## Github Actions (CI/CD)
+```bash
+pnpm create next-app --example with-electron-typescript with-electron-typescript-app
+```
 
-App version in `package.json` modify using tag version (tag`v0.0.1` -> `0.0.1`)
+Available commands:
 
-## Contact
+```bash
+"build-renderer": build and transpile Next.js layer
+"build-electron": transpile electron layer
+"build": build both layers
+"dev": start dev version
+"dist": create production electron build
+"type-check": check TypeScript in project
+```
 
-Telegram: [@mrdr_scn](https://t.me/mrdr_scn)
+## Notes
 
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+You can create the production app using `npm run dist`.
 
-[forks-shield]: https://img.shields.io/github/forks/mmmykhailo/timetracker.svg?style=for-the-badge
-[forks-url]: https://github.com/mmmykhailo/timetracker/network/members
-[stars-shield]: https://img.shields.io/github/stars/mmmykhailo/timetracker.svg?style=for-the-badge
-[license-shield]: https://img.shields.io/github/license/mmmykhailo/timetracker.svg?style=for-the-badge
-[license-url]: https://github.com/mmmykhailo/timetracker/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/mmmykhailo
-[product-screenshot]: images/screenshot.png
+_note regarding types:_
+
+- Electron provides its own type definitions, so you don't need @types/electron installed!
+  source: https://www.npmjs.com/package/@types/electron
+- There were no types available for `electron-next` at the time of creating this example, so until they are available there is a file `electron-next.d.ts` in `electron-src` directory.

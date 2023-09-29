@@ -172,7 +172,7 @@ export default function TrackTimeModal({
     setTo(to.time || "");
     setActivity("meeting");
     setDescription(summary || "");
-  }
+  };
 
   return (
     <Transition.Root show={isOpen} as={Fragment}>
@@ -356,10 +356,9 @@ export default function TrackTimeModal({
               <div className="mt-6">
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
-                    {
-                      checkIsToday(selectedDate) &&
-                      <GoogleCalendarAddEventBtn addEvent={addEventToList}/>
-                    }
+                    {checkIsToday(selectedDate) && (
+                      <GoogleCalendarAddEventBtn addEvent={addEventToList} />
+                    )}
                   </div>
                   <div className="flex gap-3 justify-end">
                     <Button

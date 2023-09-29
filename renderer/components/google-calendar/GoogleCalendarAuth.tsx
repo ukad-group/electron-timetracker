@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from "react";
-import {
-  checkIsSignedIn,
-  getEventsList,
-  signIn,
-  signOut,
-} from "../../API/googleCalendarAPI";
+import ApiCalendar from "react-google-calendar-api";
 import Button from "../ui/Button";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
+
+const config = {
+  clientId:
+    "717524073110-hbh5ei25iuhb7mvucqgjr92maivpt7df.apps.googleusercontent.com",
+  apiKey: "AIzaSyC8SpmdGCMoNOkJM3fc85PAyMiFbxOOUAM",
+  scope: "https://www.googleapis.com/auth/calendar",
+  discoveryDocs: [
+    "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest",
+  ],
+};
+
+const { handleAuthClick, handleSignoutClick, listEvents, sign } =
+  new ApiCalendar(config);
 
 function GoogleCalendarAuth() {
   const [signed, setSigned] = useState(false);
@@ -14,23 +22,39 @@ function GoogleCalendarAuth() {
   const currentMonth = new Date().getMonth() + 1;
 
   useEffect(() => {
-    const sign = checkIsSignedIn();
-    setSigned(sign);
-    if (sign) {
+    const isSign = sign;
+    setSigned(isSign);
+    if (isSign) {
       getEvents();
     }
   }, []);
 
   const signInHandler = () => {
-    signIn().then((data) => {
+    handleAuthClick().then(() => {
       setSigned(true);
       getEvents();
     });
   };
 
+  // const signInHandler = () => {
+  //   signIn().then((data) => {
+  //     setSigned(true);
+  //     getEvents();
+  //   });
+  // };
+
   const signOutHandler = () => {
     setSigned(false);
-    signOut();
+    handleSignoutClick();
+  };
+
+  const getEventsList = () => {
+    return listEvents({
+      showDeleted: false,
+      orderBy: "updated",
+    }).then(({ result }) => {
+      return result?.items;
+    });
   };
 
   const getEvents = () => {
@@ -86,18 +110,22 @@ function GoogleCalendarAuth() {
     <div>
       {signed ? (
         <>
-          <div className="flex justify-between" onClick={signOutHandler}>
-            <h3 className="text-lg font-semibold py-4">Current month events</h3>
-            <div className="text-sm font-medium text-blue-600 p-2 cursor-pointer">
-              SignOut
-            </div>
+          <Button text="Signout" callback={signOutHandler} type="button" />
+          <div className="flex justify-between">
+            <h3 className="text-lg font-semibold py-4">
+              Current month google events
+            </h3>
           </div>
           <div className="callendar-container">
             <ul className="callendar-list">{buildEventsList()}</ul>
           </div>
         </>
       ) : (
-        <Button text="Connect to Google Calendar" callback={signInHandler} />
+        <Button
+          text="Connect to Google Calendar"
+          callback={signInHandler}
+          type="button"
+        />
       )}
     </div>
   );

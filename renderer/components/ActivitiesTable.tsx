@@ -139,7 +139,7 @@ export default function ActivitiesTable({
                 </p>
               </Tooltip>
             </td>
-            <td className="px-3 py-4">
+            <td className="flex flex-col px-3 py-4">
               <Tooltip>
                 <p
                   className="text-sm font-medium text-gray-900"

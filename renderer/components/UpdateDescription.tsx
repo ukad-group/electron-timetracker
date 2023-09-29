@@ -1,4 +1,3 @@
-import { app, ipcRenderer } from "electron";
 import { useState, useEffect } from "react";
 import { shallow } from "zustand/shallow";
 import { useUpdateStore } from "../store/updateStore";
@@ -24,7 +23,9 @@ type Release = {
 
 export default function UpdateDescription() {
   const [release, setRelease] = useState<Release | null>();
-  const [currentVersion, setCurrentVersion] = useState(app?.getVersion());
+  const [currentVersion, setCurrentVersion] = useState(
+    global.app?.getVersion()
+  );
   const [isUpdate, setIsUpdate] = useState(false);
   const [update, setUpdate] = useUpdateStore(
     (state) => [state.update, state.setUpdate],
@@ -37,20 +38,20 @@ export default function UpdateDescription() {
   const [isOpen, setIsOpen] = useState(update?.age === "new");
 
   useEffect(() => {
-    ipcRenderer.send("beta-channel", isBeta);
+    global.ipcRenderer.send("beta-channel", isBeta);
   }, [isBeta]);
 
-  ipcRenderer.on("update-available", (event, data, info) => {
+  global.ipcRenderer.on("update-available", (event, data, info) => {
     setIsUpdate(data);
   });
 
-  ipcRenderer.on("downloaded", (event, data, info) => {
+  global.ipcRenderer.on("downloaded", (event, data, info) => {
     setRelease(info);
     setIsOpen(true);
     setUpdate({ age: "new", description: info?.releaseNotes });
   });
 
-  ipcRenderer.on("current-version", (event, data) => {
+  global.ipcRenderer.on("current-version", (event, data) => {
     setCurrentVersion(data);
   });
 

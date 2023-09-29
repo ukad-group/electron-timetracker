@@ -1,4 +1,3 @@
-import { ipcRenderer } from "electron";
 import { PencilIcon } from "@heroicons/react/24/solid";
 
 type FolderSelectorProps = {
@@ -11,11 +10,13 @@ export default function FolderSelector({
   setFolderLocation,
 }: FolderSelectorProps) {
   const clickHandler = () => {
-    ipcRenderer.invoke("app:select-folder").then((folder: string | null) => {
-      if (folder) {
-        setFolderLocation(folder);
-      }
-    });
+    global.ipcRenderer
+      .invoke("app:select-folder")
+      .then((folder: string | null) => {
+        if (folder) {
+          setFolderLocation(folder);
+        }
+      });
   };
 
   return (

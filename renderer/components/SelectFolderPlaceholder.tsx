@@ -1,5 +1,4 @@
 import React from "react";
-import { ipcRenderer } from "electron";
 import { PlusIcon } from "@heroicons/react/24/solid";
 
 type SelectFolderPlaceholderProps = {
@@ -10,11 +9,13 @@ const SelectFolderPlaceholder = ({
   setFolder,
 }: SelectFolderPlaceholderProps) => {
   const handleButtonClick = () => {
-    ipcRenderer.invoke("app:select-folder").then((folder: string | null) => {
-      if (folder) {
-        setFolder(folder);
-      }
-    });
+    global.ipcRenderer
+      .invoke("app:select-folder")
+      .then((folder: string | null) => {
+        if (folder) {
+          setFolder(folder);
+        }
+      });
   };
 
   return (

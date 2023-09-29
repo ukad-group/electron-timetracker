@@ -1,4 +1,3 @@
-import { ipcRenderer } from "electron";
 import { useEffect, useState } from "react";
 import { CheckIcon, ExclamationCircleIcon } from "@heroicons/react/24/solid";
 
@@ -8,19 +7,19 @@ export default function VersionMessage() {
   const [version, setVersion] = useState("");
 
   useEffect(() => {
-    ipcRenderer.send("start-update-watcher");
-    ipcRenderer.on("update-available", (event, data, info) => {
+    global.ipcRenderer.send("start-update-watcher");
+    global.ipcRenderer.on("update-available", (event, data, info) => {
       setIsUpdate(data);
       setVersion(info.version);
     });
-    ipcRenderer.on("downloaded", (event, data, info) => {
+    global.ipcRenderer.on("downloaded", (event, data, info) => {
       setIsDownload(data);
       setVersion(info.version);
     });
   }, []);
 
   const install = () => {
-    ipcRenderer.send("install");
+    global.ipcRenderer.send("install");
   };
   return (
     <div className="flex justify-center pt-2">

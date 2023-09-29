@@ -1,10 +1,9 @@
-import {
-  screen,
-  BrowserWindow,
-  BrowserWindowConstructorOptions,
-} from "electron";
+import { BrowserWindow, BrowserWindowConstructorOptions } from "electron";
+import { join } from "path";
 
-export default (options: BrowserWindowConstructorOptions): BrowserWindow => {
+export function createWindow(
+  options: BrowserWindowConstructorOptions
+): BrowserWindow {
   let state = {};
   let win;
 
@@ -12,8 +11,9 @@ export default (options: BrowserWindowConstructorOptions): BrowserWindow => {
     ...state,
     ...options,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: false, // in next example false
       contextIsolation: false,
+      preload: join(__dirname, "preload.js"),
       ...options.webPreferences,
     },
     minWidth: 360,
@@ -22,4 +22,4 @@ export default (options: BrowserWindowConstructorOptions): BrowserWindow => {
   win = new BrowserWindow(browserOptions);
 
   return win;
-};
+}

@@ -9,9 +9,7 @@ import {
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { ipcRenderer } from "electron";
 import { ExclamationCircleIcon } from "@heroicons/react/24/solid";
-
 import {
   formatDuration,
   parseReport,
@@ -84,7 +82,7 @@ export function Calendar({
   useEffect(() => {
     (async () => {
       setMonthReportsFromServer(
-        await ipcRenderer.invoke(
+        await global.ipcRenderer.invoke(
           "app:find-month-projects",
           reportsFolder,
           calendarDate
@@ -92,11 +90,15 @@ export function Calendar({
       );
     })();
 
-    ipcRenderer.send("start-folder-watcher", reportsFolder, calendarDate);
-    ipcRenderer.on("any-file-changed", (event, data) => {
+    global.ipcRenderer.send(
+      "start-folder-watcher",
+      reportsFolder,
+      calendarDate
+    );
+    global.ipcRenderer.on("any-file-changed", (event, data) => {
       (async () => {
         setMonthReportsFromServer(
-          await ipcRenderer.invoke(
+          await global.ipcRenderer.invoke(
             "app:find-month-projects",
             reportsFolder,
             calendarDate
@@ -106,7 +108,7 @@ export function Calendar({
     });
 
     return () => {
-      ipcRenderer.removeAllListeners("any-file-changed");
+      global.ipcRenderer.removeAllListeners("any-file-changed");
     };
   }, [calendarDate, reportsFolder]);
 
