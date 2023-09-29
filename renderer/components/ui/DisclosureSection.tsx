@@ -31,16 +31,15 @@ export default function DisclosureSection(props: DisclosureSectionProps) {
                 >
                   {props.title}
                 </h2>
-                <button
+                <ChevronDownIcon
                   className={clsx(
-                    "transform transition-transform ease-linear duration-300",
+                    "transform transition-transform ease-linear duration-300 w-6 h-7",
                     {
                       "rotate-180": open,
                     }
                   )}
-                >
-                  <ChevronDownIcon className="w-6 h-7" aria-hidden="true" />
-                </button>
+                  aria-hidden="true"
+                />
               </div>
             </Disclosure.Button>
             <Disclosure.Panel static>{props.children}</Disclosure.Panel>
