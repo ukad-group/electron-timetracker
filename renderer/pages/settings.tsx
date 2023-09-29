@@ -11,6 +11,12 @@ const SettingsPage = () => (
       Go home
     </Link>
     <GoogleCalendarAuth />
+    <Link
+      className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium border rounded-md shadow-sm mb-4 bg-blue-600 text-white hover:bg-blue-700"
+      href="/trello"
+    >
+      Connect to trello
+    </Link>
   </div>
 );
 

@@ -5,7 +5,7 @@ type ButtonProps = {
   callback?: () => void;
   disabled?: boolean;
   status?: string;
-  type: "button" | "submit" | "reset";
+  type?: "button" | "submit" | "reset";
   tabIndex?: number;
 };
 
@@ -23,7 +23,7 @@ export default function Button({
   text,
   disabled,
   status,
-  type,
+  type = "button",
   tabIndex,
 }: ButtonProps) {
   const saveBtnStatuses = {
