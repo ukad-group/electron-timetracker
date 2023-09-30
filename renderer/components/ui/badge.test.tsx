@@ -38,6 +38,16 @@ const todayEndWorkLess8MockedProps: TimeBadgeProps = {
   startTime: "02:00",
   selectedDate: today,
 };
+const yesterdayMore8MockedProps: TimeBadgeProps = {
+  hours: 9,
+  startTime: "10:00",
+  selectedDate: yesterday,
+};
+const todayMore8MockedProps: TimeBadgeProps = {
+  hours: 9,
+  startTime: "10:00",
+  selectedDate: today,
+};
 
 const useFakeTime = () => {
   const currentDateTime = new Date();
@@ -62,21 +72,41 @@ describe("badge for the previous day", () => {
     const element = screen.getByTestId("eightHoursBadge");
     expect(element).toBeInTheDocument();
   });
+  test("should not render 'less than 6h' when hours are less than 6", () => {
+    render(<TimeBadge {...yesterdayMore8MockedProps} />);
+
+    const element = screen.queryByTestId("sixHoursBadge");
+    expect(element).not.toBeInTheDocument();
+  });
+
+  test("should not render 'less than 8h' when hours are less than 8", () => {
+    render(<TimeBadge {...yesterdayMore8MockedProps} />);
+
+    const element = screen.queryByTestId("eightHoursBadge");
+    expect(element).not.toBeInTheDocument();
+  });
 });
 
 describe("badge for the today morning", () => {
-  test("should render 'less than 8h' when hours are less than 6", () => {
+  test("should not render 'less than 6h' when hours are less than 6", () => {
     render(<TimeBadge {...todayStartWorkLess6MockedProps} />);
 
-    const element = screen.getByTestId("eightHoursBadge");
-    expect(element).toBeInTheDocument();
+    const element = screen.queryByTestId("sixHoursBadge");
+    expect(element).not.toBeInTheDocument();
   });
 
-  test("should render 'less than 8h' when hours are less than 8", () => {
+  test("should not render 'less than 8h' when hours are less than 6", () => {
+    render(<TimeBadge {...todayStartWorkLess6MockedProps} />);
+
+    const element = screen.queryByTestId("eightHoursBadge");
+    expect(element).not.toBeInTheDocument();
+  });
+
+  test("should not render 'less than 8h' when hours are less than 8", () => {
     render(<TimeBadge {...todayStartWorkLess8MockedProps} />);
 
-    const element = screen.getByTestId("eightHoursBadge");
-    expect(element).toBeInTheDocument();
+    const element = screen.queryByTestId("eightHoursBadge");
+    expect(element).not.toBeInTheDocument();
   });
 });
 
@@ -93,5 +123,18 @@ describe("badge for the today evening", () => {
 
     const element = screen.getByTestId("eightHoursBadge");
     expect(element).toBeInTheDocument();
+  });
+  test("should not render 'less than 6h' when hours are less than 6", () => {
+    render(<TimeBadge {...todayMore8MockedProps} />);
+
+    const element = screen.queryByTestId("sixHoursBadge");
+    expect(element).not.toBeInTheDocument();
+  });
+
+  test("should not render 'less than 8h' when hours are less than 8", () => {
+    render(<TimeBadge {...todayMore8MockedProps} />);
+
+    const element = screen.queryByTestId("eightHoursBadge");
+    expect(element).not.toBeInTheDocument();
   });
 });

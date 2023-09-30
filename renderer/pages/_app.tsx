@@ -1,12 +1,22 @@
 import React from "react";
 import type { AppProps } from "next/app";
-import "../styles/globals.css";
+import "../styles/global.css";
 import dynamic from "next/dynamic";
 import "../components/Calendar/Calendar.css";
 import "../components/ui/Tooltip/Tooltip.css";
+import Head from "next/head";
 
 function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  // return <Component {...pageProps} />;
+  const AnyComponent = Component as any; // need review this
+  return (
+    <>
+    <Head>
+      <title>UKAD Timetrecker</title>
+    </Head>
+      <AnyComponent {...pageProps} />
+    </>
+  );
 }
 
 export default dynamic(() => Promise.resolve(App), {

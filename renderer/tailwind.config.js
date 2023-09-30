@@ -1,5 +1,4 @@
-const colors = require("tailwindcss/colors");
-
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./renderer/pages/**/*.{js,ts,jsx,tsx}",
@@ -8,5 +7,5 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [],
 };

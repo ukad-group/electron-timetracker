@@ -26,7 +26,10 @@ export function getPathFromDate(date: Date, reportsFolder: string): string {
   return `${reportsFolder}/${year}/week ${week}/timereport - ${timereportDate}`;
 }
 
-export function calcDurationBetweenTimes(from: string, to: string): number {
+export function calcDurationBetweenTimes(
+  from: string,
+  to: string
+): number | null {
   if (from == undefined || to == undefined) {
     return null;
   }

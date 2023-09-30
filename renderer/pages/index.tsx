@@ -1,4 +1,3 @@
-import { ipcRenderer } from "electron";
 import { useCallback, useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
@@ -63,14 +62,14 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      const dayReport = await ipcRenderer.invoke(
+      const dayReport = await global.ipcRenderer.invoke(
         "app:read-day-report",
         reportsFolder,
         selectedDate
       );
       setSelectedDateReport(dayReport || "");
 
-      const sortedActAndDesc = await ipcRenderer.invoke(
+      const sortedActAndDesc = await global.ipcRenderer.invoke(
         "app:find-latest-projects",
         reportsFolder,
         selectedDate
@@ -78,13 +77,13 @@ export default function Home() {
       setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct || {});
       setLatestProjAndDesc(sortedActAndDesc.descriptionsSet || {});
     })();
-    ipcRenderer.send("start-file-watcher", reportsFolder, selectedDate);
-    ipcRenderer.on("file-changed", (event, data) => {
+    global.ipcRenderer.send("start-file-watcher", reportsFolder, selectedDate);
+    global.ipcRenderer.on("file-changed", (event, data) => {
       if (selectedDateReport != data) {
         setSelectedDateReport(data || "");
       }
     });
-    ipcRenderer.on("errorMes", (event, data) => {
+    global.ipcRenderer.on("errorMes", (event, data) => {
       console.log("event ", event);
       console.log("data ", data);
     });
@@ -114,7 +113,7 @@ export default function Home() {
   }, [selectedDateActivities]);
 
   const saveSerializedReport = (serializedReport: string) => {
-    ipcRenderer.invoke(
+    global.ipcRenderer.invoke(
       "app:write-day-report",
       reportsFolder,
       selectedDate,
@@ -147,6 +146,12 @@ export default function Home() {
             return oldActivity[key] === activity[key];
           })
         ) {
+          activities.forEach(
+            (act, i) => (
+              (act.id = i + 1), act.isBreak ? (act.to = "") : (act.to = act.to)
+            )
+          );
+
           return activities;
         }
 

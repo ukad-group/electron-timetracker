@@ -3,7 +3,7 @@ import { getPathFromDate, calcDurationBetweenTimes } from "./datetime";
 export type Activity = {
   acti: string;
   desc: string;
-  dur: number;
+  dur: number | null;
 };
 
 export type AllActivities = Record<string, Activity[]>;

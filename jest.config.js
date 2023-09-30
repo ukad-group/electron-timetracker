@@ -6,7 +6,7 @@ module.exports = {
   ],
   transform: {
     "\\.tsx$": "<rootDir>/node_modules/babel-jest",
-    "^.+\\.(ts)$": "ts-jest",
+    "^.+\\.(ts)$": ["ts-jest", { tsconfig: "./renderer/tsconfig.json" }], // by default ts-jest looks for tsconfig in root directory, so i need to change to ./renderer/tsconfig.json
   },
   testEnvironment: "jsdom",
 };
