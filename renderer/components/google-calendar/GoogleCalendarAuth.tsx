@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import ApiCalendar from "react-google-calendar-api";
 import Button from "../ui/Button";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
@@ -17,34 +16,19 @@ const { handleAuthClick, handleSignoutClick, listEvents, sign } =
   new ApiCalendar(config);
 
 function GoogleCalendarAuth() {
-  const [signed, setSigned] = useState(false);
-  const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
+  const { googleEvents, setGoogleEvents, isLogged, setIsLogged } =
+    useGoogleCalendarStore();
   const currentMonth = new Date().getMonth() + 1;
-
-  useEffect(() => {
-    const isSign = sign;
-    setSigned(isSign);
-    if (isSign) {
-      getEvents();
-    }
-  }, []);
 
   const signInHandler = () => {
     handleAuthClick().then(() => {
-      setSigned(true);
+      setIsLogged(true);
       getEvents();
     });
   };
 
-  // const signInHandler = () => {
-  //   signIn().then((data) => {
-  //     setSigned(true);
-  //     getEvents();
-  //   });
-  // };
-
   const signOutHandler = () => {
-    setSigned(false);
+    setIsLogged(false);
     handleSignoutClick();
   };
 
@@ -108,7 +92,8 @@ function GoogleCalendarAuth() {
 
   return (
     <div>
-      {signed ? (
+      <div id="signInButton"></div>
+      {isLogged ? (
         <>
           <Button text="Signout" callback={signOutHandler} type="button" />
           <div className="flex justify-between">
@@ -117,6 +102,9 @@ function GoogleCalendarAuth() {
             </h3>
           </div>
           <div className="callendar-container">
+            {isLogged && googleEvents.length === 0 && (
+              <p>There are no events in this month</p>
+            )}
             <ul className="callendar-list">{buildEventsList()}</ul>
           </div>
         </>
