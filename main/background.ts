@@ -326,8 +326,8 @@ ipcMain.handle(
           const activitySet = new Set<string>();
 
           parsedProjects[key].forEach((activity: Activity) => {
-            if (activity.acti) {
-              activitySet.add(activity.acti);
+            if (activity.activity) {
+              activitySet.add(activity.activity);
             }
           });
 
@@ -341,8 +341,8 @@ ipcMain.handle(
         const descriptionsSet = new Set<string>();
 
         parsedProjects[key]?.forEach((activity: Activity) => {
-          if (activity.desc) {
-            descriptionsSet.add(activity.desc);
+          if (activity.description) {
+            descriptionsSet.add(activity.description);
           }
         });
 

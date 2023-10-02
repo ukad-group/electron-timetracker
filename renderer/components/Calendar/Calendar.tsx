@@ -135,10 +135,10 @@ export function Calendar({
         const workDurationMs = activities.reduce((acc, { duration }) => acc + (duration || 0), 0);
       
         return {
-        date: reportDate,
-        week: getWeekNumber(reportDate),
-        workDurationMs: workDurationMs,
-        isValid: activities.every((report: ReportActivity) => report.isValid === true),
+          date: reportDate,
+          week: getWeekNumber(reportDate),
+          workDurationMs: workDurationMs,
+          isValid: activities.every((report: ReportActivity) => report.isValid === true),
         };
       });
       setMonthWorkHoursReports(monthWorkHours);
