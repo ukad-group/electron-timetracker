@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useEffect } from "react";
 import NavButtons from "./ui/NavButtons";
 
 type DateSelectorProps = {
@@ -19,6 +19,23 @@ export default function DateSelector({
   const descreaseDate = () => {
     setSelectedDate((date) => new Date(date.getTime() - day));
   };
+
+  const keydownHandler = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.code === "Tab") {
+      if (e.shiftKey) {
+        descreaseDate();
+      } else {
+        increaseDate();
+      }
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", keydownHandler);
+    return () => {
+      document.removeEventListener("keydown", keydownHandler);
+    };
+  }, []);
 
   return (
     <div className="flex items-center justify-between px-4 py-5 sm:px-6">
