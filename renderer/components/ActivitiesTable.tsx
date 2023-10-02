@@ -66,24 +66,20 @@ export default function ActivitiesTable({
         console.error("Clipboard write error:", error);
       });
   };
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.ctrlKey && event.key === "ArrowUp") {
-        event.preventDefault();
-        if (nonBreakActivities.length > 0) {
-          const lastActivity =
-            nonBreakActivities[nonBreakActivities.length - 1];
-          onEditActivity(lastActivity);
-        }
+  const handleKeyDown = (event) => {
+    if (event.ctrlKey && event.key === "ArrowUp") {
+      if (nonBreakActivities.length > 0) {
+        const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
+        onEditActivity(lastActivity);
       }
-    };
-
+    }
+  };
+  useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [nonBreakActivities, onEditActivity]);
+  }, []);
 
   return (
     <table className="min-w-full divide-y divide-gray-300 table-fixed">
