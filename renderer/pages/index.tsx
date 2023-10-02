@@ -135,6 +135,14 @@ export default function Home() {
         if (activities.length === activityIndex + 2 && !activityIndex) {
           return [];
         }
+        if (
+          activities[activityIndex + 1].isBreak &&
+          activities.length !== activityIndex + 2
+        ) {
+          activities = activities.filter(
+            (act) => act.id !== activities[activityIndex + 1].id
+          );
+        }
         if (activityIndex) {
           activities[activityIndex - 1].to = activities[activityIndex + 1].from;
         } else if (activities[activityIndex].isBreak) {
@@ -145,7 +153,14 @@ export default function Home() {
 
         if (activities.length === activityIndex + 2) {
           activities[activityIndex - 1].to = activities[activityIndex].from;
-
+          if (activities[activityIndex - 1].isBreak) {
+            return activities.filter(
+              (act) =>
+                act.id !== activities[activityIndex].id &&
+                act.id !== activities[activityIndex + 1].id &&
+                act.id !== activities[activityIndex - 1].id
+            );
+          }
           return activities.filter(
             (act) =>
               act.id !== activities[activityIndex].id &&
