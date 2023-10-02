@@ -265,6 +265,15 @@ export default function Home() {
     setShouldAutosave(shouldAutosave);
   };
 
+  const onDeleteActivity = (id: number) => {
+    submitActivity({
+      id: id,
+      from: "",
+      to: "",
+      duration: 0,
+      project: "delete",
+    });
+  };
   return (
     <div className="min-h-full">
       <Header />
