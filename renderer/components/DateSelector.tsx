@@ -44,7 +44,7 @@ export default function DateSelector({
         </p>
       </div>
       <div className="flex gap-4">
-        {selectedDate.getDay() !== new Date().getDay() && (
+        {selectedDate.toDateString() !== new Date().toDateString() && (
           <Button
             text="Go to current day"
             callback={todayButtonHandle}
