@@ -61,31 +61,36 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    (async () => {
-      const dayReport = await global.ipcRenderer.invoke(
-        "app:read-day-report",
-        reportsFolder,
-        selectedDate
-      );
-      setSelectedDateReport(dayReport || "");
+    try {
+      (async () => {
+        const dayReport = await global.ipcRenderer.invoke(
+          "app:read-day-report",
+          reportsFolder,
+          selectedDate
+        );
+        setSelectedDateReport(dayReport || "");
 
-      const sortedActAndDesc = await global.ipcRenderer.invoke(
-        "app:find-latest-projects",
-        reportsFolder,
-        selectedDate
+        const sortedActAndDesc = await global.ipcRenderer.invoke(
+          "app:find-latest-projects",
+          reportsFolder,
+          selectedDate
+        );
+        setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct || {});
+        setLatestProjAndDesc(sortedActAndDesc.descriptionsSet || {});
+      })();
+    } catch (err) {
+      global.ipcRenderer.send(
+        "front error",
+        "Reports reading error",
+        "An error occurred while reading reports. ",
+        err
       );
-      setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct || {});
-      setLatestProjAndDesc(sortedActAndDesc.descriptionsSet || {});
-    })();
+    }
     global.ipcRenderer.send("start-file-watcher", reportsFolder, selectedDate);
     global.ipcRenderer.on("file-changed", (event, data) => {
       if (selectedDateReport != data) {
         setSelectedDateReport(data || "");
       }
-    });
-    global.ipcRenderer.on("errorMes", (event, data) => {
-      console.log("event ", event);
-      console.log("data ", data);
     });
   }, [selectedDate, reportsFolder]);
 
@@ -101,14 +106,23 @@ export default function Home() {
 
   // Save report on change
   useEffect(() => {
-    if (shouldAutosave) {
-      const serializedReport =
-        serializeReport(selectedDateActivities) +
-        (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined")
-          ? ""
-          : reportAndNotes[1]);
-      saveSerializedReport(serializedReport);
-      setShouldAutosave(false);
+    try {
+      if (shouldAutosave) {
+        const serializedReport =
+          serializeReport(selectedDateActivities) +
+          (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined")
+            ? ""
+            : reportAndNotes[1]);
+        saveSerializedReport(serializedReport);
+        setShouldAutosave(false);
+      }
+    } catch (err) {
+      global.ipcRenderer.send(
+        "front error",
+        "Reports saving error",
+        "An error occurred while saving reports. ",
+        err
+      );
     }
   }, [selectedDateActivities]);
 
@@ -184,26 +198,42 @@ export default function Home() {
 
     if (activityIndex >= 0) {
       setSelectedDateActivities((activities) => {
-        const oldActivity = activities[activityIndex];
+        try {
+          const oldActivity = activities[activityIndex];
 
-        if (
-          Object.keys(activity).every((key) => {
-            return oldActivity[key] === activity[key];
-          })
-        ) {
-          return activities;
+          if (
+            Object.keys(activity).every((key) => {
+              return oldActivity[key] === activity[key];
+            })
+          ) {
+            activities.forEach(
+              (act, i) => (
+                (act.id = i + 1),
+                act.isBreak ? (act.to = "") : (act.to = act.to)
+              )
+            );
+            return activities;
+          }
+
+          activities[activityIndex] = activity;
+          if (activities[activityIndex + 1].isBreak) {
+            activities.splice(activityIndex + 1, 1);
+          } else if (
+            newActTo > stringToMinutes(activities[activityIndex + 1].from)
+          ) {
+            activities[activityIndex + 1].from = activities[activityIndex].to;
+          }
+
+          return [...activities];
+        } catch (err) {
+          global.ipcRenderer.send(
+            "front error",
+            "Activity editing error",
+            "An error occurred while editing reports. ",
+            err
+          );
+          return [...activities];
         }
-
-        activities[activityIndex] = activity;
-        if (activities[activityIndex + 1].isBreak) {
-          activities.splice(activityIndex + 1, 1);
-        } else if (
-          newActTo > stringToMinutes(activities[activityIndex + 1].from)
-        ) {
-          activities[activityIndex + 1].from = activities[activityIndex].to;
-        }
-
-        return [...activities];
       });
       isEdit = true;
     }
@@ -214,22 +244,31 @@ export default function Home() {
     }
 
     for (let i = 0; i < selectedDateActivities.length; i++) {
-      const indexActFrom = stringToMinutes(selectedDateActivities[i].from);
+      try {
+        const indexActFrom = stringToMinutes(selectedDateActivities[i].from);
 
-      if (newActFrom < indexActFrom && !isPastTime) {
-        tempActivities.push(activity);
-        isPastTime = true;
+        if (newActFrom < indexActFrom && !isPastTime) {
+          tempActivities.push(activity);
+          isPastTime = true;
+        }
+        if (!i && newActFrom < indexActFrom) {
+          tempActivities.push(...selectedDateActivities);
+          break;
+        }
+        if (newActFrom === indexActFrom) {
+          tempActivities.push(activity);
+          isPastTime = true;
+          continue;
+        }
+      } catch (err) {
+        global.ipcRenderer.send(
+          "front error",
+          "Adding activity error",
+          "An error occurred when adding a new activity to the report. ",
+          err
+        );
+        console.log(activity);
       }
-      if (!i && newActFrom < indexActFrom) {
-        tempActivities.push(...selectedDateActivities);
-        break;
-      }
-      if (newActFrom === indexActFrom) {
-        tempActivities.push(activity);
-        isPastTime = true;
-        continue;
-      }
-
       tempActivities.push(selectedDateActivities[i]);
     }
 
@@ -239,12 +278,22 @@ export default function Home() {
       )
     );
 
-    if (tempActivities.length === selectedDateActivities.length) {
-      !isPastTime && tempActivities.push(activity);
-      setSelectedDateActivities(tempActivities.filter((act) => act.duration));
-    }
-    if (isPastTime) {
-      setSelectedDateActivities(tempActivities);
+    try {
+      if (tempActivities.length === selectedDateActivities.length && !isEdit) {
+        !isPastTime && tempActivities.push(activity);
+        setSelectedDateActivities(tempActivities.filter((act) => act.duration));
+      }
+      if (isPastTime && !isEdit) {
+        setSelectedDateActivities(tempActivities);
+      }
+    } catch (err) {
+      global.ipcRenderer.send(
+        "front error",
+        "Adding activity error",
+        "An error occurred when adding a new activity to the report. ",
+        err
+      );
+      console.log(activity);
     }
 
     setShouldAutosave(true);
@@ -265,15 +314,6 @@ export default function Home() {
     setShouldAutosave(shouldAutosave);
   };
 
-  const onDeleteActivity = (id: number) => {
-    submitActivity({
-      id: id,
-      from: "",
-      to: "",
-      duration: 0,
-      project: "delete",
-    });
-  };
   return (
     <div className="min-h-full">
       <Header />

@@ -18,6 +18,7 @@ import {
 } from "../../utils/reports";
 import NavButtons from "../ui/NavButtons";
 import Button from "../ui/Button";
+import { ErrorPlaceholder, RenderError } from "../ui/ErrorPlaceholder";
 import {
   getMonthWorkHours,
   getWeekNumber,
@@ -72,6 +73,10 @@ export function Calendar({
   const calendarRef = useRef(null);
   const currentReadableMonth = months[calendarDate.getMonth()];
   const currentYear = calendarDate.getFullYear();
+  const [renderError, setRenderError] = useState<RenderError>({
+    errorTitle: "",
+    errorMessage: "",
+  });
 
   const monthTotalHours = useMemo(() => {
     return formatDuration(
@@ -80,22 +85,7 @@ export function Calendar({
   }, [monthWorkHoursReports, calendarDate]);
 
   useEffect(() => {
-    (async () => {
-      setMonthReportsFromServer(
-        await global.ipcRenderer.invoke(
-          "app:find-month-projects",
-          reportsFolder,
-          calendarDate
-        )
-      );
-    })();
-
-    global.ipcRenderer.send(
-      "start-folder-watcher",
-      reportsFolder,
-      calendarDate
-    );
-    global.ipcRenderer.on("any-file-changed", (event, data) => {
+    try {
       (async () => {
         setMonthReportsFromServer(
           await global.ipcRenderer.invoke(
@@ -105,34 +95,59 @@ export function Calendar({
           )
         );
       })();
-    });
+      global.ipcRenderer.send(
+        "start-folder-watcher",
+        reportsFolder,
+        calendarDate
+      );
+      global.ipcRenderer.on("any-file-changed", (event, data) => {
+        (async () => {
+          setMonthReportsFromServer(
+            await global.ipcRenderer.invoke(
+              "app:find-month-projects",
+              reportsFolder,
+              calendarDate
+            )
+          );
+        })();
+      });
 
-    return () => {
-      global.ipcRenderer.removeAllListeners("any-file-changed");
-    };
+      return () => {
+        global.ipcRenderer.removeAllListeners("any-file-changed");
+      };
+    } catch (err) {
+      console.log("Error details ", err);
+      setRenderError({
+        errorTitle: "Calendar error",
+        errorMessage:
+          "An error occurred when validating reports for the last month. ",
+      });
+    }
   }, [calendarDate, reportsFolder]);
 
   // prettier-ignore
-  useEffect(() => {
-    const monthWorkHours = monthReportsFromServer.map((report) => {
-      const { reportDate, data } = report;
-      const activities: ReportActivity[] = validation((parseReport(data)[0] || []).filter(
-        (activity: ReportActivity) => !activity.isBreak
-      ));
-      const workDurationMs = activities.reduce((acc, { duration }) => acc + (duration || 0), 0);
-     
-      if(workDurationMs){
-        return {
-        date: reportDate,
-        week: getWeekNumber(reportDate),
-        workDurationMs: workDurationMs,
-        isValid: activities.every((report: ReportActivity) => report.isValid === true),
-        };
-      }
-      return undefined;
-     }).filter((report)=>report!==undefined);
+  useEffect(() => { 
+    try{
+      const monthWorkHours = monthReportsFromServer.map((report) => {
+        const { reportDate, data } = report;
+        const activities: ReportActivity[] = validation((parseReport(data)[0] || []).filter(
+          (activity: ReportActivity) => !activity.isBreak
+        ));
+        const workDurationMs = activities.reduce((acc, { duration }) => acc + (duration || 0), 0);
 
-    setMonthWorkHoursReports(monthWorkHours);
+        return {
+          date: reportDate,
+          week: getWeekNumber(reportDate),
+          workDurationMs: workDurationMs,
+          isValid: activities.every((report: ReportActivity) => report.isValid === true),
+        };
+      });
+      setMonthWorkHoursReports(monthWorkHours);
+    } catch (err) {
+      console.log("Error details ", err)
+      setRenderError({errorTitle:"Calendar error", errorMessage:"An error occurred when validating reports for the last month. "})
+
+}
   }, [monthReportsFromServer]);
 
   const getCalendarApi = () => calendarRef.current.getApi();
@@ -182,6 +197,10 @@ export function Calendar({
       </div>
     );
   };
+
+  if (renderError.errorMessage && renderError.errorTitle) {
+    return <ErrorPlaceholder {...renderError} />;
+  }
 
   return (
     <div className="wrapper bg-white p-4 rounded-lg shadow">
