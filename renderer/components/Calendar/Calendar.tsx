@@ -121,13 +121,16 @@ export function Calendar({
       ));
       const workDurationMs = activities.reduce((acc, { duration }) => acc + (duration || 0), 0);
      
-      return {
-       date: reportDate,
-       week: getWeekNumber(reportDate),
-       workDurationMs: workDurationMs,
-       isValid: activities.every((report: ReportActivity) => report.isValid === true),
-      };
-     });
+      if(workDurationMs){
+        return {
+        date: reportDate,
+        week: getWeekNumber(reportDate),
+        workDurationMs: workDurationMs,
+        isValid: activities.every((report: ReportActivity) => report.isValid === true),
+        };
+      }
+      return undefined;
+     }).filter((report)=>report!==undefined);
 
     setMonthWorkHoursReports(monthWorkHours);
   }, [monthReportsFromServer]);
@@ -184,7 +187,7 @@ export function Calendar({
     <div className="wrapper bg-white p-4 rounded-lg shadow">
       <div className="calendar-header h-10 flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold">{`${currentReadableMonth} ${currentYear}`}</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{`${currentReadableMonth} ${currentYear}`}</h3>
           <p className="text-xs text-gray-500">Total: {monthTotalHours}</p>
         </div>
         <div className="flex gap-4">
@@ -220,14 +223,16 @@ export function Calendar({
 }
 
 function renderEventContent(eventInfo) {
-  return (
-    <>
-      <p>
-        Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}
-      </p>
-      {eventInfo.event.extendedProps.isValid === false && (
-        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-[290%] left-[60%]" />
-      )}
-    </>
-  );
+  if (eventInfo.event.extendedProps.workDurationMs) {
+    return (
+      <>
+        {eventInfo.event.extendedProps.isValid === false && (
+          <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[290%]" />
+        )}
+        <p>
+          Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}
+        </p>
+      </>
+    );
+  }
 }

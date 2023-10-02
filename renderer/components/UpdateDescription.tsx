@@ -96,7 +96,7 @@ export default function UpdateDescription() {
           </div>
         </div>
       </div>
-      <h2 className="font-bold">
+      <h2 className="font-bold text-gray-700">
         In {release?.version ? release?.version : currentVersion} version
       </h2>
       {update?.description ? (
