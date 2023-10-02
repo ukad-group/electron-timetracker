@@ -90,10 +90,12 @@ const generateTray = () => {
     },
   ]);
 
-  const trayIconPath = path.join(
-    __dirname,
-    "../renderer/out/images/clock-16.png"
-  );
+  let trayIconPath = null;
+  if (isDev) {
+    trayIconPath = path.join(__dirname, "/images/clock-16.png");
+  } else {
+    trayIconPath = "../renderer/public/images/clock-16.png";
+  }
 
   tray = new Tray(trayIconPath);
   tray.setContextMenu(contextMenu);
@@ -237,6 +239,7 @@ ipcMain.handle("app:select-folder", async () => {
 type Callback = (data: string | null) => void;
 const readDataFromFile = (timereportPath: string, callback: Callback) => {
   if (!fs.existsSync(timereportPath)) return callback(null);
+  mainWindow?.webContents.send("file exist", true);
   try {
     const data = fs.readFileSync(timereportPath, "utf8");
     callback(data);
@@ -245,7 +248,32 @@ const readDataFromFile = (timereportPath: string, callback: Callback) => {
     callback(null);
   }
 };
+const deleteFile = (filePath: string): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    fs.unlink(filePath, (error) => {
+      if (error) {
+        console.error("Error deleting file:", error);
+        reject(error);
+      } else {
+        console.log("File deleted successfully:", filePath);
+        resolve();
+      }
+    });
+  });
+};
 
+ipcMain.handle(
+  "app:delete-file",
+  async (event, reportsFolder: string, date: Date) => {
+    const timereportPath = getPathFromDate(date, reportsFolder);
+    try {
+      await deleteFile(timereportPath);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+);
 ipcMain.handle(
   "app:read-day-report",
   (event, reportsFolder: string, date: Date) => {
