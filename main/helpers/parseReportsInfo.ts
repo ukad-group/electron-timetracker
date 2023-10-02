@@ -68,21 +68,21 @@ export function parseReportsInfo(
           ];
           continue;
         }
-        const newctivity: Activity = {
+        const newActivity: Activity = {
           activity: "",
           description: "",
           duration: to ? calcDurationBetweenTimes(from, to) : 0,
         };
         if (parts.length === 3) {
-          newctivity.description = activity;
+          newActivity.description = activity;
         }
 
         if (parts.length === 4) {
-          newctivity.activity = activity;
-          newctivity.description = description;
+          newActivity.activity = activity;
+          newActivity.description = description;
         }
 
-        parsedProjects[project].push(newctivity);
+        parsedProjects[project].push(newActivity);
       }
     } catch (e) {
       continue;
