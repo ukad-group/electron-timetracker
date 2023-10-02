@@ -87,6 +87,11 @@ export default function Home() {
       console.log("event ", event);
       console.log("data ", data);
     });
+
+    return () => {
+      global.ipcRenderer.removeAllListeners("file-changed");
+      global.ipcRenderer.removeAllListeners("errorMes");
+    };
   }, [selectedDate, reportsFolder]);
 
   useEffect(() => {
