@@ -233,6 +233,14 @@ export function checkIntersection(previousTo: string, currentFrom: string) {
 
 export function validation(activities: Array<ReportActivity>) {
   for (let i = 0; i < activities.length; i++) {
+    const toHours = Number(activities[i].to.split(":")[0]);
+    const toMinutes = Number(activities[i].to.split(":")[1]);
+    const fromHours = Number(activities[i].from.split(":")[0]);
+    const fromMinutes = Number(activities[i].from.split(":")[1]);
+
+    if (toHours > 23 || fromHours > 23 || toMinutes > 59 || fromMinutes > 59) {
+      activities[i].isValid = false;
+    }
     if (i > 0 && checkIntersection(activities[i - 1].to, activities[i].from)) {
       activities[i - 1].isValid = false;
     }
