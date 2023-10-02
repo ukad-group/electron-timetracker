@@ -146,12 +146,6 @@ export default function Home() {
             return oldActivity[key] === activity[key];
           })
         ) {
-          activities.forEach(
-            (act, i) => (
-              (act.id = i + 1), act.isBreak ? (act.to = "") : (act.to = act.to)
-            )
-          );
-
           return activities;
         }
 
@@ -167,6 +161,11 @@ export default function Home() {
         return [...activities];
       });
       isEdit = true;
+    }
+
+    if (isEdit) {
+      setShouldAutosave(true);
+      return;
     }
 
     for (let i = 0; i < selectedDateActivities.length; i++) {
@@ -188,17 +187,18 @@ export default function Home() {
 
       tempActivities.push(selectedDateActivities[i]);
     }
+
     tempActivities.forEach(
       (act, i) => (
-        (act.id = i + 1), act.isBreak ? (act.to = "") : (act.to = act.to)
+        (act.id = i), act.isBreak ? (act.to = "") : (act.to = act.to)
       )
     );
 
-    if (tempActivities.length === selectedDateActivities.length && !isEdit) {
+    if (tempActivities.length === selectedDateActivities.length) {
       !isPastTime && tempActivities.push(activity);
       setSelectedDateActivities(tempActivities.filter((act) => act.duration));
     }
-    if (isPastTime && !isEdit) {
+    if (isPastTime) {
       setSelectedDateActivities(tempActivities);
     }
 
