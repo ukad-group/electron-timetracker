@@ -98,9 +98,12 @@ const generateTray = () => {
       },
     },
   ]);
-
-  const imagePath = path.join(__dirname, "/images/clock-16.png");
-
+  let imagePath = null;
+  if (isProd) {
+    imagePath = "../renderer/public/images/clock-16.png";
+  } else {
+    imagePath = path.join(__dirname, "/images/clock-16.png");
+  }
   tray = new Tray(imagePath);
   tray.setContextMenu(contextMenu);
 
