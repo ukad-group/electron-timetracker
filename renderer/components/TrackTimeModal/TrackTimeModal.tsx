@@ -173,12 +173,14 @@ export default function TrackTimeModal({
     setActivity("meeting");
     setDescription(summary || "");
   };
+
   const handleKey = (event) => {
     if (event.ctrlKey && event.key === "Enter") {
       event.preventDefault();
       onSave(event);
     }
   };
+
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog

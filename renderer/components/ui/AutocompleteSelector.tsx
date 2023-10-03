@@ -29,6 +29,7 @@ export default function AutocompleteSelector({
   isLastThree,
 }: AutocompleteProps) {
   const inputRef = useRef(null);
+
   const filteredList =
     selectedItem === ""
       ? availableItems?.filter((activity, i) => {
