@@ -103,6 +103,7 @@ const generateTray = () => {
   );
 
   tray = new Tray(trayIconPath);
+  tray.setToolTip("Timetracker");
   tray.setContextMenu(contextMenu);
 
   tray.on("click", () => {
