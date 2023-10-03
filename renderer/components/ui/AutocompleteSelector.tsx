@@ -68,6 +68,7 @@ export default function AutocompleteSelector({
       onSave(event);
     }
   };
+
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.startsWith(" ")) {
       e.target.value = e.target.value.trim();
@@ -173,6 +174,7 @@ export default function AutocompleteSelector({
                     >
                       {selectedItem}
                     </span>
+
                     {selected && (
                       <span
                         className={clsx(
