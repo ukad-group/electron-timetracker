@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { ReportActivity, formatDuration, validation } from "../utils/reports";
 import { checkIsToday, getCeiledTime } from "../utils/datetime-ui";
 import TimeBadge from "../components/ui/TimeBadge";
@@ -69,11 +69,20 @@ export default function ActivitiesTable({
         console.error("Clipboard write error:", error);
       });
   };
-
-  const curDate = new Date();
-  const curTime = parseInt(
-    curDate.getHours() + "" + ("0" + curDate.getMinutes()).substr(-2)
-  );
+  const handleKeyDown = (event) => {
+    if (event.ctrlKey && event.key === "ArrowUp") {
+      if (nonBreakActivities.length > 0) {
+        const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
+        onEditActivity(lastActivity);
+      }
+    }
+  };
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <table className="min-w-full divide-y divide-gray-300 table-fixed">
