@@ -40,7 +40,7 @@ autoUpdater.on("update-downloaded", (info: UpdateInfo) => {
 });
 
 ipcMain.on("install", (event) => {
-  autoUpdater.quitAndInstall(true);
+  autoUpdater.quitAndInstall(true, true);
 });
 
 ipcMain.on("front error", (event, errorTitle, errorMessage, data) => {
@@ -153,6 +153,19 @@ app.on("ready", async () => {
   let currentSelectedDate = "";
 
   if (mainWindow) {
+    app.whenReady().then(() => {
+      autoUpdater.checkForUpdates();
+      try {
+        generateTray();
+      } catch (err) {
+        console.log(err);
+        mainWindow?.webContents.send(
+          "background error",
+          "Tray error. Encountered errors while integrating the application into the system tray.",
+          err
+        );
+      }
+    });
     ipcMain.on(
       "start-file-watcher",
       (event, reportsFolder: string, selectedDate: Date) => {
@@ -227,20 +240,6 @@ app.on("ready", async () => {
     ipcMain.on("start-update-watcher", (event) => {
       mainWindow &&
         mainWindow.webContents.send("current-version", app.getVersion());
-
-      app.whenReady().then(() => {
-        autoUpdater.checkForUpdates();
-        try {
-          generateTray();
-        } catch (err) {
-          console.log(err);
-          mainWindow?.webContents.send(
-            "background error",
-            "Tray error. Encountered errors while integrating the application into the system tray.",
-            err
-          );
-        }
-      });
     });
   }
 });

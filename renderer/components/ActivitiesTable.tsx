@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { ReportActivity, formatDuration, validation } from "../utils/reports";
 import { checkIsToday, getCeiledTime } from "../utils/datetime-ui";
 import TimeBadge from "../components/ui/TimeBadge";
@@ -9,6 +9,7 @@ import {
   ArchiveBoxXMarkIcon,
 } from "@heroicons/react/24/outline";
 import Tooltip from "./ui/Tooltip/Tooltip";
+import DeleteTooltip from "./ui/DeleteTooltop";
 
 type ActivitiesTableProps = {
   activities: Array<ReportActivity>;
@@ -34,7 +35,7 @@ export default function ActivitiesTable({
       return value + (activity.duration ? activity.duration : 0);
     }, 0);
   }, [nonBreakActivities]);
-
+  const [isDeleting, setIsDeleting] = useState(false);
   const copyToClipboardHandle = (e) => {
     const cell = e.target;
     const originaValue = cell.textContent;
@@ -196,12 +197,16 @@ export default function ActivitiesTable({
               </Tooltip>
             </td>
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
+              <DeleteTooltip
+                isDeleting={isDeleting}
+                onDeleteActivity={onDeleteActivity}
+                activityId={activity.id}
+                setIsDeleting={setIsDeleting}
+              />
               <button
                 className="group py-4 px-3"
                 title="Delete"
-                onClick={() => {
-                  onDeleteActivity(activity.id);
-                }}
+                onClick={() => setIsDeleting((isDeleting) => !isDeleting)}
               >
                 <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
               </button>
