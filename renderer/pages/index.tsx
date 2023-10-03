@@ -206,12 +206,6 @@ export default function Home() {
               return oldActivity[key] === activity[key];
             })
           ) {
-            activities.forEach(
-              (act, i) => (
-                (act.id = i + 1),
-                act.isBreak ? (act.to = "") : (act.to = act.to)
-              )
-            );
             return activities;
           }
 
