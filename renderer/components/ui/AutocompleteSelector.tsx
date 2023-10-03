@@ -1,4 +1,10 @@
-import { FormEvent, Dispatch, SetStateAction, useRef } from "react";
+import {
+  FormEvent,
+  Dispatch,
+  SetStateAction,
+  useRef,
+  ChangeEvent,
+} from "react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
@@ -62,7 +68,12 @@ export default function AutocompleteSelector({
       onSave(event);
     }
   };
-
+  const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.value.startsWith(" ")) {
+      e.target.value = e.target.value.trim();
+    }
+    setSelectedItem(e.target.value);
+  };
   return (
     <Combobox
       className={className}
@@ -86,7 +97,7 @@ export default function AutocompleteSelector({
                 required && isValidationEnabled && !selectedItem,
             }
           )}
-          onChange={(event) => setSelectedItem(event.target.value)}
+          onChange={onChangeHandler}
           tabIndex={tabIndex}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center px-2 rounded-r-md focus:outline-none">
@@ -139,42 +150,44 @@ export default function AutocompleteSelector({
             ))}
           </Combobox.Options>
         ) : (
-          <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-            <Combobox.Option
-              key={1}
-              value={selectedItem}
-              className={({ active }) =>
-                clsx(
-                  "relative cursor-default select-none py-2 pl-3 pr-9",
-                  active ? "bg-blue-600 text-white" : "text-gray-900"
-                )
-              }
-            >
-              {({ active, selected }) => (
-                <>
-                  <span
-                    className={clsx(
-                      "block truncate",
-                      selected && "font-semibold"
-                    )}
-                  >
-                    {selectedItem}
-                  </span>
-
-                  {selected && (
+          filteredList &&
+          selectedItem && (
+            <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+              <Combobox.Option
+                key={1}
+                value={selectedItem}
+                className={({ active }) =>
+                  clsx(
+                    "relative cursor-default select-none py-2 pl-3 pr-9",
+                    active ? "bg-blue-600 text-white" : "text-gray-900"
+                  )
+                }
+              >
+                {({ active, selected }) => (
+                  <>
                     <span
                       className={clsx(
-                        "absolute inset-y-0 right-0 flex items-center pr-4",
-                        active ? "text-white" : "text-blue-600"
+                        "block truncate",
+                        selected && "font-semibold"
                       )}
                     >
-                      <CheckIcon className="w-5 h-5" aria-hidden="true" />
+                      {selectedItem}
                     </span>
-                  )}
-                </>
-              )}
-            </Combobox.Option>
-          </Combobox.Options>
+                    {selected && (
+                      <span
+                        className={clsx(
+                          "absolute inset-y-0 right-0 flex items-center pr-4",
+                          active ? "text-white" : "text-blue-600"
+                        )}
+                      >
+                        <CheckIcon className="w-5 h-5" aria-hidden="true" />
+                      </span>
+                    )}
+                  </>
+                )}
+              </Combobox.Option>
+            </Combobox.Options>
+          )
         )}
       </div>
     </Combobox>
