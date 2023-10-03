@@ -173,7 +173,12 @@ export default function TrackTimeModal({
     setActivity("meeting");
     setDescription(summary || "");
   };
-
+  const handleKey = (event) => {
+    if (event.ctrlKey && event.key === "Enter") {
+      event.preventDefault();
+      onSave(event);
+    }
+  };
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
@@ -241,6 +246,7 @@ export default function TrackTimeModal({
                       From
                     </label>
                     <input
+                      onKeyDown={(event: FormEvent) => handleKey(event)}
                       required
                       value={from}
                       onChange={onFromChange}
@@ -268,6 +274,7 @@ export default function TrackTimeModal({
                       To
                     </label>
                     <input
+                      onKeyDown={(event: FormEvent) => handleKey(event)}
                       required
                       value={to}
                       onChange={onToChange}
@@ -295,6 +302,7 @@ export default function TrackTimeModal({
                       Duration
                     </label>
                     <input
+                      onKeyDown={(event: FormEvent) => handleKey(event)}
                       onChange={onDurationChange}
                       onBlur={onDurationBlur}
                       onFocus={selectText}
@@ -315,6 +323,7 @@ export default function TrackTimeModal({
 
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      onSave={onSave}
                       title="Project"
                       required
                       availableItems={
@@ -329,6 +338,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      onSave={onSave}
                       title="Activity"
                       availableItems={
                         latestProjAndAct ? latestProjAndAct[project] : []
@@ -341,6 +351,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      onSave={onSave}
                       title="Description"
                       availableItems={
                         latestProjAndDesc ? latestProjAndDesc[project] : []
