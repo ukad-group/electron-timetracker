@@ -135,9 +135,16 @@ export default function ActivitiesTable({
           </th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-gray-200">
-        {nonBreakActivities.map((activity) => (
-          <tr key={activity.id}>
+      <tbody className="">
+        {nonBreakActivities.map((activity, i) => (
+          <tr
+            key={activity.id}
+            className={clsx("border-b border-gray-200", {
+              "border-dashed border-b-2 border-gray-200":
+                nonBreakActivities[i].to != nonBreakActivities[i + 1]?.from &&
+                i + 1 !== nonBreakActivities.length,
+            })}
+          >
             <td className="py-4 pl-4 pr-3 text-sm text-gray-500 whitespace-nowrap sm:pl-6 md:pl-0">
               <span
                 className={clsx({
