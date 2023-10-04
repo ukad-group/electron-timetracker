@@ -39,6 +39,7 @@ export default function UpdateDescription() {
 
   useEffect(() => {
     global.ipcRenderer.send("beta-channel", isBeta);
+    global.ipcRenderer.send("get-current-version");
 
     global.ipcRenderer.on("update-available", (event, data, info) => {
       setIsUpdate(data);

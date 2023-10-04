@@ -8,7 +8,6 @@ export default function VersionMessage() {
   const [version, setVersion] = useState("");
 
   useEffect(() => {
-    // global.ipcRenderer.send("start-update-watcher");
     global.ipcRenderer.on(
       "update-available",
       (event, data: boolean, info: UpdateInfo) => {

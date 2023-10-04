@@ -26,6 +26,11 @@ autoUpdater.on("error", (e: Error, message?: string) => {
   );
 });
 
+ipcMain.on("get-current-version", (event) => {
+  mainWindow &&
+    mainWindow.webContents.send("current-version", app.getVersion());
+});
+
 autoUpdater.on("update-available", (info: UpdateInfo) => {
   autoUpdater.downloadUpdate();
   if (mainWindow) {
@@ -237,11 +242,6 @@ app.on("ready", async () => {
         }
       }
     );
-
-    ipcMain.on("start-update-watcher", (event) => {
-      mainWindow &&
-        mainWindow.webContents.send("current-version", app.getVersion());
-    });
   }
 });
 
