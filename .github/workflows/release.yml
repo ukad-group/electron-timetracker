@@ -86,7 +86,7 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v1
         id: release
-        if: startsWith(github.ref, 'refs/tags/') && !(contains(github.ref, 'beta'))
+        if: (startsWith(github.ref, 'refs/tags/')) && (!(contains(github.ref, 'beta')))
         with:
           body: "${{ steps.tag_info.outputs.tag_message }}"
           generate_release_notes: true
@@ -99,7 +99,7 @@ jobs:
       - name: Publish pre-release
         uses: softprops/action-gh-release@v1
         id: pre_release
-        if: startsWith(github.ref, 'refs/tags/') && contains(github.ref, 'beta')
+        if: (startsWith(github.ref, 'refs/tags/')) && (contains(github.ref, 'beta'))
         with:
           body: "${{ steps.tag_info.outputs.tag_message }}"
           generate_release_notes: true
