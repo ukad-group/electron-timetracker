@@ -179,6 +179,7 @@ app.on("ready", async () => {
         try {
           currentSelectedDate = selectedDate.toDateString();
           if (fs.existsSync(timereportPath)) {
+            mainWindow?.webContents.send("file exist", true);
             fs.watch(timereportPath, (eventType, filename) => {
               if (
                 eventType === "change" &&
@@ -207,30 +208,11 @@ app.on("ready", async () => {
       (event, reportsFolder: string, calendarDate: Date) => {
         try {
           if (fs.existsSync(reportsFolder)) {
-            fs.watch(
-              reportsFolder,
-              { recursive: true },
-              (eventType, filename) => {
-                if (eventType === "change" && filename) {
-                  const fileDate = getDateFromFilename(filename);
-
-                  if (fileDate === null) return;
-
-                  const monthsBetweenDates = Math.abs(
-                    fileDate.getMonth() - calendarDate.getMonth()
-                  );
-
-                  if (
-                    monthsBetweenDates > 1 ||
-                    fileDate.getFullYear() !== calendarDate.getFullYear()
-                  ) {
-                    return;
-                  }
-
-                  mainWindow?.webContents.send("any-file-changed");
-                }
+            fs.watch(reportsFolder, { recursive: true }, (eventType) => {
+              if (eventType === "change") {
+                mainWindow?.webContents.send("any-file-changed");
               }
-            );
+            });
           }
         } catch (err) {
           console.log(err);
@@ -277,8 +259,6 @@ ipcMain.handle("app:select-folder", async () => {
 type Callback = (data: string | null) => void;
 const readDataFromFile = (timereportPath: string, callback: Callback) => {
   if (!fs.existsSync(timereportPath)) return callback(null);
-
-  mainWindow?.webContents.send("file exist", true);
 
   try {
     const data = fs.readFileSync(timereportPath, "utf8");
