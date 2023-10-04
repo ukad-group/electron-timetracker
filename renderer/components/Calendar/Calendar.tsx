@@ -242,16 +242,18 @@ export function Calendar({
 }
 
 function renderEventContent(eventInfo) {
-  if (eventInfo.event.extendedProps.workDurationMs) {
-    return (
-      <>
-        {eventInfo.event.extendedProps.isValid === false && (
-          <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[290%]" />
-        )}
+  return (
+    <>
+      {eventInfo.event.extendedProps.isValid === false && (
+        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[290%]" />
+      )}
+      {eventInfo.event.extendedProps.workDurationMs ? (
         <p>
           Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}
         </p>
-      </>
-    );
-  }
+      ) : (
+        <p>File is empty</p>
+      )}
+    </>
+  );
 }
