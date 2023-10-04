@@ -39,21 +39,27 @@ export default function UpdateDescription() {
 
   useEffect(() => {
     global.ipcRenderer.send("beta-channel", isBeta);
+
+    global.ipcRenderer.on("update-available", (event, data, info) => {
+      setIsUpdate(data);
+    });
+
+    global.ipcRenderer.on("downloaded", (event, data, info) => {
+      setRelease(info);
+      setIsOpen(true);
+      setUpdate({ age: "new", description: info?.releaseNotes });
+    });
+
+    global.ipcRenderer.on("current-version", (event, data) => {
+      setCurrentVersion(data);
+    });
+
+    return () => {
+      global.ipcRenderer.removeAllListeners("update-available");
+      global.ipcRenderer.removeAllListeners("downloaded");
+      global.ipcRenderer.removeAllListeners("current-version");
+    };
   }, [isBeta]);
-
-  global.ipcRenderer.on("update-available", (event, data, info) => {
-    setIsUpdate(data);
-  });
-
-  global.ipcRenderer.on("downloaded", (event, data, info) => {
-    setRelease(info);
-    setIsOpen(true);
-    setUpdate({ age: "new", description: info?.releaseNotes });
-  });
-
-  global.ipcRenderer.on("current-version", (event, data) => {
-    setCurrentVersion(data);
-  });
 
   const isOpenToggle = () => {
     if (isOpen) {
@@ -96,7 +102,7 @@ export default function UpdateDescription() {
           </div>
         </div>
       </div>
-      <h2 className="font-bold">
+      <h2 className="font-bold text-gray-700">
         In {release?.version ? release?.version : currentVersion} version
       </h2>
       {update?.description ? (

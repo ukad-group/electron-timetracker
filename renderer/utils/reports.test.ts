@@ -98,12 +98,6 @@ describe("parseReport function", () => {
     expect(registration).toHaveProperty("description", "dEscrIptIOn");
   });
 
-  // test('should skip the latest time line when it is only contains time "19:00" without project name', () => {
-  //     const dayReport = parsedReport('18:00 2013-05-05 - project - activity - description\n19:00');
-  //
-  //     expect(dayReport.length).toBe(2);
-  // });
-
   test('should parse the line when backslash "/" or slash "\\" are used in description', () => {
     const dayReport = parsedReport(
       "18:00 2013-05-05 - project - activity - de \\ scription /\n19:00 2013-05-05"

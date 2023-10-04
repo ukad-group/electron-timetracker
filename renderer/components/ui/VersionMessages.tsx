@@ -23,6 +23,11 @@ export default function VersionMessage() {
         setVersion(info.version);
       }
     );
+
+    return () => {
+      global.ipcRenderer.removeAllListeners("update-available");
+      global.ipcRenderer.removeAllListeners("downloaded");
+    };
   }, []);
 
   const install = () => {
