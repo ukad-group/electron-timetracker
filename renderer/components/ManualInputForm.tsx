@@ -20,7 +20,7 @@ export default function ManualInputForm({
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
-    if (e.code === "KeyS" && e.ctrlKey) {
+    if (e.code === "KeyS" && e.ctrlKey && saveBtnStatus === "enabled") {
       saveReportHandler();
     }
   };
