@@ -1,9 +1,9 @@
 import fs from "fs";
 import { getPathFromDate, calcDurationBetweenTimes } from "./datetime";
 export type Activity = {
-  acti: string;
-  desc: string;
-  dur: number | null;
+  activity: string;
+  description: string;
+  duration: number | null;
 };
 
 export type AllActivities = Record<string, Activity[]>;
@@ -40,9 +40,9 @@ export function parseReportsInfo(
         if (!parsedProjects.hasOwnProperty(project) && parts.length === 2) {
           parsedProjects[project] = [
             {
-              acti: "",
-              desc: "",
-              dur: to ? calcDurationBetweenTimes(from, to) : 0,
+              activity: "",
+              description: "",
+              duration: to ? calcDurationBetweenTimes(from, to) : 0,
             },
           ];
           continue;
@@ -51,9 +51,9 @@ export function parseReportsInfo(
         if (!parsedProjects.hasOwnProperty(project) && parts.length === 3) {
           parsedProjects[project] = [
             {
-              acti: "",
-              desc: activity,
-              dur: to ? calcDurationBetweenTimes(from, to) : 0,
+              activity: "",
+              description: activity,
+              duration: to ? calcDurationBetweenTimes(from, to) : 0,
             },
           ];
           continue;
@@ -61,28 +61,28 @@ export function parseReportsInfo(
         if (!parsedProjects.hasOwnProperty(project) && parts.length === 4) {
           parsedProjects[project] = [
             {
-              acti: activity,
-              desc: description,
-              dur: to ? calcDurationBetweenTimes(from, to) : 0,
+              activity: activity,
+              description: description,
+              duration: to ? calcDurationBetweenTimes(from, to) : 0,
             },
           ];
           continue;
         }
-        const newctivity: Activity = {
-          acti: "",
-          desc: "",
-          dur: to ? calcDurationBetweenTimes(from, to) : 0,
+        const newActivity: Activity = {
+          activity: "",
+          description: "",
+          duration: to ? calcDurationBetweenTimes(from, to) : 0,
         };
         if (parts.length === 3) {
-          newctivity.desc = activity;
+          newActivity.description = activity;
         }
 
         if (parts.length === 4) {
-          newctivity.acti = activity;
-          newctivity.desc = description;
+          newActivity.activity = activity;
+          newActivity.description = description;
         }
 
-        parsedProjects[project].push(newctivity);
+        parsedProjects[project].push(newActivity);
       }
     } catch (e) {
       continue;

@@ -16,8 +16,7 @@ export default function TimeBadge({
   const curTime = curDate.getHours() * 60 + curDate.getMinutes();
 
   if (
-    (hours < 6 &&
-      selectedDate.toLocaleDateString() !== curDate.toLocaleDateString()) ||
+    (hours < 6 && selectedDate.toDateString() !== curDate.toDateString()) ||
     (hours < 6 && curTime - stringToMinutes(startTime) > 360)
   ) {
     return (

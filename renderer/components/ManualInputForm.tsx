@@ -1,5 +1,6 @@
 import { SetStateAction, useEffect, useState } from "react";
 import Button from "./ui/Button";
+import DeleteMessage from "./ui/DeleteMessage";
 
 type ManualInputFormProps = {
   selectedDateReport: string;
@@ -7,11 +8,13 @@ type ManualInputFormProps = {
     selectedDateReport: SetStateAction<string>,
     shouldAutosave: SetStateAction<boolean>
   ) => void;
+  selectedDate: Date;
 };
 
 export default function ManualInputForm({
   selectedDateReport,
   onSave,
+  selectedDate,
 }: ManualInputFormProps) {
   const [report, setReport] = useState("");
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
@@ -50,7 +53,7 @@ export default function ManualInputForm({
       setSaveBtnStatus("enabled");
     }
 
-    if (!report) {
+    if (!report || selectedDateReport === report) {
       setSaveBtnStatus("disabled");
     }
 
@@ -71,6 +74,10 @@ export default function ManualInputForm({
         spellCheck={false}
       />
       <div className="flex flex-col mt-6 justify-stretch">
+        <DeleteMessage
+          selectedDateReport={selectedDateReport}
+          selectedDate={selectedDate}
+        />
         <Button
           text="Save"
           callback={saveReportHandler}

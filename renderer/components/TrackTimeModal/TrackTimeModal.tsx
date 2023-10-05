@@ -14,6 +14,7 @@ import { checkIsToday } from "../../utils/datetime-ui";
 import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
 import GoogleCalendarAddEventBtn from "../google-calendar/GoogleCalendarAddEventBtn";
+import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -46,6 +47,7 @@ export default function TrackTimeModal({
   const [description, setDescription] = useState("");
   const [isTypingFromDuration, setIsTypingFromDuration] = useState(false);
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
+  const { isLogged } = useGoogleCalendarStore();
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -91,10 +93,10 @@ export default function TrackTimeModal({
       .padStart(2, "0");
     const isToday = checkIsToday(selectedDate);
 
-    if (activities.length && activities[activities.length - 1].to) {
-      setFrom(activities[activities.length - 1].to);
-    } else if (activities.length && !activities[activities.length - 1].to) {
-      setFrom(activities[activities.length - 1].from);
+    if (activities?.length && activities[activities?.length - 1].to) {
+      setFrom(activities[activities?.length - 1].to);
+    } else if (activities.length && !activities[activities?.length - 1].to) {
+      setFrom(activities[activities?.length - 1].from);
     } else {
       setFrom(`${hours}:${floorMinutes}`);
     }
@@ -174,6 +176,13 @@ export default function TrackTimeModal({
     setDescription(summary || "");
   };
 
+  const handleKey = (event) => {
+    if (event.ctrlKey && event.key === "Enter") {
+      event.preventDefault();
+      onSave(event);
+    }
+  };
+
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
@@ -241,6 +250,7 @@ export default function TrackTimeModal({
                       From
                     </label>
                     <input
+                      onKeyDown={(event: FormEvent) => handleKey(event)}
                       required
                       value={from}
                       onChange={onFromChange}
@@ -268,6 +278,7 @@ export default function TrackTimeModal({
                       To
                     </label>
                     <input
+                      onKeyDown={(event: FormEvent) => handleKey(event)}
                       required
                       value={to}
                       onChange={onToChange}
@@ -295,6 +306,7 @@ export default function TrackTimeModal({
                       Duration
                     </label>
                     <input
+                      onKeyDown={(event: FormEvent) => handleKey(event)}
                       onChange={onDurationChange}
                       onBlur={onDurationBlur}
                       onFocus={selectText}
@@ -315,6 +327,7 @@ export default function TrackTimeModal({
 
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      onSave={onSave}
                       title="Project"
                       required
                       availableItems={
@@ -329,6 +342,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      onSave={onSave}
                       title="Activity"
                       availableItems={
                         latestProjAndAct ? latestProjAndAct[project] : []
@@ -341,6 +355,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      onSave={onSave}
                       title="Description"
                       availableItems={
                         latestProjAndDesc ? latestProjAndDesc[project] : []
@@ -356,7 +371,7 @@ export default function TrackTimeModal({
               <div className="mt-6">
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
-                    {checkIsToday(selectedDate) && (
+                    {checkIsToday(selectedDate) && isLogged && (
                       <GoogleCalendarAddEventBtn addEvent={addEventToList} />
                     )}
                   </div>

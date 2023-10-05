@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import NavButtons from "./ui/NavButtons";
+import Button from "../components/ui/Button";
 
 type DateSelectorProps = {
   selectedDate: Date;
@@ -16,10 +17,14 @@ export default function DateSelector({
   const increaseDate = () => {
     setSelectedDate((date) => new Date(date.getTime() + day));
   };
+
   const descreaseDate = () => {
     setSelectedDate((date) => new Date(date.getTime() - day));
   };
 
+  const todayButtonHandle = () => {
+    setSelectedDate(new Date());
+  };
   return (
     <div className="flex items-center justify-between px-4 py-5 sm:px-6">
       <div>
@@ -40,7 +45,16 @@ export default function DateSelector({
           {selectedDate?.toLocaleDateString("en-US", { weekday: "long" })}
         </p>
       </div>
-      <NavButtons prevCallback={descreaseDate} nextCallback={increaseDate} />
+      <div className="flex gap-4">
+        {selectedDate.toDateString() !== new Date().toDateString() && (
+          <Button
+            text="Go to current day"
+            callback={todayButtonHandle}
+            type={"button"}
+          />
+        )}
+        <NavButtons prevCallback={descreaseDate} nextCallback={increaseDate} />
+      </div>
     </div>
   );
 }
