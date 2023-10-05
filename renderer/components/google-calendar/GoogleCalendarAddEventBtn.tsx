@@ -4,13 +4,19 @@ import React, { Fragment } from "react";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 
 export default function GoogleCalendarAddEventBtn({ addEvent }) {
-  const { googleEvents } = useGoogleCalendarStore();
+  const { googleEvents, isLogged } = useGoogleCalendarStore();
 
   const generateMenuEvents = () => {
-    const events = getTodayEvents();
-    if (events.length > 0) {
-      return events.map((event) => {
-        const { id, from, to, summary } = event;
+    if (googleEvents.length > 0) {
+      return googleEvents.map((event) => {
+        const { start, end, id, summary } = event;
+        const from: { date: string; time: string } = setDateTimeObj(
+          start.dateTime
+        );
+        const to: { date: string; time: string } = setDateTimeObj(end.dateTime);
+        event.from = from;
+        event.to = to;
+
         return (
           <div className="" key={id}>
             <Menu.Item>
@@ -41,10 +47,17 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
       });
     }
 
+    if (isLogged && googleEvents.length === 0) {
+      return (
+        <div className="text-gray-500 text-xs p-2 text-center">
+          You don't have events for today
+        </div>
+      );
+    }
+
     return (
       <div className="text-gray-500 text-xs p-2 text-center">
-        Connect to Google Calendar to get Events or you don't have events for
-        today
+        Connect to Google Calendar to get Events
       </div>
     );
   };
@@ -66,28 +79,8 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
     );
   };
 
-  const getTodayEvents = (): any[] => {
-    if (googleEvents && googleEvents.length > 0) {
-      return googleEvents.filter((event) => {
-        const { start, end } = event;
-        const from: { date: string; time: string } = setDateTimeObj(
-          start.dateTime
-        );
-        const to: { date: string; time: string } = setDateTimeObj(end.dateTime);
-        const currDate: string = new Date().toLocaleDateString();
-        event.from = from;
-        event.to = to;
-
-        return from.date === currDate;
-      });
-    }
-
-    return [];
-  };
-
   const addActiveEvent = () => {
-    const events = getTodayEvents();
-    const activeEvent = events.find((event) => {
+    const activeEvent = googleEvents.find((event) => {
       const { start, end } = event;
       const intFrom = getTimeAsInt(start.dateTime);
       const intTo = getTimeAsInt(end.dateTime);
@@ -100,7 +93,7 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
       return;
     }
 
-    const prevEvents: any[] = events.filter((event) => {
+    const prevEvents: any[] = googleEvents.filter((event) => {
       const { end } = event;
       const intTo: number = getTimeAsInt(end.dateTime);
       const intNow: number = getTimeAsInt();
@@ -125,7 +118,7 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
               className="px-4 py-2 text-sm font-medium text-white border-r-2"
               onClick={addActiveEvent}
             >
-              Add Event
+              Add active event
             </button>
             <Menu.Button className="p-2 text-sm font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
               <ChevronDownIcon

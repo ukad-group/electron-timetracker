@@ -12,13 +12,14 @@ const config = {
   ],
 };
 
-const { handleAuthClick, handleSignoutClick, listEvents, sign } =
-  new ApiCalendar(config);
+const { handleAuthClick, handleSignoutClick, listEvents } = new ApiCalendar(
+  config
+);
 
 function GoogleCalendarAuth() {
   const { googleEvents, setGoogleEvents, isLogged, setIsLogged } =
     useGoogleCalendarStore();
-  const currentMonth = new Date().getMonth() + 1;
+  const currentDate = new Date().toLocaleDateString();
 
   const signInHandler = () => {
     handleAuthClick().then(() => {
@@ -43,7 +44,12 @@ function GoogleCalendarAuth() {
 
   const getEvents = () => {
     getEventsList().then((items) => {
-      setGoogleEvents(items);
+      const todayEvents = items.filter(
+        (item) =>
+          currentDate === new Date(item.start.dateTime).toLocaleDateString()
+      );
+
+      setGoogleEvents(todayEvents);
     });
   };
 
@@ -52,31 +58,28 @@ function GoogleCalendarAuth() {
       const { id, start, end, summary, htmlLink } = event;
       const from = setDateTimeObj(start.dateTime);
       const to = setDateTimeObj(end.dateTime);
-      const month = parseInt(from.date.split(".")[1]);
 
-      if (currentMonth === month) {
-        return (
-          <li
-            id={id}
-            key={id}
-            className="text-m font-medium text-gray-900 px-4 py-2 flex justify-between border items-stretch"
+      return (
+        <li
+          id={id}
+          key={id}
+          className="text-m font-medium text-gray-900 px-4 py-2 flex justify-between border items-stretch"
+        >
+          <div className="w-full justify-start">
+            {summary}
+            <span className="block text-sm text-gray-500">
+              {from.date} {from.time} - {to.time}
+            </span>
+          </div>
+          <a
+            href={htmlLink}
+            target="_blank"
+            className="flex w-full justify-end align-middle text-sm text-gray-500 pl-10"
           >
-            <div className="w-full justify-start">
-              {summary}
-              <span className="block text-sm text-gray-500">
-                {from.date} {from.time} - {to.time}
-              </span>
-            </div>
-            <a
-              href={htmlLink}
-              target="_blank"
-              className="flex w-full justify-end align-middle text-sm text-gray-500 pl-10"
-            >
-              Go to event
-            </a>
-          </li>
-        );
-      }
+            Go to event
+          </a>
+        </li>
+      );
     });
   };
 
@@ -95,17 +98,22 @@ function GoogleCalendarAuth() {
       <div id="signInButton"></div>
       {isLogged ? (
         <>
-          <Button text="Signout" callback={signOutHandler} type="button" />
+          <Button
+            text="Signout from google"
+            callback={signOutHandler}
+            type="button"
+          />
           <div className="flex justify-between">
             <h3 className="text-lg font-semibold py-4">
-              Current month google events
+              List of google events for today
             </h3>
           </div>
           <div className="callendar-container">
-            {isLogged && googleEvents.length === 0 && (
-              <p>There are no events in this month</p>
+            {googleEvents.length === 0 ? (
+              <p>There are no events for today</p>
+            ) : (
+              <ul className="callendar-list">{buildEventsList()}</ul>
             )}
-            <ul className="callendar-list">{buildEventsList()}</ul>
           </div>
         </>
       ) : (
