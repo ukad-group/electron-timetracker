@@ -115,12 +115,12 @@ export default function ActivitiesTable({
           >
             Description
           </th>
-          <th
+          {/* <th
             scope="col"
             className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
           >
             <span className="sr-only">Delete</span>
-          </th>
+          </th> */}
           <th
             scope="col"
             className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
@@ -202,7 +202,7 @@ export default function ActivitiesTable({
                 )}
               </Tooltip>
             </td>
-            <td className="relative text-sm font-medium text-right whitespace-nowrap">
+            {/* <td className="relative text-sm font-medium text-right whitespace-nowrap">
               <button
                 className="group py-4 px-3"
                 title="Delete"
@@ -212,7 +212,7 @@ export default function ActivitiesTable({
               >
                 <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
               </button>
-            </td>
+            </td> */}
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
               <button
                 className="group py-4 px-3"
