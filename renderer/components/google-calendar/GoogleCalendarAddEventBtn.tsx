@@ -31,7 +31,7 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
                     addEvent(event);
                   }}
                 >
-                  {summary}
+                  {summary ? summary : "No title"}
                   <span
                     className={`${
                       active ? "text-white" : "text-gray-500"

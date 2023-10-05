@@ -12,14 +12,13 @@ const config = {
   ],
 };
 
-const { handleAuthClick, handleSignoutClick, listEvents } = new ApiCalendar(
-  config
-);
+const { handleAuthClick, handleSignoutClick, listEvents, setCalendar } =
+  new ApiCalendar(config);
 
 function GoogleCalendarAuth() {
   const { googleEvents, setGoogleEvents, isLogged, setIsLogged } =
     useGoogleCalendarStore();
-  const currentDate = new Date().toLocaleDateString();
+  const currentDate = new Date();
 
   const signInHandler = () => {
     handleAuthClick().then(() => {
@@ -30,27 +29,32 @@ function GoogleCalendarAuth() {
 
   const signOutHandler = () => {
     setIsLogged(false);
+    setGoogleEvents([]);
     handleSignoutClick();
   };
 
   const getEventsList = () => {
+    const startOfDay = new Date(currentDate);
+    startOfDay.setHours(0, 0);
+
+    const endOfDay = new Date(currentDate);
+    endOfDay.setHours(23, 59);
+
     return listEvents({
       showDeleted: false,
-      orderBy: "updated",
+      singleEvents: true,
+      orderBy: "startTime",
+      timeMin: startOfDay.toISOString(),
+      timeMax: endOfDay.toISOString(),
     }).then(({ result }) => {
       return result?.items;
     });
   };
 
   const getEvents = () => {
-    getEventsList().then((items) => {
-      const todayEvents = items.filter(
-        (item) =>
-          currentDate === new Date(item.start.dateTime).toLocaleDateString()
-      );
-
-      setGoogleEvents(todayEvents);
-    });
+    getEventsList()
+      .then((items) => setGoogleEvents(items))
+      .catch((e) => console.log(e));
   };
 
   const buildEventsList = () => {
@@ -66,7 +70,7 @@ function GoogleCalendarAuth() {
           className="text-m font-medium text-gray-900 px-4 py-2 flex justify-between border items-stretch"
         >
           <div className="w-full justify-start">
-            {summary}
+            {summary ? summary : "No title"}
             <span className="block text-sm text-gray-500">
               {from.date} {from.time} - {to.time}
             </span>
@@ -95,7 +99,6 @@ function GoogleCalendarAuth() {
 
   return (
     <div>
-      <div id="signInButton"></div>
       {isLogged ? (
         <>
           <Button
