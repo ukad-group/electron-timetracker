@@ -86,10 +86,24 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v1
         id: release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: (startsWith(github.ref, 'refs/tags/')) && (!(contains(github.ref, 'beta')))
         with:
           body: "${{ steps.tag_info.outputs.tag_message }}"
           generate_release_notes: true
+          files: |
+            ./dist/*.exe
+            ./dist/*.dmg
+            ./dist/latest.yml
+            ./dist/latest-mac.yml
+
+      - name: Publish pre-release
+        uses: softprops/action-gh-release@v1
+        id: pre_release
+        if: (startsWith(github.ref, 'refs/tags/')) && (contains(github.ref, 'beta'))
+        with:
+          body: "${{ steps.tag_info.outputs.tag_message }}"
+          generate_release_notes: true
+          prerelease: true
           files: |
             ./dist/*.exe
             ./dist/*.dmg
