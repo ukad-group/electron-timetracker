@@ -24,7 +24,7 @@ const TrelloPage = () => {
   };
 
   const handleShowBoards = async () => {
-    const data = await getBoards(token, TRELLO_KEY);
+    const data = await getBoards({ token: token, key: TRELLO_KEY });
 
     if (data) {
       setBoards(data);
@@ -32,7 +32,11 @@ const TrelloPage = () => {
   };
 
   const handleGetCardsOnBoard = async (boardId: string) => {
-    const data = await getCardsOnBoard(boardId, token, TRELLO_KEY);
+    const data = await getCardsOnBoard({
+      boardId: boardId,
+      token: token,
+      key: TRELLO_KEY,
+    });
 
     if (data) {
       setCards(data);
@@ -61,7 +65,7 @@ const TrelloPage = () => {
     return "";
   }
 
-  useEffect(() => { 
+  useEffect(() => {
     let tokenFromPath = "";
 
     if (Boolean(localStorage.getItem("trelloToken"))) {

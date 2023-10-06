@@ -4,6 +4,7 @@ import {
   SetStateAction,
   useRef,
   ChangeEvent,
+  useEffect,
 } from "react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Combobox } from "@headlessui/react";
@@ -75,6 +76,13 @@ export default function AutocompleteSelector({
     }
     setSelectedItem(e.target.value);
   };
+
+  useEffect(() => {
+    if (selectedItem.startsWith("TT:: ")) {
+      setSelectedItem((prev) => prev.slice(5));
+    }
+  }, [selectedItem]);
+
   return (
     <Combobox
       className={className}
