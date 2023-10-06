@@ -130,7 +130,7 @@ export default function TrackTimeModal({
         const trelloTasksFromAPI = (
           await getCardsOfMember({ token: trelloToken, key: TRELLO_KEY })
         ).map((card) =>
-          replaceHyphensWithSpaces(`${card.name} ${card.shortUrl}`)
+          replaceHyphensWithSpaces(`TT:: ${card.name} ${card.shortUrl}`)
         );
 
         setTrelloTasks(trelloTasksFromAPI);
