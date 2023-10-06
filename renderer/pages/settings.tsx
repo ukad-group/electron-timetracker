@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
-import { getTrelloAuthUrl } from "../API/trelloAPI";
+import { getMember, getTrelloAuthUrl } from "../API/trelloAPI";
 import FolderSelector from "../components/FolderSelector";
 import GoogleCalendarAuth from "../components/google-calendar/GoogleCalendarAuth";
 import Button from "../components/ui/Button";
@@ -30,6 +30,7 @@ function extractTokenFromString(inputString: string) {
 
 const SettingsPage = () => {
   const [token, setToken] = useState("");
+  const [trelloUsername, setTrelloUsername] = useState("");
   const router = useRouter();
   const [reportsFolder, setReportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
@@ -64,6 +65,17 @@ const SettingsPage = () => {
       const storedToken = localStorage.getItem("trelloToken") as string;
 
       setToken(storedToken);
+
+      (async () => {
+        const trelloMember = await getMember({
+          token: storedToken,
+          key: TRELLO_KEY,
+        });
+
+        if (trelloMember && trelloMember.username) {
+          setTrelloUsername(trelloMember.username);
+        }
+      })();
     }
   }, []);
 
@@ -114,13 +126,18 @@ const SettingsPage = () => {
           <div className="p-4 flex items-start justify-between gap-6 border rounded-lg shadow">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-4">
-                <span>Trello</span>
-
-                {token.length > 0 ? (
+                <span className="font-medium">Trello</span>
+                {token.length > 0 && (
                   <div className="text-green-500 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
                     Already authorized
                   </div>
-                ) : (
+                )}
+                {token.length > 0 && trelloUsername.length > 0 && (
+                  <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
+                    {trelloUsername}
+                  </div>
+                )}
+                {!token.length && (
                   <div className="text-red-500 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
                     Not authorized
                   </div>
@@ -150,12 +167,22 @@ const SettingsPage = () => {
           <div className="p-4 flex items-start justify-between gap-6 border rounded-lg shadow">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-4">
-                <span>Google</span>
-                {isLogged ? (
+                <span className="font-medium">Google</span>
+                {isLogged && (
                   <div className="text-green-500 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
                     Already authorized
                   </div>
-                ) : (
+                )}
+
+                {/* 
+                  we should get username/email from google api and use it here
+
+                {isLogged && googleUsername.length > 0 && (
+                  <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
+                    {googleUsername}
+                  </div>
+                )} */}
+                {!isLogged && (
                   <div className="text-red-500 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
                     Not authorized
                   </div>
