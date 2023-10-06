@@ -75,6 +75,7 @@ export default function AutocompleteSelector({
     }
     setSelectedItem(e.target.value);
   };
+
   return (
     <Combobox
       className={className}

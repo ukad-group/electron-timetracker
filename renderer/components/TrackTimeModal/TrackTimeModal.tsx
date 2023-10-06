@@ -15,6 +15,10 @@ import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
 import GoogleCalendarAddEventBtn from "../google-calendar/GoogleCalendarAddEventBtn";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
+import { getCardsOfMember } from "../../API/trelloAPI";
+import { replaceHyphensWithSpaces } from "../../utils/utils";
+
+const TRELLO_KEY = process.env.NEXT_PUBLIC_TRELLO_KEY;
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -47,6 +51,8 @@ export default function TrackTimeModal({
   const [description, setDescription] = useState("");
   const [isTypingFromDuration, setIsTypingFromDuration] = useState(false);
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
+  const [trelloToken, setTrelloToken] = useState("");
+  const [trelloTasks, setTrelloTasks] = useState([]);
   const { isLogged } = useGoogleCalendarStore();
 
   const duration = useMemo(() => {
@@ -72,6 +78,10 @@ export default function TrackTimeModal({
     setActivity(editedActivity.activity || "");
     setDescription(editedActivity.description || "");
   }, [editedActivity]);
+
+  useEffect(() => {
+    setTrelloToken(localStorage.getItem("trelloToken") as string);
+  }, []);
 
   useEffect(() => {
     if (editedActivity !== "new") {
@@ -113,6 +123,20 @@ export default function TrackTimeModal({
 
     setFormattedDuration(formatDuration(duration));
   }, [from, to]);
+
+  useEffect(() => {
+    if (trelloToken) {
+      (async () => {
+        const trelloTasksFromAPI = (
+          await getCardsOfMember({ token: trelloToken, key: TRELLO_KEY })
+        ).map((card) =>
+          replaceHyphensWithSpaces(`${card.name} ${card.shortUrl}`)
+        );
+
+        setTrelloTasks(trelloTasksFromAPI);
+      })();
+    }
+  }, [trelloToken]);
 
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
@@ -358,7 +382,9 @@ export default function TrackTimeModal({
                       onSave={onSave}
                       title="Description"
                       availableItems={
-                        latestProjAndDesc ? latestProjAndDesc[project] : []
+                        latestProjAndDesc[project]
+                          ? [...latestProjAndDesc[project], ...trelloTasks]
+                          : trelloTasks
                       }
                       selectedItem={description}
                       setSelectedItem={setDescription}
