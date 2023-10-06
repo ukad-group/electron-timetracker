@@ -21,13 +21,17 @@ export const getTrelloAuthUrl = ({
   return trelloAuthUrl.toString();
 };
 
+type Board = {
+  id: string;
+};
+
 export const getBoards = async ({
   token,
   key,
 }: {
   token: string;
   key: string;
-}): Promise<any[]> => {
+}): Promise<Board[]> => {
   try {
     const response = await fetch(
       `https://api.trello.com/1/members/me/boards?key=${key}&token=${token}`
@@ -45,6 +49,12 @@ export const getBoards = async ({
   }
 };
 
+type Card = {
+  id: string;
+  name: string;
+  shortUrl: string;
+};
+
 export const getCardsOnBoard = async ({
   boardId,
   token,
@@ -53,7 +63,7 @@ export const getCardsOnBoard = async ({
   boardId: string;
   token: string;
   key: string;
-}): Promise<any[]> => {
+}): Promise<Card[]> => {
   try {
     const response = await fetch(
       `https://api.trello.com/1/boards/${boardId}/cards?key=${key}&token=${token}`
@@ -71,13 +81,18 @@ export const getCardsOnBoard = async ({
   }
 };
 
-export const getMemberId = async ({
+type Member = {
+  id: string;
+  username: string;
+};
+
+export const getMember = async ({
   token,
   key,
 }: {
   token: string;
   key: string;
-}): Promise<string> => {
+}): Promise<Member> => {
   try {
     const response = await fetch(
       `https://api.trello.com/1/members/me?key=${key}&token=${token}`
@@ -88,7 +103,7 @@ export const getMemberId = async ({
     }
 
     const data = await response.json();
-    return data.id;
+    return data;
   } catch (error) {
     console.error("Error fetching member:", error);
     throw error;
@@ -101,16 +116,16 @@ export const getCardsOfMember = async ({
 }: {
   token: string;
   key: string;
-}): Promise<any[]> => {
+}): Promise<Card[]> => {
   try {
-    const memberId = await getMemberId({ token, key });
+    const member = await getMember({ token, key });
 
-    if (!memberId) {
+    if (!member && !member.id) {
       throw new Error("Failed to fetch member");
     }
 
     const response = await fetch(
-      `https://api.trello.com/1/members/${memberId}/cards?key=${key}&token=${token}`
+      `https://api.trello.com/1/members/${member.id}/cards?key=${key}&token=${token}`
     );
 
     if (!response.ok) {

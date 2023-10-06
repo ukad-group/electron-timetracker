@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
-import Header from "../components/Header";
 import {
   ReportActivity,
   parseReport,
@@ -17,6 +16,8 @@ import VersionMessage from "../components/ui/VersionMessages";
 import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
 import { Calendar } from "../components/Calendar/Calendar";
+import Link from "next/link";
+import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -319,7 +320,6 @@ export default function Home() {
 
   return (
     <div className="min-h-full">
-      <Header />
       <VersionMessage />
       <main className="py-10">
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
@@ -371,6 +371,14 @@ export default function Home() {
             />
           </section>
         </div>
+        <Link
+          href="/settings"
+          className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold"
+        >
+          <span className="w-8 flex items-center justify-center text-white ">
+            <Cog8ToothIcon />
+          </span>
+        </Link>
       </main>
       <TrackTimeModal
         activities={selectedDateActivities}
