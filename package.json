@@ -29,7 +29,7 @@
   },
   "build": {
     "appId": "com.timetracker.autoupdater",
-    "productName": "Timetracker-next",
+    "productName": "Timetracker",
     "artifactName": "${productName}-Setup-${version}.${ext}",
     "asar": true,
     "files": [
