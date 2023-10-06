@@ -22,7 +22,20 @@ export default function VersionMessage() {
         setVersion(info.version);
       }
     );
-
+    (async () => {
+      const [updateStatus, currentVersion] = await global.ipcRenderer.invoke(
+        "app:update-status"
+      );
+      setVersion(currentVersion);
+      switch (updateStatus) {
+        case "available":
+          setIsUpdate(true);
+          break;
+        case "downloaded":
+          setIsDownload(true);
+          break;
+      }
+    })();
     return () => {
       global.ipcRenderer.removeAllListeners("update-available");
       global.ipcRenderer.removeAllListeners("downloaded");

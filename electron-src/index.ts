@@ -11,12 +11,20 @@ import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { getDateFromFilename, getPathFromDate } from "./helpers/datetime";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
 
+let updateStatus: null | "available" | "downloaded" = null;
+let updateVersion = "";
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 ipcMain.on("beta-channel", (event, isBeta: boolean) => {
   autoUpdater.allowPrerelease = isBeta;
 });
-
+function updateUpdateStatus(
+  status: "available" | "downloaded",
+  version: string
+) {
+  updateStatus = status;
+  updateVersion = version;
+}
 autoUpdater.allowDowngrade = true;
 autoUpdater.on("error", (e: Error, message?: string) => {
   mainWindow?.webContents.send(
@@ -32,6 +40,7 @@ ipcMain.on("get-current-version", (event) => {
 });
 
 autoUpdater.on("update-available", (info: UpdateInfo) => {
+  updateUpdateStatus("available", info.version);
   autoUpdater.downloadUpdate();
   if (mainWindow) {
     mainWindow.webContents.send("update-available", true, info);
@@ -39,6 +48,7 @@ autoUpdater.on("update-available", (info: UpdateInfo) => {
 });
 
 autoUpdater.on("update-downloaded", (info: UpdateInfo) => {
+  updateUpdateStatus("downloaded", info.version);
   if (mainWindow) {
     mainWindow.webContents.send("downloaded", true, info);
   }
@@ -286,6 +296,10 @@ const deleteFile = (filePath: string): Promise<void> => {
     });
   });
 };
+
+ipcMain.handle("app:update-status", async (event) => {
+  return [updateStatus, updateVersion];
+});
 
 ipcMain.handle(
   "app:delete-file",
