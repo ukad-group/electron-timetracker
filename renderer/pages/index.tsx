@@ -17,7 +17,7 @@ import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
 import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
-import SettingsIcon from "../components/ui/icons/SettingsIcon";
+import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -375,8 +375,8 @@ export default function Home() {
           href="/settings"
           className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold"
         >
-          <span className="w-full flex items-center justify-center text-white ">
-            <SettingsIcon />
+          <span className="w-8 flex items-center justify-center text-white ">
+            <Cog8ToothIcon />
           </span>
         </Link>
       </main>
