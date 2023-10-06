@@ -45,11 +45,16 @@ export default function AutocompleteSelector({
           }
           return activity !== "";
         })
-      : availableItems
-          ?.filter((activity) => {
-            return activity.toLowerCase().includes(selectedItem.toLowerCase());
-          })
-          .sort();
+      : availableItems?.sort().reduce((accumulator, current) => {
+          if (current.toLowerCase() === selectedItem.toLowerCase()) {
+            accumulator.unshift(current);
+          } else if (
+            current.toLowerCase().includes((selectedItem || "").toLowerCase())
+          ) {
+            accumulator.push(current);
+          }
+          return accumulator;
+        }, []);
 
   const handleKey = (event) => {
     if (event.key === "Home") {
