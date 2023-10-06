@@ -45,7 +45,7 @@ export default function AutocompleteSelector({
           return activity !== "";
         })
       : availableItems?.sort().reduce((accumulator, current) => {
-          if (current.toLowerCase() == selectedItem.toLowerCase()) {
+          if (current.toLowerCase() === selectedItem.toLowerCase()) {
             accumulator.unshift(current);
           } else if (
             current.toLowerCase().includes((selectedItem || "").toLowerCase())
