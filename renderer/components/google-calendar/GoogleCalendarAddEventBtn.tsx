@@ -1,13 +1,64 @@
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
+import { useEffect } from "react";
+import {
+  getGoogleEvents,
+  updateGoogleCredentials,
+} from "../../API/googleCalendarAPI";
 
 export default function GoogleCalendarAddEventBtn({ addEvent }) {
-  const { googleEvents, isLogged } = useGoogleCalendarStore();
+  const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
+  const [isError, setIsError] = useState(false);
+
+  const loadGoogleEvents = async (gToken: string) => {
+    try {
+      const data = await getGoogleEvents(gToken);
+
+      // detect expired token
+      if (data?.error && data?.error?.code === 401) {
+        const refreshToken = localStorage.getItem("googleRefreshToken");
+        const updatedCredentials = await updateGoogleCredentials(refreshToken);
+        const newAccessToken = updatedCredentials?.access_token;
+        localStorage.setItem("googleAccessToken", newAccessToken);
+        loadGoogleEvents(newAccessToken);
+        return;
+      }
+
+      setGoogleEvents(data?.items);
+    } catch (error) {
+      setIsError(true);
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    const googleAccessToken = localStorage.getItem("googleAccessToken");
+
+    if (googleAccessToken) {
+      loadGoogleEvents(googleAccessToken);
+    }
+  }, []);
 
   const generateMenuEvents = () => {
-    if (googleEvents.length > 0) {
+    if (googleEvents?.length === 0 && !isError) {
+      return (
+        <p className="text-gray-500 text-xs p-2 text-center">
+          You don't have events for today
+        </p>
+      );
+    }
+
+    if (isError) {
+      return (
+        <p className="text-gray-500 text-xs p-2 text-center">
+          Something went wrong while getting your events
+        </p>
+      );
+    }
+
+    if (googleEvents?.length > 0 && !isError) {
       return googleEvents.map((event) => {
         const { start, end, id, summary } = event;
         const from: { date: string; time: string } = setDateTimeObj(
@@ -46,20 +97,6 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
         );
       });
     }
-
-    if (isLogged && googleEvents.length === 0) {
-      return (
-        <div className="text-gray-500 text-xs p-2 text-center">
-          You don't have events for today
-        </div>
-      );
-    }
-
-    return (
-      <div className="text-gray-500 text-xs p-2 text-center">
-        Connect to Google Calendar to get Events
-      </div>
-    );
   };
 
   const setDateTimeObj = (date: string): { date: string; time: string } => {

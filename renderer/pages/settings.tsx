@@ -1,4 +1,4 @@
-import { XMarkIcon } from "@heroicons/react/24/solid";
+import { CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -36,7 +36,7 @@ const SettingsPage = () => {
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );
-  const { isLogged } = useGoogleCalendarStore();
+  const { isLogged, googleUsername } = useGoogleCalendarStore();
 
   const handleSignInTrelloButton = () => {
     const trelloAuthUrl = getTrelloAuthUrl({
@@ -128,17 +128,18 @@ const SettingsPage = () => {
               <div className="flex items-center gap-4">
                 <span className="font-medium">Trello</span>
                 {token.length > 0 && (
-                  <div className="text-green-500 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
+                  <div className="text-green-700 inline-flex gap-2 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-200">
                     Already authorized
+                    <CheckIcon className="w-4 h-4 fill-green-700" />
                   </div>
                 )}
                 {token.length > 0 && trelloUsername.length > 0 && (
-                  <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
+                  <div className="inline-flex  px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
                     {trelloUsername}
                   </div>
                 )}
                 {!token.length && (
-                  <div className="text-red-500 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
+                  <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
                     Not authorized
                   </div>
                 )}
@@ -169,21 +170,19 @@ const SettingsPage = () => {
               <div className="flex items-center gap-4">
                 <span className="font-medium">Google</span>
                 {isLogged && (
-                  <div className="text-green-500 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
+                  <div className="text-green-700 inline-flex gap-2 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-200">
                     Already authorized
+                    <CheckIcon className="w-4 h-4 fill-green-700" />
                   </div>
                 )}
 
-                {/* 
-                  we should get username/email from google api and use it here
-
-                {isLogged && googleUsername.length > 0 && (
+                {isLogged && googleUsername?.length > 0 && (
                   <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
                     {googleUsername}
                   </div>
-                )} */}
+                )}
                 {!isLogged && (
-                  <div className="text-red-500 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
+                  <div className="text-yellow-600 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
                     Not authorized
                   </div>
                 )}

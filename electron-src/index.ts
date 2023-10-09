@@ -8,8 +8,10 @@ import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
 import { createWindow } from "./helpers/create-window";
 import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
-import { getDateFromFilename, getPathFromDate } from "./helpers/datetime";
+import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
+
+const PORT = 8000;
 
 let updateStatus: null | "available" | "downloaded" = null;
 let updateVersion = "";
@@ -74,7 +76,7 @@ const generateWindow = () => {
     autoHideMenuBar: true,
   });
 
-  mainWindow.loadURL("http://localhost:8000/");
+  mainWindow.loadURL(`http://localhost:${PORT}/`);
 
   if (isDev) {
     mainWindow.webContents.openDevTools();
@@ -148,8 +150,8 @@ app.on("ready", async () => {
   createServer((req: any, res: any) => {
     const parsedUrl = parse(req.url, true);
     requestHandler(req, res, parsedUrl);
-  }).listen(8000, () => {
-    console.log("> Ready on http://localhost:8000");
+  }).listen(PORT, () => {
+    console.log(`> Ready on http://localhost:${PORT}`);
   });
 
   if (!gotTheLock) {
