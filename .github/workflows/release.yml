@@ -1,7 +1,8 @@
 name: publish release
 on:
   push:
-    # branches:
+    branches:
+      - "feature/CI_CD_beta"
     #   - main
     #   - master
     tags:
@@ -79,7 +80,23 @@ jobs:
         if: runner.os == 'macOS'
         run: npm i dmg-license
 
-      - run: npm run build
+      - name: 'generate ".env.production" file'
+        shell: bash
+        # env:
+        #   NEXT_PUBLIC_TRELLO_KEY: ${{ secrets.NEXT_PUBLIC_TRELLO_KEY }}
+        #   NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+        #   NEXT_PUBLIC_GOOGLE_CLIENT_SECRET: ${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET }}
+        run: |
+          cd render
+          touch .env.production
+          cp .env.demo .env.production
+          # sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=$(NEXT_PUBLIC_TRELLO_KEY)|g' .env.production
+          sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=${{ secrets.NEXT_PUBLIC_TRELLO_KEY }}|g' .env.production
+          sed -i 's|^NEXT_PUBLIC_GOOGLE_CLIENT_ID=.*|NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}|g' .env.production
+          sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET }}|g' .env.production
+          cat .env.production
+
+      # - run: npm run build
       - run: npm run test
       - run: npm run dist
 
@@ -102,6 +119,19 @@ jobs:
         if: (startsWith(github.ref, 'refs/tags/')) && (contains(github.ref, 'beta'))
         with:
           body: "${{ steps.tag_info.outputs.tag_message }}"
+          generate_release_notes: true
+          prerelease: true
+          files: |
+            ./dist/*.exe
+            ./dist/*.dmg
+            ./dist/latest.yml
+            ./dist/latest-mac.yml
+
+      - name: Publish pre-release
+        uses: softprops/action-gh-release@v1
+        id: pre_release_test
+        with:
+          # body: "${{ steps.tag_info.outputs.tag_message }}"
           generate_release_notes: true
           prerelease: true
           files: |
