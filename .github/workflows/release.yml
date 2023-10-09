@@ -83,21 +83,23 @@ jobs:
       - name: 'generate ".env.production" file'
         shell: bash
         working-directory: ./renderer
-        # env:
-        #   NEXT_PUBLIC_TRELLO_KEY: ${{ secrets.NEXT_PUBLIC_TRELLO_KEY }}
+        env:
+          NEXT_PUBLIC_TRELLO_KEY: ${{ secrets.NEXT_PUBLIC_TRELLO_KEY }}
         #   NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
         #   NEXT_PUBLIC_GOOGLE_CLIENT_SECRET: ${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET }}
         run: |
           # cd renderer
           # touch .env.production
-          cp .env.demo .env.production
+          cp .env.demo .env
           ls -l
-          cat .env.production
+          cat .env
           sed -h
-          # sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=$(NEXT_PUBLIC_TRELLO_KEY)|g' .env.production
-          sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=${{ secrets.NEXT_PUBLIC_TRELLO_KEY }}|g' .env.production
-          sed -i 's|^NEXT_PUBLIC_GOOGLE_CLIENT_ID=.*|NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}|g' .env.production
-          sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET }}|g' .env.production
+          sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=$(NEXT_PUBLIC_TRELLO_KEY)|g' .env
+          cat .env
+          echo "========"
+          sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=${{ secrets.NEXT_PUBLIC_TRELLO_KEY }}|g' .env
+          sed -i 's|^NEXT_PUBLIC_GOOGLE_CLIENT_ID=.*|NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}|g' .env
+          sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET }}|g' .env
           cat .env.production
 
       # - run: npm run build
