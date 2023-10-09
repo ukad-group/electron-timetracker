@@ -11,7 +11,7 @@ import { useGoogleCalendarStore } from "../store/googleCalendarStore";
 import { useMainStore } from "../store/mainStore";
 
 const TRELLO_KEY = process.env.NEXT_PUBLIC_TRELLO_KEY;
-const RETURN_URL = process.env.NEXT_PUBLIC_TRELLO_REDIRECT_URI;
+const RETURN_URL = "http://localhost:8000/settings";
 
 function extractTokenFromString(inputString: string) {
   const parts = inputString.split("#");
