@@ -46,9 +46,17 @@ export default function AutocompleteSelector({
           return activity !== "";
         })
       : availableItems?.sort().reduce((accumulator, current) => {
-          if (current.toLowerCase() === selectedItem.toLowerCase()) {
+          let duplicate = false;
+          if (current.startsWith("TT:: ")) {
+            duplicate = availableItems.includes(current.slice(5));
+          }
+          if (
+            !duplicate &&
+            current.toLowerCase() === selectedItem.toLowerCase()
+          ) {
             accumulator.unshift(current);
           } else if (
+            !duplicate &&
             current.toLowerCase().includes((selectedItem || "").toLowerCase())
           ) {
             accumulator.push(current);
