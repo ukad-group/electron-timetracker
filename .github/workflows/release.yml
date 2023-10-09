@@ -131,16 +131,3 @@ jobs:
             ./dist/*.dmg
             ./dist/latest.yml
             ./dist/latest-mac.yml
-
-      - name: Publish pre-release
-        uses: softprops/action-gh-release@v1
-        id: pre_release_test
-        with:
-          # body: "${{ steps.tag_info.outputs.tag_message }}"
-          generate_release_notes: true
-          prerelease: true
-          files: |
-            ./dist/*.exe
-            ./dist/*.dmg
-            ./dist/latest.yml
-            ./dist/latest-mac.yml
