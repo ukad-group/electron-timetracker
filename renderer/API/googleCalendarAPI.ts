@@ -95,7 +95,9 @@ export const getGoogleUsername = async (googleAccessToken: string) => {
     }
   );
 
-  if (!response.ok) throw new Error();
+  if (!response.ok && response.status !== 401) {
+    throw new Error();
+  }
 
   return response.json();
 };

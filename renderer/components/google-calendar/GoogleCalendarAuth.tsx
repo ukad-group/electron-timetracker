@@ -6,6 +6,7 @@ import {
   getGoogleAuthUrl,
   getGoogleCredentials,
   getGoogleUsername,
+  updateGoogleCredentials,
 } from "../../API/googleCalendarAPI";
 
 function GoogleCalendarAuth() {
@@ -40,6 +41,17 @@ function GoogleCalendarAuth() {
   const loadGoogleUsername = async (gToken: string) => {
     try {
       const data = await getGoogleUsername(gToken);
+
+      // detect expired token
+      if (data?.error && data?.error?.code === 401) {
+        const refreshToken = localStorage.getItem("googleRefreshToken");
+        const updatedCredentials = await updateGoogleCredentials(refreshToken);
+        const newAccessToken = updatedCredentials?.access_token;
+        localStorage.setItem("googleAccessToken", newAccessToken);
+        loadGoogleUsername(newAccessToken);
+        return;
+      }
+
       const googleProfileUsername = data?.names[0]?.displayName;
       setGoogleUsername(googleProfileUsername);
     } catch (e) {
