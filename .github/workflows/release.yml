@@ -79,7 +79,29 @@ jobs:
         if: runner.os == 'macOS'
         run: npm i dmg-license
 
-      - run: npm run build
+      - name: 'generate ".env" file'
+        if: runner.os != 'macOS'
+        shell: bash
+        working-directory: ./renderer
+        run: |
+          cp .env.demo .env
+          sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=${{ secrets.NEXT_PUBLIC_TRELLO_KEY }}|g' .env
+          sed -i 's|^NEXT_PUBLIC_GOOGLE_CLIENT_ID=.*|NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}|g' .env
+          sed -i 's|^NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=.*|NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET }}|g' .env
+          cat .env
+
+      - name: 'generate ".env" file (MacOS)'
+        if: runner.os == 'macOS'
+        shell: bash
+        working-directory: ./renderer
+        run: |
+          cp .env.demo .env
+          sed -i '' 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=${{ secrets.NEXT_PUBLIC_TRELLO_KEY }}|g' .env
+          sed -i '' 's|^NEXT_PUBLIC_GOOGLE_CLIENT_ID=.*|NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}|g' .env
+          sed -i '' 's|^NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=.*|NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET }}|g' .env
+          cat .env
+
+      # - run: npm run build
       - run: npm run test
       - run: npm run dist
 
