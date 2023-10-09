@@ -12,7 +12,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        # os: [macos-latest, windows-latest]
+        os: [windows-latest]
     permissions:
       contents: write
     env:
@@ -91,9 +92,8 @@ jobs:
           # cd renderer
           # touch .env.production
           cp .env.demo .env
-          ls -l
+          ls -la
           cat .env
-          sed -h
           sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=$(NEXT_PUBLIC_TRELLO_KEY)|g' .env
           cat .env
           echo "========"
