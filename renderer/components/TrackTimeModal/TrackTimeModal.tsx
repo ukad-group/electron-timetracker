@@ -125,7 +125,7 @@ export default function TrackTimeModal({
   }, [from, to]);
 
   useEffect(() => {
-    if (trelloToken) {
+    if (trelloToken.length > 0) {
       (async () => {
         const trelloTasksFromAPI = (
           await getCardsOfMember({ token: trelloToken, key: TRELLO_KEY })

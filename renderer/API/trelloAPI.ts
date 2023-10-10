@@ -37,10 +37,6 @@ export const getBoards = async ({
       `https://api.trello.com/1/members/me/boards?key=${key}&token=${token}`
     );
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch boards");
-    }
-
     const data = await response.json();
     return data;
   } catch (error) {
@@ -69,10 +65,6 @@ export const getCardsOnBoard = async ({
       `https://api.trello.com/1/boards/${boardId}/cards?key=${key}&token=${token}`
     );
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch cards");
-    }
-
     const data = await response.json();
     return data;
   } catch (error) {
@@ -98,10 +90,6 @@ export const getMember = async ({
       `https://api.trello.com/1/members/me?key=${key}&token=${token}`
     );
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch member");
-    }
-
     const data = await response.json();
     return data;
   } catch (error) {
@@ -120,17 +108,9 @@ export const getCardsOfMember = async ({
   try {
     const member = await getMember({ token, key });
 
-    if (!member && !member.id) {
-      throw new Error("Failed to fetch member");
-    }
-
     const response = await fetch(
       `https://api.trello.com/1/members/${member.id}/cards?key=${key}&token=${token}`
     );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch cards of a member");
-    }
 
     const data = await response.json();
 
