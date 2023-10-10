@@ -196,7 +196,7 @@ export default function TrackTimeModal({
     const { from, to, summary } = event;
     setFrom(from.time || "");
     setTo(to.time || "");
-    setActivity("meeting");
+    // setActivity("meeting");
     setDescription(summary || "");
   };
 
