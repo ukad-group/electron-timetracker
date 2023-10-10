@@ -88,7 +88,7 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
                       active ? "text-white" : "text-gray-500"
                     } block text-xs`}
                   >
-                    {from.date} {from.time} - {to.time}
+                    {from.time} - {to.time}
                   </span>
                 </button>
               )}
@@ -105,6 +105,7 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
       time: new Date(date).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
+        hour12: false,
       }),
     };
   };
@@ -149,7 +150,7 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
     <div className="">
       <div className="">
         <Menu as="div" className="relative inline-block text-left">
-          <div className="inline-flex w-full justify-center rounded-md bg-black bg-opacity-20 hover:bg-opacity-30">
+          <div className="inline-flex w-full justify-center rounded-md bg-blue-600 hover:bg-blue-700">
             <button
               type="button"
               className="px-4 py-2 text-sm font-medium text-white border-r-2"
