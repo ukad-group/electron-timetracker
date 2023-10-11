@@ -80,7 +80,7 @@ export default function TrackTimeModal({
   }, [editedActivity]);
 
   useEffect(() => {
-    setTrelloToken(localStorage.getItem("trelloToken") as string);
+    setTrelloToken(localStorage.getItem("trelloToken") as string || '');
   }, []);
 
   useEffect(() => {
@@ -125,7 +125,7 @@ export default function TrackTimeModal({
   }, [from, to]);
 
   useEffect(() => {
-    if (trelloToken.length > 0) {
+    if (trelloToken?.length > 0) {
       (async () => {
         const trelloTasksFromAPI = (
           await getCardsOfMember({ token: trelloToken, key: TRELLO_KEY })
