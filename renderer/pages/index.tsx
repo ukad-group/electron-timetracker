@@ -367,17 +367,17 @@ export default function Home() {
                 </div>
                 <UpdateDescription />
               </section>
+              <section className="lg:col-span-2">
+                <Calendar
+                  reportsFolder={reportsFolder}
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                />
+              </section>
             </>
           ) : (
             <SelectFolderPlaceholder setFolder={setReportsFolder} />
           )}
-          <section className="lg:col-span-2">
-            <Calendar
-              reportsFolder={reportsFolder}
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-            />
-          </section>
         </div>
         <Link
           href="/settings"
