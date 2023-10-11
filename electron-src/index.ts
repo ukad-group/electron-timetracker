@@ -11,7 +11,7 @@ import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
 
-const PORT = 8000;
+const PORT = 51432;
 
 let updateStatus: null | "available" | "downloaded" = null;
 let updateVersion = "";

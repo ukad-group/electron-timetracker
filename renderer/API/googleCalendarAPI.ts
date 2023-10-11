@@ -1,6 +1,6 @@
 const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const clientSecret = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET;
-const redirectURI = "http://localhost:8000/settings";
+const redirectURI = "http://localhost:51432/settings";
 const scope =
   "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile";
 
