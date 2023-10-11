@@ -62,7 +62,15 @@ export default function TrackTimeModal({
   }, [from, to]);
 
   const isFormInvalid = useMemo(() => {
-    return !from || !to || !duration || duration < 0 || !project;
+    return (
+      !from ||
+      !to ||
+      !duration ||
+      duration < 0 ||
+      !project ||
+      to.length < 5 ||
+      from.length < 5
+    );
   }, [from, to, duration, project]);
 
   useEffect(() => {
@@ -80,7 +88,7 @@ export default function TrackTimeModal({
   }, [editedActivity]);
 
   useEffect(() => {
-    setTrelloToken(localStorage.getItem("trelloToken") as string || '');
+    setTrelloToken((localStorage.getItem("trelloToken") as string) || "");
   }, []);
 
   useEffect(() => {
@@ -196,7 +204,6 @@ export default function TrackTimeModal({
     const { from, to, summary } = event;
     setFrom(from.time || "");
     setTo(to.time || "");
-    // setActivity("meeting");
     setDescription(summary || "");
   };
 
@@ -287,7 +294,7 @@ export default function TrackTimeModal({
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
                         {
                           "border-red-300 text-red-900 placeholder-red-300":
-                            isValidationEnabled && !from,
+                            isValidationEnabled && (!from || from.length < 5),
                         }
                       )}
                       onDragStart={disableTextDrag}
@@ -315,7 +322,7 @@ export default function TrackTimeModal({
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm",
                         {
                           "border-red-300 text-red-900 placeholder-red-300":
-                            isValidationEnabled && !to,
+                            isValidationEnabled && (!to || to.length < 5),
                         }
                       )}
                       onDragStart={disableTextDrag}
