@@ -13,7 +13,9 @@ import {
 import { checkIsToday } from "../../utils/datetime-ui";
 import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
-import GoogleCalendarAddEventBtn from "../google-calendar/GoogleCalendarAddEventBtn";
+import GoogleCalendarAddEventBtn, {
+  Event,
+} from "../google-calendar/GoogleCalendarAddEventBtn";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { getCardsOfMember } from "../../API/trelloAPI";
 import { replaceHyphensWithSpaces } from "../../utils/utils";
@@ -200,11 +202,13 @@ export default function TrackTimeModal({
     e.target.select();
   };
 
-  const addEventToList = (event) => {
-    const { from, to, summary } = event;
+  const addEventToList = (event: Event) => {
+    const { from, to, project, activity, description } = event;
     setFrom(from.time || "");
     setTo(to.time || "");
-    setDescription(summary || "");
+    setProject(project || "");
+    setActivity(activity || "");
+    setDescription(description || "");
   };
 
   const handleKey = (event) => {
@@ -405,7 +409,12 @@ export default function TrackTimeModal({
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
                     {checkIsToday(selectedDate) && isLogged && (
-                      <GoogleCalendarAddEventBtn addEvent={addEventToList} />
+                      <GoogleCalendarAddEventBtn
+                        addEvent={addEventToList}
+                        availableProjects={
+                          latestProjAndAct ? Object.keys(latestProjAndAct) : []
+                        }
+                      />
                     )}
                   </div>
                   <div className="flex gap-3 justify-end">
