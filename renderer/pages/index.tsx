@@ -329,7 +329,6 @@ export default function Home() {
   return (
     <div className="min-h-full">
       <VersionMessage />
-      <p>Just test update</p>
       <main className="py-10">
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
           {reportsFolder ? (
