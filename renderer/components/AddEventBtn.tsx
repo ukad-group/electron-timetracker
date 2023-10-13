@@ -1,16 +1,23 @@
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import React, { Fragment, useState } from "react";
-import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
+import { useGoogleCalendarStore } from "../store/googleCalendarStore";
 import { useEffect } from "react";
 import {
   getGoogleEvents,
   updateGoogleCredentials,
-} from "../../API/googleCalendarAPI";
+} from "../API/googleCalendarAPI";
+import { callCalendarGraph, loginRequest } from "../API/office365API";
+import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 
-export default function GoogleCalendarAddEventBtn({ addEvent }) {
-  const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
+export default function AddEventBtn({ addEvent }) {
+  const [office365Events, setOffice365Events] = useState([]);
   const [isError, setIsError] = useState(false);
+  const [allEvents, setAllEvents] = useState([]);
+
+  const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
+  const { instance, accounts } = useMsal();
+  const isAuthenticated = useIsAuthenticated();
 
   const loadGoogleEvents = async (gToken: string) => {
     try {
@@ -25,11 +32,28 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
         loadGoogleEvents(newAccessToken);
         return;
       }
-
+      
       setGoogleEvents(data?.items);
     } catch (error) {
       setIsError(true);
       console.error(error);
+    }
+  };
+
+  const getOffice365AccessToken = async () => {
+    const { accessToken } = await instance.acquireTokenSilent({
+      ...loginRequest,
+      account: accounts[0],
+    });
+
+    return accessToken;
+  };
+
+  const getOffice365Events = async () => {
+    if (isAuthenticated) {
+      const accessToken = await getOffice365AccessToken();
+      const response = await callCalendarGraph(accessToken);
+      setOffice365Events(response.value);
     }
   };
 
@@ -39,10 +63,75 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
     if (googleAccessToken) {
       loadGoogleEvents(googleAccessToken);
     }
+
+    (async () => {
+      await getOffice365Events();
+    })();
   }, []);
 
+  useEffect(() => {
+    combineAndSortEvents();
+  }, [googleEvents, office365Events]);
+
+  const prepareGoogleEvents = () => {
+    if (googleEvents?.length > 0 && !isError) {
+      return googleEvents.map((event) => {
+        const { start, end, id, summary } = event;
+        const from: { date: string; time: string } = setDateTimeObj(
+          start.dateTime
+        );
+        const to: { date: string; time: string } = setDateTimeObj(end.dateTime);
+        event.from = from;
+        event.to = to;
+
+        return { start, end, id, summary, from, to };
+      });
+    }
+
+    return [];
+  };
+
+  const prepareOffice365Events = () => {
+    if (!office365Events?.length) return [];
+
+    const preparedEvents = office365Events.map((event) => {
+      const { start, end, id, subject } = event;
+      const from: { date: string; time: string } = setDateTimeObj(
+        new Date(`${start.dateTime}Z`).toString()
+      );
+      const to: { date: string; time: string } = setDateTimeObj(
+        new Date(`${end.dateTime}Z`).toString()
+      );
+      event.from = from;
+      event.to = to;
+
+      return { start, end, id, summary: subject, from, to };
+    });
+
+    return preparedEvents;
+  };
+
+  const combineAndSortEvents = () => {
+    const googleEvents = prepareGoogleEvents();
+    const office365Events = prepareOffice365Events();
+
+    const combinedEvents = [...googleEvents, ...office365Events];
+    const sortedEvents = combinedEvents.sort((a, b) => {
+      const [hoursA, minutesA] = a.from.time.split(":").map(Number);
+      const [hoursB, minutesB] = b.from.time.split(":").map(Number);
+
+      if (hoursA !== hoursB) {
+        return hoursA - hoursB;
+      } else {
+        return minutesA - minutesB;
+      }
+    });
+
+    setAllEvents(sortedEvents);
+  };
+
   const generateMenuEvents = () => {
-    if (googleEvents?.length === 0 && !isError) {
+    if (allEvents?.length === 0 && !isError) {
       return (
         <p className="text-gray-500 text-xs p-2 text-center">
           You don't have events for today
@@ -58,15 +147,9 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
       );
     }
 
-    if (googleEvents?.length > 0 && !isError) {
-      return googleEvents.map((event) => {
-        const { start, end, id, summary } = event;
-        const from: { date: string; time: string } = setDateTimeObj(
-          start.dateTime
-        );
-        const to: { date: string; time: string } = setDateTimeObj(end.dateTime);
-        event.from = from;
-        event.to = to;
+    if (allEvents?.length > 0 && !isError) {
+      return allEvents.map((event) => {
+        const { from, to, id, summary } = event;
 
         return (
           <div className="" key={id}>
@@ -118,7 +201,7 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
   };
 
   const addActiveEvent = () => {
-    const activeEvent = googleEvents.find((event) => {
+    const activeEvent = allEvents.find((event) => {
       const { start, end } = event;
       const intFrom = getTimeAsInt(start.dateTime);
       const intTo = getTimeAsInt(end.dateTime);
@@ -131,7 +214,7 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
       return;
     }
 
-    const prevEvents: any[] = googleEvents.filter((event) => {
+    const prevEvents: any[] = allEvents.filter((event) => {
       const { end } = event;
       const intTo: number = getTimeAsInt(end.dateTime);
       const intNow: number = getTimeAsInt();

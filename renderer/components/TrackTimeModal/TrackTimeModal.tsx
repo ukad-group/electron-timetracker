@@ -13,10 +13,11 @@ import {
 import { checkIsToday } from "../../utils/datetime-ui";
 import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
-import GoogleCalendarAddEventBtn from "../google-calendar/GoogleCalendarAddEventBtn";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { getCardsOfMember } from "../../API/trelloAPI";
 import { replaceHyphensWithSpaces } from "../../utils/utils";
+import { useIsAuthenticated } from "@azure/msal-react";
+import AddEventBtn from "../AddEventBtn";
 
 const TRELLO_KEY = process.env.NEXT_PUBLIC_TRELLO_KEY;
 
@@ -54,6 +55,7 @@ export default function TrackTimeModal({
   const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
   const { isLogged } = useGoogleCalendarStore();
+  const isAuthenticated = useIsAuthenticated();
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -397,9 +399,10 @@ export default function TrackTimeModal({
               <div className="mt-6">
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
-                    {checkIsToday(selectedDate) && isLogged && (
-                      <GoogleCalendarAddEventBtn addEvent={addEventToList} />
-                    )}
+                    {checkIsToday(selectedDate) &&
+                      (isLogged || isAuthenticated) && (
+                        <AddEventBtn addEvent={addEventToList} />
+                      )}
                   </div>
                   <div className="flex gap-3 justify-end">
                     <Button

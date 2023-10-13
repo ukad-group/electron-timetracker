@@ -1,83 +1,17 @@
-import { CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
-import { getMember, getTrelloAuthUrl } from "../API/trelloAPI";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 import FolderSelector from "../components/FolderSelector";
-import GoogleCalendarAuth from "../components/google-calendar/GoogleCalendarAuth";
-import Button from "../components/ui/Button";
-import { useGoogleCalendarStore } from "../store/googleCalendarStore";
 import { useMainStore } from "../store/mainStore";
-
-const TRELLO_KEY = process.env.NEXT_PUBLIC_TRELLO_KEY;
-const RETURN_URL = "http://localhost:8000/settings";
-
-function extractTokenFromString(inputString: string) {
-  const parts = inputString.split("#");
-
-  if (parts.length >= 2) {
-    const afterHash = parts[1];
-    const tokenPart = afterHash.split("=");
-
-    if (tokenPart.length === 2 && tokenPart[0] === "token") {
-      return tokenPart[1];
-    }
-  }
-
-  return "";
-}
+import TrelloConnection from "../components/TrelloConnection";
+import Office365Connection from "../components/Office365Connection";
+import GoogleConnection from "../components/GoogleConnection";
 
 const SettingsPage = () => {
-  const [token, setToken] = useState("");
-  const [trelloUsername, setTrelloUsername] = useState("");
-  const router = useRouter();
   const [reportsFolder, setReportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );
-  const { isLogged, googleUsername } = useGoogleCalendarStore();
-
-  const handleSignInTrelloButton = () => {
-    const trelloAuthUrl = getTrelloAuthUrl({
-      key: TRELLO_KEY,
-      returnUrl: RETURN_URL,
-    });
-
-    router.push(trelloAuthUrl);
-  };
-
-  const handleSignOutTrelloButton = () => {
-    localStorage.removeItem("trelloToken");
-    setToken("");
-    router.push("/settings");
-  };
-
-  useEffect(() => {
-    if (window.location.hash.includes("token")) {
-      const tokenFromUrl = extractTokenFromString(window.location.hash);
-
-      localStorage.setItem("trelloToken", tokenFromUrl);
-      setToken(tokenFromUrl);
-    }
-
-    if (Boolean(localStorage.getItem("trelloToken"))) {
-      const storedToken = localStorage.getItem("trelloToken") as string;
-
-      setToken(storedToken);
-
-      (async () => {
-        const trelloMember = await getMember({
-          token: storedToken,
-          key: TRELLO_KEY,
-        });
-
-        if (trelloMember && trelloMember.username) {
-          setTrelloUsername(trelloMember.username);
-        }
-      })();
-    }
-  }, []);
 
   return (
     <div className="mx-auto sm:px-6 max-w-3xl flex flex-col gap-6 px-6 py-10">
@@ -123,77 +57,9 @@ const SettingsPage = () => {
               complete your reports
             </p>
           </div>
-          <div className="p-4 flex items-start justify-between gap-6 border rounded-lg shadow">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-4">
-                <span className="font-medium">Trello</span>
-                {token.length > 0 && (
-                  <div className="text-green-700 inline-flex gap-2 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-200">
-                    Already authorized
-                    <CheckIcon className="w-4 h-4 fill-green-700" />
-                  </div>
-                )}
-                {token.length > 0 && trelloUsername.length > 0 && (
-                  <div className="inline-flex  px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
-                    {trelloUsername}
-                  </div>
-                )}
-                {!token.length && (
-                  <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
-                    Not authorized
-                  </div>
-                )}
-              </div>
-              <p className="text-sm text-gray-500">
-                After connection, you will be able to fill in the Description
-                field with tasks from the drop-down list
-              </p>
-            </div>
-            <div className="flex-shrink-0">
-              {token.length > 0 ? (
-                <Button
-                  text="Sign Out"
-                  callback={handleSignOutTrelloButton}
-                  type="button"
-                />
-              ) : (
-                <Button
-                  text="Sign In"
-                  callback={handleSignInTrelloButton}
-                  type="button"
-                />
-              )}
-            </div>
-          </div>
-          <div className="p-4 flex items-start justify-between gap-6 border rounded-lg shadow">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-4">
-                <span className="font-medium">Google</span>
-                {isLogged && (
-                  <div className="text-green-700 inline-flex gap-2 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-200">
-                    Already authorized
-                    <CheckIcon className="w-4 h-4 fill-green-700" />
-                  </div>
-                )}
-
-                {isLogged && googleUsername?.length > 0 && (
-                  <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
-                    {googleUsername}
-                  </div>
-                )}
-                {!isLogged && (
-                  <div className="text-yellow-600 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
-                    Not authorized
-                  </div>
-                )}
-              </div>
-              <p className="text-sm text-gray-500">
-                After connection, you will be able to fill in the Report with
-                the information from events of your Google Calendar
-              </p>
-            </div>
-            <GoogleCalendarAuth />
-          </div>
+          <TrelloConnection />
+          <GoogleConnection />
+          <Office365Connection />
         </div>
       </section>
     </div>
