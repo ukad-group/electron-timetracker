@@ -7,6 +7,7 @@ import {
   getGoogleEvents,
   updateGoogleCredentials,
 } from "../../API/googleCalendarAPI";
+import { checkAlreadyAddedGoogleEvents } from "../../utils/utils";
 
 export default function GoogleCalendarAddEventBtn({ addEvent }) {
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
@@ -26,7 +27,13 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
         return;
       }
 
-      setGoogleEvents(data?.items);
+      const checkedGoogleEvents = checkAlreadyAddedGoogleEvents(
+        googleEvents,
+        data?.items
+      );
+
+      localStorage.setItem("googleEvents", JSON.stringify(checkedGoogleEvents));
+      setGoogleEvents(checkedGoogleEvents);
     } catch (error) {
       setIsError(true);
       console.error(error);

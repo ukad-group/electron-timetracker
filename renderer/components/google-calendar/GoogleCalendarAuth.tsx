@@ -22,6 +22,7 @@ function GoogleCalendarAuth() {
   const signOutHandler = () => {
     localStorage.removeItem("googleAccessToken");
     localStorage.removeItem("googleRefreshToken");
+    localStorage.removeItem("googleEvents");
     setIsLogged(false);
     router.push("/settings");
   };
