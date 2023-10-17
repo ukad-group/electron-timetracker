@@ -7,7 +7,7 @@ import {
   getGoogleEvents,
   updateGoogleCredentials,
 } from "../API/googleCalendarAPI";
-import { callCalendarGraph, loginRequest } from "../API/office365API";
+import { callTodayEventsGraph, silentRequest } from "../API/office365API";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 
 export default function AddEventBtn({ addEvent }) {
@@ -32,7 +32,7 @@ export default function AddEventBtn({ addEvent }) {
         loadGoogleEvents(newAccessToken);
         return;
       }
-      
+
       setGoogleEvents(data?.items);
     } catch (error) {
       setIsError(true);
@@ -42,7 +42,7 @@ export default function AddEventBtn({ addEvent }) {
 
   const getOffice365AccessToken = async () => {
     const { accessToken } = await instance.acquireTokenSilent({
-      ...loginRequest,
+      ...silentRequest,
       account: accounts[0],
     });
 
@@ -52,7 +52,7 @@ export default function AddEventBtn({ addEvent }) {
   const getOffice365Events = async () => {
     if (isAuthenticated) {
       const accessToken = await getOffice365AccessToken();
-      const response = await callCalendarGraph(accessToken);
+      const response = await callTodayEventsGraph(accessToken);
       setOffice365Events(response.value);
     }
   };

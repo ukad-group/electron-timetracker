@@ -48,12 +48,17 @@ export const loginRequest = {
   prompt: "consent",
 };
 
+export const silentRequest = {
+  scopes: ["User.Read", "Calendars.Read"],
+  prompt: "none",
+};
+
 export const endpoints = {
   me: "https://graph.microsoft.com/v1.0/me",
   events: "https://graph.microsoft.com/v1.0/me/events",
 };
 
-export async function callMsGraph(accessToken: string) {
+export async function callProfileInfoGraph(accessToken: string) {
   const headers = new Headers();
   const bearer = `Bearer ${accessToken}`;
 
@@ -69,7 +74,7 @@ export async function callMsGraph(accessToken: string) {
     .catch((error) => console.log(error));
 }
 
-export async function callCalendarGraph(accessToken: string) {
+export async function callTodayEventsGraph(accessToken: string) {
   const headers = new Headers();
   const bearer = `Bearer ${accessToken}`;
 

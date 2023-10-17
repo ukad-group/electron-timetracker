@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import {
-  callCalendarGraph,
-  callMsGraph,
+  callTodayEventsGraph,
+  callProfileInfoGraph,
   loginRequest,
 } from "../API/office365API";
 import { CheckIcon } from "@heroicons/react/24/solid";
@@ -42,13 +42,13 @@ const Office365Connection = () => {
 
   const getUsername = async () => {
     const accessToken = await getAccessToken();
-    const response = await callMsGraph(accessToken);
+    const response = await callProfileInfoGraph(accessToken);
     setUsername(response.userPrincipalName);
   };
 
   const checkIfUserHasMailbox = async () => {
     const accessToken = await getAccessToken();
-    const response = await callCalendarGraph(accessToken);
+    const response = await callTodayEventsGraph(accessToken);
 
     if (response?.error) {
       setHasUserMailbox(false);
