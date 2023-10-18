@@ -18,7 +18,6 @@ type ActivitiesTableProps = {
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
   formattedGoogleEvents: ReportActivity[];
-  setShowGoogleEvents: Dispatch<SetStateAction<Boolean>>;
 };
 const msPerHour = 60 * 60 * 1000;
 export default function ActivitiesTable({
@@ -27,10 +26,7 @@ export default function ActivitiesTable({
   onDeleteActivity,
   selectedDate,
   formattedGoogleEvents,
-  setShowGoogleEvents,
 }: ActivitiesTableProps) {
-  const today = checkIsToday(selectedDate);
-
   const nonBreakActivities = useMemo(() => {
     return validation(
       activities.filter((activity) => !activity.isBreak && activity.project)
@@ -48,13 +44,6 @@ export default function ActivitiesTable({
       ? concatSortArrays(nonBreakActivities, formattedGoogleEvents)
       : nonBreakActivities;
   }, [nonBreakActivities, formattedGoogleEvents]);
-
-  useEffect(() => {
-    if (!today) {
-      setShowGoogleEvents(false);
-      return;
-    }
-  }, [nonBreakActivities]);
 
   const copyToClipboardHandle = (e) => {
     const cell = e.target;
@@ -293,7 +282,7 @@ export default function ActivitiesTable({
           >
             <TimeBadge
               hours={totalDuration / msPerHour}
-              startTime={nonBreakActivities[0].from}
+              startTime={tableActivities[0].from}
               selectedDate={selectedDate}
             />
           </td>

@@ -43,9 +43,9 @@ export default function ActivitiesSection({
     }
   };
 
-  const checkBoxClickHandler = () => {
-    setShowGoogleEvents((prev) => !prev);
-  };
+  useEffect(() => {
+    if (!today) setShowGoogleEvents(false);
+  }, [selectedDate]);
 
   useEffect(() => {
     if (googleEvents.length === 0) return;
@@ -131,7 +131,6 @@ export default function ActivitiesSection({
           activities={activities}
           onDeleteActivity={onDeleteActivity}
           selectedDate={selectedDate}
-          setShowGoogleEvents={setShowGoogleEvents}
           formattedGoogleEvents={
             showGoogleEvents &&
             googleEvents.length > 0 &&
