@@ -65,7 +65,7 @@ export default function ActivitiesSection({
           duration: calcDurationBetweenTimes(from, to),
           project: "",
           activity: "",
-          description: googleEvent.description || "",
+          description: googleEvent.summary || "",
           isValid: true,
           calendarId: googleEvent.id,
         };
