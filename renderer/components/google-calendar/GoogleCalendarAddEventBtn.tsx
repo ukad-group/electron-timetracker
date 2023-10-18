@@ -112,6 +112,8 @@ export default function GoogleCalendarAddEventBtn({
             event.activity = items[1];
             event.description = items[2];
             break;
+            default:
+            event.description = items.join(" - ");
         }
 
         return (
