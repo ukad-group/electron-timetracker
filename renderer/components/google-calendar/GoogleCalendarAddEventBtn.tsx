@@ -9,7 +9,28 @@ import {
 } from "../../API/googleCalendarAPI";
 import { checkAlreadyAddedGoogleEvents } from "../../utils/utils";
 
-export default function GoogleCalendarAddEventBtn({ addEvent }) {
+export type Event = {
+  from: {
+    date: string;
+    time: string;
+  };
+  to: {
+    date: string;
+    time: string;
+  };
+  project?: string;
+  activity?: string;
+  description?: string;
+};
+type GoogleCalendarAddEventBtnProps = {
+  addEvent: (event: Event) => void;
+  availableProjects: Array<string>;
+};
+
+export default function GoogleCalendarAddEventBtn({
+  addEvent,
+  availableProjects,
+}: GoogleCalendarAddEventBtnProps) {
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const [isError, setIsError] = useState(false);
 
@@ -74,6 +95,33 @@ export default function GoogleCalendarAddEventBtn({ addEvent }) {
         const to: { date: string; time: string } = setDateTimeObj(end.dateTime);
         event.from = from;
         event.to = to;
+
+        const items = summary ? summary.split(" - ") : "";
+
+        switch (items.length) {
+          case 0:
+            event.description = "";
+            break;
+          case 1:
+            event.description = items[0];
+            break;
+          case 2:
+            if (availableProjects.includes(items[0])) {
+              event.project = items[0];
+              event.description = items[1];
+            } else {
+              event.activity = items[0];
+              event.description = items[1];
+            }
+            break;
+          case 3:
+            event.project = items[0];
+            event.activity = items[1];
+            event.description = items[2];
+            break;
+            default:
+            event.description = items.join(" - ");
+        }
 
         return (
           <div className="" key={id}>
