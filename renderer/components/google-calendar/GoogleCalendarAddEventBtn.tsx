@@ -53,8 +53,12 @@ export default function GoogleCalendarAddEventBtn({
         data?.items
       );
 
+      const filteredGoogleEventsWithoutTime = checkedGoogleEvents.filter(
+        (gEvent) => gEvent?.start?.dateTime || gEvent?.end?.dateTime
+      );
+
       localStorage.setItem("googleEvents", JSON.stringify(checkedGoogleEvents));
-      setGoogleEvents(checkedGoogleEvents);
+      setGoogleEvents(filteredGoogleEventsWithoutTime);
     } catch (error) {
       setIsError(true);
       console.error(error);
@@ -119,7 +123,7 @@ export default function GoogleCalendarAddEventBtn({
             event.activity = items[1];
             event.description = items[2];
             break;
-            default:
+          default:
             event.description = items.join(" - ");
         }
 
