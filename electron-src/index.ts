@@ -10,6 +10,7 @@ import { createWindow } from "./helpers/create-window";
 import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
+import chokidar from 'chokidar';
 
 const PORT = 51432;
 
@@ -17,7 +18,7 @@ let updateStatus: null | "available" | "downloaded" = null;
 let updateVersion = "";
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
-ipcMain.on("beta-channel", (event, isBeta: boolean) => {
+ipcMain.on("beta-channel", (event: any, isBeta: boolean) => {
   autoUpdater.allowPrerelease = isBeta;
 });
 function updateUpdateStatus(
@@ -36,7 +37,7 @@ autoUpdater.on("error", (e: Error, message?: string) => {
   );
 });
 
-ipcMain.on("get-current-version", (event) => {
+ipcMain.on("get-current-version", () => {
   mainWindow &&
     mainWindow.webContents.send("current-version", app.getVersion());
 });
@@ -56,11 +57,11 @@ autoUpdater.on("update-downloaded", (info: UpdateInfo) => {
   }
 });
 
-ipcMain.on("install", (event) => {
+ipcMain.on("install", () => {
   autoUpdater.quitAndInstall(true, true);
 });
 
-ipcMain.on("front error", (event, errorTitle, errorMessage, data) => {
+ipcMain.on("front error", (event, errorTitle:string, errorMessage:string, data) => {
   mainWindow?.webContents.send("render error", errorTitle, errorMessage, data);
 });
 const userDataDirectory = app.getPath("userData");
@@ -157,7 +158,7 @@ app.on("ready", async () => {
   if (!gotTheLock) {
     app.quit();
   } else {
-    app.on("second-instance", (event, commandLine, workingDirectory) => {
+    app.on("second-instance", () => {
       if (mainWindow) {
         if (mainWindow.isMinimized()) mainWindow.restore();
         mainWindow.show();
@@ -192,9 +193,10 @@ app.on("ready", async () => {
           currentSelectedDate = selectedDate.toDateString();
           if (fs.existsSync(timereportPath)) {
             mainWindow?.webContents.send("file exist", true);
-            fs.watch(timereportPath, (eventType, filename) => {
+            chokidar
+            .watch(timereportPath)
+            .on('change', (timereportPath) => {
               if (
-                eventType === "change" &&
                 currentSelectedDate === selectedDate.toDateString()
               ) {
                 readDataFromFile(timereportPath, (data: string | null) => {
@@ -220,11 +222,11 @@ app.on("ready", async () => {
       (event, reportsFolder: string, calendarDate: Date) => {
         try {
           if (fs.existsSync(reportsFolder)) {
-            fs.watch(reportsFolder, { recursive: true }, (eventType) => {
-              if (eventType === "change") {
-                mainWindow?.webContents.send("any-file-changed");
-              }
-            });
+            chokidar
+            .watch(reportsFolder)
+            .on('change', () =>{
+                mainWindow?.webContents.send("any-file-changed"); 
+            })
           }
         } catch (err) {
           console.log(err);
@@ -299,7 +301,7 @@ const deleteFile = (filePath: string): Promise<void> => {
   });
 };
 
-ipcMain.handle("app:update-status", async (event) => {
+ipcMain.handle("app:update-status", async () => {
   return [updateStatus, updateVersion];
 });
 
