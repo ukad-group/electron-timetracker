@@ -9,6 +9,7 @@ import GoogleCalendarAuth from "../components/google-calendar/GoogleCalendarAuth
 import Button from "../components/ui/Button";
 import { useGoogleCalendarStore } from "../store/googleCalendarStore";
 import { useMainStore } from "../store/mainStore";
+import Tooltip from "../components/ui/Tooltip/Tooltip";
 
 const TRELLO_KEY = process.env.NEXT_PUBLIC_TRELLO_KEY;
 const RETURN_URL = "http://localhost:51432/settings";
@@ -36,7 +37,8 @@ const SettingsPage = () => {
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );
-  const { isLogged, googleUsername } = useGoogleCalendarStore();
+  const { isLogged, googleUsername, googleEvents, setGoogleEvents } =
+    useGoogleCalendarStore();
 
   const handleSignInTrelloButton = () => {
     const trelloAuthUrl = getTrelloAuthUrl({
@@ -51,6 +53,17 @@ const SettingsPage = () => {
     localStorage.removeItem("trelloToken");
     setToken("");
     router.push("/settings");
+  };
+
+  const resetGoogleEventsHandle = () => {
+    const resetedGoogleEvents = googleEvents.map((gEvent) => {
+      gEvent.isAdded = false;
+
+      return gEvent;
+    });
+
+    localStorage.setItem("googleEvents", JSON.stringify(resetedGoogleEvents));
+    setGoogleEvents(resetedGoogleEvents);
   };
 
   useEffect(() => {
@@ -165,34 +178,53 @@ const SettingsPage = () => {
               )}
             </div>
           </div>
-          <div className="p-4 flex items-start justify-between gap-6 border rounded-lg shadow">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-4">
-                <span className="font-medium">Google</span>
-                {isLogged && (
-                  <div className="text-green-700 inline-flex gap-2 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-200">
-                    Already authorized
-                    <CheckIcon className="w-4 h-4 fill-green-700" />
-                  </div>
-                )}
 
-                {isLogged && googleUsername?.length > 0 && (
-                  <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
-                    {googleUsername}
-                  </div>
-                )}
-                {!isLogged && (
-                  <div className="text-yellow-600 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
-                    Not authorized
-                  </div>
-                )}
+          <div className="p-4 border rounded-lg shadow flex flex-col gap-6">
+            <div className="flex items-start justify-between gap-6">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-4">
+                  <span className="font-medium">Google</span>
+                  {isLogged && (
+                    <div className="text-green-700 inline-flex gap-2 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-200">
+                      Already authorized
+                      <CheckIcon className="w-4 h-4 fill-green-700" />
+                    </div>
+                  )}
+                  {isLogged && googleUsername?.length > 0 && (
+                    <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
+                      {googleUsername}
+                    </div>
+                  )}
+                  {!isLogged && (
+                    <div className="text-yellow-600 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
+                      Not authorized
+                    </div>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500">
+                  After connection, you will be able to fill in the Report with
+                  the information from events of your Google Calendar
+                </p>
               </div>
-              <p className="text-sm text-gray-500">
-                After connection, you will be able to fill in the Report with
-                the information from events of your Google Calendar
-              </p>
+              <GoogleCalendarAuth />
             </div>
-            <GoogleCalendarAuth />
+
+            {isLogged && googleEvents.length > 0 && (
+              <div className="flex items-start justify-between gap-6">
+                <p className=" max-w-lg text-sm text-gray-500">
+                  Make all Google events visible again. This can be useful when
+                  you have added an event and accidentally deleted it manually
+                </p>
+                <Tooltip tooltipText="reseted">
+                  <button
+                    onClick={resetGoogleEventsHandle}
+                    className="text-gray-500 inline-flex items-center justify-center px-2 py-1 text-xs border rounded-md shadow-sm hover:bg-gray-100 "
+                  >
+                    reset
+                  </button>
+                </Tooltip>
+              </div>
+            )}
           </div>
         </div>
       </section>

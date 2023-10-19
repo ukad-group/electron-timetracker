@@ -16,7 +16,10 @@ import Button from "../ui/Button";
 import GoogleCalendarAddEventBtn from "../google-calendar/GoogleCalendarAddEventBtn";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { getCardsOfMember } from "../../API/trelloAPI";
-import { replaceHyphensWithSpaces } from "../../utils/utils";
+import {
+  markActivityAsAdded,
+  replaceHyphensWithSpaces,
+} from "../../utils/utils";
 
 const TRELLO_KEY = process.env.NEXT_PUBLIC_TRELLO_KEY;
 
@@ -53,7 +56,7 @@ export default function TrackTimeModal({
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
-  const { isLogged } = useGoogleCalendarStore();
+  const { isLogged, googleEvents, setGoogleEvents } = useGoogleCalendarStore();
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -161,7 +164,22 @@ export default function TrackTimeModal({
       project,
       activity,
       description,
+      calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
     });
+
+    if (googleEvents.length > 0 && editedActivity !== "new") {
+      const arrayWithMarkedActivty = markActivityAsAdded(
+        googleEvents,
+        editedActivity
+      );
+
+      localStorage.setItem(
+        "googleEvents",
+        JSON.stringify(arrayWithMarkedActivty)
+      );
+      setGoogleEvents(arrayWithMarkedActivty);
+    }
+
     close();
   };
 

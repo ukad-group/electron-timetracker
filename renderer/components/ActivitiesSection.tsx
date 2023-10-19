@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { ipcRenderer } from "electron";
 import { ClockIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import ActivitiesTable from "./ActivitiesTable";
 import { ReportActivity } from "../utils/reports";
 import { ErrorPlaceholder, RenderError } from "./ui/ErrorPlaceholder";
 import { PlusIcon } from "@heroicons/react/24/solid";
+import { useGoogleCalendarStore } from "../store/googleCalendarStore";
+import { calcDurationBetweenTimes } from "../utils/reports";
+import { checkIsToday, getTimeFromGoogleObj } from "../utils/datetime-ui";
+import GoogleCalendarShowCheckbox from "./google-calendar/GoogleCalendarShowCheckbox";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
@@ -29,12 +32,47 @@ export default function ActivitiesSection({
     errorTitle: "",
     errorMessage: "",
   });
+  const { googleEvents, isLogged } = useGoogleCalendarStore();
+  const [showGoogleEvents, setShowGoogleEvents] = useState(false);
+  const [formattedGoogleEvents, setFormattedGoogleEvents] = useState([]);
+  const today = checkIsToday(selectedDate);
 
   const keydownHandler = (e: KeyboardEvent) => {
     if (e.code === "Space" && e.ctrlKey) {
       onEditActivity("new");
     }
   };
+
+  useEffect(() => {
+    if (!today) setShowGoogleEvents(false);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (googleEvents.length === 0) return;
+
+    if (showGoogleEvents === false) setFormattedGoogleEvents([]);
+
+    const formattedEvents = googleEvents
+      .filter((googleEvent) => !googleEvent?.isAdded)
+      .map((googleEvent) => {
+        const { start, end } = googleEvent;
+        const from = getTimeFromGoogleObj(start.dateTime);
+        const to = getTimeFromGoogleObj(end.dateTime);
+
+        return {
+          from: from,
+          to: to,
+          duration: calcDurationBetweenTimes(from, to),
+          project: "",
+          activity: "",
+          description: googleEvent.summary || "",
+          isValid: true,
+          calendarId: googleEvent.id,
+        };
+      });
+
+    setFormattedGoogleEvents(formattedEvents);
+  }, [showGoogleEvents, googleEvents]);
 
   useEffect(() => {
     document.addEventListener("keydown", keydownHandler);
@@ -49,8 +87,11 @@ export default function ActivitiesSection({
         console.log("Error data ", data);
       }
     );
+
     return () => {
       document.removeEventListener("keydown", keydownHandler);
+      global.ipcRenderer.removeAllListeners("background error");
+      global.ipcRenderer.removeAllListeners("render error");
     };
   }, []);
 
@@ -90,8 +131,24 @@ export default function ActivitiesSection({
           activities={activities}
           onDeleteActivity={onDeleteActivity}
           selectedDate={selectedDate}
+          formattedGoogleEvents={
+            showGoogleEvents &&
+            googleEvents.length > 0 &&
+            formattedGoogleEvents.length > 0
+              ? formattedGoogleEvents
+              : undefined
+          }
         />
       </div>
+
+      <div className="flex gap-2 px-6 pb-4 items-center justify-end mr-auto">
+        {today && isLogged && (
+          <GoogleCalendarShowCheckbox
+            setShowGoogleEvents={setShowGoogleEvents}
+          />
+        )}
+      </div>
+
       <div>
         <button
           className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300  sm:rounded-b-lg"
