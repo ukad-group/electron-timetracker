@@ -39,6 +39,7 @@ const SettingsPage = () => {
   );
   const { isLogged, googleUsername, googleEvents, setGoogleEvents } =
     useGoogleCalendarStore();
+  const [showGoogleEvents, setShowGoogleEvents] = useState(false);
 
   const handleSignInTrelloButton = () => {
     const trelloAuthUrl = getTrelloAuthUrl({
@@ -55,16 +56,18 @@ const SettingsPage = () => {
     router.push("/settings");
   };
 
-  const resetGoogleEventsHandle = () => {
-    const resetedGoogleEvents = googleEvents.map((gEvent) => {
-      gEvent.isAdded = false;
-
-      return gEvent;
-    });
-
-    localStorage.setItem("googleEvents", JSON.stringify(resetedGoogleEvents));
-    setGoogleEvents(resetedGoogleEvents);
+  const handleCheckboxChange = () => {
+    setShowGoogleEvents((prev) => !prev);
+    const reversShowGoogleEvents = !showGoogleEvents;
+    localStorage.setItem("showGoogleEvents", reversShowGoogleEvents.toString());
   };
+
+  useEffect(() => {
+    const lsShowGoogleEvents = localStorage.getItem("showGoogleEvents");
+    if (lsShowGoogleEvents === "true") {
+      setShowGoogleEvents(true);
+    }
+  }, []);
 
   useEffect(() => {
     if (window.location.hash.includes("token")) {
@@ -209,20 +212,19 @@ const SettingsPage = () => {
               <GoogleCalendarAuth />
             </div>
 
-            {isLogged && googleEvents.length > 0 && (
+            {isLogged && (
               <div className="flex items-start justify-between gap-6">
-                <p className=" max-w-lg text-sm text-gray-500">
-                  Make all Google events visible again. This can be useful when
-                  you have added an event and accidentally deleted it manually
+                <p className=" max-w-sm text-sm text-gray-500">
+                  Show google events in activity table
                 </p>
-                <Tooltip tooltipText="reseted">
-                  <button
-                    onClick={resetGoogleEventsHandle}
-                    className="text-gray-500 inline-flex items-center justify-center px-2 py-1 text-xs border rounded-md shadow-sm hover:bg-gray-100 "
-                  >
-                    reset
-                  </button>
-                </Tooltip>
+                <div>
+                  <input
+                    onChange={handleCheckboxChange}
+                    className="w-4 h-4"
+                    type="checkbox"
+                    checked={showGoogleEvents}
+                  ></input>
+                </div>
               </div>
             )}
           </div>

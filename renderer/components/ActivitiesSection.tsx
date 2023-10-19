@@ -7,7 +7,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { useGoogleCalendarStore } from "../store/googleCalendarStore";
 import { calcDurationBetweenTimes } from "../utils/reports";
 import { checkIsToday, getTimeFromGoogleObj } from "../utils/datetime-ui";
-import GoogleCalendarShowCheckbox from "./google-calendar/GoogleCalendarShowCheckbox";
+import GoogleCalendarEventsMessage from "./google-calendar/GoogleCalendarEventsMessage";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
@@ -36,6 +36,9 @@ export default function ActivitiesSection({
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);
   const [formattedGoogleEvents, setFormattedGoogleEvents] = useState([]);
   const today = checkIsToday(selectedDate);
+  const showGoogleEVentsTip = JSON.parse(
+    localStorage.getItem("showGoogleEvents")
+  );
 
   const keydownHandler = (e: KeyboardEvent) => {
     if (e.code === "Space" && e.ctrlKey) {
@@ -150,8 +153,8 @@ export default function ActivitiesSection({
       </div>
 
       <div className="flex gap-2 px-6 pb-4 items-center justify-end mr-auto">
-        {today && isLogged && (
-          <GoogleCalendarShowCheckbox
+        {today && isLogged && showGoogleEVentsTip && (
+          <GoogleCalendarEventsMessage
             setShowGoogleEvents={setShowGoogleEvents}
           />
         )}
