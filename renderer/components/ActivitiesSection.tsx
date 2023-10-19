@@ -53,7 +53,15 @@ export default function ActivitiesSection({
     if (showGoogleEvents === false) setFormattedGoogleEvents([]);
 
     const formattedEvents = googleEvents
-      .filter((googleEvent) => !googleEvent?.isAdded)
+      .filter((googleEvent) => {
+        if (
+          googleEvent?.start?.dateTime &&
+          googleEvent?.end?.dateTime &&
+          !googleEvent?.isAdded
+        ) {
+          return googleEvent;
+        }
+      })
       .map((googleEvent) => {
         const { start, end } = googleEvent;
         const from = getTimeFromGoogleObj(start.dateTime);
