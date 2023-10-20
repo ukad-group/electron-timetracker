@@ -6,10 +6,11 @@ import {
 } from "../../API/googleCalendarAPI";
 import { checkAlreadyAddedGoogleEvents } from "../../utils/utils";
 import Loader from "../ui/Loader";
+import { ReportActivity } from "../../utils/reports";
 
 type GoogleCalendarEventsMessageProps = {
   setShowGoogleEvents: Dispatch<SetStateAction<Boolean>>;
-  formattedGoogleEvents: Report[];
+  formattedGoogleEvents: ReportActivity[];
 };
 
 export default function GoogleCalendarEventsMessage({
