@@ -16,7 +16,9 @@ import Button from "../ui/Button";
 import GoogleCalendarAddEventBtn, {
   Event,
 } from "../google-calendar/GoogleCalendarAddEventBtn";
+import { shallow } from "zustand/shallow";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
+import { useEventsStore, Events } from "../../store/googleEventsStore";
 import { getCardsOfMember } from "../../API/trelloAPI";
 import {
   markActivityAsAdded,
@@ -59,7 +61,10 @@ export default function TrackTimeModal({
   const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
   const { isLogged, googleEvents, setGoogleEvents } = useGoogleCalendarStore();
-
+  const [googleEvent, setGoogleEvent] = useEventsStore(
+    (state) => [state.event, state.setEvent],
+    shallow
+  );
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
 
@@ -169,6 +174,12 @@ export default function TrackTimeModal({
       calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
     });
 
+    if (googleEvent[description] && !googleEvent[description].project) {
+      googleEvent[description].project = project;
+      googleEvent[description].activity = activity || "";
+    }
+
+    setGoogleEvent(googleEvent);
     if (googleEvents.length > 0 && editedActivity !== "new") {
       const arrayWithMarkedActivty = markActivityAsAdded(
         googleEvents,
@@ -222,11 +233,23 @@ export default function TrackTimeModal({
 
   const addEventToList = (event: Event) => {
     const { from, to, project, activity, description } = event;
+    if (googleEvent[description]) {
+      setProject(googleEvent[description].project);
+      setActivity(activity || googleEvent[description].activity);
+    }
+    if (!googleEvent[description]) {
+      setProject(project || "");
+      setActivity(activity || "");
+      googleEvent[description] = { project: "", activity: "" };
+      googleEvent[description].project = project || "";
+      googleEvent[description].activity = activity || "";
+    }
+
     setFrom(from.time || "");
     setTo(to.time || "");
-    setProject(project || "");
-    setActivity(activity || "");
     setDescription(description || "");
+
+    setGoogleEvent(googleEvent);
   };
 
   const handleKey = (event) => {
