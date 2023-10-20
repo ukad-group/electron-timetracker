@@ -13,11 +13,10 @@ import {
 import { checkIsToday } from "../../utils/datetime-ui";
 import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
-import GoogleCalendarAddEventBtn, {
-  Event,
-} from "../google-calendar/GoogleCalendarAddEventBtn";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { getCardsOfMember } from "../../API/trelloAPI";
+import { useIsAuthenticated } from "@azure/msal-react";
+import AddEventBtn, { Event } from "../AddEventBtn";
 import {
   markActivityAsAdded,
   replaceHyphensWithSpaces,
@@ -58,6 +57,7 @@ export default function TrackTimeModal({
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
+  const isAuthenticated = useIsAuthenticated();
   const { isLogged, googleEvents, setGoogleEvents } = useGoogleCalendarStore();
 
   const duration = useMemo(() => {
@@ -435,14 +435,17 @@ export default function TrackTimeModal({
               <div className="mt-6">
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
-                    {checkIsToday(selectedDate) && isLogged && (
-                      <GoogleCalendarAddEventBtn
-                        addEvent={addEventToList}
-                        availableProjects={
-                          latestProjAndAct ? Object.keys(latestProjAndAct) : []
-                        }
-                      />
-                    )}
+                    {checkIsToday(selectedDate) &&
+                      (isLogged || isAuthenticated) && (
+                        <AddEventBtn
+                          addEvent={addEventToList}
+                          availableProjects={
+                            latestProjAndAct
+                              ? Object.keys(latestProjAndAct)
+                              : []
+                          }
+                        />
+                      )}
                   </div>
                   <div className="flex gap-3 justify-end">
                     <Button

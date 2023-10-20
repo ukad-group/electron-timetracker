@@ -6,7 +6,6 @@ import TimeBadge from "../components/ui/TimeBadge";
 import {
   Square2StackIcon,
   PencilSquareIcon,
-  ArchiveBoxXMarkIcon,
 } from "@heroicons/react/24/outline";
 import Tooltip from "./ui/Tooltip/Tooltip";
 import { PlusIcon } from "@heroicons/react/24/solid";

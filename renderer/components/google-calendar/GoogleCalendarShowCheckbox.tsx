@@ -33,16 +33,16 @@ export default function GoogleCalendarShowCheckbox({
         return;
       }
 
-      const lsGoogleEvents = JSON.parse(localStorage.getItem("googleEvents"));
+      const storedGoogleEvents = JSON.parse(localStorage.getItem("googleEvents"));
 
-      if (lsGoogleEvents === null) {
+      if (storedGoogleEvents === null) {
         localStorage.setItem("googleEvents", JSON.stringify(data?.items));
         setGoogleEvents(data?.items);
         return;
       }
 
       const checkedGoogleEvents = checkAlreadyAddedGoogleEvents(
-        lsGoogleEvents,
+        storedGoogleEvents,
         data?.items
       );
 

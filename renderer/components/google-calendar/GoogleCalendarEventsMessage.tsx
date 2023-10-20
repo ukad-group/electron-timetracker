@@ -36,9 +36,11 @@ export default function GoogleCalendarEventsMessage({
         return;
       }
 
-      const lsGoogleEvents = JSON.parse(localStorage.getItem("googleEvents"));
+      const storedgoogleEvents = JSON.parse(
+        localStorage.getItem("googleEvents")
+      );
 
-      if (lsGoogleEvents === null) {
+      if (storedgoogleEvents === null) {
         localStorage.setItem("googleEvents", JSON.stringify(data?.items));
         setShowGoogleEvents(true);
         setGoogleEvents(data?.items);
@@ -46,7 +48,7 @@ export default function GoogleCalendarEventsMessage({
       }
 
       const checkedGoogleEvents = checkAlreadyAddedGoogleEvents(
-        lsGoogleEvents,
+        storedgoogleEvents,
         data?.items
       );
 
