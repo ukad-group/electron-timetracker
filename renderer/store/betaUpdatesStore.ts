@@ -1,5 +1,4 @@
-// import { ipcRenderer } from "electron";
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import {
   StateStorage,
   createJSONStorage,
@@ -24,7 +23,7 @@ const storage: StateStorage = {
   },
 };
 
-export const useBetaStore = create<BetaStore>()(
+export const useBetaStore = createWithEqualityFn<BetaStore>()(
   devtools(
     persist(
       (set) => ({
@@ -36,5 +35,6 @@ export const useBetaStore = create<BetaStore>()(
         storage: createJSONStorage(() => storage),
       }
     )
-  )
+  ),
+  null
 );
