@@ -80,3 +80,10 @@ export const getTimeFromGoogleObj = (date: string) => {
     hour12: false,
   });
 };
+
+export const padStringToMinutes = (timeString: string) => {
+  if (!timeString) return;
+
+  const [hours, minutes] = timeString.split(":").map(Number);
+  return hours * 60 + minutes;
+};

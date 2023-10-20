@@ -9,10 +9,12 @@ import Loader from "../ui/Loader";
 
 type GoogleCalendarEventsMessageProps = {
   setShowGoogleEvents: Dispatch<SetStateAction<Boolean>>;
+  formattedGoogleEvents: Report[];
 };
 
 export default function GoogleCalendarEventsMessage({
   setShowGoogleEvents,
+  formattedGoogleEvents,
 }: GoogleCalendarEventsMessageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -84,7 +86,6 @@ export default function GoogleCalendarEventsMessage({
 
     localStorage.setItem("googleEvents", JSON.stringify(resetedGoogleEvents));
     setGoogleEvents(resetedGoogleEvents);
-    setShowGoogleEvents(false);
   };
 
   if (isLoading) {
@@ -127,6 +128,35 @@ export default function GoogleCalendarEventsMessage({
           reset
         </button>
       </>
+    );
+  }
+
+  if (
+    formattedGoogleEvents.length <
+      googleEvents.filter((gEvent) => !gEvent.isAdded).length &&
+    formattedGoogleEvents.length !== 0
+  ) {
+    return (
+      <p className="text-sm text-gray-500">
+        Google events are showing. Skipped{" "}
+        {googleEvents.filter((gEvent) => !gEvent.isAdded).length -
+          formattedGoogleEvents.length}{" "}
+        event(s)
+      </p>
+    );
+  }
+
+  if (
+    formattedGoogleEvents?.length === 0 &&
+    !googleEvents.every((gEvent) => {
+      return gEvent?.isAdded || !gEvent?.start?.dateTime;
+    })
+  ) {
+    return (
+      <p className="text-sm text-gray-500">
+        Skipped {googleEvents.filter((gEvent) => !gEvent?.isAdded)?.length}{" "}
+        event(s)
+      </p>
     );
   }
 

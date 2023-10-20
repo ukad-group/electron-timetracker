@@ -22,6 +22,9 @@ export const checkAlreadyAddedGoogleEvents = (
       newEvent.isAdded = false;
     }
 
+    if (originalEvent.project) newEvent.project = originalEvent.project;
+    if (originalEvent.activity) newEvent.activity = originalEvent.activity;
+
     return newEvent;
   });
 };

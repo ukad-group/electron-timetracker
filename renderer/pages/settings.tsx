@@ -56,6 +56,17 @@ const SettingsPage = () => {
     router.push("/settings");
   };
 
+  const resetGoogleEventsHandle = () => {
+    const resetedGoogleEvents = googleEvents.map((gEvent) => {
+      gEvent.isAdded = false;
+
+      return gEvent;
+    });
+
+    localStorage.setItem("googleEvents", JSON.stringify(resetedGoogleEvents));
+    setGoogleEvents(resetedGoogleEvents);
+  };
+
   const handleCheckboxChange = () => {
     setShowGoogleEvents((prev) => !prev);
     const reversShowGoogleEvents = !showGoogleEvents;
@@ -225,6 +236,23 @@ const SettingsPage = () => {
                     checked={showGoogleEvents}
                   ></input>
                 </div>
+              </div>
+            )}
+
+            {isLogged && googleEvents.length > 0 && (
+              <div className="flex items-start justify-between gap-6">
+                <p className=" max-w-lg text-sm text-gray-500">
+                  Make all Google events visible again. This can be useful when
+                  you have added an event and accidentally deleted it manually
+                </p>
+                <Tooltip tooltipText="reseted">
+                  <button
+                    onClick={resetGoogleEventsHandle}
+                    className="text-gray-500 inline-flex items-center justify-center px-2 py-1 text-xs border rounded-md shadow-sm hover:bg-gray-100 "
+                  >
+                    reset
+                  </button>
+                </Tooltip>
               </div>
             )}
           </div>

@@ -6,7 +6,11 @@ import { ErrorPlaceholder, RenderError } from "./ui/ErrorPlaceholder";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { useGoogleCalendarStore } from "../store/googleCalendarStore";
 import { calcDurationBetweenTimes } from "../utils/reports";
-import { checkIsToday, getTimeFromGoogleObj } from "../utils/datetime-ui";
+import {
+  checkIsToday,
+  getTimeFromGoogleObj,
+  padStringToMinutes,
+} from "../utils/datetime-ui";
 import GoogleCalendarEventsMessage from "./google-calendar/GoogleCalendarEventsMessage";
 
 type ActivitiesSectionProps = {
@@ -57,10 +61,17 @@ export default function ActivitiesSection({
 
     const formattedEvents = googleEvents
       .filter((googleEvent) => {
+        const { end } = googleEvent;
+        const to = getTimeFromGoogleObj(end.dateTime);
+        const isOverlapped = activities.some((activity) => {
+          return padStringToMinutes(activity.to) >= padStringToMinutes(to);
+        });
+
         if (
+          !googleEvent?.isAdded &&
           googleEvent?.start?.dateTime &&
           googleEvent?.end?.dateTime &&
-          !googleEvent?.isAdded
+          !isOverlapped
         ) {
           return googleEvent;
         }
@@ -74,8 +85,8 @@ export default function ActivitiesSection({
           from: from,
           to: to,
           duration: calcDurationBetweenTimes(from, to),
-          project: "",
-          activity: "",
+          project: googleEvent.project || "",
+          activity: googleEvent.activity || "",
           description: googleEvent.summary || "",
           isValid: true,
           calendarId: googleEvent.id,
@@ -83,7 +94,7 @@ export default function ActivitiesSection({
       });
 
     setFormattedGoogleEvents(formattedEvents);
-  }, [showGoogleEvents, googleEvents]);
+  }, [showGoogleEvents, googleEvents, activities]);
 
   useEffect(() => {
     document.addEventListener("keydown", keydownHandler);
@@ -156,6 +167,7 @@ export default function ActivitiesSection({
         {today && isLogged && showGoogleEVentsTip && (
           <GoogleCalendarEventsMessage
             setShowGoogleEvents={setShowGoogleEvents}
+            formattedGoogleEvents={formattedGoogleEvents}
           />
         )}
       </div>

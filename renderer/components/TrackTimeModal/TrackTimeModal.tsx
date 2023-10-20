@@ -175,11 +175,20 @@ export default function TrackTimeModal({
         editedActivity
       );
 
+      const arrayWithPrefilledValue = arrayWithMarkedActivty.map((gEvent) => {
+        if (gEvent.summary === editedActivity.description) {
+          if (project) gEvent.project = project;
+          if (activity) gEvent.activity = activity;
+        }
+
+        return gEvent;
+      });
+
       localStorage.setItem(
         "googleEvents",
-        JSON.stringify(arrayWithMarkedActivty)
+        JSON.stringify(arrayWithPrefilledValue)
       );
-      setGoogleEvents(arrayWithMarkedActivty);
+      setGoogleEvents(arrayWithPrefilledValue);
     }
 
     close();

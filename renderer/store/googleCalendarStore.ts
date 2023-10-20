@@ -21,6 +21,8 @@ export type GoogleEvent = {
   from: { date: string; time: string };
   to: { date: string; time: string };
   isAdded?: boolean;
+  project?: string;
+  activity?: string;
 };
 
 type googleCalendarStoreProps = {
