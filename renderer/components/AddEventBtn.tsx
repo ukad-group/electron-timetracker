@@ -147,7 +147,7 @@ export default function AddEventBtn({ addEvent }) {
       );
     }
 
-    if (allEvents?.length > 0 && !isError) {
+    if (allEvents?.length > 0 && !isError) {     
       return allEvents.map((event) => {
         const { from, to, id, summary } = event;
 
@@ -159,8 +159,7 @@ export default function AddEventBtn({ addEvent }) {
                   type="button"
                   className={`${
                     active ? "bg-blue-300 text-white" : "text-gray-900"
-                  } 
-                        group w-full p-2 text-sm`}
+                  } group w-full p-2 text-sm`}
                   onClick={() => {
                     addEvent(event);
                   }}
