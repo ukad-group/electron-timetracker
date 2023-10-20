@@ -8,6 +8,7 @@ import {
   updateGoogleCredentials,
 } from "../../API/googleCalendarAPI";
 import { checkAlreadyAddedGoogleEvents } from "../../utils/utils";
+import { googleCalendarEventsParsing } from "./GoogleCalendarEventsParsing";
 
 export type Event = {
   from: {
@@ -100,32 +101,7 @@ export default function GoogleCalendarAddEventBtn({
         event.from = from;
         event.to = to;
 
-        const items = summary ? summary.split(" - ") : "";
-
-        switch (items.length) {
-          case 0:
-            event.description = "";
-            break;
-          case 1:
-            event.description = items[0];
-            break;
-          case 2:
-            if (availableProjects.includes(items[0])) {
-              event.project = items[0];
-              event.description = items[1];
-            } else {
-              event.activity = items[0];
-              event.description = items[1];
-            }
-            break;
-          case 3:
-            event.project = items[0];
-            event.activity = items[1];
-            event.description = items[2];
-            break;
-          default:
-            event.description = items.join(" - ");
-        }
+        event = googleCalendarEventsParsing(event, availableProjects);
 
         return (
           <div className="" key={id}>

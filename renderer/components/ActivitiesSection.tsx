@@ -12,12 +12,14 @@ import {
   padStringToMinutes,
 } from "../utils/datetime-ui";
 import GoogleCalendarEventsMessage from "./google-calendar/GoogleCalendarEventsMessage";
+import { googleCalendarEventsParsing } from "./google-calendar/GoogleCalendarEventsParsing";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
   onEditActivity: (activity: ReportActivity | "new") => void;
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
+  availableProjects: Array<string>;
 };
 
 type PlaceholderProps = {
@@ -30,6 +32,7 @@ export default function ActivitiesSection({
   activities,
   onDeleteActivity,
   selectedDate,
+  availableProjects,
 }: ActivitiesSectionProps) {
   const [backgroundError, setBackgroundError] = useState("");
   const [renderError, setRenderError] = useState<RenderError>({
@@ -81,13 +84,17 @@ export default function ActivitiesSection({
         const from = getTimeFromGoogleObj(start.dateTime);
         const to = getTimeFromGoogleObj(end.dateTime);
 
+        googleEvent = googleCalendarEventsParsing(
+          googleEvent,
+          availableProjects
+        );
         return {
           from: from,
           to: to,
           duration: calcDurationBetweenTimes(from, to),
           project: googleEvent.project || "",
           activity: googleEvent.activity || "",
-          description: googleEvent.summary || "",
+          description: googleEvent.description || "",
           isValid: true,
           calendarId: googleEvent.id,
         };
