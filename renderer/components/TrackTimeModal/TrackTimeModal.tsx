@@ -15,7 +15,7 @@ import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { getCardsOfMember } from "../../API/trelloAPI";
-import { useIsAuthenticated } from "@azure/msal-react";
+// import { useIsAuthenticated } from "@azure/msal-react";
 import AddEventBtn, { Event } from "../AddEventBtn";
 import {
   markActivityAsAdded,
@@ -57,7 +57,7 @@ export default function TrackTimeModal({
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
-  const isAuthenticated = useIsAuthenticated();
+  // const isAuthenticated = useIsAuthenticated();
   const { isLogged, googleEvents, setGoogleEvents } = useGoogleCalendarStore();
 
   const duration = useMemo(() => {
@@ -436,7 +436,8 @@ export default function TrackTimeModal({
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
                     {checkIsToday(selectedDate) &&
-                      (isLogged || isAuthenticated) && (
+                      // (isLogged || isAuthenticated) && (
+                      (isLogged) && (
                         <AddEventBtn
                           addEvent={addEventToList}
                           availableProjects={

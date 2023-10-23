@@ -6,8 +6,8 @@ import {
   getGoogleEvents,
   updateGoogleCredentials,
 } from "../API/googleCalendarAPI";
-import { callTodayEventsGraph, silentRequest } from "../API/office365API";
-import { useIsAuthenticated, useMsal } from "@azure/msal-react";
+// import { callTodayEventsGraph, silentRequest } from "../API/office365API";
+// import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { checkAlreadyAddedGoogleEvents } from "../utils/utils";
 import { googleCalendarEventsParsing } from "./google-calendar/GoogleCalendarEventsParsing";
 
@@ -37,8 +37,8 @@ export default function AddEventBtn({
   const [allEvents, setAllEvents] = useState([]);
 
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
-  const { instance, accounts } = useMsal();
-  const isAuthenticated = useIsAuthenticated();
+  // const { instance, accounts } = useMsal();
+  // const isAuthenticated = useIsAuthenticated();
 
   const loadGoogleEvents = async (gToken: string) => {
     try {
@@ -72,20 +72,20 @@ export default function AddEventBtn({
   };
 
   const getOffice365AccessToken = async () => {
-    const { accessToken } = await instance.acquireTokenSilent({
-      ...silentRequest,
-      account: accounts[0],
-    });
+    // const { accessToken } = await instance.acquireTokenSilent({
+    //   ...silentRequest,
+    //   account: accounts[0],
+    // });
 
-    return accessToken;
+    // return accessToken;
   };
 
   const getOffice365Events = async () => {
-    if (isAuthenticated) {
-      const accessToken = await getOffice365AccessToken();
-      const response = await callTodayEventsGraph(accessToken);
-      setOffice365Events(response.value);
-    }
+    // if (isAuthenticated) {
+    //   const accessToken = await getOffice365AccessToken();
+    //   const response = await callTodayEventsGraph(accessToken);
+    //   setOffice365Events(response.value);
+    // }
   };
 
   useEffect(() => {

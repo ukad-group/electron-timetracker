@@ -4,7 +4,7 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 import FolderSelector from "../components/FolderSelector";
 import { useMainStore } from "../store/mainStore";
 import TrelloConnection from "../components/TrelloConnection";
-import Office365Connection from "../components/Office365Connection";
+// import Office365Connection from "../components/Office365Connection";
 import GoogleConnection from "../components/GoogleConnection";
 
 const SettingsPage = () => {
@@ -59,7 +59,7 @@ const SettingsPage = () => {
           </div>
           <TrelloConnection />
           <GoogleConnection />
-          <Office365Connection />
+          {/* <Office365Connection /> */}
         </div>
       </section>
     </div>
