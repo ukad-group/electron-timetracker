@@ -6,11 +6,11 @@ import {
   persist,
 } from "zustand/middleware";
 
-export type Events = Record<string, {project?:string , activity?:string}>;
+export type ScheduledEvents = Record<string, {project?:string , activity?:string}>;
 
-export type EventsStore = {
-  event: Events;
-  setEvent: (event: Events) => void;
+export type ScheduledEventsStore = {
+  event: ScheduledEvents;
+  setEvent: (event: ScheduledEvents) => void;
 };
 
 const storage: StateStorage = {
@@ -25,16 +25,16 @@ const storage: StateStorage = {
   },
 };
 
-export const useEventsStore = create<EventsStore>()(
+export const useScheduledEventsStore = create<ScheduledEventsStore>()(
   devtools(
     persist(
       (set) => ({
         event: {"":{}} ,
-        setEvent: (event: Events) =>
+        setEvent: (event: ScheduledEvents) =>
           set({ event: event }),
       }),
       {
-        name: "event-storage",
+        name: "scheduled-events-storage",
         storage: createJSONStorage(() => storage),
       }
     )
