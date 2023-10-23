@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ReportActivity, formatDuration, validation } from "../utils/reports";
 import { checkIsToday, getCeiledTime } from "../utils/datetime-ui";
 import TimeBadge from "../components/ui/TimeBadge";
@@ -23,6 +23,7 @@ export default function ActivitiesTable({
   onDeleteActivity,
   selectedDate,
 }: ActivitiesTableProps) {
+  const [ctrlPressed, setCtrlPressed] = useState(false);
   const nonBreakActivities = useMemo(() => {
     return validation(
       activities.filter((activity) => !activity.isBreak && activity.project)
@@ -70,17 +71,40 @@ export default function ActivitiesTable({
       });
   };
   const handleKeyDown = (event) => {
-    if (event.ctrlKey && event.key === "ArrowUp") {
+    if (
+      (event.ctrlKey && event.key === "ArrowUp") ||
+      (event.key === "Meta" && event.key === "ArrowUp")
+    ) {
       if (nonBreakActivities.length > 0) {
         const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
         onEditActivity(lastActivity);
       }
     }
+    if (event.key === "Control" || event.key === "Meta") {
+      setCtrlPressed(true);
+    }
+    if (
+      (event.ctrlKey || event.key === "Control" || event.key === "Meta") &&
+      /^[1-9]$/.test(event.key)
+    ) {
+      const number = parseInt(event.key, 10);
+      if (number >= 1 && number <= nonBreakActivities.length) {
+        const selectedActivity = nonBreakActivities[Number(event.key) - 1];
+        onEditActivity(selectedActivity);
+      }
+    }
+  };
+  const handleKeyUp = (event) => {
+    if (event.key === "Control" || event.key === "Meta") {
+      setCtrlPressed(false);
+    }
   };
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.addEventListener("keyup", handleKeyUp);
     };
   }, []);
 
@@ -145,7 +169,11 @@ export default function ActivitiesTable({
                 i + 1 !== nonBreakActivities.length,
             })}
           >
-            <td className="py-4 pl-4 pr-3 text-sm text-gray-500 whitespace-nowrap sm:pl-6 md:pl-0">
+            <td className="relative py-4 pl-4 pr-3 text-sm text-gray-500 whitespace-nowrap sm:pl-6 md:pl-0">
+              {ctrlPressed && (
+                <span className="absolute -left-4 text-blue-700">{i + 1}</span>
+              )}
+
               <span
                 className={clsx({
                   "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800":
