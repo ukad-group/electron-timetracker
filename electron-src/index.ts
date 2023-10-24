@@ -10,6 +10,11 @@ import { createWindow } from "./helpers/create-window";
 import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
+import { initialize, trackEvent } from "@aptabase/electron/main";
+
+
+
+initialize("A-EU-9361517871");
 
 const PORT = 51432;
 
