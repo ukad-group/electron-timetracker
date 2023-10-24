@@ -11,9 +11,9 @@ function App({ Component, pageProps }: AppProps) {
   const AnyComponent = Component as any; // need review this
   return (
     <>
-    <Head>
-      <title>UKAD Timetrecker</title>
-    </Head>
+      <Head>
+        <title>UKAD Timetaecker</title>
+      </Head>
       <AnyComponent {...pageProps} />
     </>
   );
