@@ -1,6 +1,7 @@
 const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const clientSecret = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET;
-const redirectURI = "http://localhost:51432/settings";
+const PORT = process.env.NEXT_PUBLIC_PORT;
+const redirectURI = `http://localhost:${PORT}/settings`;
 const scope =
   "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile";
 
@@ -85,7 +86,7 @@ export const getGoogleEvents = async (token: string) => {
   return response.json();
 };
 
-export const getGoogleUsername = async (googleAccessToken: string) => {
+export const getGoogleUserInfo = async (googleAccessToken: string) => {
   const response = await fetch(
     "https://people.googleapis.com/v1/people/me?personFields=names",
     {
@@ -95,7 +96,7 @@ export const getGoogleUsername = async (googleAccessToken: string) => {
     }
   );
 
-  if (!response.ok && response.status !== 401) {
+  if (!response.ok) {
     throw new Error();
   }
 
