@@ -1,16 +1,25 @@
 import { useEffect, useState } from "react";
-import { ipcRenderer } from "electron";
 import { ClockIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import ActivitiesTable from "./ActivitiesTable";
 import { ReportActivity } from "../utils/reports";
 import { ErrorPlaceholder, RenderError } from "./ui/ErrorPlaceholder";
 import { PlusIcon } from "@heroicons/react/24/solid";
+import { useGoogleCalendarStore } from "../store/googleCalendarStore";
+import { calcDurationBetweenTimes } from "../utils/reports";
+import {
+  checkIsToday,
+  getTimeFromGoogleObj,
+  padStringToMinutes,
+} from "../utils/datetime-ui";
+import GoogleCalendarEventsMessage from "./google-calendar/GoogleCalendarEventsMessage";
+import { googleCalendarEventsParsing } from "./google-calendar/GoogleCalendarEventsParsing";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
   onEditActivity: (activity: ReportActivity | "new") => void;
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
+  availableProjects: Array<string>;
 };
 
 type PlaceholderProps = {
@@ -23,18 +32,76 @@ export default function ActivitiesSection({
   activities,
   onDeleteActivity,
   selectedDate,
+  availableProjects,
 }: ActivitiesSectionProps) {
   const [backgroundError, setBackgroundError] = useState("");
   const [renderError, setRenderError] = useState<RenderError>({
     errorTitle: "",
     errorMessage: "",
   });
+  const { googleEvents, isLogged } = useGoogleCalendarStore();
+  const [showGoogleEvents, setShowGoogleEvents] = useState(false);
+  const [formattedGoogleEvents, setFormattedGoogleEvents] = useState([]);
+  const today = checkIsToday(selectedDate);
+  const showGoogleEVentsTip = JSON.parse(
+    localStorage.getItem("showGoogleEvents")
+  );
 
   const keydownHandler = (e: KeyboardEvent) => {
     if (e.code === "Space" && e.ctrlKey) {
       onEditActivity("new");
     }
   };
+
+  useEffect(() => {
+    if (!today) setShowGoogleEvents(false);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (googleEvents.length === 0) return;
+
+    if (showGoogleEvents === false) setFormattedGoogleEvents([]);
+
+    const formattedEvents = googleEvents
+      .filter((googleEvent) => {
+        const { end } = googleEvent;
+        const to = getTimeFromGoogleObj(end.dateTime);
+        const isOverlapped = activities.some((activity) => {
+          return padStringToMinutes(activity.to) >= padStringToMinutes(to);
+        });
+
+        if (
+          !googleEvent?.isAdded &&
+          googleEvent?.start?.dateTime &&
+          googleEvent?.end?.dateTime &&
+          !isOverlapped
+        ) {
+          return googleEvent;
+        }
+      })
+      .map((googleEvent) => {
+        const { start, end } = googleEvent;
+        const from = getTimeFromGoogleObj(start.dateTime);
+        const to = getTimeFromGoogleObj(end.dateTime);
+
+        googleEvent = googleCalendarEventsParsing(
+          googleEvent,
+          availableProjects
+        );
+        return {
+          from: from,
+          to: to,
+          duration: calcDurationBetweenTimes(from, to),
+          project: googleEvent.project || "",
+          activity: googleEvent.activity || "",
+          description: googleEvent.description || "",
+          isValid: true,
+          calendarId: googleEvent.id,
+        };
+      });
+
+    setFormattedGoogleEvents(formattedEvents);
+  }, [showGoogleEvents, googleEvents, activities]);
 
   useEffect(() => {
     document.addEventListener("keydown", keydownHandler);
@@ -49,8 +116,11 @@ export default function ActivitiesSection({
         console.log("Error data ", data);
       }
     );
+
     return () => {
       document.removeEventListener("keydown", keydownHandler);
+      global.ipcRenderer.removeAllListeners("background error");
+      global.ipcRenderer.removeAllListeners("render error");
     };
   }, []);
 
@@ -90,8 +160,25 @@ export default function ActivitiesSection({
           activities={activities}
           onDeleteActivity={onDeleteActivity}
           selectedDate={selectedDate}
+          formattedGoogleEvents={
+            showGoogleEvents &&
+            googleEvents.length > 0 &&
+            formattedGoogleEvents.length > 0
+              ? formattedGoogleEvents
+              : undefined
+          }
         />
       </div>
+
+      <div className="flex gap-2 px-6 pb-4 items-center justify-end mr-auto">
+        {today && isLogged && showGoogleEVentsTip && (
+          <GoogleCalendarEventsMessage
+            setShowGoogleEvents={setShowGoogleEvents}
+            formattedGoogleEvents={formattedGoogleEvents}
+          />
+        )}
+      </div>
+
       <div>
         <button
           className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300  sm:rounded-b-lg"

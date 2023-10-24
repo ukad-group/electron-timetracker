@@ -2,7 +2,7 @@
   "private": true,
   "name": "timetracker",
   "description": "Timetracker app",
-  "version": "1.47.0",
+  "version": "1.47.0-beta.1",
   "author": "mmmykhailo <mmmykhailo@proton.me>",
   "main": "main/index.js",
   "scripts": {
@@ -48,6 +48,8 @@
   },
   "dependencies": {
     "@aptabase/electron": "^0.2.2",
+    "@azure/msal-browser": "^3.2.0",
+    "@azure/msal-react": "^2.0.4",
     "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.8",
     "@fullcalendar/interaction": "^6.1.8",

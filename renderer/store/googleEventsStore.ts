@@ -1,4 +1,4 @@
-import { createWithEqualityFn } from "zustand/traditional";
+import { create } from "zustand";
 import {
   StateStorage,
   createJSONStorage,
@@ -6,9 +6,11 @@ import {
   persist,
 } from "zustand/middleware";
 
-export type BetaStore = {
-  isBeta: boolean;
-  setIsBeta: (isDownload: boolean) => void;
+export type ScheduledEvents = Record<string, {project?:string , activity?:string}>;
+
+export type ScheduledEventsStore = {
+  event: ScheduledEvents;
+  setEvent: (event: ScheduledEvents) => void;
 };
 
 const storage: StateStorage = {
@@ -23,18 +25,18 @@ const storage: StateStorage = {
   },
 };
 
-export const useBetaStore = createWithEqualityFn<BetaStore>()(
+export const useScheduledEventsStore = create<ScheduledEventsStore>()(
   devtools(
     persist(
       (set) => ({
-        isBeta: false,
-        setIsBeta: (isDownload: boolean) => set({ isBeta: isDownload }),
+        event: {"":{}} ,
+        setEvent: (event: ScheduledEvents) =>
+          set({ event: event }),
       }),
       {
-        name: "beta-storage",
+        name: "scheduled-events-storage",
         storage: createJSONStorage(() => storage),
       }
     )
-  ),
-  null
+  )
 );

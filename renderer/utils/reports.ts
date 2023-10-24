@@ -1,6 +1,3 @@
-import next from "next/types";
-import { ipcRenderer } from "electron";
-
 export type ReportActivity = {
   id: number;
   from: string;
@@ -12,6 +9,7 @@ export type ReportActivity = {
   isBreak?: boolean;
   isValid?: boolean;
   mistakes?: string;
+  calendarId?: string;
 };
 export type ReportAndNotes = [Array<Partial<ReportActivity>>, string];
 export function parseReport(fileContent: string) {

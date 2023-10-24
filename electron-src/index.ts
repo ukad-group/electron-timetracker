@@ -135,6 +135,7 @@ const generateTray = () => {
       mainWindow?.show();
     }
     autoUpdater.checkForUpdates();
+    mainWindow?.webContents.send("window-restored");
   });
 };
 
@@ -155,7 +156,7 @@ app.on("ready", async () => {
   createServer((req: any, res: any) => {
     const parsedUrl = parse(req.url, true);
     requestHandler(req, res, parsedUrl);
-  }).listen(PORT, () => {
+  }).listen(PORT, '127.0.0.1', () => {
     console.log(`> Ready on http://localhost:${PORT}`);
   });
 
@@ -242,6 +243,10 @@ app.on("ready", async () => {
       }
     );
   }
+
+  mainWindow?.on("restore", () => {
+    mainWindow?.webContents.send("window-restored");
+  });
 });
 
 app.on("window-all-closed", () => {

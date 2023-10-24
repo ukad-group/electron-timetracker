@@ -161,49 +161,49 @@ export default function Home() {
       (act) => act.id === activity.id
     );
 
-    if (activity.project === "delete") {
-      setSelectedDateActivities((activities) => {
-        if (activities.length === activityIndex + 2 && !activityIndex) {
-          return [];
-        }
-        if (
-          activities[activityIndex + 1].isBreak &&
-          activities.length !== activityIndex + 2
-        ) {
-          activities = activities.filter(
-            (act) => act.id !== activities[activityIndex + 1].id
-          );
-        }
-        if (activityIndex) {
-          activities[activityIndex - 1].to = activities[activityIndex + 1].from;
-        } else if (activities[activityIndex].isBreak) {
-          return activities.filter(
-            (act) => act.id !== activities[activityIndex].id
-          );
-        }
+    // if (activity.project === "delete") {
+    //   setSelectedDateActivities((activities) => {
+    //     if (activities.length === activityIndex + 2 && !activityIndex) {
+    //       return [];
+    //     }
+    //     if (
+    //       activities[activityIndex + 1].isBreak &&
+    //       activities.length !== activityIndex + 2
+    //     ) {
+    //       activities = activities.filter(
+    //         (act) => act.id !== activities[activityIndex + 1].id
+    //       );
+    //     }
+    //     if (activityIndex) {
+    //       activities[activityIndex - 1].to = activities[activityIndex + 1].from;
+    //     } else if (activities[activityIndex].isBreak) {
+    //       return activities.filter(
+    //         (act) => act.id !== activities[activityIndex].id
+    //       );
+    //     }
 
-        if (activities.length === activityIndex + 2) {
-          activities[activityIndex - 1].to = activities[activityIndex].from;
-          if (activities[activityIndex - 1].isBreak) {
-            return activities.filter(
-              (act) =>
-                act.id !== activities[activityIndex].id &&
-                act.id !== activities[activityIndex + 1].id &&
-                act.id !== activities[activityIndex - 1].id
-            );
-          }
-          return activities.filter(
-            (act) =>
-              act.id !== activities[activityIndex].id &&
-              act.id !== activities[activityIndex + 1].id
-          );
-        }
-        const filtered = activities.filter((act) => act.id !== activity.id);
-        return filtered;
-      });
-      setShouldAutosave(true);
-      return;
-    }
+    //     if (activities.length === activityIndex + 2) {
+    //       activities[activityIndex - 1].to = activities[activityIndex].from;
+    //       if (activities[activityIndex - 1].isBreak) {
+    //         return activities.filter(
+    //           (act) =>
+    //             act.id !== activities[activityIndex].id &&
+    //             act.id !== activities[activityIndex + 1].id &&
+    //             act.id !== activities[activityIndex - 1].id
+    //         );
+    //       }
+    //       return activities.filter(
+    //         (act) =>
+    //           act.id !== activities[activityIndex].id &&
+    //           act.id !== activities[activityIndex + 1].id
+    //       );
+    //     }
+    //     const filtered = activities.filter((act) => act.id !== activity.id);
+    //     return filtered;
+    //   });
+    //   setShouldAutosave(true);
+    //   return;
+    // }
     const tempActivities: Array<ReportActivity> = [];
     const newActFrom = stringToMinutes(activity.from);
     const newActTo = stringToMinutes(activity.to);
@@ -267,11 +267,12 @@ export default function Home() {
           tempActivities.push(...selectedDateActivities);
           break;
         }
-        if (newActFrom === indexActFrom) {
-          tempActivities.push(activity);
-          isPastTime = true;
-          continue;
-        }
+        // if (newActFrom === indexActFrom) {
+        //   tempActivities.push(activity);
+        //   isPastTime = true;
+        //   activity.isValid = true;
+        //   continue;
+        // }
       } catch (err) {
         global.ipcRenderer.send(
           "front error",
@@ -349,6 +350,9 @@ export default function Home() {
                       onEditActivity={setTrackTimeModalActivity}
                       onDeleteActivity={onDeleteActivity}
                       selectedDate={selectedDate}
+                      availableProjects={
+                        latestProjAndAct ? Object.keys(latestProjAndAct) : []
+                      }
                     />
                   </div>
                 </section>

@@ -72,3 +72,18 @@ export function getCeiledTime() {
 
   return `${ceilHours}:${ceilMinutes}`;
 }
+
+export const getTimeFromGoogleObj = (date: string) => {
+  return new Date(date).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
+
+export const padStringToMinutes = (timeString: string) => {
+  if (!timeString) return;
+
+  const [hours, minutes] = timeString.split(":").map(Number);
+  return hours * 60 + minutes;
+};

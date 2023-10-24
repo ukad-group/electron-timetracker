@@ -1,16 +1,41 @@
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
+
+export type GoogleEvent = {
+  created: string;
+  creator: { email: string; self: boolean };
+  description: string;
+  end: { dateTime: string; timeZone: string };
+  etag: string;
+  eventType: string;
+  htmlLink: URL;
+  iCalUID: string;
+  id: string;
+  kind: string;
+  organizer: { email: string; self: true };
+  reminders: { useDefault: boolean };
+  sequence: number;
+  start: { dateTime: string; timeZone: string };
+  status: string;
+  summary: string;
+  updated: string;
+  from: { date: string; time: string };
+  to: { date: string; time: string };
+  isAdded?: boolean;
+  project?: string;
+  activity?: string;
+};
 
 type googleCalendarStoreProps = {
-  googleEvents: any[];
-  setGoogleEvents: (gEvents: any[]) => void;
+  googleEvents: GoogleEvent[];
+  setGoogleEvents: (gEvents: GoogleEvent[]) => void;
   isLogged: boolean;
   setIsLogged: (userLogged: boolean) => void;
   googleUsername: string;
   setGoogleUsername: (username: string) => void;
 };
 
-export const useGoogleCalendarStore = create<googleCalendarStoreProps>(
-  (set) => {
+export const useGoogleCalendarStore =
+  createWithEqualityFn<googleCalendarStoreProps>((set) => {
     return {
       googleEvents: [],
       setGoogleEvents: (events) => set(() => ({ googleEvents: events })),
@@ -20,5 +45,4 @@ export const useGoogleCalendarStore = create<googleCalendarStoreProps>(
       setGoogleUsername: (username) =>
         set(() => ({ googleUsername: username })),
     };
-  }
-);
+  }, null);

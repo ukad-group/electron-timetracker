@@ -1,20 +1,22 @@
 import clsx from "clsx";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState, Dispatch, SetStateAction } from "react";
 import { ReportActivity, formatDuration, validation } from "../utils/reports";
 import { checkIsToday, getCeiledTime } from "../utils/datetime-ui";
 import TimeBadge from "../components/ui/TimeBadge";
 import {
   Square2StackIcon,
   PencilSquareIcon,
-  ArchiveBoxXMarkIcon,
 } from "@heroicons/react/24/outline";
 import Tooltip from "./ui/Tooltip/Tooltip";
+import { PlusIcon } from "@heroicons/react/24/solid";
+import { concatSortArrays } from "../utils/utils";
 
 type ActivitiesTableProps = {
   activities: Array<ReportActivity>;
   onEditActivity: (activity: ReportActivity) => void;
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
+  formattedGoogleEvents: ReportActivity[];
 };
 const msPerHour = 60 * 60 * 1000;
 export default function ActivitiesTable({
@@ -22,6 +24,7 @@ export default function ActivitiesTable({
   onEditActivity,
   onDeleteActivity,
   selectedDate,
+  formattedGoogleEvents,
 }: ActivitiesTableProps) {
   const nonBreakActivities = useMemo(() => {
     return validation(
@@ -34,6 +37,12 @@ export default function ActivitiesTable({
       return value + (activity.duration ? activity.duration : 0);
     }, 0);
   }, [nonBreakActivities]);
+
+  const tableActivities = useMemo(() => {
+    return formattedGoogleEvents && formattedGoogleEvents.length > 0
+      ? concatSortArrays(nonBreakActivities, formattedGoogleEvents)
+      : nonBreakActivities;
+  }, [nonBreakActivities, formattedGoogleEvents]);
 
   const copyToClipboardHandle = (e) => {
     const cell = e.target;
@@ -69,6 +78,7 @@ export default function ActivitiesTable({
         console.error("Clipboard write error:", error);
       });
   };
+
   const handleKeyDown = (event) => {
     if (event.ctrlKey && event.key === "ArrowUp") {
       if (nonBreakActivities.length > 0) {
@@ -77,6 +87,7 @@ export default function ActivitiesTable({
       }
     }
   };
+
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -90,7 +101,7 @@ export default function ActivitiesTable({
         <tr>
           <th
             scope="col"
-            className="w-24 pb-6 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0"
+            className="w-24 pb-6 px-3 text-left text-sm font-semibold text-gray-900"
           >
             Interval
           </th>
@@ -136,16 +147,16 @@ export default function ActivitiesTable({
         </tr>
       </thead>
       <tbody className="">
-        {nonBreakActivities.map((activity, i) => (
+        {tableActivities.map((activity, i) => (
           <tr
-            key={activity.id}
-            className={clsx("border-b border-gray-200", {
+            key={i}
+            className={clsx(`border-b border-gray-200 `, {
               "border-dashed border-b-2 border-gray-200":
-                nonBreakActivities[i].to != nonBreakActivities[i + 1]?.from &&
-                i + 1 !== nonBreakActivities.length,
+                tableActivities[i].to != tableActivities[i + 1]?.from &&
+                i + 1 !== tableActivities.length,
             })}
           >
-            <td className="py-4 pl-4 pr-3 text-sm text-gray-500 whitespace-nowrap sm:pl-6 md:pl-0">
+            <td className="py-4 px-3 text-sm text-gray-500 whitespace-nowrap">
               <span
                 className={clsx({
                   "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800":
@@ -202,47 +213,53 @@ export default function ActivitiesTable({
                 )}
               </Tooltip>
             </td>
-            {/* <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              <button
-                className="group py-4 px-3"
-                title="Delete"
-                onClick={() => {
-                  onDeleteActivity(activity.id);
-                }}
-              >
-                <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
-              </button>
-            </td> */}
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              <button
-                className="group py-4 px-3"
-                title="Copy"
-                onClick={() => {
-                  onEditActivity({
-                    ...activity,
-                    id: null,
-                    from: activities[activities.length - 2].to,
-                    to: checkIsToday(selectedDate) ? getCeiledTime() : "",
-                    duration: null,
-                  });
-                }}
-              >
-                <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
-              </button>
+              <div className={`${activity.calendarId ? "invisible" : ""}`}>
+                <button
+                  className="group py-4 px-3"
+                  title="Copy"
+                  onClick={() => {
+                    onEditActivity({
+                      ...activity,
+                      id: null,
+                      from: activities[activities.length - 2].to,
+                      to: checkIsToday(selectedDate) ? getCeiledTime() : "",
+                      duration: null,
+                    });
+                  }}
+                >
+                  <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+                </button>
+              </div>
             </td>
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
               <button
                 className="group py-4 px-3"
-                title="Edit"
-                onClick={() => onEditActivity(activity)}
+                title={activity.calendarId ? "Add" : "Edit"}
+                onClick={() => {
+                  if (activity.calendarId) {
+                    onEditActivity({
+                      ...activity,
+                      id: null,
+                    });
+                  } else {
+                    onEditActivity(activity);
+                  }
+                }}
               >
-                <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+                {!activity.calendarId && (
+                  <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+                )}
+
+                {activity.calendarId && (
+                  <PlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+                )}
               </button>
             </td>
           </tr>
         ))}
         <tr>
-          <td className="py-4 pl-4 pr-3 text-sm text-gray-500 whitespace-nowrap sm:pl-6 md:pl-0">
+          <td className="py-4 px-3 text-sm text-gray-500 whitespace-nowrap">
             <p>Total</p>
           </td>
           <td
@@ -259,7 +276,7 @@ export default function ActivitiesTable({
           >
             <TimeBadge
               hours={totalDuration / msPerHour}
-              startTime={nonBreakActivities[0].from}
+              startTime={tableActivities[0].from}
               selectedDate={selectedDate}
             />
           </td>
@@ -267,4 +284,18 @@ export default function ActivitiesTable({
       </tbody>
     </table>
   );
+}
+
+{
+  /* <td className="relative text-sm font-medium text-right whitespace-nowrap">
+              <button
+                className="group py-4 px-3"
+                title="Delete"
+                onClick={() => {
+                  onDeleteActivity(activity.id);
+                }}
+              >
+                <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+              </button>
+            </td> */
 }
