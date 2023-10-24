@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 
 export type GoogleEvent = {
   created: string;
@@ -34,8 +34,8 @@ type googleCalendarStoreProps = {
   setGoogleUsername: (username: string) => void;
 };
 
-export const useGoogleCalendarStore = create<googleCalendarStoreProps>(
-  (set) => {
+export const useGoogleCalendarStore =
+  createWithEqualityFn<googleCalendarStoreProps>((set) => {
     return {
       googleEvents: [],
       setGoogleEvents: (events) => set(() => ({ googleEvents: events })),
@@ -45,5 +45,4 @@ export const useGoogleCalendarStore = create<googleCalendarStoreProps>(
       setGoogleUsername: (username) =>
         set(() => ({ googleUsername: username })),
     };
-  }
-);
+  }, null);
