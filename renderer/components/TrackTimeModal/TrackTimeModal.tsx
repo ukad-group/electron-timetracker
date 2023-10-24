@@ -57,7 +57,7 @@ export default function TrackTimeModal({
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
-  const isAuthenticated = useIsAuthenticated();
+  // const isAuthenticated = useIsAuthenticated();
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const loggedGoogleUsers = JSON.parse(localStorage.getItem("googleUsers"));
 
@@ -437,7 +437,8 @@ export default function TrackTimeModal({
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
                     {checkIsToday(selectedDate) &&
-                      (loggedGoogleUsers || isAuthenticated) && (
+                      // (loggedGoogleUsers?.length > 0 || isAuthenticated) && (
+                      loggedGoogleUsers?.length > 0 && (
                         <AddEventBtn
                           addEvent={addEventToList}
                           availableProjects={
