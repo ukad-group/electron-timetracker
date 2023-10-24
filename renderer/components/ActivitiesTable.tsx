@@ -6,7 +6,6 @@ import TimeBadge from "../components/ui/TimeBadge";
 import {
   Square2StackIcon,
   PencilSquareIcon,
-  ArchiveBoxXMarkIcon,
 } from "@heroicons/react/24/outline";
 import Tooltip from "./ui/Tooltip/Tooltip";
 import { PlusIcon } from "@heroicons/react/24/solid";
@@ -151,16 +150,11 @@ export default function ActivitiesTable({
         {tableActivities.map((activity, i) => (
           <tr
             key={i}
-            className={clsx(
-              `border-b border-gray-200 ${
-                activity.calendarId ? "bg-gray-100" : ""
-              }`,
-              {
-                "border-dashed border-b-2 border-gray-200":
-                  tableActivities[i].to != tableActivities[i + 1]?.from &&
-                  i + 1 !== tableActivities.length,
-              }
-            )}
+            className={clsx(`border-b border-gray-200 `, {
+              "border-dashed border-b-2 border-gray-200":
+                tableActivities[i].to != tableActivities[i + 1]?.from &&
+                i + 1 !== tableActivities.length,
+            })}
           >
             <td className="py-4 px-3 text-sm text-gray-500 whitespace-nowrap">
               <span

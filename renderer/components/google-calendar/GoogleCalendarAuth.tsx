@@ -23,6 +23,7 @@ function GoogleCalendarAuth() {
     localStorage.removeItem("googleAccessToken");
     localStorage.removeItem("googleRefreshToken");
     localStorage.removeItem("googleEvents");
+    localStorage.setItem("showGoogleEvents", false.toString());
     setIsLogged(false);
     router.push("/settings");
   };

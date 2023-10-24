@@ -6,14 +6,20 @@ import { ErrorPlaceholder, RenderError } from "./ui/ErrorPlaceholder";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { useGoogleCalendarStore } from "../store/googleCalendarStore";
 import { calcDurationBetweenTimes } from "../utils/reports";
-import { checkIsToday, getTimeFromGoogleObj } from "../utils/datetime-ui";
-import GoogleCalendarShowCheckbox from "./google-calendar/GoogleCalendarShowCheckbox";
+import {
+  checkIsToday,
+  getTimeFromGoogleObj,
+  padStringToMinutes,
+} from "../utils/datetime-ui";
+import GoogleCalendarEventsMessage from "./google-calendar/GoogleCalendarEventsMessage";
+import { googleCalendarEventsParsing } from "./google-calendar/GoogleCalendarEventsParsing";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
   onEditActivity: (activity: ReportActivity | "new") => void;
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
+  availableProjects: Array<string>;
 };
 
 type PlaceholderProps = {
@@ -26,6 +32,7 @@ export default function ActivitiesSection({
   activities,
   onDeleteActivity,
   selectedDate,
+  availableProjects,
 }: ActivitiesSectionProps) {
   const [backgroundError, setBackgroundError] = useState("");
   const [renderError, setRenderError] = useState<RenderError>({
@@ -36,6 +43,9 @@ export default function ActivitiesSection({
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);
   const [formattedGoogleEvents, setFormattedGoogleEvents] = useState([]);
   const today = checkIsToday(selectedDate);
+  const showGoogleEVentsTip = JSON.parse(
+    localStorage.getItem("showGoogleEvents")
+  );
 
   const keydownHandler = (e: KeyboardEvent) => {
     if (e.code === "Space" && e.ctrlKey) {
@@ -53,26 +63,45 @@ export default function ActivitiesSection({
     if (showGoogleEvents === false) setFormattedGoogleEvents([]);
 
     const formattedEvents = googleEvents
-      .filter((googleEvent) => !googleEvent?.isAdded)
+      .filter((googleEvent) => {
+        const { end } = googleEvent;
+        const to = getTimeFromGoogleObj(end.dateTime);
+        const isOverlapped = activities.some((activity) => {
+          return padStringToMinutes(activity.to) >= padStringToMinutes(to);
+        });
+
+        if (
+          !googleEvent?.isAdded &&
+          googleEvent?.start?.dateTime &&
+          googleEvent?.end?.dateTime &&
+          !isOverlapped
+        ) {
+          return googleEvent;
+        }
+      })
       .map((googleEvent) => {
         const { start, end } = googleEvent;
         const from = getTimeFromGoogleObj(start.dateTime);
         const to = getTimeFromGoogleObj(end.dateTime);
 
+        googleEvent = googleCalendarEventsParsing(
+          googleEvent,
+          availableProjects
+        );
         return {
           from: from,
           to: to,
           duration: calcDurationBetweenTimes(from, to),
-          project: "",
-          activity: "",
-          description: googleEvent.summary || "",
+          project: googleEvent.project || "",
+          activity: googleEvent.activity || "",
+          description: googleEvent.description || "",
           isValid: true,
           calendarId: googleEvent.id,
         };
       });
 
     setFormattedGoogleEvents(formattedEvents);
-  }, [showGoogleEvents, googleEvents]);
+  }, [showGoogleEvents, googleEvents, activities]);
 
   useEffect(() => {
     document.addEventListener("keydown", keydownHandler);
@@ -142,9 +171,10 @@ export default function ActivitiesSection({
       </div>
 
       <div className="flex gap-2 px-6 pb-4 items-center justify-end mr-auto">
-        {today && isLogged && (
-          <GoogleCalendarShowCheckbox
+        {today && isLogged && showGoogleEVentsTip && (
+          <GoogleCalendarEventsMessage
             setShowGoogleEvents={setShowGoogleEvents}
+            formattedGoogleEvents={formattedGoogleEvents}
           />
         )}
       </div>

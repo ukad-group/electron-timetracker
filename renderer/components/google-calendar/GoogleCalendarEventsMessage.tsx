@@ -6,14 +6,17 @@ import {
 } from "../../API/googleCalendarAPI";
 import { checkAlreadyAddedGoogleEvents } from "../../utils/utils";
 import Loader from "../ui/Loader";
+import { ReportActivity } from "../../utils/reports";
 
-type GoogleCalendarShowCheckboxProps = {
+type GoogleCalendarEventsMessageProps = {
   setShowGoogleEvents: Dispatch<SetStateAction<Boolean>>;
+  formattedGoogleEvents: ReportActivity[];
 };
 
-export default function GoogleCalendarShowCheckbox({
+export default function GoogleCalendarEventsMessage({
   setShowGoogleEvents,
-}: GoogleCalendarShowCheckboxProps) {
+  formattedGoogleEvents,
+}: GoogleCalendarEventsMessageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
@@ -33,21 +36,25 @@ export default function GoogleCalendarShowCheckbox({
         return;
       }
 
-      const storedGoogleEvents = JSON.parse(localStorage.getItem("googleEvents"));
+      const storedgoogleEvents = JSON.parse(
+        localStorage.getItem("googleEvents")
+      );
 
-      if (storedGoogleEvents === null) {
+      if (storedgoogleEvents === null) {
         localStorage.setItem("googleEvents", JSON.stringify(data?.items));
+        setShowGoogleEvents(true);
         setGoogleEvents(data?.items);
         return;
       }
 
       const checkedGoogleEvents = checkAlreadyAddedGoogleEvents(
-        storedGoogleEvents,
+        storedgoogleEvents,
         data?.items
       );
 
       localStorage.setItem("googleEvents", JSON.stringify(checkedGoogleEvents));
       setGoogleEvents(checkedGoogleEvents);
+      setShowGoogleEvents(true);
     } catch (error) {
       setIsError(true);
       console.error(error);
@@ -58,8 +65,9 @@ export default function GoogleCalendarShowCheckbox({
 
   useEffect(() => {
     const googleAccessToken = localStorage.getItem("googleAccessToken");
+    const showGoogleEvents = localStorage.getItem("showGoogleEvents");
 
-    if (googleAccessToken) {
+    if (googleAccessToken && showGoogleEvents === "true") {
       loadGoogleEvents(googleAccessToken);
 
       global.ipcRenderer.on("window-restored", () => {
@@ -81,7 +89,6 @@ export default function GoogleCalendarShowCheckbox({
 
     localStorage.setItem("googleEvents", JSON.stringify(resetedGoogleEvents));
     setGoogleEvents(resetedGoogleEvents);
-    setShowGoogleEvents(false);
   };
 
   if (isLoading) {
@@ -108,7 +115,9 @@ export default function GoogleCalendarShowCheckbox({
 
   if (
     googleEvents?.length > 0 &&
-    googleEvents.every((gEvent) => gEvent?.isAdded)
+    googleEvents.every((gEvent) => {
+      return gEvent?.isAdded || !gEvent?.start?.dateTime;
+    })
   ) {
     return (
       <>
@@ -125,17 +134,39 @@ export default function GoogleCalendarShowCheckbox({
     );
   }
 
+  if (
+    formattedGoogleEvents.length <
+      googleEvents.filter((gEvent) => !gEvent.isAdded).length &&
+    formattedGoogleEvents.length !== 0
+  ) {
+    return (
+      <p className="text-sm text-gray-500">
+        Google events are showing. Skipped{" "}
+        {googleEvents.filter((gEvent) => !gEvent.isAdded).length -
+          formattedGoogleEvents.length}{" "}
+        event(s)
+      </p>
+    );
+  }
+
+  if (
+    formattedGoogleEvents?.length === 0 &&
+    !googleEvents.every((gEvent) => {
+      return gEvent?.isAdded || !gEvent?.start?.dateTime;
+    })
+  ) {
+    return (
+      <p className="text-sm text-gray-500">
+        Skipped {googleEvents.filter((gEvent) => !gEvent?.isAdded)?.length}{" "}
+        event(s)
+      </p>
+    );
+  }
+
   if (googleEvents?.length > 0) {
     return (
       <>
-        <label className="text-sm text-gray-500" htmlFor="google-calendar">
-          Show Google calendar events
-        </label>
-        <input
-          onClick={() => setShowGoogleEvents((prev) => !prev)}
-          id="google-calendar"
-          type="checkbox"
-        ></input>
+        <p className="text-sm text-gray-500">Google events are showing</p>
       </>
     );
   }

@@ -13,16 +13,12 @@ import {
 import { checkIsToday } from "../../utils/datetime-ui";
 import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
-import GoogleCalendarAddEventBtn, {
-  Event,
-} from "../google-calendar/GoogleCalendarAddEventBtn";
 import { shallow } from "zustand/shallow";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
-import {
-  useScheduledEventsStore,
-  ScheduledEvents,
-} from "../../store/googleEventsStore";
+import { useScheduledEventsStore } from "../../store/googleEventsStore";
 import { getCardsOfMember } from "../../API/trelloAPI";
+// import { useIsAuthenticated } from "@azure/msal-react";
+import AddEventBtn, { Event } from "../AddEventBtn";
 import {
   markActivityAsAdded,
   replaceHyphensWithSpaces,
@@ -63,6 +59,7 @@ export default function TrackTimeModal({
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
+  // const isAuthenticated = useIsAuthenticated();
   const { isLogged, googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
     (state) => [state.event, state.setEvent],
@@ -194,11 +191,20 @@ export default function TrackTimeModal({
         editedActivity
       );
 
+      const arrayWithPrefilledValue = arrayWithMarkedActivty.map((gEvent) => {
+        if (gEvent.summary === editedActivity.description) {
+          if (project) gEvent.project = project;
+          if (activity) gEvent.activity = activity;
+        }
+
+        return gEvent;
+      });
+
       localStorage.setItem(
         "googleEvents",
-        JSON.stringify(arrayWithMarkedActivty)
+        JSON.stringify(arrayWithPrefilledValue)
       );
-      setGoogleEvents(arrayWithMarkedActivty);
+      setGoogleEvents(arrayWithPrefilledValue);
     }
 
     close();
@@ -457,14 +463,18 @@ export default function TrackTimeModal({
               <div className="mt-6">
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
-                    {checkIsToday(selectedDate) && isLogged && (
-                      <GoogleCalendarAddEventBtn
-                        addEvent={addEventToList}
-                        availableProjects={
-                          latestProjAndAct ? Object.keys(latestProjAndAct) : []
-                        }
-                      />
-                    )}
+                    {checkIsToday(selectedDate) &&
+                      // (isLogged || isAuthenticated) && (
+                      isLogged && (
+                        <AddEventBtn
+                          addEvent={addEventToList}
+                          availableProjects={
+                            latestProjAndAct
+                              ? Object.keys(latestProjAndAct)
+                              : []
+                          }
+                        />
+                      )}
                   </div>
                   <div className="flex gap-3 justify-end">
                     <Button
