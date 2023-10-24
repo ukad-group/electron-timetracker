@@ -1,0 +1,42 @@
+import { create } from "zustand";
+import {
+  StateStorage,
+  createJSONStorage,
+  devtools,
+  persist,
+} from "zustand/middleware";
+
+export type ScheduledEvents = Record<string, {project?:string , activity?:string}>;
+
+export type ScheduledEventsStore = {
+  event: ScheduledEvents;
+  setEvent: (event: ScheduledEvents) => void;
+};
+
+const storage: StateStorage = {
+  getItem: async (name: string): Promise<string | null> => {
+    return (await global.ipcRenderer.invoke("storage:get", name)) || null;
+  },
+  setItem: async (name: string, value: string): Promise<void> => {
+    await global.ipcRenderer.invoke("storage:set", name, value);
+  },
+  removeItem: async (name: string): Promise<void> => {
+    await global.ipcRenderer.invoke("storage:delete", name);
+  },
+};
+
+export const useScheduledEventsStore = create<ScheduledEventsStore>()(
+  devtools(
+    persist(
+      (set) => ({
+        event: {"":{}} ,
+        setEvent: (event: ScheduledEvents) =>
+          set({ event: event }),
+      }),
+      {
+        name: "scheduled-events-storage",
+        storage: createJSONStorage(() => storage),
+      }
+    )
+  )
+);
