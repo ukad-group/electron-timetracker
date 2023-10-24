@@ -15,8 +15,7 @@ import { initialize, trackEvent } from "@aptabase/electron/main";
 
 
 initialize("A-EU-9361517871");
-trackEvent("app_started"); // An event with no properties
-trackEvent("screen_view", { name: "Settings" }); 
+
 const PORT = 51432;
 
 let updateStatus: null | "available" | "downloaded" = null;
