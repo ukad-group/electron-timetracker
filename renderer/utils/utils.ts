@@ -13,13 +13,15 @@ export const checkAlreadyAddedGoogleEvents = (
 ) => {
   return newEvents.map((newEvent) => {
     const originalEvent = originalEvents.find(
-      (item) => item.id === newEvent.id
+      (item) => item?.id === newEvent?.id
     );
 
     if (originalEvent?.isAdded === true) {
       newEvent.isAdded = originalEvent.isAdded;
     } else {
-      newEvent.isAdded = false;
+      if (newEvent) {
+        newEvent.isAdded = false;
+      }
     }
 
     if (originalEvent?.project) newEvent.project = originalEvent.project;

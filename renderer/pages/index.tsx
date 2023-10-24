@@ -18,7 +18,6 @@ import { useMainStore } from "../store/mainStore";
 import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
-import { useGoogleCalendarStore } from "../store/googleCalendarStore";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -43,8 +42,6 @@ export default function Home() {
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
-  const { setIsLogged } = useGoogleCalendarStore();
-
   const visibilitychangeHandler = useCallback(() => {
     const currDate = new Date().toLocaleDateString();
     const lastUsingDate = localStorage.getItem("lastUsingDate");
@@ -61,12 +58,6 @@ export default function Home() {
     return () => {
       document.removeEventListener("visibilitychange", visibilitychangeHandler);
     };
-  }, []);
-
-  useEffect(() => {
-    if (localStorage.getItem("googleAccessToken")) {
-      setIsLogged(true);
-    }
   }, []);
 
   useEffect(() => {

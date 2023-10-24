@@ -10,6 +10,7 @@ import { callTodayEventsGraph, silentRequest } from "../API/office365API";
 import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { checkAlreadyAddedGoogleEvents } from "../utils/utils";
 import { googleCalendarEventsParsing } from "./google-calendar/GoogleCalendarEventsParsing";
+import { GoogleUser } from "./GoogleConnection";
 
 export type Event = {
   from: {
@@ -40,35 +41,52 @@ export default function AddEventBtn({
   const { instance, accounts } = useMsal();
   const isAuthenticated = useIsAuthenticated();
 
-  const loadGoogleEvents = async (gToken: string) => {
+  const loadGoogleEvents = async (
+    accessToken: string,
+    refreshToken: string,
+    index: number
+  ) => {
     try {
-      const data = await getGoogleEvents(gToken);
+      const data = await getGoogleEvents(accessToken);
 
       // detect expired token
       if (data?.error && data?.error?.code === 401) {
-        const refreshToken = localStorage.getItem("googleRefreshToken");
         const updatedCredentials = await updateGoogleCredentials(refreshToken);
         const newAccessToken = updatedCredentials?.access_token;
-        localStorage.setItem("googleAccessToken", newAccessToken);
-        loadGoogleEvents(newAccessToken);
-        return;
+        const usersLs = JSON.parse(localStorage.getItem("googleUsers"));
+        usersLs[index].googleAccessToken = newAccessToken;
+        localStorage.setItem("googleUsers", JSON.stringify(usersLs));
+        return "expired-token";
       }
 
-      const checkedGoogleEvents = checkAlreadyAddedGoogleEvents(
-        googleEvents,
-        data?.items
-      );
-
-      const filteredGoogleEventsWithoutTime = checkedGoogleEvents.filter(
-        (gEvent) => gEvent?.start?.dateTime || gEvent?.end?.dateTime
-      );
-
-      localStorage.setItem("googleEvents", JSON.stringify(checkedGoogleEvents));
-      setGoogleEvents(filteredGoogleEventsWithoutTime);
+      return data?.items;
     } catch (error) {
       setIsError(true);
       console.error(error);
+      return [];
     }
+  };
+
+  const loadGoogleEventsFromAllUsers = async (users) => {
+    const userPromises = users.map((user, i) =>
+      loadGoogleEvents(user.googleAccessToken, user.googleRefreshToken, i)
+    );
+    const userEvents = await Promise.all(userPromises);
+
+    if (userEvents.includes("expired-token")) {
+      const updatedUsersLs = JSON.parse(localStorage.getItem("googleUsers"));
+      loadGoogleEventsFromAllUsers(updatedUsersLs);
+      return;
+    }
+
+    const flattenedEvents = userEvents.flat();
+
+    const checkedGoogleEvents = checkAlreadyAddedGoogleEvents(
+      googleEvents,
+      flattenedEvents
+    ).filter((gEvent) => gEvent?.start?.dateTime && gEvent?.end?.dateTime);
+
+    setGoogleEvents(checkedGoogleEvents);
   };
 
   const getOffice365AccessToken = async () => {
@@ -89,10 +107,13 @@ export default function AddEventBtn({
   };
 
   useEffect(() => {
-    const googleAccessToken = localStorage.getItem("googleAccessToken");
+    const googleUsers = JSON.parse(localStorage.getItem("googleUsers"));
+    if (!googleUsers) return;
 
-    if (googleAccessToken) {
-      loadGoogleEvents(googleAccessToken);
+    if (googleUsers.length > 0) {
+      loadGoogleEventsFromAllUsers(googleUsers);
+    } else if (googleUsers.length === 0) {
+      setGoogleEvents([]);
     }
 
     (async () => {
