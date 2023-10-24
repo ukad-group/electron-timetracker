@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import {
   getGoogleAuthUrl,
   getGoogleCredentials,
-  getGoogleUsername,
+  getGoogleUserInfo,
   updateGoogleCredentials,
 } from "../API/googleCalendarAPI";
 
@@ -19,6 +19,7 @@ export type GoogleUser = {
   googleAccessToken: string;
   googleRefreshToken: string;
   userName: string;
+  accountId: string;
 };
 
 const GoogleConnection = () => {
@@ -32,10 +33,10 @@ const GoogleConnection = () => {
     router.push(googleAuthUrl);
   };
 
-  const signOutHandler = (name: string) => {
+  const signOutHandler = (id) => {
     const loggedUsersFromLs = JSON.parse(localStorage.getItem("googleUsers"));
     const filteredUsers = loggedUsersFromLs.filter(
-      (user) => user.userName !== name
+      (user) => user.accountId !== id
     );
 
     if (filteredUsers.length === 0) {
@@ -53,12 +54,14 @@ const GoogleConnection = () => {
       setLoading(true);
 
       const credentials = await getGoogleCredentials(authorizationCode);
-      const googleProfileUsername = await loadGoogleUsername(credentials);
+      const googleProfileInfo = await loadGoogleUserInfo(credentials);
+      const googleProfileUsername = googleProfileInfo?.names[0]?.displayName;
+      const googleProfileId = googleProfileInfo?.resourceName;
       const googleUsersFromLs = JSON.parse(localStorage.getItem("googleUsers"));
 
       if (
         googleUsersFromLs.some((user) => {
-          return user.userName === googleProfileUsername;
+          return user.accountId === googleProfileId;
         })
       ) {
         alert(`Account ${googleProfileUsername} has already logged`);
@@ -67,6 +70,7 @@ const GoogleConnection = () => {
           googleAccessToken: credentials.access_token,
           googleRefreshToken: credentials.refresh_token,
           userName: googleProfileUsername,
+          accountId: googleProfileId,
         };
 
         googleUsersFromLs.push(userObject);
@@ -80,21 +84,10 @@ const GoogleConnection = () => {
     }
   };
 
-  const loadGoogleUsername = async (gCreds: GoogleCredentails) => {
+  const loadGoogleUserInfo = async (gCreds: GoogleCredentails) => {
     try {
-      const data = await getGoogleUsername(gCreds.access_token);
-
-      // // detect expired token
-      // if (data?.error && data?.error?.code === 401) {
-      //   const refreshToken = localStorage.getItem("googleRefreshToken");
-      //   const updatedCredentials = await updateGoogleCredentials(refreshToken);
-      //   const newAccessToken = updatedCredentials?.access_token;
-      //   localStorage.setItem("googleAccessToken", newAccessToken);
-      //   loadGoogleUsername(newAccessToken);
-      //   return;
-      // }
-
-      return data?.names[0]?.displayName;
+      const data = await getGoogleUserInfo(gCreds.access_token);
+      return data;
     } catch (e) {
       console.error(e);
     }
@@ -154,6 +147,7 @@ const GoogleConnection = () => {
             <UserStatusPanel
               key={i}
               googleUsername={user.userName}
+              googleAccountId={user.accountId}
               signOutHandler={signOutHandler}
             />
           ))}

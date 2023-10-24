@@ -99,16 +99,16 @@ export default function GoogleCalendarEventsMessage({
     };
   }, []);
 
-  const resetGoogleEventsHandle = () => {
-    const resetedGoogleEvents = googleEvents.map((gEvent) => {
-      gEvent.isAdded = false;
+  // const resetGoogleEventsHandle = () => {
+  //   const resetedGoogleEvents = googleEvents.map((gEvent) => {
+  //     gEvent.isAdded = false;
 
-      return gEvent;
-    });
+  //     return gEvent;
+  //   });
 
-    localStorage.setItem("googleEvents", JSON.stringify(resetedGoogleEvents));
-    setGoogleEvents(resetedGoogleEvents);
-  };
+  //   localStorage.setItem("googleEvents", JSON.stringify(resetedGoogleEvents));
+  //   setGoogleEvents(resetedGoogleEvents);
+  // };
 
   if (isLoading) {
     return (
@@ -143,12 +143,12 @@ export default function GoogleCalendarEventsMessage({
         <p className="text-sm text-gray-500">
           You've already added all events for today
         </p>
-        <button
+        {/* <button
           onClick={resetGoogleEventsHandle}
           className="text-gray-500 inline-flex items-center justify-center px-2 py-1 text-xs border rounded-md shadow-sm hover:bg-gray-100 "
         >
           reset
-        </button>
+        </button> */}
       </>
     );
   }
@@ -180,12 +180,6 @@ export default function GoogleCalendarEventsMessage({
           You've skipped{" "}
           {googleEvents.filter((gEvent) => !gEvent?.isAdded)?.length} event(s)
         </p>
-        <button
-          onClick={resetGoogleEventsHandle}
-          className="text-gray-500 inline-flex items-center justify-center px-2 py-1 text-xs border rounded-md shadow-sm hover:bg-gray-100 "
-        >
-          reset
-        </button>
       </>
     );
   }
