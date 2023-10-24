@@ -79,6 +79,7 @@ const generateWindow = () => {
     width: 1000,
     height: 600,
     autoHideMenuBar: true,
+    icon: path.join(__dirname, "../renderer/out/images/logo.png"),
   });
 
   mainWindow.loadURL(`http://localhost:${PORT}/`);
@@ -121,7 +122,7 @@ const generateTray = () => {
 
   const trayIconPath = path.join(
     __dirname,
-    "../renderer/out/images/clock-16.png"
+    "../renderer/out/images/logo.png"
   );
 
   tray = new Tray(trayIconPath);
