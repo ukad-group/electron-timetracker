@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CheckIcon } from "@heroicons/react/24/solid";
 
-export default function Tooltip({ children }) {
+export default function Tooltip({ children, tooltipText = "Copied" }) {
   const [isTransparent, setIsTransparent] = useState(true);
   const [isRemoved, setIsRemoved] = useState(true);
 
@@ -26,7 +26,7 @@ export default function Tooltip({ children }) {
         ${isRemoved ? "invisible" : "visible"}`}
       >
         <CheckIcon className="w-4 h-4" />
-        Copied
+        {tooltipText}
       </p>
     </div>
   );

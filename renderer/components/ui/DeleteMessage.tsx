@@ -1,9 +1,6 @@
-import clsx from "clsx";
-import { ipcRenderer } from "electron";
 import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import { useMainStore } from "../../store/mainStore";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 
 type DeleteMessageProps = {
   selectedDateReport: string;

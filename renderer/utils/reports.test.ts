@@ -312,6 +312,21 @@ describe("serializeReport function", () => {
       "11:30 - timetracker - meeting - calendar discussion\n12:30 - \n";
     expect(serializeReport(activities)).toBe(report);
   });
+  test("should return same as report", () => {
+    const report: string =
+      "08:30 - westbay.dg - Grid layout.\n15:00 - internal.trainee - Meet with alexander.razvalinov.\n16:00 - westbay.dg - Grid layout.\n18:00 - !\n";
+    expect(serializeReport(parseReport(report)[0])).toBe(report);
+  });
+  test("should return same as report", () => {
+    const report: string =
+      "09:00 - !\n10:15 - qqwe - qwe\n10:30 - qqwe - qwe\n11:00 - !\n11:30 - qew - qwe\n12:00 - !\n12:30 - qqwe - qwe\n13:00 - qweqq - qe\n14:00 - !\n14:30 - 12321 - qwe\n15:00 - \n";
+    expect(serializeReport(parseReport(report)[0])).toBe(report);
+  });
+  test("should return same as report", () => {
+    const report: string =
+      "09:30 - westbay.dg - Case images block rework.\n12:30 - westbay.dg - Fixing trailer list component and upload it to backend.\n16:30 - westbay.dg - Text list editor changing.\n17:30 - westbay.dg - Case Images fix after review.\n18:00 - !\n";
+    expect(serializeReport(parseReport(report)[0])).toBe(report);
+  });
 });
 
 describe("calcDurationBetweenTimes function", () => {

@@ -10,6 +10,11 @@ import { createWindow } from "./helpers/create-window";
 import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
+import { initialize, trackEvent } from "@aptabase/electron/main";
+
+
+
+initialize("A-EU-9361517871");
 
 const PORT = 51432;
 
@@ -131,6 +136,7 @@ const generateTray = () => {
       mainWindow?.show();
     }
     autoUpdater.checkForUpdates();
+    mainWindow?.webContents.send("window-restored");
   });
 };
 
@@ -151,7 +157,7 @@ app.on("ready", async () => {
   createServer((req: any, res: any) => {
     const parsedUrl = parse(req.url, true);
     requestHandler(req, res, parsedUrl);
-  }).listen(PORT, () => {
+  }).listen(PORT, '127.0.0.1', () => {
     console.log(`> Ready on http://localhost:${PORT}`);
   });
 
@@ -238,6 +244,10 @@ app.on("ready", async () => {
       }
     );
   }
+
+  mainWindow?.on("restore", () => {
+    mainWindow?.webContents.send("window-restored");
+  });
 });
 
 app.on("window-all-closed", () => {
