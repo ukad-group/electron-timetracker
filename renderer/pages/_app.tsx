@@ -17,10 +17,10 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>UKAD Timetrecker</title>
+        <title>UKAD Timetracker</title>
       </Head>
       {/* <MsalProvider instance={msalInstance}> */}
-        <AnyComponent {...pageProps} />
+      <AnyComponent {...pageProps} />
       {/* </MsalProvider> */}
     </>
   );

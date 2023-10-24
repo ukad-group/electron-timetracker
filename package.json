@@ -40,10 +40,15 @@
       "output": "dist"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "app/images/logo.png"
     },
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "app/images/logo.png"
+    },
+    "linux": {
+      "icon": "app/images/logo.png"
     }
   },
   "dependencies": {
