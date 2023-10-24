@@ -15,7 +15,7 @@ import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { getCardsOfMember } from "../../API/trelloAPI";
-import { useIsAuthenticated } from "@azure/msal-react";
+// import { useIsAuthenticated } from "@azure/msal-react";
 import AddEventBtn, { Event } from "../AddEventBtn";
 import {
   markActivityAsAdded,
