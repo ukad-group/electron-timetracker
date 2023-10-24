@@ -100,7 +100,14 @@ export default function ActivitiesTable({
       const number = parseInt(event.key, 10);
       if (number >= 1 && number <= nonBreakActivities.length) {
         const selectedActivity = nonBreakActivities[Number(event.key) - 1];
-        onEditActivity(selectedActivity);
+        if (selectedActivity.calendarId) {
+          onEditActivity({
+            ...selectedActivity,
+            id: null,
+          });
+        } else {
+          onEditActivity(selectedActivity);
+        }
       }
     }
   };
@@ -117,7 +124,7 @@ export default function ActivitiesTable({
       window.removeEventListener("keydown", handleKeyDown);
       window.addEventListener("keyup", handleKeyUp);
     };
-  }, []);
+  }, [nonBreakActivities]);
 
   return (
     <table className="min-w-full divide-y divide-gray-300 table-fixed">
