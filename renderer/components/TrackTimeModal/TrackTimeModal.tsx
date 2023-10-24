@@ -13,7 +13,9 @@ import {
 import { checkIsToday } from "../../utils/datetime-ui";
 import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
+import { shallow } from "zustand/shallow";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
+import { useScheduledEventsStore } from "../../store/googleEventsStore";
 import { getCardsOfMember } from "../../API/trelloAPI";
 // import { useIsAuthenticated } from "@azure/msal-react";
 import AddEventBtn, { Event } from "../AddEventBtn";
@@ -60,7 +62,10 @@ export default function TrackTimeModal({
   // const isAuthenticated = useIsAuthenticated();
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const loggedGoogleUsers = JSON.parse(localStorage.getItem("googleUsers"));
-
+  const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
+    (state) => [state.event, state.setEvent],
+    shallow
+  );
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
 
@@ -170,6 +175,17 @@ export default function TrackTimeModal({
       calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
     });
 
+    if (scheduledEvents[description] && !scheduledEvents[description].project) {
+      scheduledEvents[description].project = project;
+    }
+    if (
+      scheduledEvents[description] &&
+      scheduledEvents[description].activity !== activity
+    ) {
+      scheduledEvents[description].activity = activity || "";
+    }
+
+    setScheduledEvents(scheduledEvents);
     if (googleEvents.length > 0 && editedActivity !== "new") {
       const arrayWithMarkedActivty = markActivityAsAdded(
         googleEvents,
@@ -232,11 +248,23 @@ export default function TrackTimeModal({
 
   const addEventToList = (event: Event) => {
     const { from, to, project, activity, description } = event;
+    if (scheduledEvents[description]) {
+      setProject(scheduledEvents[description].project);
+      setActivity(activity || scheduledEvents[description].activity);
+    }
+    if (!scheduledEvents[description]) {
+      setProject(project || "");
+      setActivity(activity || "");
+      scheduledEvents[description] = { project: "", activity: "" };
+      scheduledEvents[description].project = project || "";
+      scheduledEvents[description].activity = activity || "";
+    }
+
     setFrom(from.time || "");
     setTo(to.time || "");
-    setProject(project || "");
-    setActivity(activity || "");
     setDescription(description || "");
+
+    setScheduledEvents(scheduledEvents);
   };
 
   const handleKey = (event) => {
@@ -437,7 +465,6 @@ export default function TrackTimeModal({
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
                     {checkIsToday(selectedDate) &&
-                      // (loggedGoogleUsers?.length > 0 || isAuthenticated) && (
                       loggedGoogleUsers?.length > 0 && (
                         <AddEventBtn
                           addEvent={addEventToList}
