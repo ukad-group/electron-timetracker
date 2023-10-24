@@ -36,5 +36,5 @@ export const useMainStore = createWithEqualityFn<MainStore>()(
       }
     )
   ),
-  null
+  () => false
 );

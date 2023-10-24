@@ -31,9 +31,12 @@ type googleCalendarStoreProps = {
 };
 
 export const useGoogleCalendarStore =
-  createWithEqualityFn<googleCalendarStoreProps>((set) => {
-    return {
-      googleEvents: [],
-      setGoogleEvents: (events) => set(() => ({ googleEvents: events })),
-    };
-  }, null);
+  createWithEqualityFn<googleCalendarStoreProps>(
+    (set) => {
+      return {
+        googleEvents: [],
+        setGoogleEvents: (events) => set(() => ({ googleEvents: events })),
+      };
+    },
+    () => false
+  );

@@ -39,5 +39,5 @@ export const useUpdateStore = createWithEqualityFn<UpdateStore>()(
       }
     )
   ),
-  null
+  () => false
 );

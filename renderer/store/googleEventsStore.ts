@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import {
   StateStorage,
   createJSONStorage,
@@ -6,7 +6,10 @@ import {
   persist,
 } from "zustand/middleware";
 
-export type ScheduledEvents = Record<string, {project?:string , activity?:string}>;
+export type ScheduledEvents = Record<
+  string,
+  { project?: string; activity?: string }
+>;
 
 export type ScheduledEventsStore = {
   event: ScheduledEvents;
@@ -25,18 +28,19 @@ const storage: StateStorage = {
   },
 };
 
-export const useScheduledEventsStore = create<ScheduledEventsStore>()(
-  devtools(
-    persist(
-      (set) => ({
-        event: {"":{}} ,
-        setEvent: (event: ScheduledEvents) =>
-          set({ event: event }),
-      }),
-      {
-        name: "scheduled-events-storage",
-        storage: createJSONStorage(() => storage),
-      }
-    )
-  )
-);
+export const useScheduledEventsStore =
+  createWithEqualityFn<ScheduledEventsStore>()(
+    devtools(
+      persist(
+        (set) => ({
+          event: { "": {} },
+          setEvent: (event: ScheduledEvents) => set({ event: event }),
+        }),
+        {
+          name: "scheduled-events-storage",
+          storage: createJSONStorage(() => storage),
+        }
+      )
+    ),
+    () => false
+  );
