@@ -39,11 +39,11 @@ export default function ActivitiesSection({
     errorTitle: "",
     errorMessage: "",
   });
-  const { googleEvents, isLogged } = useGoogleCalendarStore();
+  const { googleEvents } = useGoogleCalendarStore();
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);
   const [formattedGoogleEvents, setFormattedGoogleEvents] = useState([]);
   const today = checkIsToday(selectedDate);
-  const showGoogleEVentsTip = JSON.parse(
+  const isShowGoogleEvents = JSON.parse(
     localStorage.getItem("showGoogleEvents")
   );
 
@@ -171,7 +171,7 @@ export default function ActivitiesSection({
       </div>
 
       <div className="flex gap-2 px-6 pb-4 items-center justify-end mr-auto">
-        {today && isLogged && showGoogleEVentsTip && (
+        {today && isShowGoogleEvents && (
           <GoogleCalendarEventsMessage
             setShowGoogleEvents={setShowGoogleEvents}
             formattedGoogleEvents={formattedGoogleEvents}

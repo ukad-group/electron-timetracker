@@ -39,6 +39,10 @@ export default function Button({
       text: "Saving...",
       classes: "bg-blue-600 text-white border-transparent " + saveHoverStyles,
     },
+    loading: {
+      text: "Loading",
+      classes: "bg-blue-600 text-white border-transparent " + saveHoverStyles,
+    },
     done: {
       text: "Saved",
       classes: "bg-green-600 text-white border-transparent " + saveHoverStyles,
@@ -66,6 +70,7 @@ export default function Button({
       tabIndex={tabIndex}
     >
       {status && status === "inprogress" && <Loader />}
+      {status && status === "loading" && <Loader />}
       {saveBtnStatuses[status] ? saveBtnStatuses[status].text : text}
     </button>
   );

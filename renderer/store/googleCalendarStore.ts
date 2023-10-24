@@ -28,10 +28,6 @@ export type GoogleEvent = {
 type googleCalendarStoreProps = {
   googleEvents: GoogleEvent[];
   setGoogleEvents: (gEvents: GoogleEvent[]) => void;
-  isLogged: boolean;
-  setIsLogged: (userLogged: boolean) => void;
-  googleUsername: string;
-  setGoogleUsername: (username: string) => void;
 };
 
 export const useGoogleCalendarStore =
@@ -39,10 +35,5 @@ export const useGoogleCalendarStore =
     return {
       googleEvents: [],
       setGoogleEvents: (events) => set(() => ({ googleEvents: events })),
-      isLogged: false,
-      setIsLogged: (userLogged) => set(() => ({ isLogged: userLogged })),
-      googleUsername: null,
-      setGoogleUsername: (username) =>
-        set(() => ({ googleUsername: username })),
     };
   }, null);
