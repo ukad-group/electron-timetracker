@@ -85,9 +85,11 @@ jobs:
         working-directory: ./renderer
         run: |
           cp .env.demo .env
+          sed -i 's|^NEXT_PUBLIC_PORT=.*|NEXT_PUBLIC_PORT=${{ secrets.NEXT_PUBLIC_PORT }}|g' .env
           sed -i 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=${{ secrets.NEXT_PUBLIC_TRELLO_KEY }}|g' .env
           sed -i 's|^NEXT_PUBLIC_GOOGLE_CLIENT_ID=.*|NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}|g' .env
           sed -i 's|^NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=.*|NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET }}|g' .env
+          sed -i 's|^NEXT_PUBLIC_OFFICE365_CLIENT_ID=.*|NEXT_PUBLIC_OFFICE365_CLIENT_ID=${{ secrets.NEXT_PUBLIC_OFFICE365_CLIENT_ID }}|g' .env
           cat .env
 
       - name: 'generate ".env" file (MacOS)'
@@ -96,9 +98,11 @@ jobs:
         working-directory: ./renderer
         run: |
           cp .env.demo .env
+          sed -i '' 's|^NEXT_PUBLIC_PORT=.*|NEXT_PUBLIC_PORT=${{ secrets.NEXT_PUBLIC_PORT }}|g' .env
           sed -i '' 's|^NEXT_PUBLIC_TRELLO_KEY=.*|NEXT_PUBLIC_TRELLO_KEY=${{ secrets.NEXT_PUBLIC_TRELLO_KEY }}|g' .env
           sed -i '' 's|^NEXT_PUBLIC_GOOGLE_CLIENT_ID=.*|NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}|g' .env
           sed -i '' 's|^NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=.*|NEXT_PUBLIC_GOOGLE_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET }}|g' .env
+          sed -i '' 's|^NEXT_PUBLIC_OFFICE365_CLIENT_ID=.*|NEXT_PUBLIC_OFFICE365_CLIENT_ID=${{ secrets.NEXT_PUBLIC_OFFICE365_CLIENT_ID }}|g' .env
           cat .env
 
       # - run: npm run build
