@@ -13,8 +13,9 @@ export const getAuthUrl = (options: Options) => {
     client_id: clientId,
     scope: scope,
     redirect_uri: redirectUri,
-    prompt: "login",
+    prompt: "consent",
     response_type: "code",
+    state: "office365code"
   });
 
   authUrl.search = params.toString();
