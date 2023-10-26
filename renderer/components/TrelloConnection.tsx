@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { CheckIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
 import { getMember, getTrelloAuthUrl } from "../API/trelloAPI";

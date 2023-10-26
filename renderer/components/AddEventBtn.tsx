@@ -6,8 +6,6 @@ import {
   getGoogleEvents,
   updateGoogleCredentials,
 } from "../API/googleCalendarAPI";
-// import { callTodayEventsGraph, silentRequest } from "../API/office365API";
-// import { useIsAuthenticated, useMsal } from "@azure/msal-react";
 import { checkAlreadyAddedGoogleEvents } from "../utils/utils";
 import { googleCalendarEventsParsing } from "./google-calendar/GoogleCalendarEventsParsing";
 import { GoogleUser } from "./GoogleConnection";

@@ -1,28 +1,39 @@
-import { LogLevel } from "@azure/msal-browser";
+const PORT = 51432;
+const CLIENT_ID = "121f1464-4342-4093-a1ab-7a949e65c251";
+const scope = "profile email offline_access openid User.Read Calendars.Read"
+const redirectUri = `http://localhost:${PORT}/settings`
 
-const PORT = process.env.NEXT_PUBLIC_PORT;
-const CLIENT_ID = process.env.NEXT_PUBLIC_OFFICE365_CLIENT_ID;
+export const getAuthUrl = () => {
+  const authUrl = new URL("https://login.microsoftonline.com/common/oauth2/v2.0/authorize");
 
-export const msalConfig = {
-  auth: {
-    clientId: CLIENT_ID,
-    redirectUri: `http://localhost:${PORT}/settings`,
-  },
-  cache: {
-    cacheLocation: "localStorage",
-    storeAuthStateInCookie: false, // Set this to "true" if you are having issues on IE11 or Edge
-  },
+  const params = new URLSearchParams({
+    client_id: CLIENT_ID,
+    scope: scope,
+    redirect_uri: redirectUri,
+    prompt: "login",
+    response_type: "code",
+  });
+
+  authUrl.search = params.toString();
+
+  return authUrl.toString();
 };
 
-export const loginRequest = {
-  scopes: ["User.Read", "Calendars.Read"],
-  prompt: "consent",
-};
+export const getTokens = async (authCode: string, clientSecret: string) => {
+  if (!authCode) return;
 
-export const silentRequest = {
-  scopes: ["User.Read", "Calendars.Read"],
-  prompt: "none",
-};
+  const response = await fetch("https://login.microsoftonline.com/common/oauth2/v2.0/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: `code=${authCode}&client_id=${CLIENT_ID}&client_secret=${clientSecret}&redirect_uri=${redirectUri}&grant_type=authorization_code&scope=${scope}`,
+  });
+
+  // if (!response.ok) throw new Error();
+
+  return response.json();
+}
 
 export const endpoints = {
   me: "https://graph.microsoft.com/v1.0/me",

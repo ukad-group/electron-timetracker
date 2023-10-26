@@ -11,8 +11,7 @@ import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
 import { initialize, trackEvent } from "@aptabase/electron/main";
-
-
+import { callProfileInfoGraph, callTodayEventsGraph, getAuthUrl, getTokens } from "./helpers/API/office365Api";
 
 initialize("A-EU-9361517871");
 
@@ -436,3 +435,23 @@ ipcMain.handle(
     return searchReadFiles(reportsFolder, queries, year);
   }
 );
+
+ipcMain.on('office365:login', async () => {
+  const office365AuthUrl = getAuthUrl()
+
+  mainWindow?.loadURL(office365AuthUrl)
+});
+
+ipcMain.handle('office365:get-tokens', async (event, authCode: string) => {
+  const CLIENT_SECRET = process.env.NODE_ENV_OFFICE365_CLIENT_SECRET || '';
+
+  return await getTokens(authCode, CLIENT_SECRET)
+});
+
+ipcMain.handle('office365:get-profile-info', async (event, accessToken: string) => {
+  return await callProfileInfoGraph(accessToken)
+});
+
+ipcMain.handle('office365:get-today-events', async (event, accessToken: string) => {
+  return await callTodayEventsGraph(accessToken)
+});

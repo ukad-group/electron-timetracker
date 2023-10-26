@@ -1,93 +1,109 @@
 import React, { useEffect, useState } from "react";
-import { useIsAuthenticated, useMsal } from "@azure/msal-react";
-import {
-  callTodayEventsGraph,
-  callProfileInfoGraph,
-  loginRequest,
-} from "../API/office365API";
+import { useRouter } from "next/navigation";
 import { CheckIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
 
-const PORT = process.env.NEXT_PUBLIC_PORT;
-const REDIRECT_URI = `http://localhost:${PORT}/settings`;
-
 const Office365Connection = () => {
+  const [code, setCode] = useState('')
+  const [accessToken, setAccessToken] = useState('')
   const [username, setUsername] = useState("");
   const [hasUserMailbox, setHasUserMailbox] = useState(true);
-  const { instance, accounts } = useMsal();
-  const isAuthenticated = useIsAuthenticated();
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   const handleSignInButton = () => {
-    instance.loginPopup(loginRequest).catch((e) => {
-      console.log(e);
-    });
+    global.ipcRenderer.send('office365:login');
   };
 
   const handleSignOutButton = () => {
-    instance.logoutPopup({
-      postLogoutRedirectUri: REDIRECT_URI,
-      mainWindowRedirectUri: REDIRECT_URI,
-    });
-  };
+    localStorage.removeItem("office365Token");
+    setAccessToken("");
+    router.push("/settings");
+  }
 
   const getAccessToken = async () => {
-    const { accessToken } = await instance.acquireTokenSilent({
-      ...loginRequest,
-      account: accounts[0],
-    });
+    const res = await global.ipcRenderer.invoke(
+      'office365:get-tokens', code);
 
-    return accessToken;
-  };
+    setAccessToken(res.access_token);
+    localStorage.setItem("office365Token", res.access_token);
+  }
 
   const getUsername = async () => {
-    const accessToken = await getAccessToken();
-    const response = await callProfileInfoGraph(accessToken);
-    setUsername(response.userPrincipalName);
-  };
+    const res = await global.ipcRenderer.invoke(
+      'office365:get-profile-info', accessToken);
+
+    setUsername(res.userPrincipalName || res.mail || '')
+  }
 
   const checkIfUserHasMailbox = async () => {
-    const accessToken = await getAccessToken();
-    const response = await callTodayEventsGraph(accessToken);
+    const res = await global.ipcRenderer.invoke(
+      'office365:get-today-events', accessToken);
 
-    if (response?.error) {
+    if (res?.error) {
       setHasUserMailbox(false);
     }
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      (async () => {
-        getUsername();
-        checkIfUserHasMailbox();
-        setIsLoading(false);
-      })();
+    if (!Boolean(localStorage.getItem("office365Token")) && window.location.search.includes("code")) {
+      const params = new URLSearchParams(window.location.search);
+      const authorizationCode = params.get("code");
+
+      setCode(authorizationCode)
     }
-  }, [isAuthenticated]);
+
+    if (Boolean(localStorage.getItem("office365Token"))) {
+      const storedToken = localStorage.getItem("office365Token") as string;
+
+      setAccessToken(storedToken);
+    }
+
+  }, [])
+
+  useEffect(() => {
+    (async () => {
+      if (code) {
+        getAccessToken()
+      }
+    })()
+  }, [code])
+
+  useEffect(() => {
+    (async () => {
+      if (accessToken) {
+        getUsername()
+        checkIfUserHasMailbox()
+        setIsLoading(false);
+      }
+    })()
+  }, [accessToken])
+
+
 
   return (
     <div className="p-4 flex items-start justify-between gap-6 border rounded-lg shadow">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-4">
           <span className="font-medium">Office 365</span>
-          {isAuthenticated && (
+          {accessToken && (
             <div className="text-green-700 inline-flex gap-2 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-200">
               Already authorized
               <CheckIcon className="w-4 h-4 fill-green-700" />
             </div>
           )}
-          {isAuthenticated && username.length > 0 && (
+          {accessToken && username.length > 0 && (
             <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
               {username}
             </div>
           )}
-          {!isAuthenticated && (
+          {!accessToken && (
             <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
               Not authorized
             </div>
           )}
         </div>
-        {isAuthenticated && !hasUserMailbox && !isLoading && (
+        {accessToken && !hasUserMailbox && !isLoading && (
           <p className="text-sm text-red-500">
             User has no mailbox. Try to Sign In to another account
           </p>
@@ -98,7 +114,7 @@ const Office365Connection = () => {
         </p>
       </div>
       <div className="flex-shrink-0">
-        {isAuthenticated ? (
+        {accessToken ? (
           <Button
             text="Sign Out"
             callback={handleSignOutButton}
