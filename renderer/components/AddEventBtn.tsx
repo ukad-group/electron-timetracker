@@ -34,10 +34,7 @@ export default function AddEventBtn({
   const [office365Events, setOffice365Events] = useState([]);
   const [isError, setIsError] = useState(false);
   const [allEvents, setAllEvents] = useState([]);
-
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
-  // const { instance, accounts } = useMsal();
-  // const isAuthenticated = useIsAuthenticated();
 
   const loadGoogleEvents = async (
     accessToken: string,
@@ -87,21 +84,21 @@ export default function AddEventBtn({
     setGoogleEvents(checkedGoogleEvents);
   };
 
-  const getOffice365AccessToken = async () => {
-    // const { accessToken } = await instance.acquireTokenSilent({
-    //   ...silentRequest,
-    //   account: accounts[0],
-    // });
-
-    // return accessToken;
-  };
-
   const getOffice365Events = async () => {
-    // if (isAuthenticated) {
-    //   const accessToken = await getOffice365AccessToken();
-    //   const response = await callTodayEventsGraph(accessToken);
-    //   setOffice365Events(response.value);
-    // }
+    const storedToken = (localStorage.getItem("office365Token") as string) || '';
+
+    if (!storedToken.length) return [];
+
+    (async () => {
+      const res = await global.ipcRenderer.invoke(
+        'office365:get-today-events', storedToken);
+
+      if (res?.value) {
+        return setOffice365Events(res.value)
+      }
+
+      return [];
+    })()
   };
 
   useEffect(() => {
@@ -209,18 +206,16 @@ export default function AddEventBtn({
               {({ active }) => (
                 <button
                   type="button"
-                  className={`${
-                    active ? "bg-blue-300 text-white" : "text-gray-900"
-                  } group w-full p-2 text-sm`}
+                  className={`${active ? "bg-blue-300 text-white" : "text-gray-900"
+                    } group w-full p-2 text-sm`}
                   onClick={() => {
                     addEvent(event);
                   }}
                 >
                   {summary ? summary : "No title"}
                   <span
-                    className={`${
-                      active ? "text-white" : "text-gray-500"
-                    } block text-xs`}
+                    className={`${active ? "text-white" : "text-gray-500"
+                      } block text-xs`}
                   >
                     {from.time} - {to.time}
                   </span>

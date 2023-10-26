@@ -58,7 +58,6 @@ const Office365Connection = () => {
 
       setAccessToken(storedToken);
     }
-
   }, [])
 
   useEffect(() => {
@@ -78,8 +77,6 @@ const Office365Connection = () => {
       }
     })()
   }, [accessToken])
-
-
 
   return (
     <div className="p-4 flex items-start justify-between gap-6 border rounded-lg shadow">

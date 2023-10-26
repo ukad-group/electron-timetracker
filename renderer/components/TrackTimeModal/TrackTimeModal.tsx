@@ -17,7 +17,6 @@ import { shallow } from "zustand/shallow";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { useScheduledEventsStore } from "../../store/googleEventsStore";
 import { getCardsOfMember } from "../../API/trelloAPI";
-// import { useIsAuthenticated } from "@azure/msal-react";
 import AddEventBtn, { Event } from "../AddEventBtn";
 import {
   markActivityAsAdded,
@@ -59,7 +58,7 @@ export default function TrackTimeModal({
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
-  // const isAuthenticated = useIsAuthenticated();
+  const [office365Token, setOffice365Token] = useState("");
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const loggedGoogleUsers = JSON.parse(localStorage.getItem("googleUsers"));
   const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
@@ -100,6 +99,7 @@ export default function TrackTimeModal({
 
   useEffect(() => {
     setTrelloToken((localStorage.getItem("trelloToken") as string) || "");
+    setOffice365Token((localStorage.getItem("office365Token") as string) || '');
   }, []);
 
   useEffect(() => {
@@ -218,7 +218,6 @@ export default function TrackTimeModal({
     setProject("");
     setActivity("");
     setDescription("");
-
     setIsValidationEnabled(false);
   };
 
@@ -263,7 +262,6 @@ export default function TrackTimeModal({
     setFrom(from.time || "");
     setTo(to.time || "");
     setDescription(description || "");
-
     setScheduledEvents(scheduledEvents);
   };
 
@@ -465,7 +463,7 @@ export default function TrackTimeModal({
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
                     {checkIsToday(selectedDate) &&
-                      loggedGoogleUsers?.length > 0 && (
+                      (loggedGoogleUsers?.length > 0 || office365Token.length > 0) && (
                         <AddEventBtn
                           addEvent={addEventToList}
                           availableProjects={

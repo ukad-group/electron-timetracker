@@ -1,13 +1,16 @@
-const PORT = 51432;
-const CLIENT_ID = "121f1464-4342-4093-a1ab-7a949e65c251";
-const scope = "profile email offline_access openid User.Read Calendars.Read"
-const redirectUri = `http://localhost:${PORT}/settings`
+type Options = {
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string;
+  scope: string;
+}
 
-export const getAuthUrl = () => {
+export const getAuthUrl = (options: Options) => {
+  const { clientId, scope, redirectUri } = options;
   const authUrl = new URL("https://login.microsoftonline.com/common/oauth2/v2.0/authorize");
 
   const params = new URLSearchParams({
-    client_id: CLIENT_ID,
+    client_id: clientId,
     scope: scope,
     redirect_uri: redirectUri,
     prompt: "login",
@@ -19,15 +22,16 @@ export const getAuthUrl = () => {
   return authUrl.toString();
 };
 
-export const getTokens = async (authCode: string, clientSecret: string) => {
+export const getTokens = async (authCode: string, options: Options) => {
   if (!authCode) return;
 
+  const { clientId, clientSecret, redirectUri, scope } = options;
   const response = await fetch("https://login.microsoftonline.com/common/oauth2/v2.0/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: `code=${authCode}&client_id=${CLIENT_ID}&client_secret=${clientSecret}&redirect_uri=${redirectUri}&grant_type=authorization_code&scope=${scope}`,
+    body: `code=${authCode}&client_id=${clientId}&client_secret=${clientSecret}&redirect_uri=${redirectUri}&grant_type=authorization_code&scope=${scope}`,
   });
 
   // if (!response.ok) throw new Error();

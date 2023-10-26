@@ -436,16 +436,26 @@ ipcMain.handle(
   }
 );
 
+const getOffice365Options = () => {
+  return {
+    clientId: process.env.NEXT_PUBLIC_OFFICE365_CLIENT_ID || '',
+    clientSecret: process.env.NEXT_PUBLIC_OFFICE365_CLIENT_SECRET || '',
+    redirectUri: process.env.NEXT_PUBLIC_OFFICE365_REDIRECT_URI || '',
+    scope: process.env.NEXT_PUBLIC_OFFICE365_SCOPE || '',
+  };
+}
+
 ipcMain.on('office365:login', async () => {
-  const office365AuthUrl = getAuthUrl()
+  const options = getOffice365Options()
+  const office365AuthUrl = getAuthUrl(options)
 
   mainWindow?.loadURL(office365AuthUrl)
 });
 
 ipcMain.handle('office365:get-tokens', async (event, authCode: string) => {
-  const CLIENT_SECRET = process.env.NODE_ENV_OFFICE365_CLIENT_SECRET || '';
-
-  return await getTokens(authCode, CLIENT_SECRET)
+  const options = getOffice365Options()
+  
+  return await getTokens(authCode, options)
 });
 
 ipcMain.handle('office365:get-profile-info', async (event, accessToken: string) => {
