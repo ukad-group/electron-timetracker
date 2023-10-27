@@ -33,7 +33,9 @@ export default function GoogleCalendarShowCheckbox({
         return;
       }
 
-      const storedGoogleEvents = JSON.parse(localStorage.getItem("googleEvents"));
+      const storedGoogleEvents = JSON.parse(
+        localStorage.getItem("googleEvents")
+      );
 
       if (storedGoogleEvents === null) {
         localStorage.setItem("googleEvents", JSON.stringify(data?.items));
@@ -94,7 +96,7 @@ export default function GoogleCalendarShowCheckbox({
 
   if (isError) {
     return (
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-500 dark:text-slate-400">
         Something went wrong while getting events
       </p>
     );
@@ -102,7 +104,9 @@ export default function GoogleCalendarShowCheckbox({
 
   if (googleEvents?.length === 0) {
     return (
-      <p className="text-sm text-gray-500">You don't have events for today</p>
+      <p className="text-sm text-gray-500 dark:text-slate-400">
+        You don't have events for today
+      </p>
     );
   }
 
@@ -112,12 +116,12 @@ export default function GoogleCalendarShowCheckbox({
   ) {
     return (
       <>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-slate-400">
           You've already added all events for today
         </p>
         <button
           onClick={resetGoogleEventsHandle}
-          className="text-gray-500 inline-flex items-center justify-center px-2 py-1 text-xs border rounded-md shadow-sm hover:bg-gray-100 "
+          className="text-gray-500 inline-flex items-center justify-center px-2 py-1 text-xs border rounded-md shadow-sm hover:bg-gray-100 dark:text-slate-400"
         >
           reset
         </button>
@@ -128,7 +132,10 @@ export default function GoogleCalendarShowCheckbox({
   if (googleEvents?.length > 0) {
     return (
       <>
-        <label className="text-sm text-gray-500" htmlFor="google-calendar">
+        <label
+          className="text-sm text-gray-500 dark:text-slate-400"
+          htmlFor="google-calendar"
+        >
           Show Google calendar events
         </label>
         <input

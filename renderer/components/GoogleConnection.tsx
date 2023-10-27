@@ -122,12 +122,12 @@ const GoogleConnection = () => {
   }, []);
 
   return (
-    <div className="flex flex-col gap-2 p-4 border rounded-lg shadow">
+    <div className="flex flex-col gap-2 p-4 border rounded-lg shadow dark:border-dark-form-border">
       <div className="flex justify-between">
         <div className="flex justify-between items-center gap-4">
-          <h3 className="font-medium">Google</h3>
+          <h3 className="font-medium dark:text-dark-heading">Google</h3>
           {loggedUsers.length === 0 && (
-            <div className="text-yellow-600 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
+            <div className="text-yellow-600 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-400/20">
               Not authorized
             </div>
           )}
@@ -161,13 +161,13 @@ const GoogleConnection = () => {
           </div>
         )}
       </div>
-      <p className="text-sm text-gray-500 w-[80%]">
+      <p className="text-sm text-gray-500 w-[80%] dark:text-dark-main">
         After connection, you will be able to fill in the Report with the
         information from events of your Google Calendar
       </p>
       {loggedUsers?.length > 0 && (
         <div className="flex items-start justify-between gap-6">
-          <p className=" max-w-sm text-sm text-gray-500">
+          <p className=" max-w-sm text-sm text-gray-500 dark:text-dark-main">
             Show google events in activity table
           </p>
           <div>

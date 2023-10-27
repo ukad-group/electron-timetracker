@@ -77,10 +77,10 @@ export default function UpdateDescription() {
       isOpen={isOpen}
       title="What's new?"
     >
-      <p className="text-xs text-gray-700 font-semibold">
+      <p className="text-xs text-gray-700 font-semibold dark:text-dark-main">
         Current version {currentVersion} {!isUpdate && "(latest)"}
       </p>
-      <div className="relative flex items-start my-4">
+      <div className="relative flex items-start my-4 ">
         <div className="relative flex items-start my-4">
           <div className="flex items-center h-5">
             <input
@@ -94,25 +94,31 @@ export default function UpdateDescription() {
             />
           </div>
           <div className="ml-2 text-sm">
-            <label htmlFor="comments" className="font-medium text-gray-700">
+            <label
+              htmlFor="comments"
+              className="font-medium text-gray-700 dark:text-gray-300"
+            >
               Download beta version
             </label>
-            <p id="comments-description" className="text-gray-500">
+            <p
+              id="comments-description"
+              className="text-gray-500 dark:text-dark-main"
+            >
               You need to restart the application (or reopen from the tray)
             </p>
           </div>
         </div>
       </div>
-      <h2 className="font-bold text-gray-700">
+      <h2 className="font-bold text-gray-700 dark:text-dark-heading">
         In {release?.version ? release?.version : currentVersion} version
       </h2>
       {update?.description ? (
         <div
-          className="flex flex-col gap-2 mb-3"
+          className="flex flex-col gap-2 mb-3 dark:text-dark-heading"
           dangerouslySetInnerHTML={{ __html: update?.description }}
         ></div>
       ) : (
-        <div className="flex flex-col gap-2 mb-3">
+        <div className="flex flex-col gap-2 mb-3 dark:text-dark-heading">
           Here you will receive notifications about the app's content updates
           after downloading the new version.
         </div>

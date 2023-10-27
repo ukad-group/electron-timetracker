@@ -1,5 +1,30 @@
 .fc-daygrid-day {
-  @apply hover:bg-gray-200 cursor-pointer;
+  @apply hover:bg-gray-200 cursor-pointer hover:dark:bg-slate-700 dark:text-dark-heading;
+}
+
+.fc-col-header-cell{
+  @apply dark:bg-dark-container
+}
+
+.fc-theme-standard .fc-scrollgrid{
+  @apply  dark:border-gray-600
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th{
+  @apply dark:border dark:border-gray-600
+}
+
+.fc .fc-scrollgrid-section-sticky>*{
+  @apply dark:bg-dark-container
+}
+
+.fc-theme-standard td{
+  @apply dark:border dark:border-gray-600
+}
+
+.fc .fc-daygrid-day.fc-day-today{
+  @apply dark:bg-yellow-400/10
 }
 
 .fc-daygrid-day-top {
@@ -11,11 +36,11 @@
 }
 
 .fc-day.fc-custom-today-date {
-  @apply bg-sky-100;
+  @apply bg-sky-100 dark:bg-slate-700;
 }
 
 .fc-day-other .fc-event {
-  @apply bg-gray-200 border-gray-200 text-black;
+  @apply bg-gray-200 border-gray-200 text-black dark:bg-slate-500 dark:border-dark-border dark:text-dark-heading;
 }
 
 .fc .fc-daygrid-body-natural .fc-daygrid-day-events {
@@ -23,9 +48,9 @@
 }
 
 .fc-h-event {
-  @apply bg-blue-300 border-blue-300;
+  @apply bg-blue-300 border-blue-300 dark:border-blue-400/10 dark:bg-blue-500/40;
 }
 
 .fc .fc-col-header-cell-cushion {
-  @apply inline-block p-1 text-gray-900;
+  @apply inline-block p-1 text-gray-900 dark:text-dark-heading;
 }

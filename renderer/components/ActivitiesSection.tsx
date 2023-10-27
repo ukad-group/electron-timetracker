@@ -140,8 +140,8 @@ export default function ActivitiesSection({
   return (
     <div>
       {backgroundError && (
-        <div className="border-t-4  border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left">
-          <div className="flex justify-start gap-2 w-full text-gray-900 font-bold">
+        <div className="border-t-4  border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left dark:text-slate-400">
+          <div className="flex justify-start gap-2 w-full text-gray-900 font-bold dark:text-white">
             <ExclamationCircleIcon
               className="w-7 h-7 text-red-700"
               aria-hidden="true"
@@ -181,11 +181,11 @@ export default function ActivitiesSection({
 
       <div>
         <button
-          className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300  sm:rounded-b-lg"
+          className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300 sm:rounded-b-lg dark:bg-slate-700 hover:dark:bg-slate-600 dark:text-dark-heading"
           onClick={() => onEditActivity("new")}
         >
           Track more time
-          <span className="block text-blue-500 text-xs">
+          <span className="block text-blue-500 text-xs dark:text-dark-heading">
             click or press ctrl + space
           </span>
         </button>
@@ -198,8 +198,8 @@ function Placeholder({ onEditActivity, backgroundError }: PlaceholderProps) {
   return (
     <div className="py-6 text-center">
       {backgroundError && (
-        <div className="border-t-4  border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left">
-          <div className="flex justify-start gap-2 w-full text-gray-900 font-bold">
+        <div className="border-t-4  border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 dark:text-slate-400 text-left">
+          <div className="flex justify-start gap-2 w-full text-gray-900 dark:text-dark-heading font-bold">
             <ExclamationCircleIcon
               className="w-7 h-7 text-red-700"
               aria-hidden="true"
@@ -217,10 +217,10 @@ function Placeholder({ onEditActivity, backgroundError }: PlaceholderProps) {
         aria-hidden="true"
       />
 
-      <h3 className="mt-2 text-sm font-medium text-gray-900">
+      <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-dark-heading">
         No tracked time
       </h3>
-      <p className="mt-1 text-sm text-gray-500">
+      <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
         Get started by tracking some activity
       </p>
       <div className="mt-6">

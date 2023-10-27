@@ -15,6 +15,7 @@ import SelectFolderPlaceholder from "../components/SelectFolderPlaceholder";
 import VersionMessage from "../components/ui/VersionMessages";
 import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
+// import { useThemeStore } from "../store/themeStore";
 import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
@@ -24,6 +25,10 @@ export default function Home() {
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );
+  // const [theme, setTheme] = useThemeStore(
+  //   (state) => [state.theme, state.setTheme],
+  //   shallow
+  // );
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDateReport, setSelectedDateReport] = useState("");
@@ -319,7 +324,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-full">
+    <div className="min-h-full dark:bg-dark-back">
       <VersionMessage />
       <main className="py-10">
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
@@ -327,7 +332,7 @@ export default function Home() {
             <>
               <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">
                 <section>
-                  <div className="bg-white shadow sm:rounded-lg">
+                  <div className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
                     <DateSelector
                       selectedDate={selectedDate}
                       setSelectedDate={setSelectedDate}
@@ -335,7 +340,7 @@ export default function Home() {
                   </div>
                 </section>
                 <section className="flex-grow">
-                  <div className="bg-white shadow sm:rounded-lg h-full">
+                  <div className="bg-white shadow sm:rounded-lg h-full dark:bg-dark-container dark:border dark:border-dark-border">
                     <ActivitiesSection
                       activities={selectedDateActivities}
                       onEditActivity={setTrackTimeModalActivity}
@@ -353,7 +358,7 @@ export default function Home() {
                 aria-labelledby="manual-input-title"
                 className="lg:col-start-3 lg:col-span-1 relative"
               >
-                <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6">
+                <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
                   <ManualInputForm
                     onSave={handleSave}
                     selectedDateReport={selectedDateReport}
@@ -376,7 +381,7 @@ export default function Home() {
         </div>
         <Link
           href="/settings"
-          className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold"
+          className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold before:dark:text-blue-700/50"
         >
           <span className="w-8 flex items-center justify-center text-white ">
             <Cog8ToothIcon />

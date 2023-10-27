@@ -127,34 +127,31 @@ export default function ActivitiesTable({
   }, [nonBreakActivities]);
 
   return (
-    <table className="min-w-full divide-y divide-gray-300 table-fixed">
-      <thead>
+    <table className="min-w-full divide-y divide-gray-300 table-fixed dark:divide-gray-600">
+      <thead className="text-gray-900 dark:text-dark-heading">
         <tr>
           <th
             scope="col"
-            className="w-24 pb-6 px-3 text-left text-sm font-semibold text-gray-900"
+            className="w-24 pb-6 px-3 text-left text-sm font-semibol"
           >
             Interval
           </th>
           <th
             scope="col"
-            className="w-24 pb-6 px-3 text-left text-sm font-semibold text-gray-900"
+            className="w-24 pb-6 px-3 text-left text-sm font-semibol"
           >
             Duration
           </th>
           <th
             scope="col"
-            className="w-32 pb-6 px-3 text-left text-sm font-semibold text-gray-900 relative"
+            className="w-32 pb-6 px-3 text-left text-sm font-semibol relative"
           >
-            <span className="block absolute text-xs text-gray-500 top-[22px]">
+            <span className="block absolute text-xs text-gray-500 top-[22px] dark:text-slate-400">
               activity
             </span>
             Project
           </th>
-          <th
-            scope="col"
-            className="pb-6 px-3 text-left text-sm font-semibold text-gray-900"
-          >
+          <th scope="col" className="pb-6 px-3 text-left text-sm font-semibol">
             Description
           </th>
           {/* <th
@@ -177,23 +174,23 @@ export default function ActivitiesTable({
           </th>
         </tr>
       </thead>
-      <tbody className="">
+      <tbody className="text-gray-500 dark:text-slate-400">
         {tableActivities.map((activity, i) => (
           <tr
             key={i}
-            className={clsx(`border-b border-gray-200 `, {
-              "border-dashed border-b-2 border-gray-200":
+            className={clsx(`border-b border-gray-200 dark:border-gray-300 `, {
+              "border-dashed border-b-2 border-gray-200 dark:border-gray-300":
                 tableActivities[i].to != tableActivities[i + 1]?.from &&
                 i + 1 !== tableActivities.length,
             })}
           >
-            <td className="relative py-4 pl-4 pr-3 text-sm text-gray-500 whitespace-nowrap sm:pl-6 md:pl-0">
+            <td className="relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0">
               {ctrlPressed && (
                 <span className="absolute -left-4 text-blue-700">{i + 1}</span>
               )}
               <span
                 className={clsx({
-                  "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800":
+                  "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
                     !activity.isValid,
                 })}
               >
@@ -201,7 +198,7 @@ export default function ActivitiesTable({
               </span>
             </td>
             <td
-              className={`px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap `}
+              className={`px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap `}
             >
               <Tooltip>
                 <p data-column="duration" onClick={copyToClipboardHandle}>
@@ -212,7 +209,7 @@ export default function ActivitiesTable({
             <td className="flex flex-col px-3 py-4">
               <Tooltip>
                 <p
-                  className="text-sm font-medium text-gray-900"
+                  className="text-sm font-medium text-gray-900 dark:text-dark-heading"
                   onClick={copyToClipboardHandle}
                 >
                   {activity.project}
@@ -221,7 +218,7 @@ export default function ActivitiesTable({
               {activity.activity && (
                 <Tooltip>
                   <p
-                    className="block text-xs text-gray-500 font-semibold mt-1"
+                    className="block text-xs  font-semibold mt-1"
                     onClick={copyToClipboardHandle}
                   >
                     {activity.activity}
@@ -229,7 +226,7 @@ export default function ActivitiesTable({
                 </Tooltip>
               )}
             </td>
-            <td className="px-3 py-4 text-sm text-gray-500 ">
+            <td className="px-3 py-4 text-sm ">
               <Tooltip>
                 <p
                   onClick={copyToClipboardHandle}
@@ -241,7 +238,7 @@ export default function ActivitiesTable({
                   {activity.description}
                 </p>
                 {activity.mistakes?.includes("startsWith!") && (
-                  <span className="block text-xs text-gray-500 mt-1">
+                  <span className="block text-xs mt-1">
                     Perhaps you wanted to report a break
                   </span>
                 )}
@@ -262,7 +259,7 @@ export default function ActivitiesTable({
                     });
                   }}
                 >
-                  <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+                  <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
                 </button>
               </div>
             </td>
@@ -282,22 +279,22 @@ export default function ActivitiesTable({
                 }}
               >
                 {!activity.calendarId && (
-                  <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+                  <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
                 )}
 
                 {activity.calendarId && (
-                  <PlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+                  <PlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
                 )}
               </button>
             </td>
           </tr>
         ))}
         <tr>
-          <td className="py-4 px-3 text-sm text-gray-500 whitespace-nowrap">
+          <td className="py-4 px-3 text-sm whitespace-nowrap">
             <p>Total</p>
           </td>
           <td
-            className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
+            className="px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap"
             onClick={copyToClipboardHandle}
           >
             <Tooltip>
@@ -305,7 +302,7 @@ export default function ActivitiesTable({
             </Tooltip>
           </td>
           <td
-            className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
+            className="px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap"
             colSpan={4}
           >
             <TimeBadge
@@ -329,7 +326,7 @@ export default function ActivitiesTable({
                   onDeleteActivity(activity.id);
                 }}
               >
-                <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+                <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 dark:text-dark-heading" />
               </button>
             </td> */
 }

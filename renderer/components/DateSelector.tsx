@@ -45,7 +45,7 @@ export default function DateSelector({
   return (
     <div className="flex items-center justify-between px-4 py-5 sm:px-6">
       <div>
-        <h1 className="text-lg flex items-center font-semibold leading-6 text-gray-900">
+        <h1 className="text-lg flex items-center font-semibold leading-6 text-gray-900 dark:text-dark-heading">
           <time dateTime="2022-01-22" className="sm:hidden">
             {formatDate(selectedDate, "short")}
           </time>
@@ -53,12 +53,12 @@ export default function DateSelector({
             {formatDate(selectedDate, "long")}
           </time>
           {selectedDate.toLocaleDateString() === today.toLocaleDateString() && (
-            <span className="inline-flex  px-2.5 py-0.5 ml-3 rounded-full text-xs font-medium bg-blue-300 text-white">
+            <span className="inline-flex  px-2.5 py-0.5 ml-3 rounded-full text-xs font-medium bg-blue-300 text-white dark:text-blue-400 dark:bg-blue-400/20">
               Today
             </span>
           )}
         </h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
           {selectedDate?.toLocaleDateString("en-US", { weekday: "long" })}
         </p>
       </div>
