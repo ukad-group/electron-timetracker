@@ -75,7 +75,8 @@ const Office365Connection = () => {
   useEffect(() => {
     if (
       window.location.search.includes("code") &&
-      window.location.search.includes("state=office365code")
+      window.location.search.includes("state=office365code") &&
+      !window.location.search.includes("error")
     ) {
       (async () => addUser())();
     }
