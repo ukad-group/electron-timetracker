@@ -58,9 +58,9 @@ export default function TrackTimeModal({
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
-  const [office365Token, setOffice365Token] = useState("");
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const loggedGoogleUsers = JSON.parse(localStorage.getItem("googleUsers"));
+  const office365Users = JSON.parse(localStorage.getItem("office365-users")) || [];
   const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
     (state) => [state.event, state.setEvent],
     shallow
@@ -99,7 +99,6 @@ export default function TrackTimeModal({
 
   useEffect(() => {
     setTrelloToken((localStorage.getItem("trelloToken") as string) || "");
-    setOffice365Token((localStorage.getItem("office365Token") as string) || '');
   }, []);
 
   useEffect(() => {
@@ -463,7 +462,7 @@ export default function TrackTimeModal({
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
                     {checkIsToday(selectedDate) &&
-                      (loggedGoogleUsers?.length > 0 || office365Token.length > 0) && (
+                      (loggedGoogleUsers?.length > 0 || office365Users.length > 0) && (
                         <AddEventBtn
                           addEvent={addEventToList}
                           availableProjects={

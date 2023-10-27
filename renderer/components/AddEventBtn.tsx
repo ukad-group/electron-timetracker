@@ -8,7 +8,7 @@ import {
 } from "../API/googleCalendarAPI";
 import { checkAlreadyAddedGoogleEvents } from "../utils/utils";
 import { googleCalendarEventsParsing } from "./google-calendar/GoogleCalendarEventsParsing";
-import { GoogleUser } from "./GoogleConnection";
+// import { GoogleUser } from "./GoogleConnection";
 
 export type Event = {
   from: {
@@ -85,20 +85,32 @@ export default function AddEventBtn({
   };
 
   const getOffice365Events = async () => {
-    const storedToken = (localStorage.getItem("office365Token") as string) || '';
+    const storedOffice365Users =
+      JSON.parse(localStorage.getItem("office365-users")) || [];
 
-    if (!storedToken.length) return [];
+    if (!storedOffice365Users.length) return;
 
-    (async () => {
+    const getOffice365EventByUserToken = async (token: string) => {
       const res = await global.ipcRenderer.invoke(
-        'office365:get-today-events', storedToken);
+        "office365:get-today-events",
+        token
+      );
 
-      if (res?.value) {
-        return setOffice365Events(res.value)
-      }
+      if (res?.value) return res.value;
 
-      return [];
-    })()
+      return;
+    };
+
+    const usersPromises = storedOffice365Users.map((user) =>
+      getOffice365EventByUserToken(user.accessToken)
+    );
+    const promisedOffice365Events = await Promise.all(usersPromises);
+    const allOffice365Events = promisedOffice365Events.reduce(
+      (acc, curr) => (!curr ? acc : [...acc, ...curr]),
+      []
+    );
+
+    setOffice365Events(allOffice365Events || []);
   };
 
   useEffect(() => {
@@ -206,16 +218,18 @@ export default function AddEventBtn({
               {({ active }) => (
                 <button
                   type="button"
-                  className={`${active ? "bg-blue-300 text-white" : "text-gray-900"
-                    } group w-full p-2 text-sm`}
+                  className={`${
+                    active ? "bg-blue-300 text-white" : "text-gray-900"
+                  } group w-full p-2 text-sm`}
                   onClick={() => {
                     addEvent(event);
                   }}
                 >
                   {summary ? summary : "No title"}
                   <span
-                    className={`${active ? "text-white" : "text-gray-500"
-                      } block text-xs`}
+                    className={`${
+                      active ? "text-white" : "text-gray-500"
+                    } block text-xs`}
                   >
                     {from.time} - {to.time}
                   </span>
