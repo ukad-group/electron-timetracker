@@ -18,6 +18,11 @@ import {
   getRefreshedAccessToken,
   getTokens,
 } from "./helpers/API/office365Api";
+import {
+  getCardsOfMember,
+  getMember,
+  getTrelloAuthUrl,
+} from "./helpers/API/trelloApi";
 
 initialize("A-EU-9361517871");
 
@@ -438,6 +443,37 @@ ipcMain.handle(
     return searchReadFiles(reportsFolder, queries, year);
   }
 );
+
+// TRELLO FUNCTIONS
+
+const getTrelloOptions = () => {
+  return {
+    key: process.env.NEXT_PUBLIC_TRELLO_KEY || "",
+    returnUrl: process.env.NEXT_PUBLIC_TRELLO_REDIRECT_URI || "",
+  };
+};
+
+ipcMain.on("trello:login", async () => {
+  const options = getTrelloOptions();
+  const trelloAuthUrl = getTrelloAuthUrl(options);
+
+  mainWindow?.loadURL(trelloAuthUrl);
+});
+
+ipcMain.handle(
+  "trello:get-profile-info",
+  async (event, accessToken: string) => {
+    const options = getTrelloOptions();
+
+    return await getMember(accessToken, options);
+  }
+);
+
+ipcMain.handle("trello:get-cards", async (event, accessToken: string) => {
+  const options = getTrelloOptions();
+
+  return await getCardsOfMember(accessToken, options);
+});
 
 // MICROSOFT OFFICE365 FUNCTIONS
 

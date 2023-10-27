@@ -16,14 +16,11 @@ import Button from "../ui/Button";
 import { shallow } from "zustand/shallow";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { useScheduledEventsStore } from "../../store/googleEventsStore";
-import { getCardsOfMember } from "../../API/trelloAPI";
 import AddEventBtn, { Event } from "../AddEventBtn";
 import {
   markActivityAsAdded,
   replaceHyphensWithSpaces,
 } from "../../utils/utils";
-
-const TRELLO_KEY = process.env.NEXT_PUBLIC_TRELLO_KEY;
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -56,11 +53,12 @@ export default function TrackTimeModal({
   const [description, setDescription] = useState("");
   const [isTypingFromDuration, setIsTypingFromDuration] = useState(false);
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
-  const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const loggedGoogleUsers = JSON.parse(localStorage.getItem("googleUsers"));
-  const office365Users = JSON.parse(localStorage.getItem("office365-users")) || [];
+  const office365Users =
+    JSON.parse(localStorage.getItem("office365-users")) || [];
+  const trelloUser = JSON.parse(localStorage.getItem("trello-user")) || null;
   const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
     (state) => [state.event, state.setEvent],
     shallow
@@ -96,10 +94,6 @@ export default function TrackTimeModal({
     setActivity(editedActivity.activity || "");
     setDescription(editedActivity.description || "");
   }, [editedActivity]);
-
-  useEffect(() => {
-    setTrelloToken((localStorage.getItem("trelloToken") as string) || "");
-  }, []);
 
   useEffect(() => {
     if (editedActivity !== "new") {
@@ -142,19 +136,27 @@ export default function TrackTimeModal({
     setFormattedDuration(formatDuration(duration));
   }, [from, to]);
 
-  useEffect(() => {
-    if (trelloToken?.length > 0) {
-      (async () => {
-        const trelloTasksFromAPI = (
-          await getCardsOfMember({ token: trelloToken, key: TRELLO_KEY })
-        ).map((card) =>
-          replaceHyphensWithSpaces(`TT:: ${card.name} ${card.shortUrl}`)
-        );
+  const getTrelloCards = async () => {
+    try {
+      const trelloCards = await global.ipcRenderer.invoke(
+        "trello:get-cards",
+        trelloUser.accessToken
+      );
 
-        setTrelloTasks(trelloTasksFromAPI);
-      })();
+      const newTrelloTasks = trelloCards.map((card) =>
+        replaceHyphensWithSpaces(`TT:: ${card.name} ${card.shortUrl}`)
+      );
+
+      setTrelloTasks(newTrelloTasks);
+    } catch (error) {
+      localStorage.removeItem("trello-user");
+      setTrelloTasks([]);
     }
-  }, [trelloToken]);
+  };
+
+  useEffect(() => {
+    if (trelloUser) (async () => getTrelloCards())();
+  }, []);
 
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
@@ -462,7 +464,8 @@ export default function TrackTimeModal({
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
                     {checkIsToday(selectedDate) &&
-                      (loggedGoogleUsers?.length > 0 || office365Users.length > 0) && (
+                      (loggedGoogleUsers?.length > 0 ||
+                        office365Users.length > 0) && (
                         <AddEventBtn
                           addEvent={addEventToList}
                           availableProjects={
