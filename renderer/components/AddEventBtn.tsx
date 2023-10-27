@@ -8,6 +8,7 @@ import {
 } from "../API/googleCalendarAPI";
 import { checkAlreadyAddedGoogleEvents } from "../utils/utils";
 import { googleCalendarEventsParsing } from "./google-calendar/GoogleCalendarEventsParsing";
+import { Office365User } from "./Office365Connection";
 // import { GoogleUser } from "./GoogleConnection";
 
 export type Event = {
@@ -84,26 +85,87 @@ export default function AddEventBtn({
     setGoogleEvents(checkedGoogleEvents);
   };
 
+  const getOffice365EventByUser = async (
+    accessToken: string,
+    refreshToken: string,
+    userId: string
+  ) => {
+    let res = await global.ipcRenderer.invoke(
+      "office365:get-today-events",
+      accessToken
+    );
+
+    if (res?.error?.code === "MailboxNotEnabledForRESTAPI") {
+      return [];
+    }
+
+    if (res?.error) {
+      const data = await updateAccessToken(refreshToken);
+
+      if (!data?.access_token) {
+        removeStoredUser(userId);
+        return;
+      } else {
+        updateStoredUser(userId, data.access_token);
+
+        return await getOffice365EventByUser(
+          data.access_token,
+          refreshToken,
+          userId
+        );
+      }
+    }
+
+    if (res?.value) return res.value;
+
+    return [];
+  };
+
+  const removeStoredUser = (userId: string) => {
+    const storedUsers =
+      JSON.parse(localStorage.getItem("office365-users")) || [];
+    const filteredUsers = storedUsers.filter(
+      (user: Office365User) => user.userId !== userId
+    );
+
+    if (filteredUsers.length > 0) {
+      localStorage.setItem("office365-users", JSON.stringify(filteredUsers));
+    } else {
+      localStorage.removeItem("office365-users");
+    }
+  };
+
+  const updateStoredUser = (userId: string, newAccessToken: string) => {
+    const storedUsers =
+      JSON.parse(localStorage.getItem("office365-users")) || [];
+    const updatedUsers = storedUsers.map((user: Office365User) => {
+      if (user.userId === userId) {
+        return { ...user, accessToken: newAccessToken };
+      } else {
+        return user;
+      }
+    });
+
+    localStorage.setItem("office365-users", JSON.stringify(updatedUsers));
+  };
+
+  const updateAccessToken = async (refreshToken: string) =>
+    await global.ipcRenderer.invoke(
+      "office365:refresh-access-token",
+      refreshToken
+    );
+
   const getOffice365Events = async () => {
-    const storedOffice365Users =
+    const storedUsers =
       JSON.parse(localStorage.getItem("office365-users")) || [];
 
-    if (!storedOffice365Users.length) return;
+    if (!storedUsers.length) return;
 
-    const getOffice365EventByUserToken = async (token: string) => {
-      const res = await global.ipcRenderer.invoke(
-        "office365:get-today-events",
-        token
-      );
+    const usersPromises = storedUsers.map((user: Office365User) => {
+      const { accessToken, refreshToken, userId } = user;
 
-      if (res?.value) return res.value;
-
-      return;
-    };
-
-    const usersPromises = storedOffice365Users.map((user) =>
-      getOffice365EventByUserToken(user.accessToken)
-    );
+      return getOffice365EventByUser(accessToken, refreshToken, userId);
+    });
     const promisedOffice365Events = await Promise.all(usersPromises);
     const allOffice365Events = promisedOffice365Events.reduce(
       (acc, curr) => (!curr ? acc : [...acc, ...curr]),

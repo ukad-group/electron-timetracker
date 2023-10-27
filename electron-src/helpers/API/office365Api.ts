@@ -3,11 +3,13 @@ type Options = {
   clientSecret: string;
   redirectUri: string;
   scope: string;
-}
+};
 
 export const getAuthUrl = (options: Options) => {
   const { clientId, scope, redirectUri } = options;
-  const authUrl = new URL("https://login.microsoftonline.com/common/oauth2/v2.0/authorize");
+  const authUrl = new URL(
+    "https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
+  );
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -15,7 +17,7 @@ export const getAuthUrl = (options: Options) => {
     redirect_uri: redirectUri,
     prompt: "consent",
     response_type: "code",
-    state: "office365code"
+    state: "office365code",
   });
 
   authUrl.search = params.toString();
@@ -27,18 +29,42 @@ export const getTokens = async (authCode: string, options: Options) => {
   if (!authCode) return;
 
   const { clientId, clientSecret, redirectUri, scope } = options;
-  const response = await fetch("https://login.microsoftonline.com/common/oauth2/v2.0/token", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: `code=${authCode}&client_id=${clientId}&client_secret=${clientSecret}&redirect_uri=${redirectUri}&grant_type=authorization_code&scope=${scope}`,
-  });
+  const response = await fetch(
+    "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `code=${authCode}&client_id=${clientId}&client_secret=${clientSecret}&redirect_uri=${redirectUri}&grant_type=authorization_code&scope=${scope}`,
+    }
+  );
 
   // if (!response.ok) throw new Error();
 
   return response.json();
-}
+};
+
+export const getRefreshedAccessToken = async (
+  refreshToken: string,
+  options: Options
+) => {
+  const { clientId, clientSecret, scope } = options;
+  const response = await fetch(
+    "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}&grant_type=refresh_token&scope=${scope}`,
+    }
+  );
+
+  // if (!response.ok) throw new Error();
+
+  return response.json();
+};
 
 export const endpoints = {
   me: "https://graph.microsoft.com/v1.0/me",

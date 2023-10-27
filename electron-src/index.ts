@@ -11,7 +11,13 @@ import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
 import { initialize, trackEvent } from "@aptabase/electron/main";
-import { callProfileInfoGraph, callTodayEventsGraph, getAuthUrl, getTokens } from "./helpers/API/office365Api";
+import {
+  callProfileInfoGraph,
+  callTodayEventsGraph,
+  getAuthUrl,
+  getRefreshedAccessToken,
+  getTokens,
+} from "./helpers/API/office365Api";
 
 initialize("A-EU-9361517871");
 
@@ -119,10 +125,7 @@ const generateTray = () => {
     },
   ]);
 
-  const trayIconPath = path.join(
-    __dirname,
-    "../renderer/out/images/logo.png"
-  );
+  const trayIconPath = path.join(__dirname, "../renderer/out/images/logo.png");
 
   tray = new Tray(trayIconPath);
   tray.setToolTip("Timetracker");
@@ -156,7 +159,7 @@ app.on("ready", async () => {
   createServer((req: any, res: any) => {
     const parsedUrl = parse(req.url, true);
     requestHandler(req, res, parsedUrl);
-  }).listen(PORT, '127.0.0.1', () => {
+  }).listen(PORT, "127.0.0.1", () => {
     console.log(`> Ready on http://localhost:${PORT}`);
   });
 
@@ -436,32 +439,49 @@ ipcMain.handle(
   }
 );
 
+// MICROSOFT OFFICE365 FUNCTIONS
+
 const getOffice365Options = () => {
   return {
-    clientId: process.env.NEXT_PUBLIC_OFFICE365_CLIENT_ID || '',
-    clientSecret: process.env.NEXT_PUBLIC_OFFICE365_CLIENT_SECRET || '',
-    redirectUri: process.env.NEXT_PUBLIC_OFFICE365_REDIRECT_URI || '',
-    scope: process.env.NEXT_PUBLIC_OFFICE365_SCOPE || '',
+    clientId: process.env.NEXT_PUBLIC_OFFICE365_CLIENT_ID || "",
+    clientSecret: process.env.NEXT_PUBLIC_OFFICE365_CLIENT_SECRET || "",
+    redirectUri: process.env.NEXT_PUBLIC_OFFICE365_REDIRECT_URI || "",
+    scope: process.env.NEXT_PUBLIC_OFFICE365_SCOPE || "",
   };
-}
+};
 
-ipcMain.on('office365:login', async () => {
-  const options = getOffice365Options()
-  const office365AuthUrl = getAuthUrl(options)
+ipcMain.on("office365:login", async () => {
+  const options = getOffice365Options();
+  const office365AuthUrl = getAuthUrl(options);
 
-  mainWindow?.loadURL(office365AuthUrl)
+  mainWindow?.loadURL(office365AuthUrl);
 });
 
-ipcMain.handle('office365:get-tokens', async (event, authCode: string) => {
-  const options = getOffice365Options()
-  
-  return await getTokens(authCode, options)
+ipcMain.handle("office365:get-tokens", async (event, authCode: string) => {
+  const options = getOffice365Options();
+
+  return await getTokens(authCode, options);
 });
 
-ipcMain.handle('office365:get-profile-info', async (event, accessToken: string) => {
-  return await callProfileInfoGraph(accessToken)
-});
+ipcMain.handle(
+  "office365:refresh-access-token",
+  async (event, refreshToken: string) => {
+    const options = getOffice365Options();
 
-ipcMain.handle('office365:get-today-events', async (event, accessToken: string) => {
-  return await callTodayEventsGraph(accessToken)
-});
+    return await getRefreshedAccessToken(refreshToken, options);
+  }
+);
+
+ipcMain.handle(
+  "office365:get-profile-info",
+  async (event, accessToken: string) => {
+    return await callProfileInfoGraph(accessToken);
+  }
+);
+
+ipcMain.handle(
+  "office365:get-today-events",
+  async (event, accessToken: string) => {
+    return await callTodayEventsGraph(accessToken);
+  }
+);

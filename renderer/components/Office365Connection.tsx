@@ -2,6 +2,13 @@ import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
 
+export interface Office365User {
+  accessToken: string;
+  refreshToken: string;
+  userId: string;
+  username: string;
+}
+
 const Office365Connection = () => {
   const [users, setUsers] = useState(
     JSON.parse(localStorage.getItem("office365-users")) || []
@@ -12,7 +19,9 @@ const Office365Connection = () => {
   };
 
   const handleSignOutButton = (id: string) => {
-    const filteredUsers = users.filter((user) => user.userId !== id);
+    const filteredUsers = users.filter(
+      (user: Office365User) => user.userId !== id
+    );
 
     if (filteredUsers.length > 0) {
       localStorage.setItem("office365-users", JSON.stringify(filteredUsers));
@@ -41,7 +50,9 @@ const Office365Connection = () => {
       );
 
     const username = userPrincipalName || mail || displayName || "";
-    const isUserExists = users.some((user) => id === user.userId);
+    const isUserExists = users.some(
+      (user: Office365User) => id === user.userId
+    );
 
     if (isUserExists) {
       alert(`Account ${username} has already logged`);
