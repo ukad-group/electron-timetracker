@@ -80,7 +80,7 @@ export function parseReport(fileContent: string) {
       // should skip registraion when task starts from !
       const isBreak = workingTimeRegex.test(currentLine) || !currentLine;
       if (isBreak) {
-        registration.project = currentLine;
+        registration.project = !currentLine ? "!" : currentLine;
         registration.isBreak = isBreak;
         reportItems.push(registration);
         reportCount++;
