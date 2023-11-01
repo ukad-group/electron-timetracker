@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  ArrowRightOnRectangleIcon,
-} from "@heroicons/react/24/solid";
+import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
 
 function extractTokenFromString(inputString: string) {
@@ -52,7 +50,10 @@ const TrelloConnection = () => {
   };
 
   useEffect(() => {
-    if (window.location.hash.includes("token") && !window.location.hash.includes("error")) {
+    if (
+      window.location.hash.includes("token") &&
+      !window.location.hash.includes("error")
+    ) {
       (async () => addUser())();
     }
   }, []);
@@ -95,7 +96,9 @@ const TrelloConnection = () => {
       </div>
       <p className="text-sm text-gray-500">
         After connection, you will be able to fill in the Description field with
-        tasks from the drop-down list
+        tasks from the drop-down list. Just begin typing and in the drop-down
+        list you will see Trello tasks that starting with "TT::". You can see
+        only those tasks you joined in Trello
       </p>
     </div>
   );
