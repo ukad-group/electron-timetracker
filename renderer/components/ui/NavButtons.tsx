@@ -13,7 +13,7 @@ export default function NavButtons({
     <div className="flex items-center rounded-md shadow-sm">
       <button
         type="button"
-        className="flex items-center justify-center py-2 pl-3 pr-4 text-gray-400 bg-white border border-r-0 border-gray-300 dark:border-gray-800 rounded-l-md hover:text-gray-500 md:w-9 md:px-2 md:hover:bg-gray-50 dark:bg-slate-700 md:hover:dark:bg-slate-600"
+        className="flex items-center justify-center py-2 pl-3 pr-4 text-gray-400 bg-white border border-r-0 border-gray-300 dark:border-gray-800 rounded-l-md hover:text-gray-500 md:w-9 md:px-2 md:hover:bg-gray-50 dark:bg-dark-button-back-gray md:hover:dark:bg-dark-button-gray-hover"
         onClick={prevCallback}
       >
         <span className="sr-only">Previous day</span>
@@ -25,7 +25,7 @@ export default function NavButtons({
       <span className="relative w-px h-5 -mx-px bg-gray-300 dark:bg-gray-800" />
       <button
         type="button"
-        className="flex items-center justify-center py-2 pl-4 pr-3 text-gray-400 bg-white border border-l-0 border-gray-300 dark:border-gray-800 rounded-r-md hover:text-gray-500 md:w-9 md:px-2 md:hover:bg-gray-50 dark:bg-slate-700 md:hover:dark:bg-slate-600"
+        className="flex items-center justify-center py-2 pl-4 pr-3 text-gray-400 bg-white border border-l-0 border-gray-300 dark:border-gray-800 rounded-r-md hover:text-gray-500 md:w-9 md:px-2 md:hover:bg-gray-50 dark:bg-dark-button-back-gray md:hover:dark:bg-dark-button-gray-hover"
         onClick={nextCallback}
       >
         <span className="sr-only">Next day</span>

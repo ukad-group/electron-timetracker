@@ -181,7 +181,7 @@ export default function ActivitiesSection({
 
       <div>
         <button
-          className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300 sm:rounded-b-lg dark:bg-slate-700 hover:dark:bg-slate-600 dark:text-dark-heading"
+          className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300 sm:rounded-b-lg dark:bg-dark-button-back-gray hover:dark:bg-dark-button-gray-hover dark:text-dark-heading"
           onClick={() => onEditActivity("new")}
         >
           Track more time

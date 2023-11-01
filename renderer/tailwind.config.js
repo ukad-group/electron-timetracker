@@ -17,6 +17,9 @@ module.exports = {
         'dark-form-border': 'rgb(71 85 105)',
         'dark-button-back': 'rgb(79 70 229)',
         'dark-button-hover':'rgb(67 56 202)',
+        'dark-button-back-gray': 'rgb(51 65 85)',
+        'dark-button-gray-hover':'rgb(75 85 99)',
+        
       },
       keyframes: {
         scaling: {
