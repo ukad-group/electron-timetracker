@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { CheckIcon } from "@heroicons/react/24/solid";
+import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
-import { getMember, getTrelloAuthUrl } from "../API/trelloAPI";
-
-const PORT = process.env.NEXT_PUBLIC_PORT;
-const TRELLO_KEY = process.env.NEXT_PUBLIC_TRELLO_KEY;
-const RETURN_URL = `http://localhost:${PORT}/settings`;
 
 function extractTokenFromString(inputString: string) {
   const parts = inputString.split("#");
@@ -24,89 +18,88 @@ function extractTokenFromString(inputString: string) {
 }
 
 const TrelloConnection = () => {
-  const [token, setToken] = useState("");
-  const [username, setUsername] = useState("");
-  const router = useRouter();
+  const [user, setUser] = useState(
+    JSON.parse(localStorage.getItem("trello-user")) || null
+  );
 
   const handleSignInButton = () => {
-    const authUrl = getTrelloAuthUrl({
-      key: TRELLO_KEY,
-      returnUrl: RETURN_URL,
-    });
-
-    router.push(authUrl);
+    global.ipcRenderer.send("trello:login");
   };
 
   const handleSignOutButton = () => {
-    localStorage.removeItem("trelloToken");
-    setToken("");
-    router.push("/settings");
+    localStorage.removeItem("trello-user");
+    setUser(null);
+  };
+
+  const addUser = async () => {
+    const tokenFromUrl = extractTokenFromString(window.location.hash);
+
+    const { id, username, fullName } = await global.ipcRenderer.invoke(
+      "trello:get-profile-info",
+      tokenFromUrl
+    );
+
+    const newUser = {
+      userId: id,
+      accessToken: tokenFromUrl,
+      username: username || fullName || "",
+    };
+
+    localStorage.setItem("trello-user", JSON.stringify(newUser));
+    setUser(newUser);
   };
 
   useEffect(() => {
-    if (window.location.hash.includes("token")) {
-      const tokenFromUrl = extractTokenFromString(window.location.hash);
-
-      localStorage.setItem("trelloToken", tokenFromUrl);
-      setToken(tokenFromUrl);
-    }
-
-    if (Boolean(localStorage.getItem("trelloToken"))) {
-      const storedToken = localStorage.getItem("trelloToken") as string;
-
-      setToken(storedToken);
-
-      (async () => {
-        const trelloMember = await getMember({
-          token: storedToken,
-          key: TRELLO_KEY,
-        });
-
-        if (trelloMember && trelloMember.username) {
-          setUsername(trelloMember.username);
-        }
-      })();
+    if (
+      window.location.hash.includes("token") &&
+      !window.location.hash.includes("error")
+    ) {
+      (async () => addUser())();
     }
   }, []);
 
   return (
-    <div className="p-4 flex items-start justify-between gap-6 border rounded-lg shadow">
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-4">
-          <span className="font-medium">Trello</span>
-          {token.length > 0 && (
-            <div className="text-green-700 inline-flex gap-2 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-200">
-              Already authorized
-              <CheckIcon className="w-4 h-4 fill-green-700" />
-            </div>
-          )}
-          {token.length > 0 && username.length > 0 && (
-            <div className="inline-flex  px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
-              {username}
-            </div>
-          )}
-          {!token.length && (
-            <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
-              Not authorized
-            </div>
-          )}
-        </div>
-        <p className="text-sm text-gray-500">
-          After connection, you will be able to fill in the Description field
-          with tasks from the drop-down list
-        </p>
-      </div>
-      <div className="flex-shrink-0">
-        {token.length > 0 ? (
+    <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow">
+      <div className="flex justify-between items-center w-full">
+        <span className="font-medium">Trello</span>
+        {!user && (
           <Button
-            text="Sign Out"
-            callback={handleSignOutButton}
+            text="Add account"
+            callback={handleSignInButton}
             type="button"
           />
-        ) : (
-          <Button text="Sign In" callback={handleSignInButton} type="button" />
         )}
       </div>
+      <div className="flex items-center justify-between gap-4 w-full">
+        {!user && (
+          <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
+            No one user authorized
+          </div>
+        )}
+
+        {user && (
+          <div className="flex flex-col gap-2 w-full">
+            <div className="flex gap-4 items-center">
+              <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-blue-900">
+                {user.username}
+              </div>
+              <div
+                onClick={handleSignOutButton}
+                className="cursor-pointer bg-gray-400 hover:bg-gray-500 transition duration-300 inline-flex gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
+              >
+                <ArrowRightOnRectangleIcon className="w-4 h-4 fill-white" />
+                Sign Out
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      <p className="text-sm text-gray-500">
+        After connection, you will be able to fill in the Description field with
+        tasks from the drop-down list. Just begin typing and in the drop-down
+        list you will see Trello tasks that starting with "TT::". You can see
+        only those tasks you joined in Trello
+      </p>
     </div>
   );
 };
