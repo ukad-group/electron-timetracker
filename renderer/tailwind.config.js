@@ -7,18 +7,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'dark-heading': 'rgb(243 244 246);',
+        'dark-heading': 'rgb(200 200 200);',
         'dark-main':'rgb(156 163 175)',
-        'dark-container': 'rgb(30 41 59)',
-        'dark-back': 'rgb(15 23 42)',
-        'dark-border': 'rgb(55 65 81)',
+        'dark-container': 'rgb(33, 33, 37)',
+        'dark-back': 'rgb(24, 24, 24)',
+        'dark-border': 'rgb(29, 33, 37)',
         'focus-border': '#3b82f666',
-        'dark-form-back': 'rgb(51 65 85)',
-        'dark-form-border': 'rgb(71 85 105)',
-        'dark-button-back': 'rgb(79 70 229)',
-        'dark-button-hover':'rgb(67 56 202)',
-        'dark-button-back-gray': 'rgb(51 65 85)',
-        'dark-button-gray-hover':'rgb(75 85 99)',
+        'dark-form-back': 'rgb(55 55 60)',
+        'dark-form-border': 'rgb(55 55 60)',
+        'dark-button-back': 'rgb(67 56 202)',
+        'dark-button-hover':'rgb(79 70 229)',
+        'dark-button-back-gray': 'rgb(55 55 64)',
+        'dark-button-gray-hover':'rgb(65 65 74)',
         
       },
       keyframes: {

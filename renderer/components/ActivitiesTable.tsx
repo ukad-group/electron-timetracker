@@ -179,7 +179,7 @@ export default function ActivitiesTable({
           <tr
             key={i}
             className={clsx(`border-b border-gray-200 dark:border-gray-300 `, {
-              "border-dashed border-b-2 border-gray-200 dark:border-gray-300":
+              "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
                 tableActivities[i].to != tableActivities[i + 1]?.from &&
                 i + 1 !== tableActivities.length,
             })}

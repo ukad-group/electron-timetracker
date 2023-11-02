@@ -10,7 +10,7 @@ type ButtonProps = {
 };
 
 const basicStyles =
-  "inline-flex items-center justify-center px-4 py-2 text-sm font-medium border rounded-md shadow-sm dark:border-blue-900 ";
+  "inline-flex items-center justify-center px-4 py-2 text-sm font-medium border rounded-md shadow-sm dark:border-dark-form-back ";
 const defaultStyles = "bg-blue-600 text-white dark:bg-dark-button-back ";
 const saveHoverStyles = "hover:bg-blue-700 hover:dark:bg-dark-button-hover ";
 const cancelHoverStyles = "hover:bg-gray-50 ";
