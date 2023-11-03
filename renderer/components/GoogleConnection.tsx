@@ -67,7 +67,13 @@ const GoogleConnection = () => {
           userName: googleProfileUsername,
           accountId: googleProfileId,
         };
-
+        global.ipcRenderer.send(
+          "send-analytics-data",
+          "calendars_connections",
+          {
+            calendar: "googleCalendar",
+          }
+        );
         googleUsersFromLs.push(userObject);
         localStorage.setItem("googleUsers", JSON.stringify(googleUsersFromLs));
         setLoggedUsers(googleUsersFromLs);

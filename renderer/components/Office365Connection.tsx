@@ -65,7 +65,9 @@ const Office365Connection = () => {
       refreshToken: refresh_token,
       username: username,
     };
-
+    global.ipcRenderer.send("send-analytics-data", "calendars_connections", {
+      calendar: "office365",
+    });
     const newUsers = [...users, user];
 
     localStorage.setItem("office365-users", JSON.stringify(newUsers));

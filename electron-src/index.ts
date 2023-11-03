@@ -25,7 +25,10 @@ import {
 } from "./helpers/API/trelloApi";
 
 initialize("A-EU-9361517871");
-
+ipcMain.on("send-analytics-data", (event, analyticsEvent: string, data: Record<string, string>) => {
+   trackEvent(analyticsEvent, data);
+  });
+  
 const PORT = 51432;
 
 let updateStatus: null | "available" | "downloaded" = null;
