@@ -86,7 +86,7 @@ const TrelloConnection = () => {
             </div>
           )}
           {!token.length && (
-            <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
+            <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-400/20">
               Not authorized
             </div>
           )}

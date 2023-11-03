@@ -15,7 +15,6 @@ import SelectFolderPlaceholder from "../components/SelectFolderPlaceholder";
 import VersionMessage from "../components/ui/VersionMessages";
 import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
-// import { useThemeStore } from "../store/themeStore";
 import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
@@ -25,10 +24,6 @@ export default function Home() {
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );
-  // const [theme, setTheme] = useThemeStore(
-  //   (state) => [state.theme, state.setTheme],
-  //   shallow
-  // );
 
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDateReport, setSelectedDateReport] = useState("");

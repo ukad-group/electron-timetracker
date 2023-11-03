@@ -6,9 +6,11 @@ import {
   persist,
 } from "zustand/middleware";
 
+type Theme = { custom: "light"|"dark"; os: boolean };
+
 export type ThemeStore = {
-  theme: "light"|"dark";
-  setTheme: (theme: "light"|"dark") => void;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
 };
 
 const storage: StateStorage = {
@@ -27,8 +29,8 @@ export const useThemeStore = createWithEqualityFn<ThemeStore>()(
   devtools(
     persist(
       (set) => ({
-        theme: "light",
-        setTheme: (theme: "light"|"dark") => set({ theme: theme }),
+        theme: { custom: "light", os: true },
+        setTheme: (theme: Theme) => set({ theme: theme }),
       }),
       {
         name: "theme-storage",

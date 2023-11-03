@@ -16,6 +16,7 @@ import Button from "../ui/Button";
 import { shallow } from "zustand/shallow";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { useScheduledEventsStore } from "../../store/googleEventsStore";
+import { useThemeStore } from "../../store/themeStore";
 import { getCardsOfMember } from "../../API/trelloAPI";
 // import { useIsAuthenticated } from "@azure/msal-react";
 import AddEventBtn, { Event } from "../AddEventBtn";
@@ -59,6 +60,10 @@ export default function TrackTimeModal({
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [isOSDarkTheme, setIsOSDarkTheme] = useState(
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
   // const isAuthenticated = useIsAuthenticated();
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const loggedGoogleUsers = JSON.parse(localStorage.getItem("googleUsers"));
@@ -66,6 +71,11 @@ export default function TrackTimeModal({
     (state) => [state.event, state.setEvent],
     shallow
   );
+  const [theme, setTheme] = useThemeStore(
+    (state) => [state.theme, state.setTheme],
+    shallow
+  );
+
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
 
@@ -274,6 +284,22 @@ export default function TrackTimeModal({
     }
   };
 
+  function handleThemeChange(e) {
+    if (e.matches) {
+      setIsOSDarkTheme(true);
+    } else {
+      setIsOSDarkTheme(false);
+    }
+  }
+
+  useEffect(() => {
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addListener(handleThemeChange);
+    console.log(theme);
+
+    setIsDarkTheme(theme.os ? isOSDarkTheme : theme.custom === "dark");
+  }, [theme, isOSDarkTheme]);
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog
@@ -281,7 +307,12 @@ export default function TrackTimeModal({
         className="fixed inset-0 z-10 overflow-y-auto"
         onClose={close}
       >
-        <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div
+          className={clsx(
+            "flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0",
+            { dark: isDarkTheme }
+          )}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
