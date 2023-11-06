@@ -28,9 +28,9 @@ export function parseReport(fileContent: string) {
   const reportItems: Array<Partial<ReportActivity>> = [];
   const reportAndNotes: ReportAndNotes = [reportItems, reportComments];
   try {
-    for (const line of lines) {
-      if (!timeRegex.test(line.slice(0, 8))) {
-        reportComments += line + "\n";
+    for (let i = 0; i < lines.length; i++) {
+      if (!timeRegex.test(lines[i].slice(0, 8))) {
+        reportComments += lines[i] + "\n";
         continue;
       }
       const registration = {
@@ -45,7 +45,7 @@ export function parseReport(fileContent: string) {
       };
 
       // This code uses the string type to write the time.
-      const timeMatch = line.match(timeRegex);
+      const timeMatch = lines[i].match(timeRegex);
       const hours = parseInt(timeMatch[0].match(hoursRegex)[0]);
       const minutes = parseInt(timeMatch[0].match(minutesRegex)[0]);
       const startTime = new Date();
@@ -53,7 +53,7 @@ export function parseReport(fileContent: string) {
       startTime.setMinutes(minutes);
       // const from = startTime;
 
-      registration.from = timeRegex.exec(line)[0];
+      registration.from = timeRegex.exec(lines[i])[0];
       if (reportCount > 0) {
         reportItems[reportCount - 1].to = registration.from;
 
@@ -66,7 +66,7 @@ export function parseReport(fileContent: string) {
         );
       }
       // removing time
-      let currentLine = line.replace(timeRegex, "");
+      let currentLine = lines[i].replace(timeRegex, "");
 
       // removing registrationDate if exists. Request from Denys Denysenko
       if (dateRegex.test(currentLine)) {
@@ -78,10 +78,13 @@ export function parseReport(fileContent: string) {
       currentLine = currentLine.replace(separatorRegex, "");
 
       // should skip registraion when task starts from !
-      const isBreak = workingTimeRegex.test(currentLine);
+      const isBreak =
+        (!currentLine && i === lines.length - 2) ||
+        workingTimeRegex.test(currentLine);
+
       if (isBreak) {
         registration.project = currentLine;
-        registration.isBreak = isBreak;
+        registration.isBreak = true;
         reportItems.push(registration);
         reportCount++;
         continue;
@@ -277,9 +280,6 @@ export function validation(activities: Array<ReportActivity>) {
         activities[i].mistakes += " startsWith!";
       }
       if (i > 0 && activities[i].to && !activities[i].project) {
-        activities[i].isValid = false;
-      }
-      if (!activities[i].duration) {
         activities[i].isValid = false;
       }
       if (!activities[i].project) {
