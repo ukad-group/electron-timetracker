@@ -6,7 +6,7 @@ import FolderSelector from "../components/FolderSelector";
 import { useMainStore } from "../store/mainStore";
 import { useThemeStore } from "../store/themeStore";
 import TrelloConnection from "../components/TrelloConnection";
-// import Office365Connection from "../components/Office365Connection";
+import Office365Connection from "../components/Office365Connection";
 import GoogleConnection from "../components/GoogleConnection";
 import clsx from "clsx";
 
@@ -147,14 +147,14 @@ const SettingsPage = () => {
                 <span className="text-lg font-medium text-gray-900 dark:text-dark-heading">
                   Connections
                 </span>
-                <p className="text-sm text-gray-500 dark:text-dark-main">
+                <p className="text-sm text-gray-500">
                   You can connect available resources to use their capabilities
                   to complete your reports
                 </p>
               </div>
               <TrelloConnection />
               <GoogleConnection />
-              {/* <Office365Connection /> */}
+              <Office365Connection />
             </div>
           </section>
         </div>
