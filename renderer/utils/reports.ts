@@ -78,9 +78,9 @@ export function parseReport(fileContent: string) {
       currentLine = currentLine.replace(separatorRegex, "");
 
       // should skip registraion when task starts from !
-      const isBreak = workingTimeRegex.test(currentLine) || !currentLine;
+      const isBreak = workingTimeRegex.test(currentLine);
       if (isBreak) {
-        registration.project = !currentLine ? "!" : currentLine;
+        registration.project = currentLine;
         registration.isBreak = isBreak;
         reportItems.push(registration);
         reportCount++;
@@ -277,6 +277,12 @@ export function validation(activities: Array<ReportActivity>) {
         activities[i].mistakes += " startsWith!";
       }
       if (i > 0 && activities[i].to && !activities[i].project) {
+        activities[i].isValid = false;
+      }
+      if (!activities[i].duration) {
+        activities[i].isValid = false;
+      }
+      if (!activities[i].project) {
         activities[i].isValid = false;
       }
     }

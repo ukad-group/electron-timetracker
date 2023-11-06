@@ -28,9 +28,7 @@ export default function ActivitiesTable({
 }: ActivitiesTableProps) {
   const [ctrlPressed, setCtrlPressed] = useState(false);
   const nonBreakActivities = useMemo(() => {
-    return validation(
-      activities.filter((activity) => !activity.isBreak && activity.project)
-    );
+    return validation(activities.filter((activity) => !activity.isBreak));
   }, [activities]);
 
   const totalDuration = useMemo(() => {
