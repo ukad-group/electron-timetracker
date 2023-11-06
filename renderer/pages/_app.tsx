@@ -34,7 +34,6 @@ function App({ Component, pageProps }: AppProps) {
     window
       .matchMedia("(prefers-color-scheme: dark)")
       .addListener(handleThemeChange);
-    console.log(theme);
 
     setIsDarkTheme(theme.os ? isOSDarkTheme : theme.custom === "dark");
   }, [theme, isOSDarkTheme]);
