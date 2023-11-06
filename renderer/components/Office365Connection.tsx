@@ -1,113 +1,145 @@
 import React, { useEffect, useState } from "react";
-import { useIsAuthenticated, useMsal } from "@azure/msal-react";
-import {
-  callTodayEventsGraph,
-  callProfileInfoGraph,
-  loginRequest,
-} from "../API/office365API";
-import { CheckIcon } from "@heroicons/react/24/solid";
+import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
 
-const PORT = process.env.NEXT_PUBLIC_PORT;
-const REDIRECT_URI = `http://localhost:${PORT}/settings`;
+export interface Office365User {
+  accessToken: string;
+  refreshToken: string;
+  userId: string;
+  username: string;
+}
 
 const Office365Connection = () => {
-  const [username, setUsername] = useState("");
-  const [hasUserMailbox, setHasUserMailbox] = useState(true);
-  const { instance, accounts } = useMsal();
-  const isAuthenticated = useIsAuthenticated();
-  const [isLoading, setIsLoading] = useState(true);
+  const [users, setUsers] = useState(
+    JSON.parse(localStorage.getItem("office365-users")) || []
+  );
 
   const handleSignInButton = () => {
-    instance.loginPopup(loginRequest).catch((e) => {
-      console.log(e);
-    });
+    global.ipcRenderer.send("office365:login");
   };
 
-  const handleSignOutButton = () => {
-    instance.logoutPopup({
-      postLogoutRedirectUri: REDIRECT_URI,
-      mainWindowRedirectUri: REDIRECT_URI,
-    });
-  };
+  const handleSignOutButton = (id: string) => {
+    const filteredUsers = users.filter(
+      (user: Office365User) => user.userId !== id
+    );
 
-  const getAccessToken = async () => {
-    const { accessToken } = await instance.acquireTokenSilent({
-      ...loginRequest,
-      account: accounts[0],
-    });
-
-    return accessToken;
-  };
-
-  const getUsername = async () => {
-    const accessToken = await getAccessToken();
-    const response = await callProfileInfoGraph(accessToken);
-    setUsername(response.userPrincipalName);
-  };
-
-  const checkIfUserHasMailbox = async () => {
-    const accessToken = await getAccessToken();
-    const response = await callTodayEventsGraph(accessToken);
-
-    if (response?.error) {
-      setHasUserMailbox(false);
+    if (filteredUsers.length > 0) {
+      localStorage.setItem("office365-users", JSON.stringify(filteredUsers));
+    } else {
+      localStorage.removeItem("office365-users");
     }
+
+    setUsers(filteredUsers);
+  };
+
+  const addUser = async () => {
+    const params = new URLSearchParams(window.location.search);
+    const authorizationCode = params.get("code");
+
+    const { access_token, refresh_token } = await global.ipcRenderer.invoke(
+      "office365:get-tokens",
+      authorizationCode
+    );
+
+    if (!access_token) return;
+
+    const { userPrincipalName, mail, displayName, id } =
+      await global.ipcRenderer.invoke(
+        "office365:get-profile-info",
+        access_token
+      );
+
+    const username = userPrincipalName || mail || displayName || "";
+    const isUserExists = users.some(
+      (user: Office365User) => id === user.userId
+    );
+
+    if (isUserExists) {
+      alert(`Account ${username} has already logged`);
+      return;
+    }
+
+    const user = {
+      userId: id,
+      accessToken: access_token,
+      refreshToken: refresh_token,
+      username: username,
+    };
+
+    const newUsers = [...users, user];
+
+    localStorage.setItem("office365-users", JSON.stringify(newUsers));
+    setUsers(newUsers);
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      (async () => {
-        getUsername();
-        checkIfUserHasMailbox();
-        setIsLoading(false);
-      })();
+    if (
+      window.location.search.includes("code") &&
+      window.location.search.includes("state=office365code") &&
+      !window.location.search.includes("error")
+    ) {
+      (async () => addUser())();
     }
-  }, [isAuthenticated]);
+  }, []);
 
   return (
-    <div className="p-4 flex items-start justify-between gap-6 border rounded-lg shadow">
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-4">
-          <span className="font-medium">Office 365</span>
-          {isAuthenticated && (
-            <div className="text-green-700 inline-flex gap-2 items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-200">
-              Already authorized
-              <CheckIcon className="w-4 h-4 fill-green-700" />
-            </div>
-          )}
-          {isAuthenticated && username.length > 0 && (
-            <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-white">
-              {username}
-            </div>
-          )}
-          {!isAuthenticated && (
-            <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
-              Not authorized
-            </div>
-          )}
-        </div>
-        {isAuthenticated && !hasUserMailbox && !isLoading && (
-          <p className="text-sm text-red-500">
-            User has no mailbox. Try to Sign In to another account
-          </p>
-        )}
-        <p className="text-sm text-gray-500">
-          After connection, you will be able to fill in the Report with the
-          information from events of your Microsoft Outlook Calendar
-        </p>
-      </div>
-      <div className="flex-shrink-0">
-        {isAuthenticated ? (
+    <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">
+      <div className="flex justify-between items-center w-full">
+        <span className="font-medium dark:text-dark-heading">
+          Microsoft Office 365
+        </span>
+        {!users.length && (
           <Button
-            text="Sign Out"
-            callback={handleSignOutButton}
+            text="Add account"
+            callback={handleSignInButton}
             type="button"
           />
-        ) : (
-          <Button text="Sign In" callback={handleSignInButton} type="button" />
+        )}
+        {users.length > 0 && (
+          <button
+            onClick={handleSignInButton}
+            type="button"
+            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border shadow-sm dark:border-dark-form-border"
+          >
+            <span className="hover:underline text-gray-500 dark:text-dark-heading">
+              Add another account
+            </span>
+          </button>
         )}
       </div>
+      <div className="flex items-center justify-between gap-4 w-full">
+        {!users.length && (
+          <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:text-yellow-400/70 dark:bg-yellow-400/20">
+            No one user authorized
+          </div>
+        )}
+
+        {users.length > 0 && (
+          <div className="flex flex-col gap-2 w-full">
+            {users.map((user) => (
+              <div key={user.userId} className="flex gap-4 items-center">
+                <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-blue-900 dark:text-blue-400/80 dark:bg-blue-500/40">
+                  {user.username}
+                </div>
+                <div
+                  onClick={() => handleSignOutButton(user.userId)}
+                  className="cursor-pointer bg-gray-400 hover:bg-gray-500 transition duration-300 inline-flex gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium text-white dark:text-dark-heading dark:bg-dark-button-back-gray dark:hover:bg-dark-button-gray-hover dark:border dark:border-dark-border"
+                >
+                  <ArrowRightOnRectangleIcon className="w-4 h-4 fill-white  dark:fill-dark-heading" />
+                  Sign Out
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <p className="text-sm text-gray-500">
+        After connection, you will be able to fill in the Report with the
+        information from events of your Microsoft Outlook Calendar
+        <br />
+        You can authorize with a work, or personal Microsoft account (e.g.
+        Skype, Xbox)
+      </p>
     </div>
   );
 };

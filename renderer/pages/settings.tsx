@@ -5,7 +5,7 @@ import FolderSelector from "../components/FolderSelector";
 import { useMainStore } from "../store/mainStore";
 import { useThemeStore } from "../store/themeStore";
 import TrelloConnection from "../components/TrelloConnection";
-// import Office365Connection from "../components/Office365Connection";
+import Office365Connection from "../components/Office365Connection";
 import GoogleConnection from "../components/GoogleConnection";
 import clsx from "clsx";
 
@@ -127,7 +127,7 @@ const SettingsPage = () => {
             </div>
             <TrelloConnection />
             <GoogleConnection />
-            {/* <Office365Connection /> */}
+            <Office365Connection />
           </div>
         </section>
       </div>

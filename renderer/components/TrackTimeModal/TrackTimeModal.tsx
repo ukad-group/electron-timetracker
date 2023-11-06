@@ -17,15 +17,11 @@ import { shallow } from "zustand/shallow";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { useScheduledEventsStore } from "../../store/googleEventsStore";
 import { useThemeStore } from "../../store/themeStore";
-import { getCardsOfMember } from "../../API/trelloAPI";
-// import { useIsAuthenticated } from "@azure/msal-react";
 import AddEventBtn, { Event } from "../AddEventBtn";
 import {
   markActivityAsAdded,
   replaceHyphensWithSpaces,
 } from "../../utils/utils";
-
-const TRELLO_KEY = process.env.NEXT_PUBLIC_TRELLO_KEY;
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -58,7 +54,6 @@ export default function TrackTimeModal({
   const [description, setDescription] = useState("");
   const [isTypingFromDuration, setIsTypingFromDuration] = useState(false);
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
-  const [trelloToken, setTrelloToken] = useState("");
   const [trelloTasks, setTrelloTasks] = useState([]);
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isOSDarkTheme, setIsOSDarkTheme] = useState(
@@ -67,6 +62,9 @@ export default function TrackTimeModal({
   // const isAuthenticated = useIsAuthenticated();
   const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const loggedGoogleUsers = JSON.parse(localStorage.getItem("googleUsers"));
+  const office365Users =
+    JSON.parse(localStorage.getItem("office365-users")) || [];
+  const trelloUser = JSON.parse(localStorage.getItem("trello-user")) || null;
   const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
     (state) => [state.event, state.setEvent],
     shallow
@@ -109,10 +107,6 @@ export default function TrackTimeModal({
   }, [editedActivity]);
 
   useEffect(() => {
-    setTrelloToken((localStorage.getItem("trelloToken") as string) || "");
-  }, []);
-
-  useEffect(() => {
     if (editedActivity !== "new") {
       return;
     }
@@ -153,19 +147,27 @@ export default function TrackTimeModal({
     setFormattedDuration(formatDuration(duration));
   }, [from, to]);
 
-  useEffect(() => {
-    if (trelloToken?.length > 0) {
-      (async () => {
-        const trelloTasksFromAPI = (
-          await getCardsOfMember({ token: trelloToken, key: TRELLO_KEY })
-        ).map((card) =>
-          replaceHyphensWithSpaces(`TT:: ${card.name} ${card.shortUrl}`)
-        );
+  const getTrelloCards = async () => {
+    try {
+      const trelloCards = await global.ipcRenderer.invoke(
+        "trello:get-cards",
+        trelloUser.accessToken
+      );
 
-        setTrelloTasks(trelloTasksFromAPI);
-      })();
+      const newTrelloTasks = trelloCards.map((card) =>
+        replaceHyphensWithSpaces(`TT:: ${card.name} ${card.shortUrl}`)
+      );
+
+      setTrelloTasks(newTrelloTasks);
+    } catch (error) {
+      localStorage.removeItem("trello-user");
+      setTrelloTasks([]);
     }
-  }, [trelloToken]);
+  };
+
+  useEffect(() => {
+    if (trelloUser) (async () => getTrelloCards())();
+  }, []);
 
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
@@ -228,7 +230,6 @@ export default function TrackTimeModal({
     setProject("");
     setActivity("");
     setDescription("");
-
     setIsValidationEnabled(false);
   };
 
@@ -273,7 +274,6 @@ export default function TrackTimeModal({
     setFrom(from.time || "");
     setTo(to.time || "");
     setDescription(description || "");
-
     setScheduledEvents(scheduledEvents);
   };
 
@@ -322,7 +322,7 @@ export default function TrackTimeModal({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-gray-900/80" />
+            <Dialog.Overlay className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-gray-700/80" />
           </Transition.Child>
 
           {/* This element is to trick the browser into centering the modal contents. */}
@@ -496,7 +496,8 @@ export default function TrackTimeModal({
                 <div className="flex gap-3 justify-between">
                   <div className="flex gap-3 justify-start">
                     {checkIsToday(selectedDate) &&
-                      loggedGoogleUsers?.length > 0 && (
+                      (loggedGoogleUsers?.length > 0 ||
+                        office365Users.length > 0) && (
                         <AddEventBtn
                           addEvent={addEventToList}
                           availableProjects={

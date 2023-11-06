@@ -9,11 +9,6 @@ import "../components/Calendar/Calendar.css";
 import "../components/ui/Tooltip/Tooltip.css";
 import dynamic from "next/dynamic";
 import Head from "next/head";
-// import { MsalProvider } from "@azure/msal-react";
-// import { PublicClientApplication } from "@azure/msal-browser";
-// import { msalConfig } from "../API/office365API";
-
-// const msalInstance = new PublicClientApplication(msalConfig);
 
 function App({ Component, pageProps }: AppProps) {
   // return <Component {...pageProps} />;
@@ -52,9 +47,7 @@ function App({ Component, pageProps }: AppProps) {
       <Head>
         <title>UKAD Timetracker</title>
       </Head>
-      {/* <MsalProvider instance={msalInstance}> */}
       <AnyComponent {...pageProps} />
-      {/* </MsalProvider> */}
     </div>
   );
 }
