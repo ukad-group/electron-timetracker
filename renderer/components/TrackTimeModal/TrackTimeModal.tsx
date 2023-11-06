@@ -159,11 +159,16 @@ export default function TrackTimeModal({
   }, []);
 
   const onSave = (e: FormEvent | MouseEvent) => {
+    let dashedDescription = description;
     e.preventDefault();
 
     if (isFormInvalid) {
       setIsValidationEnabled(true);
       return;
+    }
+    if (description.includes(" - ")) {
+      setDescription(description.replace(" - ", " -- "));
+      dashedDescription = description.replace(" - ", " -- ");
     }
     submitActivity({
       id: editedActivity === "new" ? null : editedActivity.id,
@@ -172,18 +177,21 @@ export default function TrackTimeModal({
       duration,
       project,
       activity,
-      description,
+      description: dashedDescription,
       calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
     });
 
-    if (scheduledEvents[description] && !scheduledEvents[description].project) {
-      scheduledEvents[description].project = project;
+    if (
+      scheduledEvents[dashedDescription] &&
+      !scheduledEvents[dashedDescription].project
+    ) {
+      scheduledEvents[dashedDescription].project = project;
     }
     if (
-      scheduledEvents[description] &&
-      scheduledEvents[description].activity !== activity
+      scheduledEvents[dashedDescription] &&
+      scheduledEvents[dashedDescription].activity !== activity
     ) {
-      scheduledEvents[description].activity = activity || "";
+      scheduledEvents[dashedDescription].activity = activity || "";
     }
 
     setScheduledEvents(scheduledEvents);
@@ -248,21 +256,26 @@ export default function TrackTimeModal({
 
   const addEventToList = (event: Event) => {
     const { from, to, project, activity, description } = event;
-    if (scheduledEvents[description]) {
-      setProject(scheduledEvents[description].project);
-      setActivity(activity || scheduledEvents[description].activity);
+    let dashedDescription = description;
+    if (description.includes(" - ")) {
+      setDescription(description.replace(" - ", " -- "));
+      dashedDescription = description.replace(" - ", " -- ");
     }
-    if (!scheduledEvents[description]) {
+    if (scheduledEvents[dashedDescription]) {
+      setProject(scheduledEvents[dashedDescription].project);
+      setActivity(activity || scheduledEvents[dashedDescription].activity);
+    }
+    if (!scheduledEvents[dashedDescription]) {
       setProject(project || "");
       setActivity(activity || "");
-      scheduledEvents[description] = { project: "", activity: "" };
-      scheduledEvents[description].project = project || "";
-      scheduledEvents[description].activity = activity || "";
+      scheduledEvents[dashedDescription] = { project: "", activity: "" };
+      scheduledEvents[dashedDescription].project = project || "";
+      scheduledEvents[dashedDescription].activity = activity || "";
     }
 
     setFrom(from.time || "");
     setTo(to.time || "");
-    setDescription(description || "");
+    setDescription(dashedDescription || "");
     setScheduledEvents(scheduledEvents);
   };
 
