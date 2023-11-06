@@ -25,7 +25,7 @@ import {
 } from "./helpers/API/trelloApi";
 
 initialize("A-EU-9361517871");
-ipcMain.on("send-analytics-data", (event, analyticsEvent: string, data: Record<string, string>) => {
+ipcMain.on("send-analytics-data", (event, analyticsEvent: string, data?: Record<string, string>) => {
    trackEvent(analyticsEvent, data);
   });
   

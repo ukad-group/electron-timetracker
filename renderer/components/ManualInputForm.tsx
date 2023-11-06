@@ -41,6 +41,7 @@ export default function ManualInputForm({
   }, []);
 
   const saveReportHandler = () => {
+    global.ipcRenderer.send("send-analytics-data", "manuall_save");
     onSave(report, true);
     setSaveBtnStatus("inprogress");
     setTimeout(() => {
