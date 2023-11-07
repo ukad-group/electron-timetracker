@@ -17,7 +17,7 @@ export default function DisclosureSection(props: DisclosureSectionProps) {
         {({ open }) => (
           <div
             className={clsx(
-              "max-h-20 px-4 py-4 bg-white shadow overflow-hidden transition-all ease-linear duration-300 sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border",
+              "max-h-20 px-4 py-4 bg-white shadow overflow-hidden transition-[max-height] ease-linear duration-300 sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border",
               {
                 "max-h-80 overflow-y-auto ": open,
               }
