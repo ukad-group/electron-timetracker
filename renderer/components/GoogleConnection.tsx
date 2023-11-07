@@ -95,12 +95,13 @@ const GoogleConnection = () => {
   useEffect(() => {
     const googleUsers = JSON.parse(localStorage.getItem("googleUsers"));
     const params = new URLSearchParams(window.location.search);
-    const authorizationCode = params.get("code"); // detect redirection from auth page
+    const authorizationCode = params.get("code");
+    const googleUrlState = params.get("state") === "googlecalendarcode";
 
-    if (authorizationCode && !googleUsers) {
+    if (authorizationCode && googleUrlState && !googleUsers) {
       localStorage.setItem("googleUsers", JSON.stringify([]));
       loadGoogleCredentials(authorizationCode);
-    } else if (authorizationCode) {
+    } else if (authorizationCode && googleUrlState) {
       loadGoogleCredentials(authorizationCode);
     }
 

@@ -255,7 +255,7 @@ const TimetrackerWebsiteConnection = () => {
           <Button text="Show vacation/sickdays" callback={handleShowSickVac} />
         )}
         {projects?.length > 0 && (
-          <Button text="Show vacation/sickdays" callback={handleShowProjects} />
+          <Button text="Show active projects" callback={handleShowProjects} />
         )}
       </div>
       <div>

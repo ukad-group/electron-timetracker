@@ -14,6 +14,7 @@ export const getGoogleAuthUrl = () => {
     redirect_uri: redirectURI,
     access_type: "offline",
     response_type: "code",
+    state: "googlecalendarcode",
   });
 
   googleAuthUrl.search = params.toString();
