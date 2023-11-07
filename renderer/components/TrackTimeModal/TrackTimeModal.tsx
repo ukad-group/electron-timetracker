@@ -167,8 +167,8 @@ export default function TrackTimeModal({
       return;
     }
     if (description.includes(" - ")) {
-      setDescription(description.replace(" - ", " -- "));
-      dashedDescription = description.replace(" - ", " -- ");
+      setDescription(description.replace(/ - /g, " -- "));
+      dashedDescription = description.replace(/ - /g, " -- ");
     }
     submitActivity({
       id: editedActivity === "new" ? null : editedActivity.id,
