@@ -1,4 +1,4 @@
-type Options = {
+export type Options = {
   clientId: string;
   clientSecret: string;
   redirectUri: string;

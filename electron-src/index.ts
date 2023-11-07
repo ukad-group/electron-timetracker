@@ -23,6 +23,15 @@ import {
   getMember,
   getTrelloAuthUrl,
 } from "./helpers/API/trelloApi";
+import {
+  getAzureAuthUrl,
+  getAzureAuthUrlAdditional,
+  getAzureTokens,
+  getTimetrackerCookie,
+  getTimetrackerHolidays,
+  getTimetrackerProjects,
+  getTimetrackerVacations,
+} from "./TimetrackerWebsiteApi";
 
 initialize("A-EU-9361517871");
 
@@ -521,3 +530,65 @@ ipcMain.handle(
     return await callTodayEventsGraph(accessToken);
   }
 );
+
+// TIMETRACKER WEBSITE
+
+ipcMain.on("azure:login-base", async () => {
+  const options = getOffice365Options();
+
+  mainWindow?.loadURL(getAzureAuthUrl(options));
+});
+
+ipcMain.handle(
+  "timetracker:get-user-info-token",
+  async (event, authCode: string) => {
+    const options = getOffice365Options();
+
+    return await getAzureTokens(authCode, options);
+  }
+);
+
+ipcMain.on("azure:login-additional", async () => {
+  const options = getOffice365Options();
+
+  const optionsWithPlannerScope = {
+    ...options,
+    scope:
+      "api://d7d02680-bd82-47ed-95f9-e977ab5f0487/access_as_user offline_access",
+  };
+
+  mainWindow?.loadURL(getAzureAuthUrlAdditional(optionsWithPlannerScope));
+});
+
+ipcMain.handle(
+  "timetracker:get-planner-token",
+  async (event, authCode: string) => {
+    const options = getOffice365Options();
+
+    const optionsWithPlannerScope = {
+      ...options,
+      scope:
+        "api://d7d02680-bd82-47ed-95f9-e977ab5f0487/access_as_user offline_access",
+    };
+    return await getAzureTokens(authCode, optionsWithPlannerScope);
+  }
+);
+
+ipcMain.handle("timetracker:get-holidays", async (event, token: string) => {
+  return await getTimetrackerHolidays(token);
+});
+
+ipcMain.handle(
+  "timetracker:get-vacations",
+  async (event, token: string, email: string) => {
+    return await getTimetrackerVacations(token, email);
+  }
+);
+
+ipcMain.handle("timetracker:login", async (event, idToken: string) => {
+  return await getTimetrackerCookie(idToken);
+});
+
+ipcMain.handle("timetracker:get-projects", async (event, cookie: string) => {
+  return await getTimetrackerProjects(cookie);
+});
