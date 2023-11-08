@@ -117,7 +117,9 @@ export default function TrackTimeModal({
       .padStart(2, "0");
     const ceilHours = Math.ceil(
       Number(minutes) / 15 > 3 ? Number(hours) + 1 : Number(hours)
-    );
+    )
+      .toString()
+      .padStart(2, "0");
     const ceilMinutes = (
       Math.ceil(Number(minutes) / 15 > 3 ? 0 : Number(minutes) / 15) * 15
     )
