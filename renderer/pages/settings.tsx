@@ -9,6 +9,7 @@ import TrelloConnection from "../components/TrelloConnection";
 import Office365Connection from "../components/Office365Connection";
 import GoogleConnection from "../components/GoogleConnection";
 import clsx from "clsx";
+import TimetrackerWebsiteConnection from "../components/TimetrackerWebsiteConncetion";
 
 const SettingsPage = () => {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -155,6 +156,7 @@ const SettingsPage = () => {
               <TrelloConnection />
               <GoogleConnection />
               <Office365Connection />
+              <TimetrackerWebsiteConnection />
             </div>
           </section>
         </div>
