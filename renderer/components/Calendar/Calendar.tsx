@@ -21,6 +21,7 @@ import Button from "../ui/Button";
 import { ErrorPlaceholder, RenderError } from "../ui/ErrorPlaceholder";
 import {
   getMonthWorkHours,
+  getStringDate,
   getWeekNumber,
   isTheSameDates,
 } from "../../utils/datetime-ui";
@@ -91,22 +92,18 @@ export function Calendar({
           await global.ipcRenderer.invoke(
             "app:find-month-projects",
             reportsFolder,
-            calendarDate
+            getStringDate(calendarDate)
           )
         );
       })();
-      global.ipcRenderer.send(
-        "start-folder-watcher",
-        reportsFolder,
-        calendarDate
-      );
+      global.ipcRenderer.send("start-folder-watcher", reportsFolder);
       global.ipcRenderer.on("any-file-changed", (event, data) => {
         (async () => {
           setMonthReportsFromServer(
             await global.ipcRenderer.invoke(
               "app:find-month-projects",
               reportsFolder,
-              calendarDate
+              getStringDate(calendarDate)
             )
           );
         })();

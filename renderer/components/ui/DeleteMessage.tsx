@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import { useMainStore } from "../../store/mainStore";
+import { getStringDate } from "../../utils/datetime-ui";
 
 type DeleteMessageProps = {
   selectedDateReport: string;
@@ -30,7 +31,7 @@ export default function DeleteMessage({
   const deleteFile = () => {
     setIsFileExist(false);
     global.ipcRenderer
-      .invoke("app:delete-file", reportsFolder, selectedDate)
+      .invoke("app:delete-file", reportsFolder, getStringDate(selectedDate))
       .then((success) => {
         if (!success) {
           console.log("File deleting error.");

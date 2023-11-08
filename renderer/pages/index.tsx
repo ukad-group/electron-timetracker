@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import { useCallback, useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
@@ -20,6 +19,7 @@ import { useThemeStore } from "../store/themeStore";
 import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
+import { getStringDate } from "../utils/datetime-ui";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -47,6 +47,7 @@ export default function Home() {
   const visibilitychangeHandler = useCallback(() => {
     const currDate = new Date().toLocaleDateString();
     const lastUsingDate = localStorage.getItem("lastUsingDate");
+
     if (lastUsingDate && currDate !== lastUsingDate) {
       localStorage.setItem("lastUsingDate", currDate);
       window.location.reload();
@@ -78,6 +79,7 @@ export default function Home() {
 
     document.body.className = mode;
   }, [theme, isOSDarkTheme]);
+
   useEffect(() => {
     document.addEventListener("visibilitychange", visibilitychangeHandler);
     return () => {
@@ -91,15 +93,17 @@ export default function Home() {
         const dayReport = await global.ipcRenderer.invoke(
           "app:read-day-report",
           reportsFolder,
-          selectedDate
+          getStringDate(selectedDate)
         );
+
         setSelectedDateReport(dayReport || "");
 
         const sortedActAndDesc = await global.ipcRenderer.invoke(
           "app:find-latest-projects",
           reportsFolder,
-          selectedDate
+          getStringDate(selectedDate)
         );
+
         setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct || {});
         setLatestProjAndDesc(sortedActAndDesc.descriptionsSet || {});
       })();
@@ -164,7 +168,7 @@ export default function Home() {
     global.ipcRenderer.invoke(
       "app:write-day-report",
       reportsFolder,
-      selectedDate,
+      getStringDate(selectedDate),
       serializedReport
     );
     setSelectedDateReport(serializedReport);
@@ -312,6 +316,7 @@ export default function Home() {
         !isPastTime && tempActivities.push(activity);
         setSelectedDateActivities(tempActivities.filter((act) => act.duration));
       }
+
       if (isPastTime && !isEdit) {
         setSelectedDateActivities(tempActivities);
       }
