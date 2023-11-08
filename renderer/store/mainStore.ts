@@ -5,6 +5,7 @@ import {
   devtools,
   persist,
 } from "zustand/middleware";
+import {produce} from "immer";
 
 export type MainStore = {
   reportsFolder: string | null;
@@ -28,7 +29,9 @@ export const useMainStore = createWithEqualityFn<MainStore>()(
     persist(
       (set) => ({
         reportsFolder: null,
-        setReportsFolder: (folder: string) => set({ reportsFolder: folder }),
+        setReportsFolder: (folder: string) => set(produce((draft) => {
+            draft.reportsFolder = folder;
+          })),
       }),
       {
         name: "main-storage",
@@ -36,5 +39,5 @@ export const useMainStore = createWithEqualityFn<MainStore>()(
       }
     )
   ),
-  () => false
+  Object.is
 );

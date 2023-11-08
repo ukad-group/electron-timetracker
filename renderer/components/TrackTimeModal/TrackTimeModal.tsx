@@ -54,7 +54,10 @@ export default function TrackTimeModal({
   const [isTypingFromDuration, setIsTypingFromDuration] = useState(false);
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [trelloTasks, setTrelloTasks] = useState([]);
-  const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
+  const [googleEvents, setGoogleEvents] = useGoogleCalendarStore(
+    (state) => [state.googleEvents, state.setGoogleEvents],
+    shallow
+  );
   const loggedGoogleUsers = JSON.parse(localStorage.getItem("googleUsers"));
   const office365Users =
     JSON.parse(localStorage.getItem("office365-users")) || [];

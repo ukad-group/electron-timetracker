@@ -5,6 +5,7 @@ import {
   devtools,
   persist,
 } from "zustand/middleware";
+import {produce} from "immer";
 
 type Update = { age: "old" | "new"; description: string | null };
 
@@ -31,7 +32,9 @@ export const useUpdateStore = createWithEqualityFn<UpdateStore>()(
       (set) => ({
         update: { age: "old", description: null },
         setUpdate: (update: Update) =>
-          set({ update: { age: update.age, description: update.description } }),
+          set(produce((draft) => {
+        draft.update = update;
+      })),
       }),
       {
         name: "update-storage",
@@ -39,5 +42,5 @@ export const useUpdateStore = createWithEqualityFn<UpdateStore>()(
       }
     )
   ),
-  () => false
+  Object.is
 );
