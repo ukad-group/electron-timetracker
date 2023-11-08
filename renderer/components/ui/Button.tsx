@@ -10,13 +10,14 @@ type ButtonProps = {
 };
 
 const basicStyles =
-  "inline-flex items-center justify-center px-4 py-2 text-sm font-medium border rounded-md shadow-sm  ";
-const defaultStyles = "bg-blue-600 text-white ";
-const saveHoverStyles = "hover:bg-blue-700 ";
+  "inline-flex items-center justify-center px-4 py-2 text-sm font-medium border rounded-md shadow-sm dark:border-dark-form-back ";
+const defaultStyles = "bg-blue-600 text-white dark:bg-dark-button-back ";
+const saveHoverStyles = "hover:bg-blue-700 hover:dark:bg-dark-button-hover ";
 const cancelHoverStyles = "hover:bg-gray-50 ";
 const focusStyles =
-  "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ";
-const disabledStyles = "disabled:pointer-events-none disabled:bg-gray-300 ";
+  "focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:dark:border-focus-border focus:dark:ring-focus-border ";
+const disabledStyles =
+  "disabled:pointer-events-none disabled:bg-gray-300 disabled:dark:bg-gray-600 disabled:dark:border-dark-border ";
 
 export default function Button({
   callback,
@@ -29,7 +30,9 @@ export default function Button({
   const saveBtnStatuses = {
     enabled: {
       text: "Save",
-      classes: "bg-blue-600 text-white border-transparent " + saveHoverStyles,
+      classes:
+        "bg-blue-600 text-white border-transparent dark:bg-dark-button-back " +
+        saveHoverStyles,
     },
     disabled: {
       text: "Save",
@@ -37,11 +40,15 @@ export default function Button({
     },
     inprogress: {
       text: "Saving...",
-      classes: "bg-blue-600 text-white border-transparent " + saveHoverStyles,
+      classes:
+        "bg-blue-600 text-white border-transparent dark:bg-dark-button-back " +
+        saveHoverStyles,
     },
     loading: {
       text: "Loading",
-      classes: "bg-blue-600 text-white border-transparent " + saveHoverStyles,
+      classes:
+        "bg-blue-600 text-white border-transparent dark:bg-dark-button-back " +
+        saveHoverStyles,
     },
     done: {
       text: "Saved",
@@ -49,7 +56,9 @@ export default function Button({
     },
     cancel: {
       text: "Cancel",
-      classes: "bg-white text-gray-700 border-gray-300 " + cancelHoverStyles,
+      classes:
+        "bg-white text-gray-700 border-gray-300 dark:bg-gray-200 " +
+        cancelHoverStyles,
     },
   };
 

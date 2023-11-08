@@ -83,9 +83,11 @@ const Office365Connection = () => {
   }, []);
 
   return (
-    <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow">
-      <div className="flex justify-between items-center w-full">
-        <span className="font-medium">Microsoft Office 365</span>
+    <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">
+      <div className="flex justify-between items-center w-full ">
+        <span className="font-medium dark:text-dark-heading">
+          Microsoft Office 365
+        </span>
         {!users.length && (
           <Button
             text="Add account"
@@ -97,9 +99,9 @@ const Office365Connection = () => {
           <button
             onClick={handleSignInButton}
             type="button"
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border shadow-sm"
+            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border shadow-sm dark:border-dark-form-border"
           >
-            <span className="hover:underline text-gray-500">
+            <span className="hover:underline text-gray-500 dark:text-dark-main">
               Add another account
             </span>
           </button>
@@ -107,7 +109,7 @@ const Office365Connection = () => {
       </div>
       <div className="flex items-center justify-between gap-4 w-full">
         {!users.length && (
-          <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
+          <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-400/20">
             No one user authorized
           </div>
         )}
@@ -116,14 +118,14 @@ const Office365Connection = () => {
           <div className="flex flex-col gap-2 w-full">
             {users.map((user) => (
               <div key={user.userId} className="flex gap-4 items-center">
-                <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-blue-900">
+                <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-blue-900 dark:text-blue-400 dark:bg-blue-400/20">
                   {user.username}
                 </div>
                 <div
                   onClick={() => handleSignOutButton(user.userId)}
-                  className="cursor-pointer bg-gray-400 hover:bg-gray-500 transition duration-300 inline-flex gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
+                  className="cursor-pointer bg-gray-400 hover:bg-gray-500 transition duration-300 inline-flex gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium text-white dark:text-dark-heading dark:bg-dark-button-back-gray dark:hover:bg-dark-button-gray-hover"
                 >
-                  <ArrowRightOnRectangleIcon className="w-4 h-4 fill-white" />
+                  <ArrowRightOnRectangleIcon className="w-4 h-4 fill-white dark:fill-dark-heading" />
                   Sign Out
                 </div>
               </div>
@@ -131,7 +133,7 @@ const Office365Connection = () => {
           </div>
         )}
       </div>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-500  dark:text-dark-main">
         After connection, you will be able to fill in the Report with the
         information from events of your Microsoft Outlook Calendar
         <br />

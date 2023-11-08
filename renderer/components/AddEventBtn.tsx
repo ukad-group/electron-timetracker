@@ -275,13 +275,15 @@ export default function AddEventBtn({
         event = googleCalendarEventsParsing(event, availableProjects);
 
         return (
-          <div className="" key={id}>
+          <div className="dark:bg-gray-800" key={id}>
             <Menu.Item>
               {({ active }) => (
                 <button
                   type="button"
                   className={`${
-                    active ? "bg-blue-300 text-white" : "text-gray-900"
+                    active
+                      ? "bg-blue-300 text-white dark:bg-blue-700/60 dark:text-dark-heading"
+                      : "text-gray-900 dark:text-dark-main"
                   } group w-full p-2 text-sm`}
                   onClick={() => {
                     addEvent(event);
@@ -290,7 +292,9 @@ export default function AddEventBtn({
                   {summary ? summary : "No title"}
                   <span
                     className={`${
-                      active ? "text-white" : "text-gray-500"
+                      active
+                        ? "text-white dark:text-dark-heading"
+                        : "text-gray-500 dark:text-dark-main"
                     } block text-xs`}
                   >
                     {from.time} - {to.time}
@@ -355,17 +359,17 @@ export default function AddEventBtn({
     <div className="">
       <div className="">
         <Menu as="div" className="relative inline-block text-left">
-          <div className="inline-flex w-full justify-center rounded-md bg-blue-600 hover:bg-blue-700">
+          <div className="inline-flex w-full justify-center rounded-md bg-blue-700 hover:bg-blue-600 dark:bg-dark-button-back hover:dark:bg-dark-button-hover ">
             <button
               type="button"
-              className="px-4 py-2 text-sm font-medium text-white border-r-2"
+              className="px-4 py-2 text-sm font-medium text-white border-r-2 dark:text-dark-heading dark:border-indigo-800 "
               onClick={addActiveEvent}
             >
               Add active event
             </button>
             <Menu.Button className="p-2 text-sm font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
               <ChevronDownIcon
-                className="h-5 w-5 text-white hover:text-violet-100"
+                className="h-5 w-5 text-white hover:text-violet-100 dark:text-dark-heading"
                 aria-hidden="true"
               />
             </Menu.Button>
@@ -379,7 +383,7 @@ export default function AddEventBtn({
             leaveFrom="transform opacity-100 scale-100"
             leaveTo="transform opacity-0 scale-95"
           >
-            <Menu.Items className="absolute bottom-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden focus:outline-none">
+            <Menu.Items className="absolute bottom-10 right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden focus:outline-none dark:divide-gray-500 dark:bg-gray-800 dark:shadow-slate-900">
               {generateMenuEvents()}
             </Menu.Items>
           </Transition>
