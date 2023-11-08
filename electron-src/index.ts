@@ -536,7 +536,13 @@ ipcMain.handle(
 ipcMain.on("azure:login-base", async () => {
   const options = getOffice365Options();
 
-  mainWindow?.loadURL(getAzureAuthUrl(options));
+  const optionsWithAllScope = {
+    ...options,
+    scope:
+      "api://d7d02680-bd82-47ed-95f9-e977ab5f0487/access_as_user offline_access profile email offline_access openid User.Read Calendars.Read",
+  };
+
+  mainWindow?.loadURL(getAzureAuthUrl(optionsWithAllScope));
 });
 
 ipcMain.handle(
