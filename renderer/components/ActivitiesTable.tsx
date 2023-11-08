@@ -276,23 +276,23 @@ export default function ActivitiesTable({
                       ...activity,
                       id: null,
                     });
+                    global.ipcRenderer.send(
+                      "send-analytics-data",
+                      "registrations",
+                      {
+                        registration: "google-calendar-event_registration",
+                      }
+                    );
+                    global.ipcRenderer.send(
+                      "send-analytics-data",
+                      "registrations",
+                      {
+                        registration: `all_calendar-events_registration`,
+                      }
+                    );
                   } else {
                     onEditActivity(activity);
                   }
-                  global.ipcRenderer.send(
-                    "send-analytics-data",
-                    "registrations",
-                    {
-                      registration: "google-calendar-event_registration",
-                    }
-                  );
-                  global.ipcRenderer.send(
-                    "send-analytics-data",
-                    "registrations",
-                    {
-                      registration: `all_calendar-events_registration`,
-                    }
-                  );
                 }}
               >
                 {!activity.calendarId && (
