@@ -207,9 +207,11 @@ const TimetrackerWebsiteConnection = () => {
   }
 
   return (
-    <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow">
-      <div className="flex justify-between items-center w-full">
-        <span className="font-medium">Timetracker website</span>
+    <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">
+      <div className="flex justify-between items-center w-full ">
+        <span className="font-medium dark:text-dark-heading">
+          Timetracker website
+        </span>
 
         {!loggedUser && (
           <Button
@@ -221,7 +223,7 @@ const TimetrackerWebsiteConnection = () => {
       </div>
       <div className="flex items-center justify-between gap-4 w-full">
         {!loggedUser && (
-          <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100">
+          <div className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-400/20">
             No one user authorized
           </div>
         )}
@@ -229,25 +231,25 @@ const TimetrackerWebsiteConnection = () => {
         {loggedUser && (
           <div className="flex flex-col gap-2 w-full">
             <div className="flex gap-4 items-center">
-              <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-blue-900">
+              <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-blue-900 dark:text-blue-400 dark:bg-blue-400/20">
                 {loggedUser.email}
               </div>
               <div
                 onClick={handleSignOutButton}
-                className="cursor-pointer bg-gray-400 hover:bg-gray-500 transition duration-300 inline-flex gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium text-white"
+                className="cursor-pointer bg-gray-400 hover:bg-gray-500 transition duration-300 inline-flex gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium text-white dark:text-dark-heading dark:bg-dark-button-back-gray dark:hover:bg-dark-button-gray-hover"
               >
-                <ArrowRightOnRectangleIcon className="w-4 h-4 fill-white" />
+                <ArrowRightOnRectangleIcon className="w-4 h-4 fill-white dark:fill-dark-heading" />
                 Sign Out
               </div>
             </div>
           </div>
         )}
       </div>
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-500 dark:text-dark-main">
         After connection, you will be able to see a company holidays, your
         vacations and sickdays and all active projects for the last year.
       </p>
-      <div>
+      <div className="flex gap-x-2">
         {holidays?.length > 0 && (
           <Button text="Show holidays" callback={handleShowHolidays} />
         )}
@@ -261,14 +263,20 @@ const TimetrackerWebsiteConnection = () => {
       <div>
         {showholidays &&
           holidays.map((item) => (
-            <div className="flex items-center gap-2 text-sm" key={item.id}>
+            <div
+              className="flex items-center gap-2 text-sm text-gray-900 dark:text-dark-main"
+              key={item.id}
+            >
               <p>{item.description}</p>
               <p>{new Date(item.dateFrom).toLocaleDateString("en-GB")}</p>
             </div>
           ))}
         {showVacationsSickDays &&
           vacationsSickDays.map((item) => (
-            <div className="flex items-center gap-2 text-sm" key={item.id}>
+            <div
+              className="flex items-center gap-2 text-sm text-gray-900 dark:text-dark-main"
+              key={item.id}
+            >
               <p>{item.description}</p>
               <p>{new Date(item.dateFrom).toLocaleDateString("en-GB")}</p>
               <p>{item?.quantity}h</p>
@@ -277,7 +285,10 @@ const TimetrackerWebsiteConnection = () => {
         {showProjects && (
           <div className="grid grid-cols-6 gap-2">
             {projects.map((item) => (
-              <p className="text-xs col-span-1" key={item}>
+              <p
+                className="text-xs col-span-1 text-gray-900 dark:text-dark-main"
+                key={item}
+              >
                 {item}
               </p>
             ))}
