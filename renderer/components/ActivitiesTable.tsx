@@ -132,26 +132,26 @@ export default function ActivitiesTable({
         <tr>
           <th
             scope="col"
-            className="w-24 pb-6 px-3 text-left text-sm font-semibol"
+            className="w-24 pb-6 px-3 text-left text-sm font-semibold"
           >
             Interval
           </th>
           <th
             scope="col"
-            className="w-24 pb-6 px-3 text-left text-sm font-semibol"
+            className="w-24 pb-6 px-3 text-left text-sm font-semibold"
           >
             Duration
           </th>
           <th
             scope="col"
-            className="w-32 pb-6 px-3 text-left text-sm font-semibol relative"
+            className="w-32 pb-6 px-3 text-left text-sm font-semibold relative"
           >
             <span className="block absolute text-xs text-gray-500 top-[22px] dark:text-slate-400">
               activity
             </span>
             Project
           </th>
-          <th scope="col" className="pb-6 px-3 text-left text-sm font-semibol">
+          <th scope="col" className="pb-6 px-3 text-left text-sm font-semibold">
             Description
           </th>
           {/* <th

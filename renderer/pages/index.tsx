@@ -58,11 +58,8 @@ export default function Home() {
     (state) => [state.theme, state.setTheme],
     shallow
   );
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
-  const [isOSDarkTheme, setIsOSDarkTheme] = useState(
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  );
 
+  const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   function handleThemeChange(e) {
     if (e.matches) {
       setIsOSDarkTheme(true);
@@ -75,11 +72,12 @@ export default function Home() {
     window
       .matchMedia("(prefers-color-scheme: dark)")
       .addListener(handleThemeChange);
-    console.log(theme);
 
-    setIsDarkTheme(theme.os ? isOSDarkTheme : theme.custom === "dark");
+    const mode =
+      (theme.os && isOSDarkTheme) || theme.custom === "dark" ? "dark" : "light";
+
+    document.body.className = mode;
   }, [theme, isOSDarkTheme]);
-
   useEffect(() => {
     document.addEventListener("visibilitychange", visibilitychangeHandler);
     return () => {
@@ -346,86 +344,80 @@ export default function Home() {
   };
 
   return (
-    <div
-      className={clsx("", {
-        dark: isDarkTheme,
-      })}
-    >
-      <div className="h-full bg-gray-100 dark:bg-dark-back">
-        <VersionMessage />
-        <main className="py-10">
-          <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
-            {reportsFolder ? (
-              <>
-                <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">
-                  <section>
-                    <div className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
-                      <DateSelector
-                        selectedDate={selectedDate}
-                        setSelectedDate={setSelectedDate}
-                      />
-                    </div>
-                  </section>
-                  <section className="flex-grow">
-                    <div className="bg-white shadow sm:rounded-lg h-full dark:bg-dark-container dark:border dark:border-dark-border">
-                      <ActivitiesSection
-                        activities={selectedDateActivities}
-                        onEditActivity={setTrackTimeModalActivity}
-                        onDeleteActivity={onDeleteActivity}
-                        selectedDate={selectedDate}
-                        availableProjects={
-                          latestProjAndAct ? Object.keys(latestProjAndAct) : []
-                        }
-                      />
-                    </div>
-                  </section>
-                </div>
-
-                <section
-                  aria-labelledby="manual-input-title"
-                  className="lg:col-start-3 lg:col-span-1 relative"
-                >
-                  <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                    <ManualInputForm
-                      onSave={handleSave}
-                      selectedDateReport={selectedDateReport}
+    <div className="h-full bg-gray-100 dark:bg-dark-back">
+      <VersionMessage />
+      <main className="py-10">
+        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
+          {reportsFolder ? (
+            <>
+              <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">
+                <section>
+                  <div className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
+                    <DateSelector
                       selectedDate={selectedDate}
+                      setSelectedDate={setSelectedDate}
                     />
                   </div>
-                  <UpdateDescription />
                 </section>
-                <section className="lg:col-span-2">
-                  <Calendar
-                    reportsFolder={reportsFolder}
+                <section className="flex-grow">
+                  <div className="bg-white shadow sm:rounded-lg h-full dark:bg-dark-container dark:border dark:border-dark-border">
+                    <ActivitiesSection
+                      activities={selectedDateActivities}
+                      onEditActivity={setTrackTimeModalActivity}
+                      onDeleteActivity={onDeleteActivity}
+                      selectedDate={selectedDate}
+                      availableProjects={
+                        latestProjAndAct ? Object.keys(latestProjAndAct) : []
+                      }
+                    />
+                  </div>
+                </section>
+              </div>
+
+              <section
+                aria-labelledby="manual-input-title"
+                className="lg:col-start-3 lg:col-span-1 relative"
+              >
+                <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
+                  <ManualInputForm
+                    onSave={handleSave}
+                    selectedDateReport={selectedDateReport}
                     selectedDate={selectedDate}
-                    setSelectedDate={setSelectedDate}
                   />
-                </section>
-              </>
-            ) : (
-              <SelectFolderPlaceholder setFolder={setReportsFolder} />
-            )}
-          </div>
-          <Link
-            href="/settings"
-            className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold before:dark:text-blue-700/50"
-          >
-            <span className="w-8 flex items-center justify-center text-white ">
-              <Cog8ToothIcon />
-            </span>
-          </Link>
-        </main>
-        <TrackTimeModal
-          activities={selectedDateActivities}
-          isOpen={trackTimeModalActivity !== null}
-          editedActivity={trackTimeModalActivity}
-          latestProjAndAct={latestProjAndAct}
-          latestProjAndDesc={latestProjAndDesc}
-          close={() => setTrackTimeModalActivity(null)}
-          submitActivity={submitActivity}
-          selectedDate={selectedDate}
-        />
-      </div>
+                </div>
+                <UpdateDescription />
+              </section>
+              <section className="lg:col-span-2">
+                <Calendar
+                  reportsFolder={reportsFolder}
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                />
+              </section>
+            </>
+          ) : (
+            <SelectFolderPlaceholder setFolder={setReportsFolder} />
+          )}
+        </div>
+        <Link
+          href="/settings"
+          className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold before:dark:text-blue-700/50"
+        >
+          <span className="w-8 flex items-center justify-center text-white ">
+            <Cog8ToothIcon />
+          </span>
+        </Link>
+      </main>
+      <TrackTimeModal
+        activities={selectedDateActivities}
+        isOpen={trackTimeModalActivity !== null}
+        editedActivity={trackTimeModalActivity}
+        latestProjAndAct={latestProjAndAct}
+        latestProjAndDesc={latestProjAndDesc}
+        close={() => setTrackTimeModalActivity(null)}
+        submitActivity={submitActivity}
+        selectedDate={selectedDate}
+      />
     </div>
   );
 }
