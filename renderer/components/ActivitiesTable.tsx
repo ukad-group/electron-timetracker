@@ -181,10 +181,16 @@ export default function ActivitiesTable({
             className={clsx(`border-b border-gray-200 dark:border-gray-300 `, {
               "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
                 tableActivities[i].to != tableActivities[i + 1]?.from &&
-                i + 1 !== tableActivities.length,
+                i + 1 !== tableActivities.length &&
+                !activity.calendarId,
+              "dark:border-b-2 dark:border-zinc-700": activity.calendarId,
             })}
           >
-            <td className="relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0">
+            <td
+              className={`relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
+                activity.calendarId ? "opacity-60" : ""
+              }`}
+            >
               {ctrlPressed && (
                 <span className="absolute -left-4 text-blue-700">{i + 1}</span>
               )}
@@ -198,7 +204,9 @@ export default function ActivitiesTable({
               </span>
             </td>
             <td
-              className={`px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap `}
+              className={`px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
+                activity.calendarId ? "opacity-60" : ""
+              }`}
             >
               <Tooltip>
                 <p data-column="duration" onClick={copyToClipboardHandle}>
@@ -206,7 +214,11 @@ export default function ActivitiesTable({
                 </p>
               </Tooltip>
             </td>
-            <td className="flex flex-col px-3 py-4">
+            <td
+              className={`flex flex-col px-3 py-4 ${
+                activity.calendarId ? "opacity-60" : ""
+              }`}
+            >
               <Tooltip>
                 <p
                   className="text-sm font-medium text-gray-900 dark:text-dark-heading"
@@ -226,7 +238,11 @@ export default function ActivitiesTable({
                 </Tooltip>
               )}
             </td>
-            <td className="px-3 py-4 text-sm ">
+            <td
+              className={`px-3 py-4 text-sm ${
+                activity.calendarId ? "opacity-60" : ""
+              }`}
+            >
               <Tooltip>
                 <p
                   onClick={copyToClipboardHandle}
