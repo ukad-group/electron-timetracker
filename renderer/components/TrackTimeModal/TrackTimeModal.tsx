@@ -219,7 +219,9 @@ export default function TrackTimeModal({
       );
       setGoogleEvents(arrayWithPrefilledValue);
     }
-
+    global.ipcRenderer.send("send-analytics-data", "registrations", {
+      registration: "time_registrations",
+    });
     close();
   };
 
@@ -481,7 +483,7 @@ export default function TrackTimeModal({
                   <div className="flex gap-3 justify-start">
                     {checkIsToday(selectedDate) &&
                       (loggedGoogleUsers?.length > 0 ||
-                        office365Users.length > 0) && (
+                        office365Users?.length > 0) && (
                         <AddEventBtn
                           addEvent={addEventToList}
                           availableProjects={

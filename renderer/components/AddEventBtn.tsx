@@ -23,6 +23,7 @@ export type Event = {
   project?: string;
   activity?: string;
   description?: string;
+  calendar?: string;
 };
 type AddEventBtnProps = {
   addEvent: (event: Event) => void;
@@ -235,7 +236,12 @@ export default function AddEventBtn({
   const combineAndSortEvents = () => {
     const googleEvents = prepareGoogleEvents();
     const office365Events = prepareOffice365Events();
-
+    googleEvents.forEach((event) => {
+      event["calendar"] = "google";
+    });
+    office365Events.forEach((event) => {
+      event["calendar"] = "office365";
+    });
     const combinedEvents = [...googleEvents, ...office365Events];
     const sortedEvents = combinedEvents.sort((a, b) => {
       const [hoursA, minutesA] = a.from.time.split(":").map(Number);
@@ -287,6 +293,20 @@ export default function AddEventBtn({
                   } group w-full p-2 text-sm`}
                   onClick={() => {
                     addEvent(event);
+                    global.ipcRenderer.send(
+                      "send-analytics-data",
+                      "registrations",
+                      {
+                        registration: `${event.calendar}-calendar-event_registration`,
+                      }
+                    );
+                    global.ipcRenderer.send(
+                      "send-analytics-data",
+                      "registrations",
+                      {
+                        registration: `all_calendar-events_registration`,
+                      }
+                    );
                   }}
                 >
                   {summary ? summary : "No title"}
