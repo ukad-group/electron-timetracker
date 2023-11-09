@@ -408,16 +408,18 @@ export default function Home() {
           </span>
         </Link>
       </main>
-      <TrackTimeModal
-        activities={selectedDateActivities}
-        isOpen={trackTimeModalActivity !== null}
-        editedActivity={trackTimeModalActivity}
-        latestProjAndAct={latestProjAndAct}
-        latestProjAndDesc={latestProjAndDesc}
-        close={() => setTrackTimeModalActivity(null)}
-        submitActivity={submitActivity}
-        selectedDate={selectedDate}
-      />
+      {trackTimeModalActivity && (
+        <TrackTimeModal
+          activities={selectedDateActivities}
+          isOpen={trackTimeModalActivity !== null}
+          editedActivity={trackTimeModalActivity}
+          latestProjAndAct={latestProjAndAct}
+          latestProjAndDesc={latestProjAndDesc}
+          close={() => setTrackTimeModalActivity(null)}
+          submitActivity={submitActivity}
+          selectedDate={selectedDate}
+        />
+      )}
     </div>
   );
 }
