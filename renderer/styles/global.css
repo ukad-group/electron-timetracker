@@ -6,6 +6,10 @@ html {
   overflow: overlay;
 }
 
+body {
+  @apply h-full;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }
