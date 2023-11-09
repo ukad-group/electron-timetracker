@@ -270,9 +270,11 @@ app.on("ready", async () => {
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  // if (process.platform !== "darwin") {
+  //   app.quit();
+  // }
+
+  app.quit();
 });
 
 ipcMain.handle("storage:get", (event, storageName: string) => {
