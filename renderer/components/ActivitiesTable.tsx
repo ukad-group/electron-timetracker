@@ -181,12 +181,12 @@ export default function ActivitiesTable({
                 tableActivities[i].to != tableActivities[i + 1]?.from &&
                 i + 1 !== tableActivities.length &&
                 !activity.calendarId,
-              "dark:border-b-2 dark:border-zinc-700": activity.calendarId,
+              "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
             })}
           >
             <td
               className={`relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
-                activity.calendarId ? "opacity-60" : ""
+                activity.calendarId ? "opacity-50" : ""
               }`}
             >
               {ctrlPressed && (
@@ -203,7 +203,7 @@ export default function ActivitiesTable({
             </td>
             <td
               className={`px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
-                activity.calendarId ? "opacity-60" : ""
+                activity.calendarId ? "opacity-50" : ""
               }`}
             >
               <Tooltip>
@@ -214,7 +214,7 @@ export default function ActivitiesTable({
             </td>
             <td
               className={`flex flex-col px-3 py-4 ${
-                activity.calendarId ? "opacity-60" : ""
+                activity.calendarId ? "opacity-50" : ""
               }`}
             >
               <Tooltip>
@@ -238,7 +238,7 @@ export default function ActivitiesTable({
             </td>
             <td
               className={`px-3 py-4 text-sm ${
-                activity.calendarId ? "opacity-60" : ""
+                activity.calendarId ? "opacity-50" : ""
               }`}
             >
               <Tooltip>
