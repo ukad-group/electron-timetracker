@@ -186,15 +186,15 @@ export default function TrackTimeModal({
 
     if (
       scheduledEvents[dashedDescription] &&
-      !scheduledEvents[dashedDescription].project
+      !scheduledEvents[dashedDescription].modalProject
     ) {
-      scheduledEvents[dashedDescription].project = project;
+      scheduledEvents[dashedDescription].modalProject = project || "";
     }
     if (
       scheduledEvents[dashedDescription] &&
-      scheduledEvents[dashedDescription].activity !== activity
+      scheduledEvents[dashedDescription].modalActivity !== activity
     ) {
-      scheduledEvents[dashedDescription].activity = activity || "";
+      scheduledEvents[dashedDescription].modalActivity = activity || "";
     }
 
     setScheduledEvents(scheduledEvents);
@@ -260,22 +260,35 @@ export default function TrackTimeModal({
   };
 
   const addEventToList = (event: Event) => {
-    const { from, to, project, activity, description } = event;
+    const { from, to, description } = event;
+
+    // Alex request
+    // if write project/activity before adding event - don't remove them
+    const modalProject = project ? project : event.project || "";
+    const modalActivity = activity ? activity : event.activity || "";
+
     let dashedDescription = description;
     if (description.includes(" - ")) {
       setDescription(description.replace(" - ", " -- "));
       dashedDescription = description.replace(" - ", " -- ");
     }
     if (scheduledEvents[dashedDescription]) {
-      setProject(scheduledEvents[dashedDescription].project);
-      setActivity(activity || scheduledEvents[dashedDescription].activity);
+      setProject(
+        modalProject || scheduledEvents[dashedDescription]?.modalProject || ""
+      );
+      setActivity(
+        modalActivity || scheduledEvents[dashedDescription]?.modalActivity || ""
+      );
     }
     if (!scheduledEvents[dashedDescription]) {
-      setProject(project || "");
-      setActivity(activity || "");
-      scheduledEvents[dashedDescription] = { project: "", activity: "" };
-      scheduledEvents[dashedDescription].project = project || "";
-      scheduledEvents[dashedDescription].activity = activity || "";
+      setProject(modalProject || "");
+      setActivity(modalActivity || "");
+      scheduledEvents[dashedDescription] = {
+        modalProject: "",
+        modalActivity: "",
+      };
+      scheduledEvents[dashedDescription].modalProject = modalProject || "";
+      scheduledEvents[dashedDescription].modalActivity = modalActivity || "";
     }
 
     setFrom(from.time || "");

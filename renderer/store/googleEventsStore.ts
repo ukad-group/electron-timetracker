@@ -8,7 +8,7 @@ import {
 
 export type ScheduledEvents = Record<
   string,
-  { project?: string; activity?: string }
+  { modalProject?: string; modalActivity?: string }
 >;
 
 export type ScheduledEventsStore = {
