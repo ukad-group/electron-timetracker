@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
 import {
@@ -44,17 +44,23 @@ export default function Home() {
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
-  const visibilitychangeHandler = useCallback(() => {
-    const currDate = new Date().toLocaleDateString();
-    const lastUsingDate = localStorage.getItem("lastUsingDate");
 
-    if (lastUsingDate && currDate !== lastUsingDate) {
-      localStorage.setItem("lastUsingDate", currDate);
-      window.location.reload();
-    }
+  const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
 
-    localStorage.setItem("lastUsingDate", currDate);
-  }, []);
+  useEffect(() => {
+    const checkDayChange = () => {
+      const currentDay = new Date().getDate();
+      if (currentDay !== lastRenderedDay) {
+        setLastRenderedDay(currentDay);
+        setSelectedDate(new Date())
+      }
+    };
+
+    const intervalId = setInterval(checkDayChange, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [lastRenderedDay]);
+
   const [theme, setTheme] = useThemeStore(
     (state) => [state.theme, state.setTheme],
     shallow
@@ -79,13 +85,6 @@ export default function Home() {
 
     document.body.className = mode;
   }, [theme, isOSDarkTheme]);
-
-  useEffect(() => {
-    document.addEventListener("visibilitychange", visibilitychangeHandler);
-    return () => {
-      document.removeEventListener("visibilitychange", visibilitychangeHandler);
-    };
-  }, []);
 
   useEffect(() => {
     try {
@@ -130,7 +129,7 @@ export default function Home() {
       global.ipcRenderer.removeAllListeners("file-changed");
       global.ipcRenderer.removeAllListeners("errorMes");
     };
-  }, [selectedDate, reportsFolder]);
+  }, [selectedDate, reportsFolder, lastRenderedDay]);
 
   useEffect(() => {
     if (selectedDateReport) {

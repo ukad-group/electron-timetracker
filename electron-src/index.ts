@@ -333,10 +333,6 @@ ipcMain.handle(
     const date = new Date(stringDate);
     const timereportPath = getPathFromDate(date, reportsFolder);
 
-    console.log('delete');
-    console.log(date);
-    console.log(timereportPath);
-
     try {
       await deleteFile(timereportPath);
 
@@ -355,10 +351,6 @@ ipcMain.handle(
     const date = new Date(stringDate);
     const timereportPath = getPathFromDate(date, reportsFolder);
 
-    console.log('read');
-    console.log(date);
-    console.log(timereportPath);
-    
     return new Promise((resolve) => {
       readDataFromFile(timereportPath, (data) => {
         resolve(data);
@@ -374,10 +366,6 @@ ipcMain.handle(
 
     const date = new Date(stringDate);
     const timereportPath = getPathFromDate(date, reportsFolder);
-
-    console.log('write');
-    console.log(date);
-    console.log(timereportPath);
 
     try {
       createDirByPath(timereportPath.slice(0, timereportPath.lastIndexOf("/")));
@@ -402,9 +390,6 @@ ipcMain.handle(
     if (!reportsFolder || !stringDate.length) return [];
 
     const date = new Date(stringDate);
-
-    console.log('find-latest-projects');
-    console.log(date);
 
     try {
       const parsedProjects = parseReportsInfo(reportsFolder, date);
@@ -472,10 +457,6 @@ ipcMain.handle(
     if (!reportsFolder || !stringDate.length) return [];
 
     const date = new Date(stringDate);
-
-    console.log('find-month-projects');
-    console.log(date);
-
     const year = date.getFullYear().toString();
     const prevMonth = date.getMonth().toString().padStart(2, "0");
     const currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
