@@ -20,6 +20,7 @@ import { useThemeStore } from "../store/themeStore";
 import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
+import Totals from "../components/Totals";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -376,16 +377,22 @@ export default function Home() {
 
               <section
                 aria-labelledby="manual-input-title"
-                className="lg:col-start-3 lg:col-span-1 relative"
+                className="lg:col-start-3 lg:col-span-1 lg:row-span-2 relative"
               >
-                <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                  <ManualInputForm
-                    onSave={handleSave}
-                    selectedDateReport={selectedDateReport}
-                    selectedDate={selectedDate}
-                  />
+                <div className="flex flex-col gap-6">
+                  <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
+                    <ManualInputForm
+                      onSave={handleSave}
+                      selectedDateReport={selectedDateReport}
+                      selectedDate={selectedDate}
+                    />
+                  </div>
+
+                  <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
+                    <Totals activities={selectedDateActivities} />
+                  </div>
+                  <UpdateDescription />
                 </div>
-                <UpdateDescription />
               </section>
               <section className="lg:col-span-2">
                 <Calendar

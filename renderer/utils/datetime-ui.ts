@@ -87,3 +87,11 @@ export const padStringToMinutes = (timeString: string) => {
   const [hours, minutes] = timeString.split(":").map(Number);
   return hours * 60 + minutes;
 };
+
+export const convertMillisecondsToTime = (milliseconds) => {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, "0");;
+
+  return `${hours}:${minutes}`;
+}

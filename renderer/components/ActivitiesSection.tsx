@@ -138,45 +138,47 @@ export default function ActivitiesSection({
   }
 
   return (
-    <div>
-      {backgroundError && (
-        <div className="border-t-4  border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left dark:text-slate-400">
-          <div className="flex justify-start gap-2 w-full text-gray-900 font-bold dark:text-white">
-            <ExclamationCircleIcon
-              className="w-7 h-7 text-red-700"
-              aria-hidden="true"
-            />
-            <p>Noncritical error</p>
+    <div className="flex flex-col justify-between h-full">
+      <div>
+        {backgroundError && (
+          <div className="border-t-4  border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left dark:text-slate-400">
+            <div className="flex justify-start gap-2 w-full text-gray-900 font-bold dark:text-white">
+              <ExclamationCircleIcon
+                className="w-7 h-7 text-red-700"
+                aria-hidden="true"
+              />
+              <p>Noncritical error</p>
+            </div>
+            <div className="pl-9 pr-8">
+              {backgroundError} Refer to the console for specific error
+              information.
+            </div>
           </div>
-          <div className="pl-9 pr-8">
-            {backgroundError} Refer to the console for specific error
-            information.
-          </div>
-        </div>
-      )}
-      <div className="px-4 py-5 sm:px-6">
-        <ActivitiesTable
-          onEditActivity={onEditActivity}
-          activities={activities}
-          onDeleteActivity={onDeleteActivity}
-          selectedDate={selectedDate}
-          formattedGoogleEvents={
-            showGoogleEvents &&
-            googleEvents.length > 0 &&
-            formattedGoogleEvents.length > 0
-              ? formattedGoogleEvents
-              : undefined
-          }
-        />
-      </div>
-
-      <div className="flex gap-2 px-6 pb-4 items-center justify-end mr-auto">
-        {today && isShowGoogleEvents && (
-          <GoogleCalendarEventsMessage
-            setShowGoogleEvents={setShowGoogleEvents}
-            formattedGoogleEvents={formattedGoogleEvents}
-          />
         )}
+        <div className="px-4 py-5 sm:px-6">
+          <ActivitiesTable
+            onEditActivity={onEditActivity}
+            activities={activities}
+            onDeleteActivity={onDeleteActivity}
+            selectedDate={selectedDate}
+            formattedGoogleEvents={
+              showGoogleEvents &&
+              googleEvents.length > 0 &&
+              formattedGoogleEvents.length > 0
+                ? formattedGoogleEvents
+                : undefined
+            }
+          />
+        </div>
+
+        <div className="flex gap-2 px-6 pb-4 items-center justify-end mr-auto">
+          {today && isShowGoogleEvents && (
+            <GoogleCalendarEventsMessage
+              setShowGoogleEvents={setShowGoogleEvents}
+              formattedGoogleEvents={formattedGoogleEvents}
+            />
+          )}
+        </div>
       </div>
 
       <div>
