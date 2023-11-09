@@ -2,7 +2,7 @@
   "private": true,
   "name": "timetracker",
   "description": "Timetracker app",
-  "version": "1.0.46-beta.7",
+  "version": "1.47.0-beta.3",
   "author": "mmmykhailo <mmmykhailo@proton.me>",
   "main": "main/index.js",
   "scripts": {
@@ -40,16 +40,22 @@
       "output": "dist"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "app/images/logo.png"
     },
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "app/images/logo.png"
     },
     "linux": {
-      "target": "deb"
+      "target": "deb",
+      "icon": "app/images/logo.png"
     }
   },
   "dependencies": {
+    "@aptabase/electron": "^0.2.2",
+    "@azure/msal-browser": "^3.2.0",
+    "@azure/msal-react": "^2.0.4",
     "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.8",
     "@fullcalendar/interaction": "^6.1.8",
@@ -59,6 +65,7 @@
     "@tailwindcss/forms": "^0.5.3",
     "chokidar": "^3.5.3",
     "clsx": "^1.2.1",
+    "dotenv": "^16.3.1",
     "electron-is-dev": "^1.1.0",
     "electron-next": "^3.1.5",
     "electron-store": "^8.1.0",

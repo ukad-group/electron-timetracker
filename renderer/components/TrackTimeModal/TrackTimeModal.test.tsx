@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import TrackTimeModal, { TrackTimeModalProps } from "./TrackTimeModal";
-import GoogleCalendarAddEventBtn from "../google-calendar/GoogleCalendarAddEventBtn";
+import GoogleCalendarAddEventBtn from "../AddEventBtn";
 import "@testing-library/jest-dom";
 
 const mockedActivities = [
@@ -33,14 +33,16 @@ const mockedActivities = [
   },
 ];
 
-jest.mock("../google-calendar/GoogleCalendarAddEventBtn", () => {
+jest.mock("../AddEventBtn", () => {
   return {
     __esModule: true,
-    default: () => { // if you exporting component as default
-      return <div/>;
+    default: () => {
+      // if you exporting component as default
+      return <div />;
     },
-    GoogleCalendarAddEventBtn: () => { // if you exporting component as not default
-      return <div/>;
+    GoogleCalendarAddEventBtn: () => {
+      // if you exporting component as not default
+      return <div />;
     },
   };
 });

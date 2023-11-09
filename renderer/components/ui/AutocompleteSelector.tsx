@@ -103,7 +103,7 @@ export default function AutocompleteSelector({
       value={selectedItem}
       onChange={setSelectedItem}
     >
-      <Combobox.Label className="block text-sm font-medium text-gray-700">
+      <Combobox.Label className="block text-sm font-medium text-gray-700 dark:text-dark-main">
         {title}
       </Combobox.Label>
       <div className="relative mt-1">
@@ -113,7 +113,7 @@ export default function AutocompleteSelector({
           required={required}
           spellCheck={false}
           className={clsx(
-            "w-full py-2 pl-3 pr-10 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm",
+            "w-full py-2 pl-3 pr-10 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm dark:border-slate-600 dark:text-dark-heading dark:bg-dark-form-back focus:dark:border-focus-border focus:dark:ring-focus-border",
             {
               "border-red-300 text-red-900 placeholder-red-300":
                 required && isValidationEnabled && !selectedItem,
@@ -130,7 +130,7 @@ export default function AutocompleteSelector({
         </Combobox.Button>
 
         {filteredList?.length > 0 ? (
-          <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+          <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm dark:bg-dark-container dark:shadow-lg dark:shadow-slate-900">
             <div className="block text-xs text-gray-500 text-center">
               tab to choose
             </div>
@@ -141,7 +141,9 @@ export default function AutocompleteSelector({
                 className={({ active }) =>
                   clsx(
                     "relative cursor-default select-none py-2 pl-3 pr-9",
-                    active ? "bg-blue-600 text-white" : "text-gray-900"
+                    active
+                      ? "bg-blue-600 text-white dark:bg-indigo-800"
+                      : "text-gray-900 dark:text-dark-main"
                   )
                 }
               >
@@ -174,14 +176,16 @@ export default function AutocompleteSelector({
         ) : (
           filteredList &&
           selectedItem && (
-            <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm dark:bg-dark-container dark:shadow-lg dark:shadow-slate-900">
               <Combobox.Option
                 key={1}
                 value={selectedItem}
                 className={({ active }) =>
                   clsx(
                     "relative cursor-default select-none py-2 pl-3 pr-9",
-                    active ? "bg-blue-600 text-white" : "text-gray-900"
+                    active
+                      ? "bg-blue-600 text-white dark:bg-indigo-800"
+                      : "text-gray-900 dark:text-dark-main"
                   )
                 }
               >

@@ -203,11 +203,13 @@ export function Calendar({
   }
 
   return (
-    <div className="wrapper bg-white p-4 rounded-lg shadow">
+    <div className="wrapper bg-white p-4 rounded-lg shadow dark:bg-dark-container dark:border dark:border-dark-border">
       <div className="calendar-header h-10 flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">{`${currentReadableMonth} ${currentYear}`}</h3>
-          <p className="text-xs text-gray-500">Total: {monthTotalHours}</p>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-heading">{`${currentReadableMonth} ${currentYear}`}</h3>
+          <p className="text-xs text-gray-500 dark:text-dark-main">
+            Total: {monthTotalHours}
+          </p>
         </div>
         <div className="flex gap-4">
           {calendarDate.getMonth() !== new Date().getMonth() && (
@@ -245,7 +247,7 @@ function renderEventContent(eventInfo) {
   return (
     <>
       {eventInfo.event.extendedProps.isValid === false && (
-        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[290%]" />
+        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[290%] dark:fill-red-500/70" />
       )}
       {eventInfo.event.extendedProps.workDurationMs ? (
         <p>

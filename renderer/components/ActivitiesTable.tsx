@@ -1,20 +1,22 @@
 import clsx from "clsx";
-import { useMemo, useEffect } from "react";
+import { useMemo, useEffect, useState, Dispatch, SetStateAction } from "react";
 import { ReportActivity, formatDuration, validation } from "../utils/reports";
 import { checkIsToday, getCeiledTime } from "../utils/datetime-ui";
 import TimeBadge from "../components/ui/TimeBadge";
 import {
   Square2StackIcon,
   PencilSquareIcon,
-  ArchiveBoxXMarkIcon,
 } from "@heroicons/react/24/outline";
 import Tooltip from "./ui/Tooltip/Tooltip";
+import { PlusIcon } from "@heroicons/react/24/solid";
+import { concatSortArrays } from "../utils/utils";
 
 type ActivitiesTableProps = {
   activities: Array<ReportActivity>;
   onEditActivity: (activity: ReportActivity) => void;
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
+  formattedGoogleEvents: ReportActivity[];
 };
 const msPerHour = 60 * 60 * 1000;
 export default function ActivitiesTable({
@@ -22,11 +24,11 @@ export default function ActivitiesTable({
   onEditActivity,
   onDeleteActivity,
   selectedDate,
+  formattedGoogleEvents,
 }: ActivitiesTableProps) {
+  const [ctrlPressed, setCtrlPressed] = useState(false);
   const nonBreakActivities = useMemo(() => {
-    return validation(
-      activities.filter((activity) => !activity.isBreak && activity.project)
-    );
+    return validation(activities.filter((activity) => !activity.isBreak));
   }, [activities]);
 
   const totalDuration = useMemo(() => {
@@ -34,6 +36,12 @@ export default function ActivitiesTable({
       return value + (activity.duration ? activity.duration : 0);
     }, 0);
   }, [nonBreakActivities]);
+
+  const tableActivities = useMemo(() => {
+    return formattedGoogleEvents && formattedGoogleEvents.length > 0
+      ? concatSortArrays(nonBreakActivities, formattedGoogleEvents)
+      : nonBreakActivities;
+  }, [nonBreakActivities, formattedGoogleEvents]);
 
   const copyToClipboardHandle = (e) => {
     const cell = e.target;
@@ -69,50 +77,79 @@ export default function ActivitiesTable({
         console.error("Clipboard write error:", error);
       });
   };
+
   const handleKeyDown = (event) => {
-    if (event.ctrlKey && event.key === "ArrowUp") {
+    if (
+      (event.ctrlKey && event.key === "ArrowUp") ||
+      (event.key === "Meta" && event.key === "ArrowUp")
+    ) {
       if (nonBreakActivities.length > 0) {
         const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
         onEditActivity(lastActivity);
       }
     }
+    if (event.key === "Control" || event.key === "Meta") {
+      setCtrlPressed(true);
+    }
+    if (
+      (event.ctrlKey || event.key === "Control" || event.key === "Meta") &&
+      /^[1-9]$/.test(event.key)
+    ) {
+      const number = parseInt(event.key, 10);
+      if (number >= 1 && number <= nonBreakActivities.length) {
+        const selectedActivity = nonBreakActivities[Number(event.key) - 1];
+        if (selectedActivity.calendarId) {
+          onEditActivity({
+            ...selectedActivity,
+            id: null,
+          });
+        } else {
+          onEditActivity(selectedActivity);
+        }
+      }
+    }
   };
+  const handleKeyUp = (event) => {
+    if (event.key === "Control" || event.key === "Meta") {
+      setCtrlPressed(false);
+    }
+  };
+
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.addEventListener("keyup", handleKeyUp);
     };
-  }, []);
+  }, [nonBreakActivities]);
 
   return (
-    <table className="min-w-full divide-y divide-gray-300 table-fixed">
-      <thead>
+    <table className="min-w-full divide-y divide-gray-300 table-fixed dark:divide-gray-600">
+      <thead className="text-gray-900 dark:text-dark-heading">
         <tr>
           <th
             scope="col"
-            className="w-24 pb-6 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6 md:pl-0"
+            className="w-24 pb-6 px-3 text-left text-sm font-semibold"
           >
             Interval
           </th>
           <th
             scope="col"
-            className="w-24 pb-6 px-3 text-left text-sm font-semibold text-gray-900"
+            className="w-24 pb-6 px-3 text-left text-sm font-semibold"
           >
             Duration
           </th>
           <th
             scope="col"
-            className="w-32 pb-6 px-3 text-left text-sm font-semibold text-gray-900 relative"
+            className="w-32 pb-6 px-3 text-left text-sm font-semibold relative"
           >
-            <span className="block absolute text-xs text-gray-500 top-[22px]">
+            <span className="block absolute text-xs text-gray-500 top-[22px] dark:text-slate-400">
               activity
             </span>
             Project
           </th>
-          <th
-            scope="col"
-            className="pb-6 px-3 text-left text-sm font-semibold text-gray-900"
-          >
+          <th scope="col" className="pb-6 px-3 text-left text-sm font-semibold">
             Description
           </th>
           {/* <th
@@ -135,20 +172,29 @@ export default function ActivitiesTable({
           </th>
         </tr>
       </thead>
-      <tbody className="">
-        {nonBreakActivities.map((activity, i) => (
+      <tbody className="text-gray-500 dark:text-slate-400">
+        {tableActivities.map((activity, i) => (
           <tr
-            key={activity.id}
-            className={clsx("border-b border-gray-200", {
-              "border-dashed border-b-2 border-gray-200":
-                nonBreakActivities[i].to != nonBreakActivities[i + 1]?.from &&
-                i + 1 !== nonBreakActivities.length,
+            key={i}
+            className={clsx(`border-b border-gray-200 dark:border-gray-300 `, {
+              "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
+                tableActivities[i].to != tableActivities[i + 1]?.from &&
+                i + 1 !== tableActivities.length &&
+                !activity.calendarId,
+              "dark:border-b-2 dark:border-zinc-700": activity.calendarId,
             })}
           >
-            <td className="py-4 pl-4 pr-3 text-sm text-gray-500 whitespace-nowrap sm:pl-6 md:pl-0">
+            <td
+              className={`relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
+                activity.calendarId ? "opacity-60" : ""
+              }`}
+            >
+              {ctrlPressed && (
+                <span className="absolute -left-4 text-blue-700">{i + 1}</span>
+              )}
               <span
                 className={clsx({
-                  "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800":
+                  "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
                     !activity.isValid,
                 })}
               >
@@ -156,7 +202,9 @@ export default function ActivitiesTable({
               </span>
             </td>
             <td
-              className={`px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap `}
+              className={`px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
+                activity.calendarId ? "opacity-60" : ""
+              }`}
             >
               <Tooltip>
                 <p data-column="duration" onClick={copyToClipboardHandle}>
@@ -164,10 +212,14 @@ export default function ActivitiesTable({
                 </p>
               </Tooltip>
             </td>
-            <td className="flex flex-col px-3 py-4">
+            <td
+              className={`flex flex-col px-3 py-4 ${
+                activity.calendarId ? "opacity-60" : ""
+              }`}
+            >
               <Tooltip>
                 <p
-                  className="text-sm font-medium text-gray-900"
+                  className="text-sm font-medium text-gray-900 dark:text-dark-heading"
                   onClick={copyToClipboardHandle}
                 >
                   {activity.project}
@@ -176,7 +228,7 @@ export default function ActivitiesTable({
               {activity.activity && (
                 <Tooltip>
                   <p
-                    className="block text-xs text-gray-500 font-semibold mt-1"
+                    className="block text-xs  font-semibold mt-1"
                     onClick={copyToClipboardHandle}
                   >
                     {activity.activity}
@@ -184,7 +236,11 @@ export default function ActivitiesTable({
                 </Tooltip>
               )}
             </td>
-            <td className="px-3 py-4 text-sm text-gray-500 ">
+            <td
+              className={`px-3 py-4 text-sm ${
+                activity.calendarId ? "opacity-60" : ""
+              }`}
+            >
               <Tooltip>
                 <p
                   onClick={copyToClipboardHandle}
@@ -196,57 +252,77 @@ export default function ActivitiesTable({
                   {activity.description}
                 </p>
                 {activity.mistakes?.includes("startsWith!") && (
-                  <span className="block text-xs text-gray-500 mt-1">
+                  <span className="block text-xs mt-1">
                     Perhaps you wanted to report a break
                   </span>
                 )}
               </Tooltip>
             </td>
-            {/* <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              <button
-                className="group py-4 px-3"
-                title="Delete"
-                onClick={() => {
-                  onDeleteActivity(activity.id);
-                }}
-              >
-                <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
-              </button>
-            </td> */}
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              <button
-                className="group py-4 px-3"
-                title="Copy"
-                onClick={() => {
-                  onEditActivity({
-                    ...activity,
-                    id: null,
-                    from: activities[activities.length - 2].to,
-                    to: checkIsToday(selectedDate) ? getCeiledTime() : "",
-                    duration: null,
-                  });
-                }}
-              >
-                <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
-              </button>
+              <div className={`${activity.calendarId ? "invisible" : ""}`}>
+                <button
+                  className="group py-4 px-3"
+                  title="Copy"
+                  onClick={() => {
+                    onEditActivity({
+                      ...activity,
+                      id: null,
+                      from: activities[activities.length - 2].to,
+                      to: checkIsToday(selectedDate) ? getCeiledTime() : "",
+                      duration: null,
+                    });
+                  }}
+                >
+                  <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                </button>
+              </div>
             </td>
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
               <button
                 className="group py-4 px-3"
-                title="Edit"
-                onClick={() => onEditActivity(activity)}
+                title={activity.calendarId ? "Add" : "Edit"}
+                onClick={() => {
+                  if (activity.calendarId) {
+                    onEditActivity({
+                      ...activity,
+                      id: null,
+                    });
+                    global.ipcRenderer.send(
+                      "send-analytics-data",
+                      "registrations",
+                      {
+                        registration: "google-calendar-event_registration",
+                      }
+                    );
+                    global.ipcRenderer.send(
+                      "send-analytics-data",
+                      "registrations",
+                      {
+                        registration: `all_calendar-events_registration`,
+                      }
+                    );
+                  } else {
+                    onEditActivity(activity);
+                  }
+                }}
               >
-                <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+                {!activity.calendarId && (
+                  <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                )}
+
+                {activity.calendarId && (
+                  <PlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                )}
               </button>
             </td>
           </tr>
         ))}
         <tr>
-          <td className="py-4 pl-4 pr-3 text-sm text-gray-500 whitespace-nowrap sm:pl-6 md:pl-0">
+          <td className="py-4 px-3 text-sm whitespace-nowrap">
             <p>Total</p>
           </td>
           <td
-            className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
+            className="px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap"
             onClick={copyToClipboardHandle}
           >
             <Tooltip>
@@ -254,12 +330,12 @@ export default function ActivitiesTable({
             </Tooltip>
           </td>
           <td
-            className="px-3 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"
+            className="px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap"
             colSpan={4}
           >
             <TimeBadge
               hours={totalDuration / msPerHour}
-              startTime={nonBreakActivities[0].from}
+              startTime={tableActivities[0].from}
               selectedDate={selectedDate}
             />
           </td>
@@ -267,4 +343,18 @@ export default function ActivitiesTable({
       </tbody>
     </table>
   );
+}
+
+{
+  /* <td className="relative text-sm font-medium text-right whitespace-nowrap">
+              <button
+                className="group py-4 px-3"
+                title="Delete"
+                onClick={() => {
+                  onDeleteActivity(activity.id);
+                }}
+              >
+                <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 dark:text-dark-heading" />
+              </button>
+            </td> */
 }

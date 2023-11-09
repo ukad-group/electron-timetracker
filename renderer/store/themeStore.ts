@@ -6,11 +6,11 @@ import {
   persist,
 } from "zustand/middleware";
 
-type Update = { age: "old" | "new"; description: string | null };
+type Theme = { custom: "light"|"dark"; os: boolean };
 
-export type UpdateStore = {
-  update: Update | null;
-  setUpdate: (update: Update) => void;
+export type ThemeStore = {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
 };
 
 const storage: StateStorage = {
@@ -25,16 +25,15 @@ const storage: StateStorage = {
   },
 };
 
-export const useUpdateStore = createWithEqualityFn<UpdateStore>()(
+export const useThemeStore = createWithEqualityFn<ThemeStore>()(
   devtools(
     persist(
       (set) => ({
-        update: { age: "old", description: null },
-        setUpdate: (update: Update) =>
-          set({ update: { age: update.age, description: update.description } }),
+        theme: { custom: "light", os: true },
+        setTheme: (theme: Theme) => set({ theme: theme }),
       }),
       {
-        name: "update-storage",
+        name: "theme-storage",
         storage: createJSONStorage(() => storage),
       }
     )
