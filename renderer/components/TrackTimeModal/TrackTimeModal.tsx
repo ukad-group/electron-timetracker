@@ -566,9 +566,9 @@ export default function TrackTimeModal({
                   </div>
                 </div>
               </div>
-              <div className="mt-6">
-                <div className="flex gap-3 justify-between">
-                  <div className="flex gap-3 justify-start">
+              <div className="mt-6 flex justify-end">
+                <div className="flex gap-3">
+                  {/* <div className="flex gap-3 justify-start">
                     {checkIsToday(selectedDate) &&
                       (loggedGoogleUsers?.length > 0 ||
                         office365Users?.length > 0) && (
@@ -581,8 +581,8 @@ export default function TrackTimeModal({
                           }
                         />
                       )}
-                  </div>
-                  <div className="flex gap-3 justify-end">
+                  </div> */}
+                  <div className="flex gap-3">
                     <Button
                       text="Cancel"
                       type={"button"}
