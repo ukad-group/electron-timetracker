@@ -27,6 +27,9 @@ export default function ActivitiesTable({
   formattedGoogleEvents,
 }: ActivitiesTableProps) {
   const [ctrlPressed, setCtrlPressed] = useState(false);
+  const [firstKey, setFirstKey] = useState(null);
+  const [firstKeyPressTime, setFirstKeyPressTime] = useState(null);
+  const [firstTimerId, setFirstTimerId] = useState(null);
   const nonBreakActivities = useMemo(() => {
     return validation(activities.filter((activity) => !activity.isBreak));
   }, [activities]);
@@ -91,26 +94,48 @@ export default function ActivitiesTable({
     if (event.key === "Control" || event.key === "Meta") {
       setCtrlPressed(true);
     }
+
     if (
       (event.ctrlKey || event.key === "Control" || event.key === "Meta") &&
-      /^[1-9]$/.test(event.key)
+      /^[0-9]$/.test(event.key)
     ) {
       const number = parseInt(event.key, 10);
-      if (number >= 1 && number <= nonBreakActivities.length) {
+      if (!firstKey && number >= 1 && number <= nonBreakActivities.length) {
+        setFirstKey(event.key);
         const selectedActivity = nonBreakActivities[Number(event.key) - 1];
-        if (selectedActivity.calendarId) {
-          onEditActivity({
-            ...selectedActivity,
-            id: null,
-          });
-        } else {
-          onEditActivity(selectedActivity);
+        const firstTimerId = setTimeout(() => {
+          if (selectedActivity.calendarId) {
+            onEditActivity({
+              ...selectedActivity,
+              id: null,
+            });
+          } else {
+            onEditActivity(selectedActivity);
+          }
+        }, 700);
+        setFirstTimerId(firstTimerId);
+        setFirstKeyPressTime(Date.now());
+      }
+      if (Date.now() - firstKeyPressTime < 1000) {
+        clearTimeout(firstTimerId);
+        if (nonBreakActivities[Number(firstKey + event.key) - 1]) {
+          const selectedActivity =
+            nonBreakActivities[Number(firstKey + event.key) - 1];
+          if (selectedActivity.calendarId) {
+            onEditActivity({
+              ...selectedActivity,
+              id: null,
+            });
+          } else {
+            onEditActivity(selectedActivity);
+          }
         }
       }
     }
   };
   const handleKeyUp = (event) => {
     if (event.key === "Control" || event.key === "Meta") {
+      setFirstKey(null);
       setCtrlPressed(false);
     }
   };
@@ -122,7 +147,7 @@ export default function ActivitiesTable({
       window.removeEventListener("keydown", handleKeyDown);
       window.addEventListener("keyup", handleKeyUp);
     };
-  }, [nonBreakActivities]);
+  }, [nonBreakActivities, firstKey]);
 
   return (
     <table className="min-w-full divide-y divide-gray-300 table-fixed dark:divide-gray-600">
