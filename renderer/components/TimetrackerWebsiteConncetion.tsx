@@ -154,6 +154,7 @@ const TimetrackerWebsiteConnection = () => {
 
       const timtrackerYearProjects = userFetchedData[2];
       setProjects(timtrackerYearProjects);
+      localStorage.setItem("year-projects", timtrackerYearProjects.join(","));
       userInfo.yearProjects = timtrackerYearProjects;
 
       localStorage.setItem("timetracker-user", JSON.stringify(userInfo));
@@ -174,6 +175,7 @@ const TimetrackerWebsiteConnection = () => {
       setHolidays(loggedUser?.holidays);
       setVacationsSickDays(loggedUser?.vacationsSickdays);
       setProjects(loggedUser?.yearProjects);
+      localStorage.setItem("year-projects", loggedUser?.yearProjects.join(","));
     }
 
     const searchParams = window.location.search;

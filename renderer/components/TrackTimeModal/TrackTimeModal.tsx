@@ -63,6 +63,7 @@ export default function TrackTimeModal({
     (state) => [state.event, state.setEvent],
     shallow
   );
+  const [latestProjects, setLatestProjects] = useState([]);
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -131,6 +132,16 @@ export default function TrackTimeModal({
 
   useEffect(() => {
     addSuggestions(activities, latestProjAndDesc, latestProjAndAct);
+    const tempProj = Object.keys(latestProjAndAct);
+    if (localStorage.getItem("year-projects")) {
+      const yearProj = localStorage.getItem("year-projects").split(",");
+      for (let i = 0; i < yearProj.length; i++) {
+        if (!tempProj.includes(yearProj[i])) {
+          tempProj.push(yearProj[i]);
+        }
+      }
+    }
+    setLatestProjects(tempProj);
   }, [isOpen, latestProjAndDesc, latestProjAndAct]);
 
   useEffect(() => {
@@ -526,13 +537,11 @@ export default function TrackTimeModal({
                       onSave={onSave}
                       title="Project"
                       required
-                      availableItems={
-                        latestProjAndAct ? Object.keys(latestProjAndAct) : []
-                      }
+                      availableItems={latestProjects}
                       selectedItem={project}
                       setSelectedItem={setProject}
                       isValidationEnabled={isValidationEnabled}
-                      isLastThree={false}
+                      showLast={Object.keys(latestProjAndAct).length}
                       tabIndex={4}
                     />
                   </div>
@@ -545,7 +554,7 @@ export default function TrackTimeModal({
                       }
                       selectedItem={activity}
                       setSelectedItem={setActivity}
-                      isLastThree={true}
+                      showLast={3}
                       tabIndex={5}
                     />
                   </div>
@@ -560,7 +569,7 @@ export default function TrackTimeModal({
                       }
                       selectedItem={description}
                       setSelectedItem={setDescription}
-                      isLastThree={true}
+                      showLast={3}
                       tabIndex={6}
                     />
                   </div>

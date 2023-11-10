@@ -20,7 +20,7 @@ type AutocompleteProps = {
   tabIndex?: number;
   isValidationEnabled?: boolean;
   className?: string;
-  isLastThree: boolean;
+  showLast: number;
 };
 
 export default function AutocompleteSelector({
@@ -33,15 +33,15 @@ export default function AutocompleteSelector({
   required = false,
   tabIndex,
   isValidationEnabled,
-  isLastThree,
+  showLast,
 }: AutocompleteProps) {
   const inputRef = useRef(null);
 
   const filteredList =
     selectedItem === ""
       ? availableItems?.filter((activity, i) => {
-          if (isLastThree) {
-            return activity !== "" && i < 3;
+          if (showLast) {
+            return activity !== "" && i < showLast;
           }
           return activity !== "";
         })
