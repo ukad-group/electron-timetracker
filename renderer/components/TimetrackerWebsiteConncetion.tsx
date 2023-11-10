@@ -54,7 +54,7 @@ const TimetrackerWebsiteConnection = () => {
 
   const loadUserInfo = async () => {
     setLoading(true);
-    document.body.classList.add("overflow-hidden"); // prevent scrolling
+    document.body.style.overflow = "hidden"; // remove scrolling
 
     const params = new URLSearchParams(window.location.search);
     const authorizationCode = params.get("code");
@@ -98,13 +98,13 @@ const TimetrackerWebsiteConnection = () => {
       console.log(error);
       alert(error);
       setLoading(false);
-      document.body.classList.remove("overflow-hidden");
+      document.body.removeAttribute("style");
     }
   };
 
   const loadPlannerInfo = async () => {
     setLoading(true);
-    document.body.classList.add("overflow-hidden");
+    document.body.style.overflow = "hidden";
 
     const params = new URLSearchParams(window.location.search);
     const authorizationCode = params.get("code");
@@ -160,12 +160,12 @@ const TimetrackerWebsiteConnection = () => {
       setLoggedUser(userInfo);
       setLoading(false);
       router.push("/settings");
-      document.body.classList.remove("overflow-hidden"); // restore scrolling
+      document.body.removeAttribute("style"); // restore scrolling
     } catch (error) {
       console.log(error);
       alert(error);
       setLoading(false);
-      document.body.classList.remove("overflow-hidden");
+      document.body.removeAttribute("style");
     }
   };
 

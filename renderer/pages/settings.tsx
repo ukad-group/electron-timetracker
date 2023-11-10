@@ -41,7 +41,7 @@ const SettingsPage = () => {
   }, [theme, isOSDarkTheme]);
 
   return (
-    <div className="h-full w-full dark:bg-dark-back">
+    <div className="h-full w-full bg-gray-100 dark:bg-dark-back">
       <div className="mx-auto sm:px-6 max-w-3xl flex flex-col gap-6 px-6 py-10 dark:bg-dark-back">
         <section>
           <div className="bg-white shadow sm:rounded-lg p-6 flex items-center justify-between dark:bg-dark-container  dark:border-dark-border">

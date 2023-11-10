@@ -284,7 +284,95 @@ export default function TrackTimeModal({
     setScheduledEvents(scheduledEvents);
   };
 
-  const handleKey = (event) => {
+  const handleKey = (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    callback: (value: string) => void | undefined = undefined
+  ) => {
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+
+      if (!callback) return;
+
+      const input = event.target as HTMLInputElement;
+      const value = input.value;
+
+      if (value.length < 5) return;
+
+      if (input.selectionStart === 0 && input.selectionEnd === value.length) {
+        input.selectionStart = value.length;
+        input.selectionEnd = value.length;
+      }
+
+      const cursorPosition = input.selectionStart;
+      const currentTime = value;
+      let [hours, minutes] = currentTime.split(":").map(Number);
+
+      const changeMinutesAndHours = (
+        eventKey: string,
+        minutes: number,
+        hours: number
+      ) => {
+        let newMinutes = minutes;
+        let newHours = hours;
+
+        if (eventKey === "ArrowUp") {
+          newMinutes += 15;
+        } else if (eventKey === "ArrowDown") {
+          newMinutes -= 15;
+        }
+
+        if (newMinutes < 0) {
+          newHours = changeHours(eventKey, hours);
+          newMinutes += 60;
+        } else if (newMinutes >= 60) {
+          newHours = changeHours(eventKey, hours);
+          newMinutes -= 60;
+        }
+
+        return [newMinutes, newHours];
+      };
+
+      const changeHours = (eventKey: string, hours: number) => {
+        let newHours = hours;
+
+        if (eventKey === "ArrowUp") {
+          newHours += 1;
+        } else if (eventKey === "ArrowDown") {
+          newHours -= 1;
+        }
+
+        if (newHours < 0) {
+          newHours = 23;
+        } else if (newHours >= 24) {
+          newHours = 0;
+        }
+
+        return newHours;
+      };
+
+      if (cursorPosition > 2) {
+        const [newMinutes, newHours] = changeMinutesAndHours(
+          event.key,
+          minutes,
+          hours
+        );
+        minutes = newMinutes;
+        hours = newHours;
+      } else {
+        hours = changeHours(event.key, hours);
+      }
+
+      const adjustedTime =
+        hours.toString().padStart(2, "0") +
+        ":" +
+        minutes.toString().padStart(2, "0");
+
+      input.value = adjustedTime;
+      input.selectionStart = cursorPosition;
+      input.selectionEnd = cursorPosition;
+      callback(adjustedTime);
+    }
+
     if (event.ctrlKey && event.key === "Enter") {
       event.preventDefault();
       onSave(event);
@@ -358,7 +446,7 @@ export default function TrackTimeModal({
                       From
                     </label>
                     <input
-                      onKeyDown={(event: FormEvent) => handleKey(event)}
+                      onKeyDown={(event) => handleKey(event, setFrom)}
                       required
                       value={from}
                       onChange={onFromChange}
@@ -386,7 +474,7 @@ export default function TrackTimeModal({
                       To
                     </label>
                     <input
-                      onKeyDown={(event: FormEvent) => handleKey(event)}
+                      onKeyDown={(event) => handleKey(event, setTo)}
                       required
                       value={to}
                       onChange={onToChange}
@@ -414,7 +502,7 @@ export default function TrackTimeModal({
                       Duration
                     </label>
                     <input
-                      onKeyDown={(event: FormEvent) => handleKey(event)}
+                      onKeyDown={(event) => handleKey(event)}
                       onChange={onDurationChange}
                       onBlur={onDurationBlur}
                       onFocus={selectText}
@@ -478,9 +566,9 @@ export default function TrackTimeModal({
                   </div>
                 </div>
               </div>
-              <div className="mt-6">
-                <div className="flex gap-3 justify-between">
-                  <div className="flex gap-3 justify-start">
+              <div className="mt-6 flex justify-end">
+                <div className="flex gap-3">
+                  {/* <div className="flex gap-3 justify-start">
                     {checkIsToday(selectedDate) &&
                       (loggedGoogleUsers?.length > 0 ||
                         office365Users?.length > 0) && (
@@ -493,8 +581,8 @@ export default function TrackTimeModal({
                           }
                         />
                       )}
-                  </div>
-                  <div className="flex gap-3 justify-end">
+                  </div> */}
+                  <div className="flex gap-3">
                     <Button
                       text="Cancel"
                       type={"button"}
