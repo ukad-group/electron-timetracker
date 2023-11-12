@@ -80,6 +80,27 @@ export const getPlannerTokens = async (authCode: string, options: Options) => {
   return response.json();
 };
 
+export const getRefreshedPlannerToken = async (
+  refreshToken: string,
+  options: Options
+) => {
+  const { clientId, clientSecret, scope } = options;
+  const response = await fetch(
+    "https://login.microsoftonline.com/22c676eb-cbe8-4058-b9da-f58799142fbe/oauth2/v2.0/token",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}&grant_type=refresh_token&scope=${scope}`,
+    }
+  );
+
+  if (!response.ok) throw new Error();
+
+  return response.json();
+};
+
 export const getTimetrackerHolidays = async (token: string) => {
   const currentYear = new Date().getFullYear().toString();
 
@@ -95,7 +116,15 @@ export const getTimetrackerHolidays = async (token: string) => {
     }
   );
 
-  if (!response.ok) throw new Error();
+  if (!response.ok) {
+    const authStatus = response.headers.get("www-authenticate");
+
+    if (authStatus?.includes("invalid_token")) {
+      return "invalid_token";
+    } else {
+      throw new Error();
+    }
+  }
 
   return response.json();
 };
@@ -115,7 +144,15 @@ export const getTimetrackerVacations = async (token: string, email: string) => {
     }
   );
 
-  if (!response.ok) throw new Error();
+  if (!response.ok) {
+    const authStatus = response.headers.get("www-authenticate");
+
+    if (authStatus?.includes("invalid_token")) {
+      return "invalid_token";
+    } else {
+      throw new Error();
+    }
+  }
 
   return response.json();
 };

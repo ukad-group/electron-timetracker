@@ -1,4 +1,4 @@
-import { WorkHoursReport } from "../components/Calendar/Calendar";
+import { FormattedReport, DayOff } from "../components/Calendar/Calendar";
 
 export function checkIsToday(date: Date): boolean {
   const now = new Date();
@@ -41,7 +41,7 @@ export function getDateFromString(dateString: string) {
 }
 
 export function getMonthWorkHours(
-  monthReports: WorkHoursReport[],
+  monthReports: FormattedReport[],
   calendarDate: Date
 ) {
   const currentYear = calendarDate.getFullYear();
@@ -55,6 +55,35 @@ export function getMonthWorkHours(
     if (report.date.includes(query)) acc += report.workDurationMs;
     return acc;
   }, 0);
+}
+
+export function getMonthRequiredHours(calendarDate: Date, daysOff: DayOff[]) {
+  const lastDayOfMonth = new Date(
+    calendarDate.getFullYear(),
+    calendarDate.getMonth() + 1,
+    0
+  );
+
+  let totalWorkHours = 0;
+
+  for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+    const monthDay = new Date(
+      calendarDate.getFullYear(),
+      calendarDate.getMonth(),
+      i
+    );
+
+    const isWeekend = monthDay.getDay() === 0 || monthDay.getDay() === 6;
+    const dayOff = daysOff.find((day) => isTheSameDates(monthDay, day.date));
+
+    if (!isWeekend && !dayOff) {
+      totalWorkHours += 8;
+    } else if (dayOff && dayOff?.hours !== 8) {
+      totalWorkHours += 8 - dayOff.hours; // detect not a full dayOff
+    }
+  }
+
+  return totalWorkHours * 3600000;
 }
 
 export function getCeiledTime() {

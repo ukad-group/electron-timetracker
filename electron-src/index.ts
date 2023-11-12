@@ -27,6 +27,7 @@ import {
   getAzureAuthUrl,
   getAzureAuthUrlAdditional,
   getAzureTokens,
+  getRefreshedPlannerToken,
   getTimetrackerCookie,
   getTimetrackerHolidays,
   getTimetrackerProjects,
@@ -593,6 +594,23 @@ ipcMain.handle(
         "api://d7d02680-bd82-47ed-95f9-e977ab5f0487/access_as_user offline_access",
     };
     return await getAzureTokens(authCode, optionsWithPlannerScope);
+  }
+);
+
+ipcMain.handle(
+  "timetracker:refresh-planner-token",
+  async (event, refreshToken: string) => {
+    const options = getOffice365Options();
+
+    const optionsWithPlannerScope = {
+      ...options,
+      scope:
+        "api://d7d02680-bd82-47ed-95f9-e977ab5f0487/access_as_user offline_access",
+    };
+    return await getRefreshedPlannerToken(
+      refreshToken,
+      optionsWithPlannerScope
+    );
   }
 );
 
