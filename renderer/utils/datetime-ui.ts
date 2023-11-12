@@ -78,8 +78,8 @@ export function getMonthRequiredHours(calendarDate: Date, daysOff: DayOff[]) {
 
     if (!isWeekend && !dayOff) {
       totalWorkHours += 8;
-    } else if (dayOff && dayOff?.hours !== 8) {
-      totalWorkHours += 8 - dayOff.hours; // detect not a full dayOff
+    } else if (dayOff && dayOff?.duration !== 8) {
+      totalWorkHours += 8 - dayOff.duration; // detect not a full dayOff
     }
   }
 

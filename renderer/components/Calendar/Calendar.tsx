@@ -10,6 +10,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { ExclamationCircleIcon } from "@heroicons/react/24/solid";
+import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 import {
   formatDuration,
   parseReport,
@@ -62,7 +63,8 @@ export type FormattedReport = {
 
 export type DayOff = {
   date: Date;
-  hours: number;
+  duration: number;
+  description: string;
 };
 
 export function Calendar({
@@ -95,88 +97,6 @@ export function Calendar({
   const monthRequiredHours = useMemo(() => {
     return formatDuration(getMonthRequiredHours(calendarDate, daysOff));
   }, [daysOff, calendarDate]);
-
-  const loadHolidaysAndVacations = async () => {
-    console.log("Load holidays");
-    try {
-      const timetrackerUserInfo = JSON.parse(
-        localStorage.getItem("timetracker-user")
-      );
-      const plannerToken = timetrackerUserInfo?.accessToken;
-      const userPromises = [];
-
-      const holidaysPromise = global.ipcRenderer.invoke(
-        "timetracker:get-holidays",
-        plannerToken
-      );
-
-      const userEmail = timetrackerUserInfo?.email;
-      const vacationsPromise = global.ipcRenderer.invoke(
-        "timetracker:get-vacations",
-        plannerToken,
-        userEmail
-      );
-
-      userPromises.push(...[holidaysPromise, vacationsPromise]);
-
-      const userFetchedData = await Promise.all(userPromises);
-
-      if (userFetchedData.includes("invalid_token")) {
-        const refreshToken = timetrackerUserInfo?.refreshToken;
-
-        const refreshedPlannerCreds = await global.ipcRenderer.invoke(
-          "timetracker:refresh-planner-token",
-          refreshToken
-        );
-
-        const refreshedUserInfo = {
-          ...timetrackerUserInfo,
-          accessToken: refreshedPlannerCreds?.access_token,
-        };
-
-        localStorage.setItem(
-          "timetracker-user",
-          JSON.stringify(refreshedUserInfo)
-        );
-        loadHolidaysAndVacations();
-        return;
-      }
-
-      const holidays = userFetchedData[0];
-      const vacationsAndSickdays = userFetchedData[1]?.periods;
-      const userDaysOff: DayOff[] = [];
-
-      holidays.forEach((item) => {
-        userDaysOff.push({
-          date: new Date(item?.dateFrom),
-          hours: item?.quantity,
-        });
-      });
-
-      vacationsAndSickdays.forEach((item) => {
-        userDaysOff.push({
-          date: new Date(item?.dateFrom),
-          hours: item?.quantity,
-        });
-      });
-
-      setDaysOff(userDaysOff);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    loadHolidaysAndVacations();
-
-    global.ipcRenderer.on("window-restored", () => {
-      loadHolidaysAndVacations();
-    });
-
-    return () => {
-      global.ipcRenderer.removeAllListeners("window-restored");
-    };
-  }, [calendarDate]);
 
   useEffect(() => {
     try {
@@ -232,12 +152,96 @@ export function Calendar({
           isValid: activities.every((report: ReportActivity) => report.isValid === true),
         };
       });
+
       setFormattedQuarterReports(fromattedReports);
     } catch (err) {
       console.log("Error details ", err)
       setRenderError({errorTitle:"Calendar error", errorMessage:"An error occurred when validating reports for the last month. "})
     }
-  }, [parsedQuarterReports]);
+  }, [parsedQuarterReports, daysOff]);
+
+  const loadHolidaysAndVacations = async () => {
+    try {
+      const timetrackerUserInfo = JSON.parse(
+        localStorage.getItem("timetracker-user")
+      );
+      const plannerToken = timetrackerUserInfo?.accessToken;
+      const userPromises = [];
+
+      const holidaysPromise = global.ipcRenderer.invoke(
+        "timetracker:get-holidays",
+        plannerToken
+      );
+
+      const userEmail = timetrackerUserInfo?.email;
+      const vacationsPromise = global.ipcRenderer.invoke(
+        "timetracker:get-vacations",
+        plannerToken,
+        userEmail
+      );
+
+      userPromises.push(...[holidaysPromise, vacationsPromise]);
+
+      const userFetchedData = await Promise.all(userPromises);
+
+      if (userFetchedData.includes("invalid_token")) {
+        const refreshToken = timetrackerUserInfo?.refreshToken;
+
+        const refreshedPlannerCreds = await global.ipcRenderer.invoke(
+          "timetracker:refresh-planner-token",
+          refreshToken
+        );
+
+        const refreshedUserInfo = {
+          ...timetrackerUserInfo,
+          accessToken: refreshedPlannerCreds?.access_token,
+        };
+
+        localStorage.setItem(
+          "timetracker-user",
+          JSON.stringify(refreshedUserInfo)
+        );
+        loadHolidaysAndVacations();
+        return;
+      }
+
+      const holidays = userFetchedData[0];
+      const vacationsAndSickdays = userFetchedData[1]?.periods;
+      const userDaysOff: DayOff[] = [];
+
+      holidays.forEach((item) => {
+        userDaysOff.push({
+          date: new Date(item?.dateFrom),
+          duration: item?.quantity,
+          description: item?.description,
+        });
+      });
+
+      vacationsAndSickdays.forEach((item) => {
+        userDaysOff.push({
+          date: new Date(item?.dateFrom),
+          duration: item?.quantity,
+          description: item?.description,
+        });
+      });
+
+      setDaysOff(userDaysOff);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    loadHolidaysAndVacations();
+
+    global.ipcRenderer.on("window-restored", () => {
+      loadHolidaysAndVacations();
+    });
+
+    return () => {
+      global.ipcRenderer.removeAllListeners("window-restored");
+    };
+  }, [calendarDate]);
 
   const getCalendarApi = () => calendarRef.current.getApi();
 
@@ -287,6 +291,31 @@ export function Calendar({
     );
   };
 
+  const handleDayCellContent = (info) => {
+    const userDayOff = daysOff.find((day) =>
+      isTheSameDates(info.date, day.date)
+    );
+
+    if (userDayOff) {
+      const description = userDayOff?.description
+        ? userDayOff.description
+        : "Holiday, vacation or sickday";
+      const duration =
+        userDayOff?.duration === 8 ? "all day" : userDayOff?.duration + "h";
+      return (
+        <div>
+          {info.dayNumberText}
+          <CalendarDaysIcon
+            className="absolute top-[30px] right-[2px] w-5 h-5"
+            title={`${description}, ${duration}`}
+          />
+        </div>
+      );
+    } else {
+      return info.dayNumberText;
+    }
+  };
+
   if (renderError.errorMessage && renderError.errorTitle) {
     return <ErrorPlaceholder {...renderError} />;
   }
@@ -330,6 +359,7 @@ export function Calendar({
         weekNumbers={true}
         weekNumberContent={weekNumberContent}
         height="auto"
+        dayCellContent={handleDayCellContent}
       />
     </div>
   );
