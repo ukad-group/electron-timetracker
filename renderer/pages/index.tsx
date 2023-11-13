@@ -44,29 +44,13 @@ export default function Home() {
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
-
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
-
-  useEffect(() => {
-    const checkDayChange = () => {
-      const currentDay = new Date().getDate();
-      if (currentDay !== lastRenderedDay) {
-        setLastRenderedDay(currentDay);
-        setSelectedDate(new Date())
-      }
-    };
-
-    const intervalId = setInterval(checkDayChange, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [lastRenderedDay]);
-
+  const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const [theme, setTheme] = useThemeStore(
     (state) => [state.theme, state.setTheme],
     shallow
   );
 
-  const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   function handleThemeChange(e) {
     if (e.matches) {
       setIsOSDarkTheme(true);
@@ -74,6 +58,20 @@ export default function Home() {
       setIsOSDarkTheme(false);
     }
   }
+
+  useEffect(() => {
+    const checkDayChange = () => {
+      const currentDay = new Date().getDate();
+      if (currentDay !== lastRenderedDay) {
+        setLastRenderedDay(currentDay);
+        setSelectedDate(new Date());
+      }
+    };
+
+    const intervalId = setInterval(checkDayChange, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [lastRenderedDay]);
 
   useEffect(() => {
     window
@@ -132,12 +130,15 @@ export default function Home() {
   }, [selectedDate, reportsFolder, lastRenderedDay]);
 
   useEffect(() => {
-    if (selectedDateReport) {
-      setReportAndNotes(parseReport(selectedDateReport));
-      const activities = parseReport(selectedDateReport)[0];
-      setSelectedDateActivities(activities);
+    if (selectedDateReport.length > 0) {
+      const parsedReportsAndNotes = parseReport(selectedDateReport);
+      const parsedActivities = parsedReportsAndNotes[0];
+
+      setReportAndNotes(parsedReportsAndNotes);
+      setSelectedDateActivities(parsedActivities);
       return;
     }
+
     setSelectedDateActivities([]);
   }, [selectedDateReport]);
 
@@ -150,6 +151,7 @@ export default function Home() {
           (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined")
             ? ""
             : reportAndNotes[1]);
+
         saveSerializedReport(serializedReport);
         setShouldAutosave(false);
       }

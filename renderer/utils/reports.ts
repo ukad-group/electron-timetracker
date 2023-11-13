@@ -143,6 +143,7 @@ export function parseReport(fileContent: string) {
 
 export function serializeReport(activities: Array<Partial<ReportActivity>>) {
   let report = "";
+  
   try {
     for (const [i, activity] of activities.entries()) {
       const parts: Array<string> = [activity.from];
@@ -169,6 +170,7 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
         activity.to ? (report += `${activity.to} - \n`) : "";
       }
     }
+
     return report;
   } catch (err) {
     global.ipcRenderer.send(

@@ -1,7 +1,17 @@
 import clsx from "clsx";
-import { useMemo, useEffect, useState, Dispatch, SetStateAction } from "react";
-import { ReportActivity, formatDuration, validation } from "../utils/reports";
-import { checkIsToday, getCeiledTime } from "../utils/datetime-ui";
+import { useMemo, useEffect, useState } from "react";
+import {
+  ReportActivity,
+  calcDurationBetweenTimes,
+  formatDuration,
+  validation,
+} from "../utils/reports";
+import {
+  checkIsToday,
+  getCeiledTime,
+  getTimeFromGoogleObj,
+  padStringToMinutes,
+} from "../utils/datetime-ui";
 import TimeBadge from "../components/ui/TimeBadge";
 import {
   Square2StackIcon,
@@ -9,24 +19,40 @@ import {
 } from "@heroicons/react/24/outline";
 import Tooltip from "./ui/Tooltip/Tooltip";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { concatSortArrays } from "../utils/utils";
+import {
+  checkAlreadyAddedGoogleEvents,
+  concatSortArrays,
+} from "../utils/utils";
+import {
+  getGoogleEvents,
+  updateGoogleCredentials,
+} from "../API/googleCalendarAPI";
+import { googleCalendarEventsParsing as parseGoogleCalendarEvents } from "./google-calendar/GoogleCalendarEventsParsing";
+import Loader from "./ui/Loader";
 
 type ActivitiesTableProps = {
-  activities: Array<ReportActivity>;
+  activities: ReportActivity[];
   onEditActivity: (activity: ReportActivity) => void;
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
-  formattedGoogleEvents: ReportActivity[];
+  availableProjects: string[];
 };
-const msPerHour = 60 * 60 * 1000;
+
+const MS_PER_HOUR = 60 * 60 * 1000;
+
 export default function ActivitiesTable({
   activities,
   onEditActivity,
-  onDeleteActivity,
   selectedDate,
-  formattedGoogleEvents,
+  availableProjects,
 }: ActivitiesTableProps) {
   const [ctrlPressed, setCtrlPressed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [tableActivities, setTableActivities] = useState([]);
+  const [showedGoogleEvents, setShowedGoogleEvents] = useState([]);
+  const isShowGoogleEvents = JSON.parse(
+    localStorage.getItem("showGoogleEvents")
+  );
   const nonBreakActivities = useMemo(() => {
     return validation(activities.filter((activity) => !activity.isBreak));
   }, [activities]);
@@ -37,11 +63,111 @@ export default function ActivitiesTable({
     }, 0);
   }, [nonBreakActivities]);
 
-  const tableActivities = useMemo(() => {
-    return formattedGoogleEvents && formattedGoogleEvents.length > 0
-      ? concatSortArrays(nonBreakActivities, formattedGoogleEvents)
-      : nonBreakActivities;
-  }, [nonBreakActivities, formattedGoogleEvents]);
+  const loadGoogleEvents = async (
+    accessToken: string,
+    refreshToken: string,
+    index: number
+  ) => {
+    try {
+      const data = await getGoogleEvents(accessToken);
+
+      // detect expired token
+      if (data?.error && data?.error?.code === 401) {
+        const updatedCredentials = await updateGoogleCredentials(refreshToken);
+        const newAccessToken = updatedCredentials?.access_token;
+        const usersLs = JSON.parse(localStorage.getItem("googleUsers"));
+
+        usersLs[index].googleAccessToken = newAccessToken;
+        localStorage.setItem("googleUsers", JSON.stringify(usersLs));
+
+        return "expired-token";
+      }
+
+      return data?.items;
+    } catch (error) {
+      console.error(error);
+
+      return [];
+    }
+  };
+
+  const loadGoogleEventsFromAllUsers = async (users) => {
+    const userPromises = users.map((user, i) =>
+      loadGoogleEvents(user.googleAccessToken, user.googleRefreshToken, i)
+    );
+    const userEvents = await Promise.all(userPromises);
+
+    if (userEvents.includes("expired-token")) {
+      const updatedUsersLs = JSON.parse(localStorage.getItem("googleUsers"));
+      loadGoogleEventsFromAllUsers(updatedUsersLs);
+      return;
+    }
+
+    const flattenedEvents = userEvents.flat();
+    return flattenedEvents;
+    // const storedGoogleEvents = JSON.parse(localStorage.getItem("googleEvents"));
+
+    // if (storedGoogleEvents === null) {
+    //   localStorage.setItem("googleEvents", JSON.stringify(flattenedEvents));
+    //   return flattenedEvents;
+    // }
+
+    // const checkedGoogleEvents = checkAlreadyAddedGoogleEvents(
+    //   storedGoogleEvents,
+    //   flattenedEvents
+    // ).filter((gEvent) => gEvent?.start?.dateTime && gEvent?.end?.dateTime);
+
+    // localStorage.setItem("googleEvents", JSON.stringify(checkedGoogleEvents));
+    // return checkedGoogleEvents;
+  };
+
+  const formatGoogleEvents = (events) => {
+    if (events.length === 0) return;
+
+    const formattedEvents = events.map((event) => {
+      const { start, end } = event;
+      const from = getTimeFromGoogleObj(start.dateTime);
+      const to = getTimeFromGoogleObj(end.dateTime);
+
+      event = parseGoogleCalendarEvents(event, availableProjects);
+
+      return {
+        from: from,
+        to: to,
+        duration: calcDurationBetweenTimes(from, to),
+        project: event.project || "",
+        activity: event.activity || "",
+        description: event.description || "",
+        isValid: true,
+        calendarId: event.id,
+      };
+    });
+
+    return formattedEvents;
+  };
+
+  const getActualGoogleEvents = (events) => {
+    if (!events.length) return [];
+
+    const actualEvents = events.filter((event) => {
+      const { end } = event;
+      const to = getTimeFromGoogleObj(end.dateTime);
+      const isOverlapped = activities.some((activity) => {
+        return padStringToMinutes(activity.to) >= padStringToMinutes(to);
+      });
+
+      if (
+        !event?.isAdded &&
+        event?.start?.dateTime &&
+        event?.end?.dateTime &&
+        !isOverlapped
+      ) {
+        return event;
+      }
+    });
+
+    return actualEvents;
+  };
 
   const copyToClipboardHandle = (e) => {
     const cell = e.target;
@@ -109,11 +235,74 @@ export default function ActivitiesTable({
       }
     }
   };
+
   const handleKeyUp = (event) => {
     if (event.key === "Control" || event.key === "Meta") {
       setCtrlPressed(false);
     }
   };
+
+  const editActivityHandler = (activity) => {
+    if (activity.calendarId) {
+      onEditActivity({
+        ...activity,
+        id: null,
+      });
+      global.ipcRenderer.send("send-analytics-data", "registrations", {
+        registration: "google-calendar-event_registration",
+      });
+      global.ipcRenderer.send("send-analytics-data", "registrations", {
+        registration: `all_calendar-events_registration`,
+      });
+    } else {
+      onEditActivity(activity);
+    }
+  };
+
+  const getFormattedGoogleEvents = async (users) => {
+    const googleEvents = await loadGoogleEventsFromAllUsers(users);
+    const actualGoogleEvents = getActualGoogleEvents(googleEvents);
+    return formatGoogleEvents(actualGoogleEvents);
+  };
+
+  useEffect(() => {
+    let isAvailable = true;
+
+    if (checkIsToday(selectedDate) && isShowGoogleEvents) {
+      setIsLoading(true);
+
+      (async () => {
+        const googleUsers = JSON.parse(localStorage.getItem("googleUsers"));
+
+        if (googleUsers) {
+          const formattedGoogleEvents = await getFormattedGoogleEvents(
+            googleUsers
+          );
+
+          isAvailable && setShowedGoogleEvents(formattedGoogleEvents);
+          setIsLoading(false);
+        }
+      })();
+    } else {
+      setShowedGoogleEvents([]);
+    }
+
+    return () => {
+      isAvailable = false;
+    };
+  }, [selectedDate, activities]);
+
+  useEffect(() => {
+    let allActivities;
+
+    if (showedGoogleEvents && showedGoogleEvents.length > 0) {
+      allActivities = concatSortArrays(nonBreakActivities, showedGoogleEvents);
+    } else {
+      allActivities = nonBreakActivities;
+    }
+
+    setTableActivities(allActivities);
+  }, [nonBreakActivities, showedGoogleEvents]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -281,30 +470,7 @@ export default function ActivitiesTable({
               <button
                 className="group py-4 px-3"
                 title={activity.calendarId ? "Add" : "Edit"}
-                onClick={() => {
-                  if (activity.calendarId) {
-                    onEditActivity({
-                      ...activity,
-                      id: null,
-                    });
-                    global.ipcRenderer.send(
-                      "send-analytics-data",
-                      "registrations",
-                      {
-                        registration: "google-calendar-event_registration",
-                      }
-                    );
-                    global.ipcRenderer.send(
-                      "send-analytics-data",
-                      "registrations",
-                      {
-                        registration: `all_calendar-events_registration`,
-                      }
-                    );
-                  } else {
-                    onEditActivity(activity);
-                  }
-                }}
+                onClick={() => editActivityHandler(activity)}
               >
                 {!activity.calendarId && (
                   <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
@@ -317,6 +483,16 @@ export default function ActivitiesTable({
             </td>
           </tr>
         ))}
+        {isLoading && (
+          <tr>
+            <td
+              className="px-3 py-4 w-full text-center"
+              colSpan={6}
+            >
+              <Loader />
+            </td>
+          </tr>
+        )}
         <tr>
           <td className="py-4 px-3 text-sm whitespace-nowrap">
             <p>Total</p>
@@ -333,11 +509,13 @@ export default function ActivitiesTable({
             className="px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap"
             colSpan={4}
           >
-            <TimeBadge
-              hours={totalDuration / msPerHour}
-              startTime={tableActivities[0].from}
-              selectedDate={selectedDate}
-            />
+            {tableActivities.length > 0 && (
+              <TimeBadge
+                hours={totalDuration / MS_PER_HOUR}
+                startTime={tableActivities[0].from}
+                selectedDate={selectedDate}
+              />
+            )}
           </td>
         </tr>
       </tbody>
