@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
+import isOnline from "is-online";
 
 function extractTokenFromString(inputString: string) {
   const parts = inputString.split("#");
@@ -22,8 +23,14 @@ const TrelloConnection = () => {
     JSON.parse(localStorage.getItem("trello-user")) || null
   );
 
-  const handleSignInButton = () => {
-    global.ipcRenderer.send("trello:login");
+  const handleSignInButton = async () => {
+    const online = await isOnline();
+
+    if (online) {
+      global.ipcRenderer.send("trello:login");
+    } else {
+      global.ipcRenderer.send("app:load-offline-page");
+    }
   };
 
   const handleSignOutButton = () => {

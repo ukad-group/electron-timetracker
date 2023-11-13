@@ -469,6 +469,10 @@ ipcMain.handle(
   }
 );
 
+ipcMain.on("app:load-offline-page", async () => {
+  mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
+});
+
 // TRELLO FUNCTIONS
 
 const getTrelloOptions = () => {
