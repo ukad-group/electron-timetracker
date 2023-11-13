@@ -302,6 +302,7 @@ export function Calendar({
         : "Holiday, vacation or sickday";
       const duration =
         userDayOff?.duration === 8 ? "all day" : userDayOff?.duration + "h";
+
       return (
         <div>
           {info.dayNumberText}
