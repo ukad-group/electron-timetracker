@@ -9,7 +9,7 @@ import {
 import {
   checkIsToday,
   getCeiledTime,
-  getTimeFromGoogleObj,
+  getTimeFromEventObj,
   padStringToMinutes,
 } from "../utils/datetime-ui";
 import TimeBadge from "../components/ui/TimeBadge";
@@ -22,13 +22,11 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import {
   checkAlreadyAddedGoogleEvents,
   concatSortArrays,
+  parseEventTitle,
 } from "../utils/utils";
-import {
-  getGoogleEvents,
-  updateGoogleCredentials,
-} from "../API/googleCalendarAPI";
-import { googleCalendarEventsParsing as parseGoogleCalendarEvents } from "./google-calendar/GoogleCalendarEventsParsing";
 import Loader from "./ui/Loader";
+import { loadGoogleEventsFromAllUsers } from "../utils/google";
+import { getOffice365Events } from "../utils/office365";
 
 type ActivitiesTableProps = {
   activities: ReportActivity[];
@@ -49,9 +47,11 @@ export default function ActivitiesTable({
   const [ctrlPressed, setCtrlPressed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [tableActivities, setTableActivities] = useState([]);
-  const [showedGoogleEvents, setShowedGoogleEvents] = useState([]);
   const isShowGoogleEvents = JSON.parse(
     localStorage.getItem("showGoogleEvents")
+  );
+  const isShowOffice365Events = JSON.parse(
+    localStorage.getItem("showOffice365Events")
   );
   const nonBreakActivities = useMemo(() => {
     return validation(activities.filter((activity) => !activity.isBreak));
@@ -63,73 +63,15 @@ export default function ActivitiesTable({
     }, 0);
   }, [nonBreakActivities]);
 
-  const loadGoogleEvents = async (
-    accessToken: string,
-    refreshToken: string,
-    index: number
-  ) => {
-    try {
-      const data = await getGoogleEvents(accessToken);
-
-      // detect expired token
-      if (data?.error && data?.error?.code === 401) {
-        const updatedCredentials = await updateGoogleCredentials(refreshToken);
-        const newAccessToken = updatedCredentials?.access_token;
-        const usersLs = JSON.parse(localStorage.getItem("googleUsers"));
-
-        usersLs[index].googleAccessToken = newAccessToken;
-        localStorage.setItem("googleUsers", JSON.stringify(usersLs));
-
-        return "expired-token";
-      }
-
-      return data?.items;
-    } catch (error) {
-      console.error(error);
-
-      return [];
-    }
-  };
-
-  const loadGoogleEventsFromAllUsers = async (users) => {
-    const userPromises = users.map((user, i) =>
-      loadGoogleEvents(user.googleAccessToken, user.googleRefreshToken, i)
-    );
-    const userEvents = await Promise.all(userPromises);
-
-    if (userEvents.includes("expired-token")) {
-      const updatedUsersLs = JSON.parse(localStorage.getItem("googleUsers"));
-      loadGoogleEventsFromAllUsers(updatedUsersLs);
-      return;
-    }
-
-    const flattenedEvents = userEvents.flat();
-    return flattenedEvents;
-    // const storedGoogleEvents = JSON.parse(localStorage.getItem("googleEvents"));
-
-    // if (storedGoogleEvents === null) {
-    //   localStorage.setItem("googleEvents", JSON.stringify(flattenedEvents));
-    //   return flattenedEvents;
-    // }
-
-    // const checkedGoogleEvents = checkAlreadyAddedGoogleEvents(
-    //   storedGoogleEvents,
-    //   flattenedEvents
-    // ).filter((gEvent) => gEvent?.start?.dateTime && gEvent?.end?.dateTime);
-
-    // localStorage.setItem("googleEvents", JSON.stringify(checkedGoogleEvents));
-    // return checkedGoogleEvents;
-  };
-
-  const formatGoogleEvents = (events) => {
-    if (events.length === 0) return;
+  const formatEvents = (events) => {
+    if (events.length === 0) return [];
 
     const formattedEvents = events.map((event) => {
       const { start, end } = event;
-      const from = getTimeFromGoogleObj(start.dateTime);
-      const to = getTimeFromGoogleObj(end.dateTime);
+      const from = getTimeFromEventObj(start.dateTime);
+      const to = getTimeFromEventObj(end.dateTime);
 
-      event = parseGoogleCalendarEvents(event, availableProjects);
+      event = parseEventTitle(event, availableProjects);
 
       return {
         from: from,
@@ -146,12 +88,12 @@ export default function ActivitiesTable({
     return formattedEvents;
   };
 
-  const getActualGoogleEvents = (events) => {
+  const getActualEvents = (events) => {
     if (!events.length) return [];
 
     const actualEvents = events.filter((event) => {
       const { end } = event;
-      const to = getTimeFromGoogleObj(end.dateTime);
+      const to = getTimeFromEventObj(end.dateTime);
       const isOverlapped = activities.some((activity) => {
         return padStringToMinutes(activity.to) >= padStringToMinutes(to);
       });
@@ -259,50 +201,39 @@ export default function ActivitiesTable({
     }
   };
 
-  const getFormattedGoogleEvents = async (users) => {
-    const googleEvents = await loadGoogleEventsFromAllUsers(users);
-    const actualGoogleEvents = getActualGoogleEvents(googleEvents);
-    return formatGoogleEvents(actualGoogleEvents);
-  };
-
   useEffect(() => {
     let isAvailable = true;
 
-    if (checkIsToday(selectedDate) && isShowGoogleEvents) {
-      setIsLoading(true);
-
+    if (checkIsToday(selectedDate)) {
       (async () => {
-        const googleUsers = JSON.parse(localStorage.getItem("googleUsers"));
+        setIsLoading(true);
 
-        if (googleUsers) {
-          const formattedGoogleEvents = await getFormattedGoogleEvents(
-            googleUsers
-          );
+        const googleEvents = isShowGoogleEvents
+          ? await loadGoogleEventsFromAllUsers()
+          : [];
+        const office365Events = isShowOffice365Events
+          ? await getOffice365Events()
+          : [];
+        const allEvents = [...googleEvents, ...office365Events];
+        const actualEvents = getActualEvents(allEvents);
+        const formattedEvents = formatEvents(actualEvents);
+        const allActivities = concatSortArrays(
+          nonBreakActivities,
+          formattedEvents
+        );
 
-          isAvailable && setShowedGoogleEvents(formattedGoogleEvents);
-          setIsLoading(false);
-        }
+        isAvailable && setTableActivities(allActivities);
+
+        setIsLoading(false);
       })();
     } else {
-      setShowedGoogleEvents([]);
+      setTableActivities(nonBreakActivities);
     }
 
     return () => {
       isAvailable = false;
     };
-  }, [selectedDate, activities]);
-
-  useEffect(() => {
-    let allActivities;
-
-    if (showedGoogleEvents && showedGoogleEvents.length > 0) {
-      allActivities = concatSortArrays(nonBreakActivities, showedGoogleEvents);
-    } else {
-      allActivities = nonBreakActivities;
-    }
-
-    setTableActivities(allActivities);
-  }, [nonBreakActivities, showedGoogleEvents]);
+  }, [selectedDate, nonBreakActivities]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -362,133 +293,137 @@ export default function ActivitiesTable({
         </tr>
       </thead>
       <tbody className="text-gray-500 dark:text-slate-400">
-        {tableActivities.map((activity, i) => (
-          <tr
-            key={i}
-            className={clsx(`border-b border-gray-200 dark:border-gray-300 `, {
-              "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
-                tableActivities[i].to != tableActivities[i + 1]?.from &&
-                i + 1 !== tableActivities.length &&
-                !activity.calendarId,
-              "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
-            })}
-          >
-            <td
-              className={`relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
-                activity.calendarId ? "opacity-50" : ""
-              }`}
-            >
-              {ctrlPressed && (
-                <span className="absolute -left-4 text-blue-700">{i + 1}</span>
+        {!isLoading &&
+          tableActivities.length > 0 &&
+          tableActivities?.map((activity, i) => (
+            <tr
+              key={i}
+              className={clsx(
+                `border-b border-gray-200 dark:border-gray-300 `,
+                {
+                  "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
+                    tableActivities[i].to != tableActivities[i + 1]?.from &&
+                    i + 1 !== tableActivities.length &&
+                    !activity.calendarId,
+                  "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
+                }
               )}
-              <span
-                className={clsx({
-                  "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
-                    !activity.isValid,
-                })}
+            >
+              <td
+                className={`relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
+                  activity.calendarId ? "opacity-50" : ""
+                }`}
               >
-                {activity.from} - {activity.to}
-              </span>
-            </td>
-            <td
-              className={`px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
-                activity.calendarId ? "opacity-50" : ""
-              }`}
-            >
-              <Tooltip>
-                <p data-column="duration" onClick={copyToClipboardHandle}>
-                  {formatDuration(activity.duration)}
-                </p>
-              </Tooltip>
-            </td>
-            <td
-              className={`flex flex-col px-3 py-4 ${
-                activity.calendarId ? "opacity-50" : ""
-              }`}
-            >
-              <Tooltip>
-                <p
-                  className="text-sm font-medium text-gray-900 dark:text-dark-heading"
-                  onClick={copyToClipboardHandle}
-                >
-                  {activity.project}
-                </p>
-              </Tooltip>
-              {activity.activity && (
-                <Tooltip>
-                  <p
-                    className="block text-xs  font-semibold mt-1"
-                    onClick={copyToClipboardHandle}
-                  >
-                    {activity.activity}
-                  </p>
-                </Tooltip>
-              )}
-            </td>
-            <td
-              className={`px-3 py-4 text-sm ${
-                activity.calendarId ? "opacity-50" : ""
-              }`}
-            >
-              <Tooltip>
-                <p
-                  onClick={copyToClipboardHandle}
-                  className={clsx({
-                    "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800":
-                      activity.mistakes?.includes("startsWith!"),
-                  })}
-                >
-                  {activity.description}
-                </p>
-                {activity.mistakes?.includes("startsWith!") && (
-                  <span className="block text-xs mt-1">
-                    Perhaps you wanted to report a break
+                {ctrlPressed && (
+                  <span className="absolute -left-4 text-blue-700">
+                    {i + 1}
                   </span>
                 )}
-              </Tooltip>
-            </td>
-            <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              <div className={`${activity.calendarId ? "invisible" : ""}`}>
+                <span
+                  className={clsx({
+                    "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
+                      !activity.isValid,
+                  })}
+                >
+                  {activity.from} - {activity.to}
+                </span>
+              </td>
+              <td
+                className={`px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
+                  activity.calendarId ? "opacity-50" : ""
+                }`}
+              >
+                <Tooltip>
+                  <p data-column="duration" onClick={copyToClipboardHandle}>
+                    {formatDuration(activity.duration)}
+                  </p>
+                </Tooltip>
+              </td>
+              <td
+                className={`flex flex-col px-3 py-4 ${
+                  activity.calendarId ? "opacity-50" : ""
+                }`}
+              >
+                <Tooltip>
+                  <p
+                    className="text-sm font-medium text-gray-900 dark:text-dark-heading"
+                    onClick={copyToClipboardHandle}
+                  >
+                    {activity.project}
+                  </p>
+                </Tooltip>
+                {activity.activity && (
+                  <Tooltip>
+                    <p
+                      className="block text-xs  font-semibold mt-1"
+                      onClick={copyToClipboardHandle}
+                    >
+                      {activity.activity}
+                    </p>
+                  </Tooltip>
+                )}
+              </td>
+              <td
+                className={`px-3 py-4 text-sm ${
+                  activity.calendarId ? "opacity-50" : ""
+                }`}
+              >
+                <Tooltip>
+                  <p
+                    onClick={copyToClipboardHandle}
+                    className={clsx({
+                      "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800":
+                        activity.mistakes?.includes("startsWith!"),
+                    })}
+                  >
+                    {activity.description}
+                  </p>
+                  {activity.mistakes?.includes("startsWith!") && (
+                    <span className="block text-xs mt-1">
+                      Perhaps you wanted to report a break
+                    </span>
+                  )}
+                </Tooltip>
+              </td>
+              <td className="relative text-sm font-medium text-right whitespace-nowrap">
+                <div className={`${activity.calendarId ? "invisible" : ""}`}>
+                  <button
+                    className="group py-4 px-3"
+                    title="Copy"
+                    onClick={() => {
+                      onEditActivity({
+                        ...activity,
+                        id: null,
+                        from: activities[activities.length - 2].to,
+                        to: checkIsToday(selectedDate) ? getCeiledTime() : "",
+                        duration: null,
+                      });
+                    }}
+                  >
+                    <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                  </button>
+                </div>
+              </td>
+              <td className="relative text-sm font-medium text-right whitespace-nowrap">
                 <button
                   className="group py-4 px-3"
-                  title="Copy"
-                  onClick={() => {
-                    onEditActivity({
-                      ...activity,
-                      id: null,
-                      from: activities[activities.length - 2].to,
-                      to: checkIsToday(selectedDate) ? getCeiledTime() : "",
-                      duration: null,
-                    });
-                  }}
+                  title={activity.calendarId ? "Add" : "Edit"}
+                  onClick={() => editActivityHandler(activity)}
                 >
-                  <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                </button>
-              </div>
-            </td>
-            <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              <button
-                className="group py-4 px-3"
-                title={activity.calendarId ? "Add" : "Edit"}
-                onClick={() => editActivityHandler(activity)}
-              >
-                {!activity.calendarId && (
-                  <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                )}
+                  {!activity.calendarId && (
+                    <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                  )}
 
-                {activity.calendarId && (
-                  <PlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                )}
-              </button>
-            </td>
-          </tr>
-        ))}
+                  {activity.calendarId && (
+                    <PlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                  )}
+                </button>
+              </td>
+            </tr>
+          ))}
         {isLoading && (
           <tr>
-            <td
-              className="px-3 py-4 w-full text-center"
-              colSpan={6}
-            >
+            <td className="px-3 py-4 w-full text-center" colSpan={6}>
               <Loader />
             </td>
           </tr>

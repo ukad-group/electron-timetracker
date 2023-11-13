@@ -13,6 +13,7 @@ const Office365Connection = () => {
   const [users, setUsers] = useState(
     JSON.parse(localStorage.getItem("office365-users")) || []
   );
+  const [showEventsInTable, setShowEventsInTable] = useState(false);
 
   const handleSignInButton = () => {
     global.ipcRenderer.send("office365:login");
@@ -27,6 +28,7 @@ const Office365Connection = () => {
       localStorage.setItem("office365-users", JSON.stringify(filteredUsers));
     } else {
       localStorage.removeItem("office365-users");
+      localStorage.removeItem("showOffice365Events");
     }
 
     setUsers(filteredUsers);
@@ -74,6 +76,14 @@ const Office365Connection = () => {
     setUsers(newUsers);
   };
 
+  const handleCheckboxChange = () => {
+    localStorage.setItem(
+      "showOffice365Events",
+      (!showEventsInTable).toString()
+    );
+    setShowEventsInTable(!showEventsInTable);
+  };
+
   useEffect(() => {
     if (
       window.location.search.includes("code") &&
@@ -81,6 +91,10 @@ const Office365Connection = () => {
       !window.location.search.includes("error")
     ) {
       (async () => addUser())();
+    }
+
+    if (localStorage.getItem("showOffice365Events") === "true") {
+      setShowEventsInTable(true);
     }
   }, []);
 
@@ -142,6 +156,21 @@ const Office365Connection = () => {
         You can authorize with a work, or personal Microsoft account (e.g.
         Skype, Xbox)
       </p>
+      {users.length > 0 && (
+        <div className="flex items-start justify-between gap-6 w-full">
+          <p className=" max-w-sm text-sm text-gray-500 dark:text-dark-main">
+            Show Office365 events in activity table
+          </p>
+          <div>
+            <input
+              onChange={handleCheckboxChange}
+              className="w-4 h-4"
+              type="checkbox"
+              checked={showEventsInTable}
+            ></input>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
