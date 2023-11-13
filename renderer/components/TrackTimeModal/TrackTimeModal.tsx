@@ -380,7 +380,7 @@ export default function TrackTimeModal({
   };
 
   return (
-    <Transition.Root show={isOpen} as={Fragment}>
+    <Transition.Root appear={true} show={isOpen} as={Fragment}>
       <Dialog
         as="div"
         className="fixed inset-0 z-10 overflow-y-auto"
