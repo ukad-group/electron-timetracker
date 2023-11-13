@@ -64,6 +64,7 @@ export default function TrackTimeModal({
     shallow
   );
   const [latestProjects, setLatestProjects] = useState([]);
+  const [webTrackerProjects, setWebTrackerProjects] = useState([]);
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -133,11 +134,10 @@ export default function TrackTimeModal({
   useEffect(() => {
     addSuggestions(activities, latestProjAndDesc, latestProjAndAct);
     const tempProj = Object.keys(latestProjAndAct);
-    if (localStorage.getItem("year-projects")) {
-      const yearProj = localStorage.getItem("year-projects").split(",");
-      for (let i = 0; i < yearProj.length; i++) {
-        if (!tempProj.includes(yearProj[i])) {
-          tempProj.push(yearProj[i]);
+    if (webTrackerProjects) {
+      for (let i = 0; i < webTrackerProjects.length; i++) {
+        if (!tempProj.includes(webTrackerProjects[i])) {
+          tempProj.push(webTrackerProjects[i]);
         }
       }
     }
@@ -170,6 +170,17 @@ export default function TrackTimeModal({
 
   useEffect(() => {
     if (trelloUser) (async () => getTrelloCards())();
+    const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+    if (userInfo) {
+      const timetrackerCookie = userInfo.TTCookie;
+      (async () => {
+        const timtrackerProjects = await global.ipcRenderer.invoke(
+          "timetracker:get-projects",
+          timetrackerCookie
+        );
+        setWebTrackerProjects(timtrackerProjects);
+      })();
+    }
   }, []);
 
   const onSave = (e: FormEvent | MouseEvent) => {
