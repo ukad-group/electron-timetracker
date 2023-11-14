@@ -212,7 +212,7 @@ const Totals = ({ activities }) => {
                 <Tooltip>
                   <button
                     className="group"
-                    title="Copy descriptions"
+                    title="Copy project descriptions"
                     onClick={() => copyDescriptionsHandler(total.descriptions)}
                   >
                     <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
@@ -240,7 +240,7 @@ const Totals = ({ activities }) => {
                         <Tooltip>
                           <button
                             className="group"
-                            title="Copy descriptions"
+                            title="Copy activity descriptions"
                             onClick={() => {
                               copyDescriptionsHandler(activity.descriptions);
                             }}
