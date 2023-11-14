@@ -91,6 +91,9 @@ export default function ActivitiesTable({
   const getActualEvents = (events) => {
     if (!events.length) return [];
 
+    const storedAddedEventsIds =
+      JSON.parse(localStorage.getItem("addedEventsIds")) || [];
+
     const actualEvents = events.filter((event) => {
       const { end } = event;
       const to = getTimeFromEventObj(end.dateTime);
@@ -98,8 +101,10 @@ export default function ActivitiesTable({
         return padStringToMinutes(activity.to) >= padStringToMinutes(to);
       });
 
+      const isAdded = storedAddedEventsIds.some((id) => id === event.id);
+
       if (
-        !event?.isAdded &&
+        !isAdded &&
         event?.start?.dateTime &&
         event?.end?.dateTime &&
         !isOverlapped

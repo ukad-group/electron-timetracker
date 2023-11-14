@@ -4,7 +4,6 @@ import ActivitiesTable from "./ActivitiesTable";
 import { ReportActivity } from "../utils/reports";
 import { ErrorPlaceholder, RenderError } from "./ui/ErrorPlaceholder";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { useGoogleCalendarStore } from "../store/googleCalendarStore";
 import { checkIsToday } from "../utils/datetime-ui";
 
 type ActivitiesSectionProps = {

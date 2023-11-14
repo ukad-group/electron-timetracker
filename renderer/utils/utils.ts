@@ -51,22 +51,22 @@ export const concatSortArrays = (
   return combinedArray;
 };
 
-export const markActivityAsAdded = (
-  gEvents: GoogleEvent[],
-  editedActivity: ReportActivity | "new"
-) => {
-  return gEvents.map((gEvent) => {
-    if (editedActivity === "new") {
-      return gEvent;
-    }
+// export const markActivityAsAdded = (
+//   gEvents: GoogleEvent[],
+//   editedActivity: ReportActivity | "new"
+// ) => {
+//   return gEvents.map((gEvent) => {
+//     if (editedActivity === "new") {
+//       return gEvent;
+//     }
 
-    if (gEvent?.id === editedActivity?.calendarId) {
-      gEvent.isAdded = true;
-    }
+//     if (gEvent?.id === editedActivity?.calendarId) {
+//       gEvent.isAdded = true;
+//     }
 
-    return gEvent;
-  });
-};
+//     return gEvent;
+//   });
+// };
 
 export function parseEventTitle(event, availableProjects: Array<string>) {
   const { summary } = event; // Google

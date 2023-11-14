@@ -44,19 +44,6 @@ export const loadGoogleEventsFromAllUsers = async () => {
   }
 
   const flattenedEvents = userEvents.flat();
+
   return flattenedEvents;
-  // const storedGoogleEvents = JSON.parse(localStorage.getItem("googleEvents"));
-
-  // if (storedGoogleEvents === null) {
-  //   localStorage.setItem("googleEvents", JSON.stringify(flattenedEvents));
-  //   return flattenedEvents;
-  // }
-
-  // const checkedGoogleEvents = checkAlreadyAddedGoogleEvents(
-  //   storedGoogleEvents,
-  //   flattenedEvents
-  // ).filter((gEvent) => gEvent?.start?.dateTime && gEvent?.end?.dateTime);
-
-  // localStorage.setItem("googleEvents", JSON.stringify(checkedGoogleEvents));
-  // return checkedGoogleEvents;
 };

@@ -181,7 +181,7 @@ export default function Home() {
     const activityIndex = selectedDateActivities.findIndex(
       (act) => act.id === activity.id
     );
-
+      
     // if (activity.project === "delete") {
     //   setSelectedDateActivities((activities) => {
     //     if (activities.length === activityIndex + 2 && !activityIndex) {
@@ -249,6 +249,7 @@ export default function Home() {
           }
 
           activities[activityIndex] = activity;
+
           if (activities[activityIndex + 1].isBreak) {
             activities.splice(activityIndex + 1, 1);
           } else if (
@@ -268,6 +269,7 @@ export default function Home() {
           return [...activities];
         }
       });
+
       isEdit = true;
     }
 
@@ -285,6 +287,7 @@ export default function Home() {
           isPastTime = true;
         }
         if (!i && newActFrom < indexActFrom) {
+          
           tempActivities.push(...selectedDateActivities);
           break;
         }

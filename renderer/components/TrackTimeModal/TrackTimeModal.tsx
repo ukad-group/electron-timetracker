@@ -16,11 +16,7 @@ import Button from "../ui/Button";
 import { shallow } from "zustand/shallow";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { useScheduledEventsStore } from "../../store/googleEventsStore";
-import AddEventBtn, { Event } from "../AddEventBtn";
-import {
-  markActivityAsAdded,
-  replaceHyphensWithSpaces,
-} from "../../utils/utils";
+import { replaceHyphensWithSpaces } from "../../utils/utils";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -54,15 +50,12 @@ export default function TrackTimeModal({
   const [isTypingFromDuration, setIsTypingFromDuration] = useState(false);
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [trelloTasks, setTrelloTasks] = useState([]);
-  const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
-  const loggedGoogleUsers = JSON.parse(localStorage.getItem("googleUsers"));
-  const office365Users =
-    JSON.parse(localStorage.getItem("office365-users")) || [];
+  // const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const trelloUser = JSON.parse(localStorage.getItem("trello-user")) || null;
-  const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
-    (state) => [state.event, state.setEvent],
-    shallow
-  );
+  // const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
+  //   (state) => [state.event, state.setEvent],
+  //   shallow
+  // );
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -162,17 +155,20 @@ export default function TrackTimeModal({
   }, []);
 
   const onSave = (e: FormEvent | MouseEvent) => {
-    let dashedDescription = description;
     e.preventDefault();
+
+    let dashedDescription = description;
 
     if (isFormInvalid) {
       setIsValidationEnabled(true);
       return;
     }
+
     if (description.includes(" - ")) {
       setDescription(description.replace(/ - /g, " -- "));
       dashedDescription = description.replace(/ - /g, " -- ");
     }
+
     submitActivity({
       id: editedActivity === "new" ? null : editedActivity.id,
       from,
@@ -184,41 +180,58 @@ export default function TrackTimeModal({
       calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
     });
 
-    if (
-      scheduledEvents[dashedDescription] &&
-      !scheduledEvents[dashedDescription].project
-    ) {
-      scheduledEvents[dashedDescription].project = project;
-    }
-    if (
-      scheduledEvents[dashedDescription] &&
-      scheduledEvents[dashedDescription].activity !== activity
-    ) {
-      scheduledEvents[dashedDescription].activity = activity || "";
-    }
-
-    setScheduledEvents(scheduledEvents);
-    if (googleEvents.length > 0 && editedActivity !== "new") {
-      const arrayWithMarkedActivty = markActivityAsAdded(
-        googleEvents,
-        editedActivity
-      );
-
-      const arrayWithPrefilledValue = arrayWithMarkedActivty.map((gEvent) => {
-        if (gEvent.summary === editedActivity.description) {
-          if (project) gEvent.project = project;
-          if (activity) gEvent.activity = activity;
-        }
-
-        return gEvent;
-      });
+    if (editedActivity !== "new" && editedActivity.calendarId.length > 0) {
+      const storedAddedEventsIds =
+        JSON.parse(localStorage.getItem("addedEventsIds")) || [];
+      const uniqueIds = new Set([
+        ...storedAddedEventsIds,
+        editedActivity.calendarId,
+      ]);
 
       localStorage.setItem(
-        "googleEvents",
-        JSON.stringify(arrayWithPrefilledValue)
+        "addedEventsIds",
+        JSON.stringify(Array.from(uniqueIds))
       );
-      setGoogleEvents(arrayWithPrefilledValue);
     }
+
+    // if (
+    //   scheduledEvents[dashedDescription] &&
+    //   !scheduledEvents[dashedDescription].project
+    // ) {
+    //   scheduledEvents[dashedDescription].project = project;
+    // }
+
+    // if (
+    //   scheduledEvents[dashedDescription] &&
+    //   scheduledEvents[dashedDescription].activity !== activity
+    // ) {
+    //   scheduledEvents[dashedDescription].activity = activity || "";
+    // }
+
+    // setScheduledEvents(scheduledEvents);
+
+    // if (googleEvents.length > 0 && editedActivity !== "new") {
+    //   const arrayWithMarkedActivty = markActivityAsAdded(
+    //     googleEvents,
+    //     editedActivity
+    //   );
+
+    //   const arrayWithPrefilledValue = arrayWithMarkedActivty.map((gEvent) => {
+    //     if (gEvent.summary === editedActivity.description) {
+    //       if (project) gEvent.project = project;
+    //       if (activity) gEvent.activity = activity;
+    //     }
+
+    //     return gEvent;
+    //   });
+
+    //   localStorage.setItem(
+    //     "googleEvents",
+    //     JSON.stringify(arrayWithPrefilledValue)
+    //   );
+    //   setGoogleEvents(arrayWithPrefilledValue);
+    // }
+
     global.ipcRenderer.send("send-analytics-data", "registrations", {
       registration: "time_registrations",
     });
@@ -259,30 +272,30 @@ export default function TrackTimeModal({
     e.target.select();
   };
 
-  const addEventToList = (event: Event) => {
-    const { from, to, project, activity, description } = event;
-    let dashedDescription = description;
-    if (description.includes(" - ")) {
-      setDescription(description.replace(" - ", " -- "));
-      dashedDescription = description.replace(" - ", " -- ");
-    }
-    if (scheduledEvents[dashedDescription]) {
-      setProject(scheduledEvents[dashedDescription].project);
-      setActivity(activity || scheduledEvents[dashedDescription].activity);
-    }
-    if (!scheduledEvents[dashedDescription]) {
-      setProject(project || "");
-      setActivity(activity || "");
-      scheduledEvents[dashedDescription] = { project: "", activity: "" };
-      scheduledEvents[dashedDescription].project = project || "";
-      scheduledEvents[dashedDescription].activity = activity || "";
-    }
+  // const addEventToList = (event: Event) => {
+  //   const { from, to, project, activity, description } = event;
+  //   let dashedDescription = description;
+  //   if (description.includes(" - ")) {
+  //     setDescription(description.replace(" - ", " -- "));
+  //     dashedDescription = description.replace(" - ", " -- ");
+  //   }
+  //   if (scheduledEvents[dashedDescription]) {
+  //     setProject(scheduledEvents[dashedDescription].project);
+  //     setActivity(activity || scheduledEvents[dashedDescription].activity);
+  //   }
+  //   if (!scheduledEvents[dashedDescription]) {
+  //     setProject(project || "");
+  //     setActivity(activity || "");
+  //     scheduledEvents[dashedDescription] = { project: "", activity: "" };
+  //     scheduledEvents[dashedDescription].project = project || "";
+  //     scheduledEvents[dashedDescription].activity = activity || "";
+  //   }
 
-    setFrom(from.time || "");
-    setTo(to.time || "");
-    setDescription(dashedDescription || "");
-    setScheduledEvents(scheduledEvents);
-  };
+  //   setFrom(from.time || "");
+  //   setTo(to.time || "");
+  //   setDescription(dashedDescription || "");
+  //   setScheduledEvents(scheduledEvents);
+  // };
 
   const handleKey = (
     event: React.KeyboardEvent<HTMLInputElement>,
