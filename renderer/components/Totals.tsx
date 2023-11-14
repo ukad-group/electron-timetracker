@@ -34,6 +34,9 @@ const Totals = ({ activities }) => {
       if (!curr.project || curr.project.startsWith("!")) return acc;
 
       const existingTotal = acc.find((item) => item.name === curr.project);
+      const name = curr.activity
+        ? `${curr.activity} - ${curr.description}`
+        : curr.description;
 
       if (!existingTotal) {
         acc.push({
@@ -43,7 +46,7 @@ const Totals = ({ activities }) => {
           descriptions: [
             {
               id: curr.id,
-              name: curr.description,
+              name: name,
               duration: curr.duration,
             },
           ],
@@ -53,7 +56,7 @@ const Totals = ({ activities }) => {
         existingTotal.duration += curr.duration;
 
         const existingDescription = existingTotal.descriptions.find(
-          (desc) => desc.name === curr.description
+          (desc) => desc.name === name
         );
 
         if (existingDescription) {
@@ -61,7 +64,7 @@ const Totals = ({ activities }) => {
         } else {
           existingTotal.descriptions.push({
             id: curr.id,
-            name: curr.description,
+            name: name,
             duration: curr.duration,
           });
         }
@@ -136,10 +139,10 @@ const Totals = ({ activities }) => {
   const copyDescriptionsHandler = (descriptions: Description[]) => {
     const formattedDescriptions = descriptions.reduce(
       (acc: string[], curr: Description) => {
-        const name = curr.name ? curr.name : "EMPTY DESCRIPTION";
+        const name = curr.name ? curr.name : "";
         const duration = convertMillisecondsToTime(curr.duration);
 
-        acc.push(`${name}(${duration})`);
+        acc.push(`${name} (${duration})`);
 
         return acc;
       },
@@ -180,18 +183,28 @@ const Totals = ({ activities }) => {
         <div className="flex flex-col gap-1 pt-2">
           {totals.map((total) => (
             <div key={total.id}>
-              <div className="flex items-center gap-2 text-sm text-gray-700 font-semibold cursor-pointer dark:text-dark-main">
+              <div
+                className={clsx(
+                  "flex items-center gap-2 text-sm text-gray-700 font-semibold  dark:text-dark-main",
+                  { "cursor-pointer": total.activities.length > 1 }
+                )}
+              >
                 <div
-                  className="flex items-center gap-1 hover:text-gray-400 dark:hover:text-white"
+                  className={clsx("flex items-center gap-1 ml-5", {
+                    "hover:text-gray-400 dark:hover:text-white ml-0":
+                      total.activities.length > 1,
+                  })}
                   onClick={() => {
                     toggleActivitiesList(total.name);
                   }}
                 >
-                  <ChevronRightIcon
-                    className={clsx("w-4 h-4", {
-                      "rotate-90": isShowedActivitiesList(total.name),
-                    })}
-                  />
+                  {total.activities.length > 1 && (
+                    <ChevronRightIcon
+                      className={clsx("w-4 h-4", {
+                        "rotate-90": isShowedActivitiesList(total.name),
+                      })}
+                    />
+                  )}
                   <span>
                     {total.name} - {formatDuration(total.duration)}
                   </span>
@@ -207,35 +220,38 @@ const Totals = ({ activities }) => {
                 </Tooltip>
               </div>
 
-              {isShowedActivitiesList(total.name) && (
-                <div className="flex flex-col">
-                  {total.activities.map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="flex items-center gap-2 text-sm text-gray-700 font-semibold dark:text-dark-main"
-                    >
-                      <div className="flex items-center gap-1 ml-6">
-                        <span>
-                          &#8226;{" "}
-                          {activity.name ? activity.name : "empty activity"} -{" "}
-                          {formatDuration(activity.duration)}
-                        </span>
+              {isShowedActivitiesList(total.name) &&
+                total.activities.length > 1 && (
+                  <div className="flex flex-col">
+                    {total.activities.map((activity) => (
+                      <div
+                        key={activity.id}
+                        className="flex items-center gap-2 text-sm text-gray-700 font-semibold dark:text-dark-main"
+                      >
+                        <div className="flex items-center gap-1 ml-6">
+                          <span>
+                            &#8226;{" "}
+                            {activity.name
+                              ? activity.name
+                              : "without filled activity"}{" "}
+                            - {formatDuration(activity.duration)}
+                          </span>
+                        </div>
+                        <Tooltip>
+                          <button
+                            className="group"
+                            title="Copy descriptions"
+                            onClick={() => {
+                              copyDescriptionsHandler(activity.descriptions);
+                            }}
+                          >
+                            <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                          </button>
+                        </Tooltip>
                       </div>
-                      <Tooltip>
-                        <button
-                          className="group"
-                          title="Copy descriptions"
-                          onClick={() => {
-                            copyDescriptionsHandler(activity.descriptions);
-                          }}
-                        >
-                          <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                        </button>
-                      </Tooltip>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
             </div>
           ))}
         </div>
