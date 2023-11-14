@@ -17,9 +17,11 @@ type ActivitiesTableProps = {
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
   formattedGoogleEvents: ReportActivity[];
+  newProjects: Array<string>;
 };
 const msPerHour = 60 * 60 * 1000;
 export default function ActivitiesTable({
+  newProjects,
   activities,
   onEditActivity,
   onDeleteActivity,
@@ -38,9 +40,15 @@ export default function ActivitiesTable({
   }, [nonBreakActivities]);
 
   const tableActivities = useMemo(() => {
+    const badgedActivities = nonBreakActivities.map((activity) => {
+      if (newProjects.includes(activity.project)) {
+        return { ...activity, isNewProject: true };
+      }
+      return activity;
+    });
     return formattedGoogleEvents && formattedGoogleEvents.length > 0
-      ? concatSortArrays(nonBreakActivities, formattedGoogleEvents)
-      : nonBreakActivities;
+      ? concatSortArrays(badgedActivities, formattedGoogleEvents)
+      : badgedActivities;
   }, [nonBreakActivities, formattedGoogleEvents]);
 
   const copyToClipboardHandle = (e) => {
@@ -152,12 +160,12 @@ export default function ActivitiesTable({
           <th scope="col" className="pb-6 px-3 text-left text-sm font-semibold">
             Description
           </th>
-          {/* <th
+          <th
             scope="col"
             className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
           >
-            <span className="sr-only">Delete</span>
-          </th> */}
+            <span className="sr-only">Badge</span>
+          </th>
           <th
             scope="col"
             className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
@@ -245,7 +253,7 @@ export default function ActivitiesTable({
                 <p
                   onClick={copyToClipboardHandle}
                   className={clsx({
-                    "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800":
+                    "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20":
                       activity.mistakes?.includes("startsWith!"),
                   })}
                 >
@@ -257,6 +265,13 @@ export default function ActivitiesTable({
                   </span>
                 )}
               </Tooltip>
+            </td>
+            <td className="relative font-medium text-right whitespace-nowrap text-xs ">
+              {activity.isNewProject && (
+                <p className="text-center px-2.5 py-1 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20">
+                  New <br /> project!
+                </p>
+              )}
             </td>
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
               <div className={`${activity.calendarId ? "invisible" : ""}`}>

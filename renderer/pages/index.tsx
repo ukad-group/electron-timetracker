@@ -44,15 +44,15 @@ export default function Home() {
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
-
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
+  const [newProjects, setNewProjects] = useState([]);
 
   useEffect(() => {
     const checkDayChange = () => {
       const currentDay = new Date().getDate();
       if (currentDay !== lastRenderedDay) {
         setLastRenderedDay(currentDay);
-        setSelectedDate(new Date())
+        setSelectedDate(new Date());
       }
     };
 
@@ -328,7 +328,15 @@ export default function Home() {
       );
       console.log(activity);
     }
-
+    if (activity.isNewProject) {
+      setNewProjects((projs) => {
+        const newProjActivity = tempActivities.filter(
+          (act) => act.isNewProject
+        );
+        projs.push(newProjActivity[0].project);
+        return projs;
+      });
+    }
     setShouldAutosave(true);
   };
 
@@ -366,6 +374,7 @@ export default function Home() {
                 <section className="flex-grow">
                   <div className="bg-white shadow sm:rounded-lg h-full dark:bg-dark-container dark:border dark:border-dark-border">
                     <ActivitiesSection
+                      newProjects={newProjects}
                       activities={selectedDateActivities}
                       onEditActivity={setTrackTimeModalActivity}
                       onDeleteActivity={onDeleteActivity}

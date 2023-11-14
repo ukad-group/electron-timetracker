@@ -204,6 +204,7 @@ export default function TrackTimeModal({
       activity,
       description: dashedDescription,
       calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
+      isNewProject: latestProjects.includes(project) ? false : true,
     });
 
     if (

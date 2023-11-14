@@ -20,6 +20,7 @@ type ActivitiesSectionProps = {
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
   availableProjects: Array<string>;
+  newProjects: Array<string>;
 };
 
 type PlaceholderProps = {
@@ -33,6 +34,7 @@ export default function ActivitiesSection({
   onDeleteActivity,
   selectedDate,
   availableProjects,
+  newProjects,
 }: ActivitiesSectionProps) {
   const [backgroundError, setBackgroundError] = useState("");
   const [renderError, setRenderError] = useState<RenderError>({
@@ -156,6 +158,7 @@ export default function ActivitiesSection({
       )}
       <div className="px-4 py-5 sm:px-6">
         <ActivitiesTable
+          newProjects={newProjects}
           onEditActivity={onEditActivity}
           activities={activities}
           onDeleteActivity={onDeleteActivity}
