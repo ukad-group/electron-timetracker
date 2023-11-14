@@ -174,11 +174,15 @@ export default function TrackTimeModal({
     if (userInfo) {
       const timetrackerCookie = userInfo.TTCookie;
       (async () => {
-        const timtrackerProjects = await global.ipcRenderer.invoke(
-          "timetracker:get-projects",
-          timetrackerCookie
-        );
-        setWebTrackerProjects(timtrackerProjects);
+        try {
+          const timtrackerProjects = await global.ipcRenderer.invoke(
+            "timetracker:get-projects",
+            timetrackerCookie
+          );
+          setWebTrackerProjects(timtrackerProjects);
+        } catch (error) {
+          console.log(error);
+        }
       })();
     }
   }, []);
