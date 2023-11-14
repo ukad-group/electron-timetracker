@@ -86,8 +86,8 @@ export default function ActivitiesTable({
       (event.ctrlKey && event.key === "ArrowUp") ||
       (event.key === "Meta" && event.key === "ArrowUp")
     ) {
-      if (nonBreakActivities.length > 0) {
-        const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
+      if (tableActivities.length > 0) {
+        const lastActivity = tableActivities[tableActivities.length - 1];
         onEditActivity(lastActivity);
       }
     }
@@ -100,9 +100,9 @@ export default function ActivitiesTable({
       /^[0-9]$/.test(event.key)
     ) {
       const number = parseInt(event.key, 10);
-      if (!firstKey && number >= 1 && number <= nonBreakActivities.length) {
+      if (!firstKey && number >= 1 && number <= tableActivities.length) {
         setFirstKey(event.key);
-        const selectedActivity = nonBreakActivities[Number(event.key) - 1];
+        const selectedActivity = tableActivities[Number(event.key) - 1];
         const firstTimerId = setTimeout(() => {
           if (selectedActivity.calendarId) {
             onEditActivity({
@@ -118,9 +118,9 @@ export default function ActivitiesTable({
       }
       if (Date.now() - firstKeyPressTime < 1000) {
         clearTimeout(firstTimerId);
-        if (nonBreakActivities[Number(firstKey + event.key) - 1]) {
+        if (tableActivities[Number(firstKey + event.key) - 1]) {
           const selectedActivity =
-            nonBreakActivities[Number(firstKey + event.key) - 1];
+            tableActivities[Number(firstKey + event.key) - 1];
           if (selectedActivity.calendarId) {
             onEditActivity({
               ...selectedActivity,
@@ -147,7 +147,7 @@ export default function ActivitiesTable({
       window.removeEventListener("keydown", handleKeyDown);
       window.addEventListener("keyup", handleKeyUp);
     };
-  }, [nonBreakActivities, firstKey]);
+  }, [nonBreakActivities, firstKey, tableActivities]);
 
   return (
     <table className="min-w-full divide-y divide-gray-300 table-fixed dark:divide-gray-600">
