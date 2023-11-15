@@ -118,11 +118,18 @@ export default function ActivitiesSection({
         console.log("Error data ", data);
       }
     );
-
+    global.ipcRenderer.on(
+      "actualization error",
+      (event, errorMessage, data) => {
+        setBackgroundError(errorMessage);
+        console.log("Error data ", data);
+      }
+    );
     return () => {
       document.removeEventListener("keydown", keydownHandler);
       global.ipcRenderer.removeAllListeners("background error");
       global.ipcRenderer.removeAllListeners("render error");
+      global.ipcRenderer.removeAllListeners("actualization error");
     };
   }, []);
 
