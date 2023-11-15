@@ -20,7 +20,7 @@ type AutocompleteProps = {
   tabIndex?: number;
   isValidationEnabled?: boolean;
   className?: string;
-  showLast: number;
+  showedSuggestionsNumber: number;
 };
 
 export default function AutocompleteSelector({
@@ -33,15 +33,15 @@ export default function AutocompleteSelector({
   required = false,
   tabIndex,
   isValidationEnabled,
-  showLast,
+  showedSuggestionsNumber,
 }: AutocompleteProps) {
   const inputRef = useRef(null);
 
   const filteredList =
     selectedItem === ""
       ? availableItems?.filter((activity, i) => {
-          if (showLast) {
-            return activity !== "" && i < showLast;
+          if (showedSuggestionsNumber) {
+            return activity !== "" && i < showedSuggestionsNumber;
           }
           return activity !== "";
         })
