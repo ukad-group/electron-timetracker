@@ -183,6 +183,7 @@ export default function TrackTimeModal({
           setWebTrackerProjects(userInfo.yearProjects);
         } catch (error) {
           global.ipcRenderer.send(
+            "front error",
             "fetch error",
             "Problems with fetching current projects from the Timetracker website. Please notify us of the error and reconnect to the Timetracker website in the settings. We are already working on fixing the connectivity issue. ",
             error
