@@ -563,7 +563,9 @@ export default function TrackTimeModal({
                       selectedItem={project}
                       setSelectedItem={setProject}
                       isValidationEnabled={isValidationEnabled}
-                      showLast={Object.keys(latestProjAndAct).length}
+                      showedSuggestionsNumber={
+                        Object.keys(latestProjAndAct).length
+                      }
                       tabIndex={4}
                     />
                   </div>
@@ -576,7 +578,7 @@ export default function TrackTimeModal({
                       }
                       selectedItem={activity}
                       setSelectedItem={setActivity}
-                      showLast={3}
+                      showedSuggestionsNumber={3}
                       tabIndex={5}
                     />
                   </div>
@@ -591,7 +593,7 @@ export default function TrackTimeModal({
                       }
                       selectedItem={description}
                       setSelectedItem={setDescription}
-                      showLast={3}
+                      showedSuggestionsNumber={3}
                       tabIndex={6}
                     />
                   </div>
