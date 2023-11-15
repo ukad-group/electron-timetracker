@@ -10,7 +10,11 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { ExclamationCircleIcon } from "@heroicons/react/24/solid";
-import { CalendarDaysIcon } from "@heroicons/react/24/outline";
+import {
+  CalendarDaysIcon,
+  FaceFrownIcon,
+  GlobeAltIcon,
+} from "@heroicons/react/24/outline";
 import {
   formatDuration,
   parseReport,
@@ -26,6 +30,7 @@ import {
   getStringDate,
   getWeekNumber,
   isTheSameDates,
+  extractDatesFromPeriod,
 } from "../../utils/datetime-ui";
 
 const months = [
@@ -65,6 +70,7 @@ export type DayOff = {
   date: Date;
   duration: number;
   description: string;
+  type: string;
 };
 
 export function Calendar({
@@ -158,7 +164,7 @@ export function Calendar({
       console.log("Error details ", err)
       setRenderError({errorTitle:"Calendar error", errorMessage:"An error occurred when validating reports for the last month. "})
     }
-  }, [parsedQuarterReports, daysOff]);
+  }, [parsedQuarterReports]);
 
   const loadHolidaysAndVacations = async () => {
     try {
@@ -209,20 +215,45 @@ export function Calendar({
       const vacationsAndSickdays = userFetchedData[1]?.periods;
       const userDaysOff: DayOff[] = [];
 
-      holidays.forEach((item) => {
+      holidays.forEach((holiday) => {
         userDaysOff.push({
-          date: new Date(item?.dateFrom),
-          duration: item?.quantity,
-          description: item?.description,
+          date: new Date(holiday?.dateFrom),
+          duration: holiday?.quantity,
+          description: holiday?.description,
+          type: "holiday",
         });
       });
 
       vacationsAndSickdays.forEach((item) => {
-        userDaysOff.push({
-          date: new Date(item?.dateFrom),
-          duration: item?.quantity,
-          description: item?.description,
-        });
+        const singleDayOff = isTheSameDates(
+          new Date(item.dateFrom),
+          new Date(item.dateTo)
+        );
+
+        if (singleDayOff) {
+          userDaysOff.push({
+            date: new Date(item?.dateFrom),
+            duration: item?.quantity,
+            description: item?.description,
+            type: item?.type === 1 ? "sickday" : "vacation",
+          });
+        } else {
+          const periodDates = extractDatesFromPeriod(item);
+          periodDates.forEach((date) => {
+            if (
+              userDaysOff.some((item) => isTheSameDates(item.date, date.date))
+            ) {
+              return;
+            }
+
+            userDaysOff.push({
+              date: date,
+              duration: item?.quantity,
+              description: item?.description,
+              type: item?.type === 1 ? "sickday" : "vacation",
+            });
+          });
+        }
       });
 
       setDaysOff(userDaysOff);
@@ -292,26 +323,52 @@ export function Calendar({
   };
 
   const handleDayCellContent = (info) => {
+    if (daysOff?.length === 0) {
+      return info.dayNumberText;
+    }
+
     const userDayOff = daysOff.find((day) =>
       isTheSameDates(info.date, day.date)
     );
 
     if (userDayOff) {
-      const description = userDayOff?.description
-        ? userDayOff.description
-        : "Holiday, vacation or sickday";
       const duration =
         userDayOff?.duration === 8 ? "all day" : userDayOff?.duration + "h";
 
-      return (
-        <div>
-          {info.dayNumberText}
-          <CalendarDaysIcon
-            className="absolute top-[30px] right-[2px] w-5 h-5"
-            title={`${description}, ${duration}`}
-          />
-        </div>
-      );
+      if (userDayOff?.type === "vacation") {
+        return (
+          <div>
+            {info.dayNumberText}
+            <CalendarDaysIcon
+              className="absolute top-[30px] right-[2px] w-5 h-5"
+              title={`Vacation, ${duration}`}
+            />
+          </div>
+        );
+      } else if (userDayOff?.type === "sickday") {
+        return (
+          <div>
+            {info.dayNumberText}
+            <FaceFrownIcon
+              className="absolute top-[30px] right-[2px] w-5 h-5"
+              title={`Sickday, ${duration}`}
+            />
+          </div>
+        );
+      } else if (userDayOff?.type === "holiday") {
+        const desciprion = userDayOff?.description
+          ? userDayOff?.description
+          : "Holiday";
+        return (
+          <div>
+            {info.dayNumberText}
+            <GlobeAltIcon
+              className="absolute top-[30px] right-[2px] w-5 h-5"
+              title={`${desciprion}, ${duration}`}
+            />
+          </div>
+        );
+      }
     } else {
       return info.dayNumberText;
     }

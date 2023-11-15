@@ -86,6 +86,30 @@ export function getMonthRequiredHours(calendarDate: Date, daysOff: DayOff[]) {
   return totalWorkHours * 3600000;
 }
 
+export function extractDatesFromPeriod(vacation) {
+  const dateStart = new Date(vacation.dateFrom);
+  const dateEnd = new Date(vacation.dateTo);
+  const vacationRange = generateDateRange(dateStart, dateEnd);
+
+  const datesWithoutWeekends = vacationRange.filter(
+    (date) => date.getDay() >= 1 && date.getDay() <= 5
+  );
+
+  return datesWithoutWeekends;
+}
+
+function generateDateRange(startDate, endDate) {
+  const dateRange = [];
+  let currentDate = new Date(startDate);
+
+  while (currentDate <= endDate) {
+    dateRange.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return dateRange;
+}
+
 export function getCeiledTime() {
   const now = new Date();
   const hours = now.getHours();
