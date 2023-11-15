@@ -175,13 +175,19 @@ export default function TrackTimeModal({
       const timetrackerCookie = userInfo.TTCookie;
       (async () => {
         try {
-          const timtrackerProjects = await global.ipcRenderer.invoke(
+          userInfo.yearProjects = await global.ipcRenderer.invoke(
             "timetracker:get-projects",
             timetrackerCookie
           );
-          setWebTrackerProjects(timtrackerProjects);
+          localStorage.setItem("timetracker-user", JSON.stringify(userInfo));
+          setWebTrackerProjects(userInfo.yearProjects);
         } catch (error) {
-          console.log(error);
+          global.ipcRenderer.send(
+            "fetch error",
+            "Problems with fetching current projects from the Timetracker website. Please notify us of the error and reconnect to the Timetracker website in the settings. We are already working on fixing the connectivity issue. ",
+            error
+          );
+          setWebTrackerProjects(userInfo.yearProjects);
         }
       })();
     }

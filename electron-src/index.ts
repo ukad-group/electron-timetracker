@@ -94,6 +94,10 @@ ipcMain.on("front error", (event, errorTitle, errorMessage, data) => {
   mainWindow?.webContents.send("render error", errorTitle, errorMessage, data);
 });
 
+ipcMain.on("fetch error", (event, errorTitle, errorMessage, data) => {
+  mainWindow?.webContents.send("actualization error", errorTitle, errorMessage, data);
+});
+
 const userDataDirectory = app.getPath("userData");
 let mainWindow: Electron.CrossProcessExports.BrowserWindow | null = null;
 const gotTheLock = app.requestSingleInstanceLock();
