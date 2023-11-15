@@ -29,7 +29,7 @@ export default function ActivitiesTable({
   const [ctrlPressed, setCtrlPressed] = useState(false);
   const [firstKey, setFirstKey] = useState(null);
   const [firstKeyPressTime, setFirstKeyPressTime] = useState(null);
-  const [firstTimerId, setFirstTimerId] = useState(null);
+  const [timerId, setTimerId] = useState(null);
   const nonBreakActivities = useMemo(() => {
     return validation(activities.filter((activity) => !activity.isBreak));
   }, [activities]);
@@ -100,10 +100,11 @@ export default function ActivitiesTable({
       /^[0-9]$/.test(event.key)
     ) {
       const number = parseInt(event.key, 10);
+
       if (!firstKey && number >= 1 && number <= tableActivities.length) {
         setFirstKey(event.key);
         const selectedActivity = tableActivities[Number(event.key) - 1];
-        const firstTimerId = setTimeout(() => {
+        const timerId = setTimeout(() => {
           if (selectedActivity.calendarId) {
             onEditActivity({
               ...selectedActivity,
@@ -112,23 +113,23 @@ export default function ActivitiesTable({
           } else {
             onEditActivity(selectedActivity);
           }
-        }, 700);
-        setFirstTimerId(firstTimerId);
+        }, 500);
+        setTimerId(timerId);
         setFirstKeyPressTime(Date.now());
       }
-      if (Date.now() - firstKeyPressTime < 1000) {
-        clearTimeout(firstTimerId);
-        if (tableActivities[Number(firstKey + event.key) - 1]) {
-          const selectedActivity =
-            tableActivities[Number(firstKey + event.key) - 1];
+
+      if (Date.now() - firstKeyPressTime < 500) {
+        clearTimeout(timerId);
+        const selectedActivity =
+          tableActivities[Number(firstKey + event.key) - 1];
+
+        if (selectedActivity) {
           if (selectedActivity.calendarId) {
             onEditActivity({
               ...selectedActivity,
               id: null,
             });
-          } else {
-            onEditActivity(selectedActivity);
-          }
+          } else onEditActivity(selectedActivity);
         }
       }
     }
@@ -147,7 +148,7 @@ export default function ActivitiesTable({
       window.removeEventListener("keydown", handleKeyDown);
       window.addEventListener("keyup", handleKeyUp);
     };
-  }, [nonBreakActivities, firstKey, tableActivities]);
+  }, [firstKey, tableActivities]);
 
   return (
     <table className="min-w-full divide-y divide-gray-300 table-fixed dark:divide-gray-600">
