@@ -79,8 +79,7 @@ export function parseReport(fileContent: string) {
 
       // should skip registraion when task starts from !
       const isBreak =
-        (!currentLine && i === lines.length - 2) ||
-        workingTimeRegex.test(currentLine);
+        !currentLine.trim().length || workingTimeRegex.test(currentLine);
 
       if (isBreak) {
         registration.project = currentLine;
@@ -160,7 +159,18 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
         parts.push("");
       }
 
-      report += `${parts.join(" - ")}\n`;
+      const notLastEmptyRegistration =
+        !activity.project &&
+        !activity.activity &&
+        !activity.description &&
+        i !== activities.length - 1;
+
+      if (notLastEmptyRegistration) {
+        report += `${parts.join(" - ")}!\n`;
+      } else {
+        report += `${parts.join(" - ")}\n`;
+      }
+
       const nextActivity = activities[i + 1];
       if (nextActivity && nextActivity.from !== activity.to) {
         activity.to ? (report += `${activity.to} - !\n`) : "";
