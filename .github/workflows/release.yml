@@ -127,6 +127,7 @@ jobs:
           files: |
             ./dist/*.exe
             ./dist/*.dmg
+            ./dist/*.deb
             ./dist/latest.yml
             ./dist/latest-mac.yml
             ./dist/latest-linux.yml
@@ -142,6 +143,7 @@ jobs:
           files: |
             ./dist/*.exe
             ./dist/*.dmg
+            ./dist/*.deb
             ./dist/beta.yml
             ./dist/beta-mac.yml
             ./dist/beta-linux.yml

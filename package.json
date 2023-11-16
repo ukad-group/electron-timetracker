@@ -28,6 +28,7 @@
     "releaseType": "release"
   },
   "build": {
+    "generateUpdatesFilesForAllChannels": true,
     "appId": "com.timetracker.autoupdater",
     "productName": "Timetracker",
     "artifactName": "${productName}-Setup-${version}.${ext}",
