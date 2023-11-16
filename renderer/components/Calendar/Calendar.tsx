@@ -231,11 +231,11 @@ export function Calendar({
   };
 
   const handleDayCellContent = (info) => {
-    if (daysOff?.length === 0) {
+    if (!daysOff || daysOff?.length === 0) {
       return info.dayNumberText;
     }
 
-    const userDayOff = daysOff.find((day) =>
+    const userDayOff = daysOff?.find((day) =>
       isTheSameDates(info.date, day.date)
     );
 
