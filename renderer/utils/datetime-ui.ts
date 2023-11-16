@@ -58,6 +58,8 @@ export function getMonthWorkHours(
 }
 
 export function getMonthRequiredHours(calendarDate: Date, daysOff: DayOff[]) {
+  if (!daysOff) return;
+
   const lastDayOfMonth = new Date(
     calendarDate.getFullYear(),
     calendarDate.getMonth() + 1,

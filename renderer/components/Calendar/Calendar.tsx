@@ -30,10 +30,10 @@ import {
   getStringDate,
   getWeekNumber,
   isTheSameDates,
-  extractDatesFromPeriod,
 } from "../../utils/datetime-ui";
+import { loadHolidaysAndVacations } from "./calendar-utils";
 
-const months = [
+const MONTHS = [
   "January",
   "February",
   "March",
@@ -86,7 +86,7 @@ export function Calendar({
     FormattedReport[]
   >([]);
   const calendarRef = useRef(null);
-  const currentReadableMonth = months[calendarDate.getMonth()];
+  const currentReadableMonth = MONTHS[calendarDate.getMonth()];
   const currentYear = calendarDate.getFullYear();
   const [daysOff, setDaysOff] = useState([]);
   const [renderError, setRenderError] = useState<RenderError>({
@@ -166,107 +166,15 @@ export function Calendar({
     }
   }, [parsedQuarterReports]);
 
-  const loadHolidaysAndVacations = async () => {
-    try {
-      const timetrackerUserInfo = JSON.parse(
-        localStorage.getItem("timetracker-user")
-      );
-      const plannerToken = timetrackerUserInfo?.accessToken;
-      const userPromises = [];
-
-      const holidaysPromise = global.ipcRenderer.invoke(
-        "timetracker:get-holidays",
-        plannerToken
-      );
-
-      const userEmail = timetrackerUserInfo?.email;
-      const vacationsPromise = global.ipcRenderer.invoke(
-        "timetracker:get-vacations",
-        plannerToken,
-        userEmail
-      );
-
-      userPromises.push(...[holidaysPromise, vacationsPromise]);
-
-      const userFetchedData = await Promise.all(userPromises);
-
-      if (userFetchedData.includes("invalid_token")) {
-        const refreshToken = timetrackerUserInfo?.refreshToken;
-
-        const refreshedPlannerCreds = await global.ipcRenderer.invoke(
-          "timetracker:refresh-planner-token",
-          refreshToken
-        );
-
-        const refreshedUserInfo = {
-          ...timetrackerUserInfo,
-          accessToken: refreshedPlannerCreds?.access_token,
-        };
-
-        localStorage.setItem(
-          "timetracker-user",
-          JSON.stringify(refreshedUserInfo)
-        );
-        loadHolidaysAndVacations();
-        return;
-      }
-
-      const holidays = userFetchedData[0];
-      const vacationsAndSickdays = userFetchedData[1]?.periods;
-      const userDaysOff: DayOff[] = [];
-
-      holidays.forEach((holiday) => {
-        userDaysOff.push({
-          date: new Date(holiday?.dateFrom),
-          duration: holiday?.quantity,
-          description: holiday?.description,
-          type: "holiday",
-        });
-      });
-
-      vacationsAndSickdays.forEach((item) => {
-        const singleDayOff = isTheSameDates(
-          new Date(item.dateFrom),
-          new Date(item.dateTo)
-        );
-
-        if (singleDayOff) {
-          userDaysOff.push({
-            date: new Date(item?.dateFrom),
-            duration: item?.quantity,
-            description: item?.description,
-            type: item?.type === 1 ? "sickday" : "vacation",
-          });
-        } else {
-          const periodDates = extractDatesFromPeriod(item);
-          periodDates.forEach((date) => {
-            if (
-              userDaysOff.some((item) => isTheSameDates(item.date, date.date))
-            ) {
-              return;
-            }
-
-            userDaysOff.push({
-              date: date,
-              duration: item?.quantity,
-              description: item?.description,
-              type: item?.type === 1 ? "sickday" : "vacation",
-            });
-          });
-        }
-      });
-
-      setDaysOff(userDaysOff);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
-    loadHolidaysAndVacations();
+    (async () => {
+      setDaysOff(await loadHolidaysAndVacations());
+    })();
 
     global.ipcRenderer.on("window-restored", () => {
-      loadHolidaysAndVacations();
+      (async () => {
+        setDaysOff(await loadHolidaysAndVacations());
+      })();
     });
 
     return () => {
