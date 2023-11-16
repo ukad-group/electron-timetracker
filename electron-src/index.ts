@@ -92,7 +92,7 @@ ipcMain.on("install", (event) => {
 });
 
 ipcMain.on("front error", (event, errorTitle, errorMessage, data) => {
-  mainWindow?.webContents.send("render or fetch error", errorTitle, errorMessage, data);
+  mainWindow?.webContents.send("render", errorTitle, errorMessage, data);
 });
 
 const userDataDirectory = app.getPath("userData");
