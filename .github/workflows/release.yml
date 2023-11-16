@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
     permissions:
       contents: write
     env:
@@ -129,6 +129,7 @@ jobs:
             ./dist/*.dmg
             ./dist/latest.yml
             ./dist/latest-mac.yml
+            ./dist/latest-linux.yml
 
       - name: Publish pre-release
         uses: softprops/action-gh-release@v1
@@ -141,5 +142,6 @@ jobs:
           files: |
             ./dist/*.exe
             ./dist/*.dmg
-            ./dist/latest.yml
-            ./dist/latest-mac.yml
+            ./dist/beta.yml
+            ./dist/beta-mac.yml
+            ./dist/beta-linux.yml
