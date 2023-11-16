@@ -88,6 +88,14 @@ export const padStringToMinutes = (timeString: string) => {
   return hours * 60 + minutes;
 };
 
+export const getStringDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
 export const convertMillisecondsToTime = (milliseconds) => {
   const totalSeconds = Math.floor(milliseconds / 1000);
   const hours = Math.floor(totalSeconds / 3600);

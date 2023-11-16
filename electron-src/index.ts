@@ -34,26 +34,29 @@ import {
 } from "./TimetrackerWebsiteApi";
 
 initialize("A-EU-9361517871");
-ipcMain.on("send-analytics-data", (event, analyticsEvent: string, data?: Record<string, string>) => {
-   trackEvent(analyticsEvent, data);
-  });
-  
-const PORT = 51432;
+ipcMain.on(
+  "send-analytics-data",
+  (event, analyticsEvent: string, data?: Record<string, string>) => {
+    trackEvent(analyticsEvent, data);
+  }
+);
 
+const PORT = 51432;
 let updateStatus: null | "available" | "downloaded" = null;
 let updateVersion = "";
+
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
+
 ipcMain.on("beta-channel", (event, isBeta: boolean) => {
   autoUpdater.allowPrerelease = isBeta;
 });
-function updateUpdateStatus(
-  status: "available" | "downloaded",
-  version: string
-) {
+
+function setUpdateStatus(status: "available" | "downloaded", version: string) {
   updateStatus = status;
   updateVersion = version;
 }
+
 autoUpdater.allowDowngrade = true;
 autoUpdater.on("error", (e: Error, message?: string) => {
   mainWindow?.webContents.send(
@@ -69,7 +72,7 @@ ipcMain.on("get-current-version", (event) => {
 });
 
 autoUpdater.on("update-available", (info: UpdateInfo) => {
-  updateUpdateStatus("available", info.version);
+  setUpdateStatus("available", info.version);
   autoUpdater.downloadUpdate();
   if (mainWindow) {
     mainWindow.webContents.send("update-available", true, info);
@@ -77,7 +80,7 @@ autoUpdater.on("update-available", (info: UpdateInfo) => {
 });
 
 autoUpdater.on("update-downloaded", (info: UpdateInfo) => {
-  updateUpdateStatus("downloaded", info.version);
+  setUpdateStatus("downloaded", info.version);
   if (mainWindow) {
     mainWindow.webContents.send("downloaded", true, info);
   }
@@ -90,10 +93,9 @@ ipcMain.on("install", (event) => {
 ipcMain.on("front error", (event, errorTitle, errorMessage, data) => {
   mainWindow?.webContents.send("render error", errorTitle, errorMessage, data);
 });
+
 const userDataDirectory = app.getPath("userData");
-
 let mainWindow: Electron.CrossProcessExports.BrowserWindow | null = null;
-
 const gotTheLock = app.requestSingleInstanceLock();
 
 const generateWindow = () => {
@@ -193,8 +195,6 @@ app.on("ready", async () => {
     generateWindow();
   }
 
-  let currentSelectedDate = "";
-
   if (mainWindow) {
     app.whenReady().then(() => {
       autoUpdater.checkForUpdates();
@@ -214,15 +214,12 @@ app.on("ready", async () => {
       "start-file-watcher",
       (event, reportsFolder: string, selectedDate: Date) => {
         const timereportPath = getPathFromDate(selectedDate, reportsFolder);
+
         try {
-          currentSelectedDate = selectedDate.toDateString();
           if (fs.existsSync(timereportPath)) {
             mainWindow?.webContents.send("file exist", true);
             fs.watch(timereportPath, (eventType, filename) => {
-              if (
-                eventType === "change" &&
-                currentSelectedDate === selectedDate.toDateString()
-              ) {
+              if (eventType === "change") {
                 readDataFromFile(timereportPath, (data: string | null) => {
                   mainWindow &&
                     mainWindow.webContents.send("file-changed", data);
@@ -241,27 +238,24 @@ app.on("ready", async () => {
       }
     );
 
-    ipcMain.on(
-      "start-folder-watcher",
-      (event, reportsFolder: string, calendarDate: Date) => {
-        try {
-          if (fs.existsSync(reportsFolder)) {
-            fs.watch(reportsFolder, { recursive: true }, (eventType) => {
-              if (eventType === "change") {
-                mainWindow?.webContents.send("any-file-changed");
-              }
-            });
-          }
-        } catch (err) {
-          console.log(err);
-          mainWindow?.webContents.send(
-            "background error",
-            "Watcher error. Updates to files might not be accurately displayed within the application. ",
-            err
-          );
+    ipcMain.on("start-folder-watcher", (event, reportsFolder: string) => {
+      try {
+        if (fs.existsSync(reportsFolder)) {
+          fs.watch(reportsFolder, { recursive: true }, (eventType) => {
+            if (eventType === "change") {
+              mainWindow?.webContents.send("any-file-changed");
+            }
+          });
         }
+      } catch (err) {
+        console.log(err);
+        mainWindow?.webContents.send(
+          "background error",
+          "Watcher error. Updates to files might not be accurately displayed within the application. ",
+          err
+        );
       }
-    );
+    });
   }
 
   mainWindow?.on("restore", () => {
@@ -270,9 +264,11 @@ app.on("ready", async () => {
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  // if (process.platform !== "darwin") {
+  //   app.quit();
+  // }
+
+  app.quit();
 });
 
 ipcMain.handle("storage:get", (event, storageName: string) => {
@@ -335,21 +331,26 @@ ipcMain.handle("app:update-status", async (event) => {
 
 ipcMain.handle(
   "app:delete-file",
-  async (event, reportsFolder: string, date: Date) => {
+  async (event, reportsFolder: string, stringDate: string) => {
+    const date = new Date(stringDate);
     const timereportPath = getPathFromDate(date, reportsFolder);
+
     try {
       await deleteFile(timereportPath);
+
       return true;
     } catch (error) {
       return false;
     }
   }
 );
+
 ipcMain.handle(
   "app:read-day-report",
-  (event, reportsFolder: string, date: Date) => {
-    if (!reportsFolder || !date) return null;
+  (event, reportsFolder: string, stringDate: string) => {
+    if (!reportsFolder || !stringDate.length) return null;
 
+    const date = new Date(stringDate);
     const timereportPath = getPathFromDate(date, reportsFolder);
 
     return new Promise((resolve) => {
@@ -362,9 +363,10 @@ ipcMain.handle(
 
 ipcMain.handle(
   "app:write-day-report",
-  (event, reportsFolder: string, date: Date, report: string) => {
-    if (!reportsFolder || !date) return null;
+  (event, reportsFolder: string, stringDate: string, report: string) => {
+    if (!reportsFolder || !stringDate.length) return null;
 
+    const date = new Date(stringDate);
     const timereportPath = getPathFromDate(date, reportsFolder);
 
     try {
@@ -372,11 +374,13 @@ ipcMain.handle(
       fs.writeFileSync(timereportPath, report);
     } catch (err) {
       console.log(err);
+
       mainWindow?.webContents.send(
         "background error",
         "Error in writing to file. The file writing process may be incorrect. ",
         err
       );
+
       return;
     }
   }
@@ -384,17 +388,20 @@ ipcMain.handle(
 
 ipcMain.handle(
   "app:find-latest-projects",
-  (event, reportsFolder: string, date: Date) => {
-    if (!reportsFolder || !date) return [];
+  (event, reportsFolder: string, stringDate: string) => {
+    if (!reportsFolder || !stringDate.length) return [];
+
+    const date = new Date(stringDate);
+
     try {
       const parsedProjects = parseReportsInfo(reportsFolder, date);
-
       const sortedProjAndAct: Record<string, string[]> = Object.keys(
         parsedProjects
       )
         .sort()
         .reduce((accumulator: Record<string, string[]>, key) => {
           const activitySet = new Set<string>();
+
           parsedProjects[key].forEach((activity: Activity) => {
             if (activity.activity) {
               activitySet.add(activity.activity);
@@ -402,6 +409,7 @@ ipcMain.handle(
           });
 
           accumulator[key] = Array.from(activitySet);
+
           return accumulator;
         }, {});
 
@@ -417,17 +425,20 @@ ipcMain.handle(
         });
 
         accumulator[key] = Array.from(descriptionsSet);
+
         return accumulator;
       }, {});
 
       return { sortedProjAndAct, descriptionsSet };
     } catch (err) {
       console.log(err);
+
       mainWindow?.webContents.send(
         "background error",
         "Error reading past reports. Autocomplete suggestions will not appear in the form display. ",
         err
       );
+
       const sortedProjAndAct: Record<string, string[]> = {
         internal: [],
         hr: [],
@@ -436,6 +447,7 @@ ipcMain.handle(
         internal: [],
         hr: [],
       };
+
       return { sortedProjAndAct, descriptionsSet };
     }
   }
@@ -443,9 +455,10 @@ ipcMain.handle(
 
 ipcMain.handle(
   "app:find-month-projects",
-  (event, reportsFolder: string, date: Date) => {
-    if (!reportsFolder || !date) return [];
+  (event, reportsFolder: string, stringDate: string) => {
+    if (!reportsFolder || !stringDate.length) return [];
 
+    const date = new Date(stringDate);
     const year = date.getFullYear().toString();
     const prevMonth = date.getMonth().toString().padStart(2, "0");
     const currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");

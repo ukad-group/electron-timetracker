@@ -41,7 +41,7 @@ const SettingsPage = () => {
   }, [theme, isOSDarkTheme]);
 
   return (
-    <div className="h-full w-full dark:bg-dark-back">
+    <div className="h-full w-full bg-gray-100 dark:bg-dark-back">
       <div className="mx-auto sm:px-6 max-w-3xl flex flex-col gap-6 px-6 py-10 dark:bg-dark-back">
         <section>
           <div className="bg-white shadow sm:rounded-lg p-6 flex items-center justify-between dark:bg-dark-container  dark:border-dark-border">
@@ -103,7 +103,14 @@ const SettingsPage = () => {
                 </label>
               </div>
               <div className="flex items-center">
-                <label className="relative inline-flex items-center cursor-pointer">
+                <label
+                  className={clsx(
+                    "relative inline-flex items-center cursor-pointer",
+                    {
+                      "opacity-10 cursor-auto": theme.os,
+                    }
+                  )}
+                >
                   <input
                     type="checkbox"
                     value=""
@@ -121,12 +128,17 @@ const SettingsPage = () => {
                     className={clsx(
                       "w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-dark-button-back rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-dark-button-hover",
                       {
-                        "after:bg-gray-200 after:border-gray-300 peer-checked:after:border-gray-300 dark:after:bg-gray-500 dark:after:border-gray-600 dark:peer-checked:after:border-gray-600 peer-checked:bg-gray-300 dark:peer-checked:bg-gray-600":
+                        "cursor-default after:bg-gray-200 after:border-gray-300 peer-checked:after:border-gray-300 dark:after:bg-gray-500 dark:after:border-gray-600 dark:peer-checked:after:border-gray-600 peer-checked:bg-gray-300 dark:peer-checked:bg-gray-600":
                           theme.os,
                       }
                     )}
                   ></div>
-                  <span className="ml-3 text-sm font-medium text-gray-500 dark:text-dark-main">
+                  <span
+                    className={clsx(
+                      "ml-3 text-sm font-medium text-gray-500 dark:text-dark-main",
+                      { "cursor-default": theme.os }
+                    )}
+                  >
                     Toggle to {theme.custom === "light" ? "dark" : "light"}{" "}
                     theme
                   </span>

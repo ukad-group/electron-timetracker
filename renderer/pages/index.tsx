@@ -1,5 +1,4 @@
-import clsx from "clsx";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import DateSelector from "../components/DateSelector";
 import {
@@ -20,6 +19,7 @@ import { useThemeStore } from "../store/themeStore";
 import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
+import { getStringDate } from "../utils/datetime-ui";
 import Totals from "../components/Totals";
 
 export default function Home() {
@@ -45,16 +45,23 @@ export default function Home() {
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
-  const visibilitychangeHandler = useCallback(() => {
-    const currDate = new Date().toLocaleDateString();
-    const lastUsingDate = localStorage.getItem("lastUsingDate");
-    if (lastUsingDate && currDate !== lastUsingDate) {
-      localStorage.setItem("lastUsingDate", currDate);
-      window.location.reload();
-    }
 
-    localStorage.setItem("lastUsingDate", currDate);
-  }, []);
+  const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
+
+  useEffect(() => {
+    const checkDayChange = () => {
+      const currentDay = new Date().getDate();
+      if (currentDay !== lastRenderedDay) {
+        setLastRenderedDay(currentDay);
+        setSelectedDate(new Date());
+      }
+    };
+
+    const intervalId = setInterval(checkDayChange, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [lastRenderedDay]);
+
   const [theme, setTheme] = useThemeStore(
     (state) => [state.theme, state.setTheme],
     shallow
@@ -79,12 +86,6 @@ export default function Home() {
 
     document.body.className = mode;
   }, [theme, isOSDarkTheme]);
-  useEffect(() => {
-    document.addEventListener("visibilitychange", visibilitychangeHandler);
-    return () => {
-      document.removeEventListener("visibilitychange", visibilitychangeHandler);
-    };
-  }, []);
 
   useEffect(() => {
     try {
@@ -92,15 +93,17 @@ export default function Home() {
         const dayReport = await global.ipcRenderer.invoke(
           "app:read-day-report",
           reportsFolder,
-          selectedDate
+          getStringDate(selectedDate)
         );
+
         setSelectedDateReport(dayReport || "");
 
         const sortedActAndDesc = await global.ipcRenderer.invoke(
           "app:find-latest-projects",
           reportsFolder,
-          selectedDate
+          getStringDate(selectedDate)
         );
+
         setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct || {});
         setLatestProjAndDesc(sortedActAndDesc.descriptionsSet || {});
       })();
@@ -127,7 +130,7 @@ export default function Home() {
       global.ipcRenderer.removeAllListeners("file-changed");
       global.ipcRenderer.removeAllListeners("errorMes");
     };
-  }, [selectedDate, reportsFolder]);
+  }, [selectedDate, reportsFolder, lastRenderedDay]);
 
   useEffect(() => {
     if (selectedDateReport) {
@@ -165,7 +168,7 @@ export default function Home() {
     global.ipcRenderer.invoke(
       "app:write-day-report",
       reportsFolder,
-      selectedDate,
+      getStringDate(selectedDate),
       serializedReport
     );
     setSelectedDateReport(serializedReport);
@@ -284,12 +287,12 @@ export default function Home() {
           tempActivities.push(...selectedDateActivities);
           break;
         }
-        // if (newActFrom === indexActFrom) {
-        //   tempActivities.push(activity);
-        //   isPastTime = true;
-        //   activity.isValid = true;
-        //   continue;
-        // }
+        if (newActFrom === indexActFrom) {
+          tempActivities.push(activity);
+          isPastTime = true;
+          activity.isValid = true;
+          continue;
+        }
       } catch (err) {
         global.ipcRenderer.send(
           "front error",
@@ -313,6 +316,7 @@ export default function Home() {
         !isPastTime && tempActivities.push(activity);
         setSelectedDateActivities(tempActivities.filter((act) => act.duration));
       }
+
       if (isPastTime && !isEdit) {
         setSelectedDateActivities(tempActivities);
       }
@@ -415,16 +419,18 @@ export default function Home() {
           </span>
         </Link>
       </main>
-      <TrackTimeModal
-        activities={selectedDateActivities}
-        isOpen={trackTimeModalActivity !== null}
-        editedActivity={trackTimeModalActivity}
-        latestProjAndAct={latestProjAndAct}
-        latestProjAndDesc={latestProjAndDesc}
-        close={() => setTrackTimeModalActivity(null)}
-        submitActivity={submitActivity}
-        selectedDate={selectedDate}
-      />
+      {trackTimeModalActivity && (
+        <TrackTimeModal
+          activities={selectedDateActivities}
+          isOpen={trackTimeModalActivity !== null}
+          editedActivity={trackTimeModalActivity}
+          latestProjAndAct={latestProjAndAct}
+          latestProjAndDesc={latestProjAndDesc}
+          close={() => setTrackTimeModalActivity(null)}
+          submitActivity={submitActivity}
+          selectedDate={selectedDate}
+        />
+      )}
     </div>
   );
 }

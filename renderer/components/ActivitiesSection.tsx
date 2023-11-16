@@ -4,6 +4,7 @@ import ActivitiesTable from "./ActivitiesTable";
 import { ReportActivity } from "../utils/reports";
 import { ErrorPlaceholder, RenderError } from "./ui/ErrorPlaceholder";
 import { PlusIcon } from "@heroicons/react/24/solid";
+import { shallow } from "zustand/shallow";
 import { useGoogleCalendarStore } from "../store/googleCalendarStore";
 import { calcDurationBetweenTimes } from "../utils/reports";
 import {
@@ -39,7 +40,11 @@ export default function ActivitiesSection({
     errorTitle: "",
     errorMessage: "",
   });
-  const { googleEvents } = useGoogleCalendarStore();
+  const [googleEvents] = useGoogleCalendarStore(
+    (state) => [state.googleEvents],
+    shallow
+  );
+
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);
   const [formattedGoogleEvents, setFormattedGoogleEvents] = useState([]);
   const today = checkIsToday(selectedDate);

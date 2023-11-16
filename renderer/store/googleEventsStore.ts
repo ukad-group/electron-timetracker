@@ -42,5 +42,5 @@ export const useScheduledEventsStore =
         }
       )
     ),
-    () => false
+      Object.is
   );

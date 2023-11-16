@@ -1,4 +1,5 @@
 import { useEffect, useState, Dispatch, SetStateAction } from "react";
+import { shallow } from "zustand/shallow";
 import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import {
   getGoogleEvents,
@@ -19,7 +20,10 @@ export default function GoogleCalendarEventsMessage({
 }: GoogleCalendarEventsMessageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
+  const [googleEvents, setGoogleEvents] = useGoogleCalendarStore(
+    (state) => [state.googleEvents, state.setGoogleEvents],
+    shallow
+  );
 
   const loadGoogleEvents = async (
     accessToken: string,
