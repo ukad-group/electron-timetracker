@@ -28,6 +28,7 @@ export default function ActivitiesTable({
 }: ActivitiesTableProps) {
   const [ctrlPressed, setCtrlPressed] = useState(false);
   const [firstKey, setFirstKey] = useState(null);
+  const [secondKey, setSecondtKey] = useState(null);
   const [firstKeyPressTime, setFirstKeyPressTime] = useState(null);
   const [timerId, setTimerId] = useState(null);
   const nonBreakActivities = useMemo(() => {
@@ -120,6 +121,7 @@ export default function ActivitiesTable({
 
       if (Date.now() - firstKeyPressTime < 500) {
         clearTimeout(timerId);
+        setSecondtKey(event.key);
         const selectedActivity =
           tableActivities[Number(firstKey + event.key) - 1];
 
@@ -137,6 +139,7 @@ export default function ActivitiesTable({
   const handleKeyUp = (event) => {
     if (event.key === "Control" || event.key === "Meta") {
       setFirstKey(null);
+      setSecondtKey(null);
       setCtrlPressed(false);
     }
   };
@@ -202,13 +205,19 @@ export default function ActivitiesTable({
         {tableActivities.map((activity, i) => (
           <tr
             key={i}
-            className={clsx(`border-b border-gray-200 dark:border-gray-300 `, {
-              "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
-                tableActivities[i].to != tableActivities[i + 1]?.from &&
-                i + 1 !== tableActivities.length &&
-                !activity.calendarId,
-              "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
-            })}
+            className={clsx(
+              `border-b border-gray-200 dark:border-gray-300 transition-transform `,
+              {
+                "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
+                  tableActivities[i].to != tableActivities[i + 1]?.from &&
+                  i + 1 !== tableActivities.length &&
+                  !activity.calendarId,
+                "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
+                "scale-105 ":
+                  (Number(firstKey) === i + 1 && !secondKey) ||
+                  (Number(firstKey + secondKey) === i + 1 && secondKey),
+              }
+            )}
           >
             <td
               className={`relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
