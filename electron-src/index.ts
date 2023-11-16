@@ -31,6 +31,7 @@ import {
   getTimetrackerHolidays,
   getTimetrackerProjects,
   getTimetrackerVacations,
+  getRefreshedUserInfoToken,
 } from "./TimetrackerWebsiteApi";
 
 initialize("A-EU-9361517871");
@@ -567,6 +568,15 @@ ipcMain.handle(
     const options = getOffice365Options();
 
     return await getAzureTokens(authCode, options);
+  }
+);
+
+ipcMain.handle(
+  "timetracker:refresh-user-info-token",
+  async (event, refreshToken: string) => {
+    const options = getOffice365Options();
+
+    return await getRefreshedUserInfoToken(refreshToken, options);
   }
 );
 
