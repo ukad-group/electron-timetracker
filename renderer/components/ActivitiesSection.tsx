@@ -5,6 +5,8 @@ import { ReportActivity } from "../utils/reports";
 import { ErrorPlaceholder, RenderError } from "./ui/ErrorPlaceholder";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { checkIsToday } from "../utils/datetime-ui";
+import { loadGoogleEventsFromAllUsers } from "../utils/google";
+import { getOffice365Events } from "../utils/office365";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
@@ -27,20 +29,51 @@ export default function ActivitiesSection({
   availableProjects,
 }: ActivitiesSectionProps) {
   const [backgroundError, setBackgroundError] = useState("");
+  const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [renderError, setRenderError] = useState<RenderError>({
     errorTitle: "",
     errorMessage: "",
   });
-  const today = checkIsToday(selectedDate);
   const isShowGoogleEvents = JSON.parse(
     localStorage.getItem("showGoogleEvents")
   );
-
+  const isShowOffice365Events = JSON.parse(
+    localStorage.getItem("showOffice365Events")
+  );
   const keydownHandler = (e: KeyboardEvent) => {
     if (e.code === "Space" && e.ctrlKey) {
       onEditActivity("new");
     }
   };
+
+  useEffect(() => {
+    let isAvailable = true;
+
+    if (checkIsToday(selectedDate)) {
+      (async () => {
+        setIsLoading(true);
+
+        const googleEvents = isShowGoogleEvents
+          ? await loadGoogleEventsFromAllUsers()
+          : [];
+        const office365Events = isShowOffice365Events
+          ? await getOffice365Events()
+          : [];
+        const allEvents = [...googleEvents, ...office365Events];
+
+        setIsLoading(false);
+        isAvailable && setEvents(allEvents);
+      })();
+    } else {
+      setEvents([]);
+    }
+
+    return () => {
+      setIsLoading(false);
+      isAvailable = false;
+    };
+  }, [selectedDate]);
 
   useEffect(() => {
     document.addEventListener("keydown", keydownHandler);
@@ -67,7 +100,7 @@ export default function ActivitiesSection({
     return <ErrorPlaceholder {...renderError} />;
   }
 
-  if (!activities?.length && !(today && isShowGoogleEvents)) {
+  if (!activities?.length && !events?.length && !isLoading) {
     return (
       <Placeholder
         onEditActivity={onEditActivity}
@@ -75,7 +108,7 @@ export default function ActivitiesSection({
       />
     );
   }
-  
+
   return (
     <div>
       {backgroundError && (
@@ -101,6 +134,8 @@ export default function ActivitiesSection({
           onDeleteActivity={onDeleteActivity}
           selectedDate={selectedDate}
           availableProjects={availableProjects}
+          events={events}
+          isLoading={isLoading}
         />
       </div>
 

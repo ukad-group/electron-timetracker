@@ -19,14 +19,8 @@ import {
 } from "@heroicons/react/24/outline";
 import Tooltip from "./ui/Tooltip/Tooltip";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import {
-  checkAlreadyAddedGoogleEvents,
-  concatSortArrays,
-  parseEventTitle,
-} from "../utils/utils";
+import { concatSortArrays, parseEventTitle } from "../utils/utils";
 import Loader from "./ui/Loader";
-import { loadGoogleEventsFromAllUsers } from "../utils/google";
-import { getOffice365Events } from "../utils/office365";
 
 type ActivitiesTableProps = {
   activities: ReportActivity[];
@@ -34,6 +28,8 @@ type ActivitiesTableProps = {
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
   availableProjects: string[];
+  events: ReportActivity[];
+  isLoading: boolean;
 };
 
 const MS_PER_HOUR = 60 * 60 * 1000;
@@ -43,16 +39,10 @@ export default function ActivitiesTable({
   onEditActivity,
   selectedDate,
   availableProjects,
+  events,
+  isLoading,
 }: ActivitiesTableProps) {
   const [ctrlPressed, setCtrlPressed] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [tableActivities, setTableActivities] = useState([]);
-  const isShowGoogleEvents = JSON.parse(
-    localStorage.getItem("showGoogleEvents")
-  );
-  const isShowOffice365Events = JSON.parse(
-    localStorage.getItem("showOffice365Events")
-  );
   const nonBreakActivities = useMemo(() => {
     return validation(activities.filter((activity) => !activity.isBreak));
   }, [activities]);
@@ -68,8 +58,14 @@ export default function ActivitiesTable({
 
     const formattedEvents = events.map((event) => {
       const { start, end } = event;
-      const from = getTimeFromEventObj(start.dateTime);
-      const to = getTimeFromEventObj(end.dateTime);
+
+      const startDateTime =
+        start.timeZone === "UTC" ? `${start.dateTime}Z` : start.dateTime;
+      const endDateTime =
+        start.timeZone === "UTC" ? `${end.dateTime}Z` : end.dateTime;
+
+      const from = getTimeFromEventObj(startDateTime);
+      const to = getTimeFromEventObj(endDateTime);
 
       event = parseEventTitle(event, availableProjects);
 
@@ -115,6 +111,15 @@ export default function ActivitiesTable({
 
     return actualEvents;
   };
+
+  const tableActivities = useMemo(() => {
+    const actualEvents = getActualEvents(events);
+    const formattedEvents = formatEvents(actualEvents);
+
+    return formattedEvents && formattedEvents.length > 0
+      ? concatSortArrays(nonBreakActivities, formattedEvents)
+      : nonBreakActivities;
+  }, [nonBreakActivities, events]);
 
   const copyToClipboardHandle = (e) => {
     const cell = e.target;
@@ -207,40 +212,6 @@ export default function ActivitiesTable({
   };
 
   useEffect(() => {
-    let isAvailable = true;
-
-    if (checkIsToday(selectedDate)) {
-      (async () => {
-        setIsLoading(true);
-
-        const googleEvents = isShowGoogleEvents
-          ? await loadGoogleEventsFromAllUsers()
-          : [];
-        const office365Events = isShowOffice365Events
-          ? await getOffice365Events()
-          : [];
-        const allEvents = [...googleEvents, ...office365Events];
-        const actualEvents = getActualEvents(allEvents);
-        const formattedEvents = formatEvents(actualEvents);
-        const allActivities = concatSortArrays(
-          nonBreakActivities,
-          formattedEvents
-        );
-
-        isAvailable && setTableActivities(allActivities);
-
-        setIsLoading(false);
-      })();
-    } else {
-      setTableActivities(nonBreakActivities);
-    }
-
-    return () => {
-      isAvailable = false;
-    };
-  }, [selectedDate, nonBreakActivities]);
-
-  useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
     return () => {
@@ -298,8 +269,7 @@ export default function ActivitiesTable({
         </tr>
       </thead>
       <tbody className="text-gray-500 dark:text-slate-400">
-        {!isLoading &&
-          tableActivities.length > 0 &&
+        {tableActivities.length > 0 &&
           tableActivities?.map((activity, i) => (
             <tr
               key={i}
@@ -426,13 +396,6 @@ export default function ActivitiesTable({
               </td>
             </tr>
           ))}
-        {isLoading && (
-          <tr>
-            <td className="px-3 py-4 w-full text-center" colSpan={6}>
-              <Loader />
-            </td>
-          </tr>
-        )}
         <tr>
           <td className="py-4 px-3 text-sm whitespace-nowrap">
             <p>Total</p>
@@ -445,10 +408,7 @@ export default function ActivitiesTable({
               <p data-column="total">{formatDuration(totalDuration)}</p>
             </Tooltip>
           </td>
-          <td
-            className="px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap"
-            colSpan={4}
-          >
+          <td className="px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap">
             {tableActivities.length > 0 && (
               <TimeBadge
                 hours={totalDuration / MS_PER_HOUR}
@@ -457,6 +417,7 @@ export default function ActivitiesTable({
               />
             )}
           </td>
+          <td colSpan={3}>{isLoading && <Loader />}</td>
         </tr>
       </tbody>
     </table>
