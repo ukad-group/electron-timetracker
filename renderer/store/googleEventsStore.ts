@@ -5,7 +5,6 @@ import {
   devtools,
   persist,
 } from "zustand/middleware";
-import {produce} from "immer";
 
 export type ScheduledEvents = Record<
   string,
@@ -35,9 +34,7 @@ export const useScheduledEventsStore =
       persist(
         (set) => ({
           event: { "": {} },
-          setEvent: (event: ScheduledEvents) => set(produce((draft) => {
-        draft.event = event;
-      })),
+          setEvent: (event: ScheduledEvents) => set({ event: event }),
         }),
         {
           name: "scheduled-events-storage",

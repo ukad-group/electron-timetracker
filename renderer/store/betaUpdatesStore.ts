@@ -5,7 +5,6 @@ import {
   devtools,
   persist,
 } from "zustand/middleware";
-import {produce} from "immer";
 
 export type BetaStore = {
   isBeta: boolean;
@@ -29,9 +28,7 @@ export const useBetaStore = createWithEqualityFn<BetaStore>()(
     persist(
       (set) => ({
         isBeta: false,
-        setIsBeta: (isDownload: boolean) => set(produce((draft) => {
-            draft.isBeta = isDownload;
-          })),
+        setIsBeta: (isDownload: boolean) => set({ isBeta: isDownload }),
       }),
       {
         name: "beta-storage",

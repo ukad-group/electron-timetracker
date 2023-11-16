@@ -5,7 +5,6 @@ import {
   devtools,
   persist,
 } from "zustand/middleware";
-import {produce} from "immer";
 
 type Theme = { custom: "light"|"dark"; os: boolean };
 
@@ -31,9 +30,7 @@ export const useThemeStore = createWithEqualityFn<ThemeStore>()(
     persist(
       (set) => ({
         theme: { custom: "light", os: true },
-        setTheme: (theme: Theme) => set(produce((draft) => {
-        draft.theme = theme;
-      })),
+        setTheme: (theme: Theme) => set({ theme: theme }),
       }),
       {
         name: "theme-storage",
