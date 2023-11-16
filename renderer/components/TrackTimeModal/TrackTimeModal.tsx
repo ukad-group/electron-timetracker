@@ -52,10 +52,10 @@ export default function TrackTimeModal({
   const [trelloTasks, setTrelloTasks] = useState([]);
   // const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const trelloUser = JSON.parse(localStorage.getItem("trello-user")) || null;
-  // const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
-  //   (state) => [state.event, state.setEvent],
-  //   shallow
-  // );
+  const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
+    (state) => [state.event, state.setEvent],
+    shallow
+  );
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -180,7 +180,7 @@ export default function TrackTimeModal({
       calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
     });
 
-    if (editedActivity !== "new" && editedActivity.calendarId.length > 0) {
+    if (editedActivity !== "new" && editedActivity.calendarId?.length > 0) {
       const storedAddedEventsIds =
         JSON.parse(localStorage.getItem("addedEventsIds")) || [];
       const uniqueIds = new Set([
@@ -194,21 +194,21 @@ export default function TrackTimeModal({
       );
     }
 
-    // if (
-    //   scheduledEvents[dashedDescription] &&
-    //   !scheduledEvents[dashedDescription].project
-    // ) {
-    //   scheduledEvents[dashedDescription].project = project;
-    // }
+    if (
+      scheduledEvents[dashedDescription] &&
+      !scheduledEvents[dashedDescription].project
+    ) {
+      scheduledEvents[dashedDescription].project = project;
+    }
 
-    // if (
-    //   scheduledEvents[dashedDescription] &&
-    //   scheduledEvents[dashedDescription].activity !== activity
-    // ) {
-    //   scheduledEvents[dashedDescription].activity = activity || "";
-    // }
+    if (
+      scheduledEvents[dashedDescription] &&
+      scheduledEvents[dashedDescription].activity !== activity
+    ) {
+      scheduledEvents[dashedDescription].activity = activity || "";
+    }
 
-    // setScheduledEvents(scheduledEvents);
+    setScheduledEvents(scheduledEvents);
 
     // if (googleEvents.length > 0 && editedActivity !== "new") {
     //   const arrayWithMarkedActivty = markActivityAsAdded(
