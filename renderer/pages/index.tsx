@@ -52,7 +52,7 @@ export default function Home() {
       const currentDay = new Date().getDate();
       if (currentDay !== lastRenderedDay) {
         setLastRenderedDay(currentDay);
-        setSelectedDate(new Date())
+        setSelectedDate(new Date());
       }
     };
 
@@ -286,12 +286,12 @@ export default function Home() {
           tempActivities.push(...selectedDateActivities);
           break;
         }
-        // if (newActFrom === indexActFrom) {
-        //   tempActivities.push(activity);
-        //   isPastTime = true;
-        //   activity.isValid = true;
-        //   continue;
-        // }
+        if (newActFrom === indexActFrom) {
+          tempActivities.push(activity);
+          isPastTime = true;
+          activity.isValid = true;
+          continue;
+        }
       } catch (err) {
         global.ipcRenderer.send(
           "front error",
