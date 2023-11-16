@@ -190,10 +190,16 @@ const Totals = ({ activities }) => {
                 )}
               >
                 <div
-                  className={clsx("flex items-center gap-1 ml-5", {
-                    "hover:text-gray-400 dark:hover:text-white ml-0":
-                      total.activities.length > 1,
-                  })}
+                  className={clsx(
+                    "flex items-center gap-1",
+                    {
+                      "ml-5": total.activities.length <= 1,
+                    },
+                    {
+                      "hover:text-gray-400 dark:hover:text-white ml-0":
+                        total.activities.length > 1,
+                    }
+                  )}
                   onClick={() => {
                     toggleActivitiesList(total.name);
                   }}
