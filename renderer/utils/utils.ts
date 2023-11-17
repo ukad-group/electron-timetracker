@@ -73,6 +73,12 @@ export function parseEventTitle(event, availableProjects: Array<string>) {
   const { subject } = event; // Office365
   const eventTitle = summary || subject;
   const items = eventTitle ? eventTitle.split(" - ") : "";
+  let allProjects:Array<string>=availableProjects
+  const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+
+  if (userInfo && userInfo.yearProjects) {
+    allProjects = availableProjects.concat(userInfo.yearProjects)
+  }
 
   switch (items.length) {
     case 0:
@@ -84,7 +90,7 @@ export function parseEventTitle(event, availableProjects: Array<string>) {
       break;
 
     case 2:
-      if (availableProjects.includes(items[0])) {
+      if (allProjects.includes(items[0])) {
         event.project = items[0];
         event.description = items[1];
       } else {

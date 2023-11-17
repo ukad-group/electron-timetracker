@@ -134,7 +134,7 @@ export default function TrackTimeModal({
       }
     }
     setLatestProjects(tempProj);
-  }, [isOpen, latestProjAndDesc, latestProjAndAct]);
+  }, [isOpen, latestProjAndDesc, latestProjAndAct, webTrackerProjects]);
 
   useEffect(() => {
     if (duration === null || isTypingFromDuration) return;
