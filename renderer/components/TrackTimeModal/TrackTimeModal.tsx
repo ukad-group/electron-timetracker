@@ -152,7 +152,10 @@ export default function TrackTimeModal({
 
       setTrelloTasks(newTrelloTasks);
     } catch (error) {
-      localStorage.removeItem("trello-user");
+      console.log(
+        "Try to re-login to Trello or check your internet connection",
+        error
+      );
       setTrelloTasks([]);
     }
   };
