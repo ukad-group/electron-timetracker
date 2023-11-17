@@ -1,4 +1,4 @@
-import { WorkHoursReport } from "../components/Calendar/Calendar";
+import { FormattedReport, DayOff } from "../components/Calendar/Calendar";
 
 export function checkIsToday(date: Date): boolean {
   const now = new Date();
@@ -41,7 +41,7 @@ export function getDateFromString(dateString: string) {
 }
 
 export function getMonthWorkHours(
-  monthReports: WorkHoursReport[],
+  monthReports: FormattedReport[],
   calendarDate: Date
 ) {
   const currentYear = calendarDate.getFullYear();
@@ -55,6 +55,61 @@ export function getMonthWorkHours(
     if (report.date.includes(query)) acc += report.workDurationMs;
     return acc;
   }, 0);
+}
+
+export function getMonthRequiredHours(calendarDate: Date, daysOff: DayOff[]) {
+  if (!daysOff) return;
+
+  const lastDayOfMonth = new Date(
+    calendarDate.getFullYear(),
+    calendarDate.getMonth() + 1,
+    0
+  );
+
+  let totalWorkHours = 0;
+
+  for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+    const monthDay = new Date(
+      calendarDate.getFullYear(),
+      calendarDate.getMonth(),
+      i
+    );
+
+    const isWeekend = monthDay.getDay() === 0 || monthDay.getDay() === 6;
+    const dayOff = daysOff.find((day) => isTheSameDates(monthDay, day.date));
+
+    if (!isWeekend && !dayOff) {
+      totalWorkHours += 8;
+    } else if (dayOff && dayOff?.duration !== 8) {
+      totalWorkHours += 8 - dayOff.duration; // detect not a full dayOff
+    }
+  }
+
+  return totalWorkHours * 3600000;
+}
+
+export function extractDatesFromPeriod(vacation) {
+  const dateStart = new Date(vacation.dateFrom);
+  const dateEnd = new Date(vacation.dateTo);
+  const vacationRange = generateDateRange(dateStart, dateEnd);
+
+  const datesWithoutWeekends = vacationRange.filter(
+    (date) => date.getDay() >= 1 && date.getDay() <= 5
+  );
+
+  return datesWithoutWeekends;
+}
+
+function generateDateRange(startDate, endDate) {
+  const dateRange = [];
+  let currentDate = new Date(startDate);
+
+  while (currentDate <= endDate) {
+    dateRange.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return dateRange;
 }
 
 export function getCeiledTime() {
@@ -95,3 +150,11 @@ export const getStringDate = (date: Date): string => {
 
   return `${year}-${month}-${day}`;
 };
+
+export const convertMillisecondsToTime = (milliseconds) => {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, "0");;
+
+  return `${hours}:${minutes}`;
+}

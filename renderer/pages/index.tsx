@@ -20,6 +20,7 @@ import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 import { getStringDate } from "../utils/datetime-ui";
+import Totals from "../components/Totals";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -181,7 +182,7 @@ export default function Home() {
     const activityIndex = selectedDateActivities.findIndex(
       (act) => act.id === activity.id
     );
-      
+
     // if (activity.project === "delete") {
     //   setSelectedDateActivities((activities) => {
     //     if (activities.length === activityIndex + 2 && !activityIndex) {
@@ -287,16 +288,15 @@ export default function Home() {
           isPastTime = true;
         }
         if (!i && newActFrom < indexActFrom) {
-          
           tempActivities.push(...selectedDateActivities);
           break;
         }
-        // if (newActFrom === indexActFrom) {
-        //   tempActivities.push(activity);
-        //   isPastTime = true;
-        //   activity.isValid = true;
-        //   continue;
-        // }
+        if (newActFrom === indexActFrom) {
+          tempActivities.push(activity);
+          isPastTime = true;
+          activity.isValid = true;
+          continue;
+        }
       } catch (err) {
         global.ipcRenderer.send(
           "front error",
@@ -333,7 +333,6 @@ export default function Home() {
       );
       console.log(activity);
     }
-
     setShouldAutosave(true);
   };
 
@@ -385,16 +384,22 @@ export default function Home() {
 
               <section
                 aria-labelledby="manual-input-title"
-                className="lg:col-start-3 lg:col-span-1 relative"
+                className="lg:col-start-3 lg:col-span-1 lg:row-span-2 relative"
               >
-                <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                  <ManualInputForm
-                    onSave={handleSave}
-                    selectedDateReport={selectedDateReport}
-                    selectedDate={selectedDate}
-                  />
+                <div className="flex flex-col gap-6">
+                  <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
+                    <ManualInputForm
+                      onSave={handleSave}
+                      selectedDateReport={selectedDateReport}
+                      selectedDate={selectedDate}
+                    />
+                  </div>
+
+                  <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
+                    <Totals activities={selectedDateActivities} />
+                  </div>
+                  <UpdateDescription />
                 </div>
-                <UpdateDescription />
               </section>
               <section className="lg:col-span-2">
                 <Calendar
@@ -417,16 +422,18 @@ export default function Home() {
           </span>
         </Link>
       </main>
-      <TrackTimeModal
-        activities={selectedDateActivities}
-        isOpen={trackTimeModalActivity !== null}
-        editedActivity={trackTimeModalActivity}
-        latestProjAndAct={latestProjAndAct}
-        latestProjAndDesc={latestProjAndDesc}
-        close={() => setTrackTimeModalActivity(null)}
-        submitActivity={submitActivity}
-        selectedDate={selectedDate}
-      />
+      {trackTimeModalActivity && (
+        <TrackTimeModal
+          activities={selectedDateActivities}
+          isOpen={trackTimeModalActivity !== null}
+          editedActivity={trackTimeModalActivity}
+          latestProjAndAct={latestProjAndAct}
+          latestProjAndDesc={latestProjAndDesc}
+          close={() => setTrackTimeModalActivity(null)}
+          submitActivity={submitActivity}
+          selectedDate={selectedDate}
+        />
+      )}
     </div>
   );
 }

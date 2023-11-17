@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
+import isOnline from "is-online";
 
 export interface Office365User {
   accessToken: string;
@@ -15,8 +16,14 @@ const Office365Connection = () => {
   );
   const [showEventsInTable, setShowEventsInTable] = useState(false);
 
-  const handleSignInButton = () => {
-    global.ipcRenderer.send("office365:login");
+  const handleSignInButton = async () => {
+    const online = await isOnline();
+
+    if (online) {
+      global.ipcRenderer.send("office365:login");
+    } else {
+      global.ipcRenderer.send("app:load-offline-page");
+    }
   };
 
   const handleSignOutButton = (id: string) => {

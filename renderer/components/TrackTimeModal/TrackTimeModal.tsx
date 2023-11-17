@@ -14,7 +14,6 @@ import { checkIsToday } from "../../utils/datetime-ui";
 import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
 import { shallow } from "zustand/shallow";
-import { useGoogleCalendarStore } from "../../store/googleCalendarStore";
 import { useScheduledEventsStore } from "../../store/googleEventsStore";
 import { replaceHyphensWithSpaces } from "../../utils/utils";
 
@@ -56,6 +55,8 @@ export default function TrackTimeModal({
     (state) => [state.event, state.setEvent],
     shallow
   );
+  const [latestProjects, setLatestProjects] = useState([]);
+  const [webTrackerProjects, setWebTrackerProjects] = useState([]);
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -124,6 +125,15 @@ export default function TrackTimeModal({
 
   useEffect(() => {
     addSuggestions(activities, latestProjAndDesc, latestProjAndAct);
+    const tempProj = Object.keys(latestProjAndAct);
+    if (webTrackerProjects) {
+      for (let i = 0; i < webTrackerProjects.length; i++) {
+        if (!tempProj.includes(webTrackerProjects[i])) {
+          tempProj.push(webTrackerProjects[i]);
+        }
+      }
+    }
+    setLatestProjects(tempProj);
   }, [isOpen, latestProjAndDesc, latestProjAndAct]);
 
   useEffect(() => {
@@ -145,13 +155,72 @@ export default function TrackTimeModal({
 
       setTrelloTasks(newTrelloTasks);
     } catch (error) {
-      localStorage.removeItem("trello-user");
+      console.log(
+        "Try to re-login to Trello or check your internet connection",
+        error
+      );
       setTrelloTasks([]);
+    }
+  };
+
+  const getTimetrackerYearProjects = async () => {
+    const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+
+    if (!userInfo) return;
+
+    const timetrackerCookie = userInfo?.TTCookie;
+
+    try {
+      const yearProjects = await global.ipcRenderer.invoke(
+        "timetracker:get-projects",
+        timetrackerCookie
+      );
+
+      if (yearProjects === "invalid_token") {
+        const refresh_token = userInfo?.userInfoRefreshToken;
+
+        if (!refresh_token) return;
+
+        const updatedCreds = await global.ipcRenderer.invoke(
+          "timetracker:refresh-user-info-token",
+          refresh_token
+        );
+
+        const updatedIdToken = updatedCreds?.id_token;
+
+        const updatedCookie = await global.ipcRenderer.invoke(
+          "timetracker:login",
+          updatedIdToken
+        );
+
+        const updatedUser = {
+          ...userInfo,
+          idToken: updatedIdToken,
+          TTCookie: updatedCookie,
+        };
+
+        localStorage.setItem("timetracker-user", JSON.stringify(updatedUser));
+        getTimetrackerYearProjects();
+        return;
+      }
+
+      const updatedUserInfo = {
+        ...userInfo,
+        yearProjects: yearProjects,
+      };
+
+      localStorage.setItem("timetracker-user", JSON.stringify(updatedUserInfo));
+
+      setWebTrackerProjects(yearProjects);
+    } catch (error) {
+      console.log(error);
+      setWebTrackerProjects(userInfo.yearProjects);
     }
   };
 
   useEffect(() => {
     if (trelloUser) (async () => getTrelloCards())();
+    getTimetrackerYearProjects();
   }, []);
 
   const onSave = (e: FormEvent | MouseEvent) => {
@@ -161,7 +230,7 @@ export default function TrackTimeModal({
       setIsValidationEnabled(true);
       return;
     }
-    
+
     let dashedDescription = description;
 
     if (description.includes(" - ")) {
@@ -393,7 +462,7 @@ export default function TrackTimeModal({
   };
 
   return (
-    <Transition.Root show={isOpen} as={Fragment}>
+    <Transition.Root appear={true} show={isOpen} as={Fragment}>
       <Dialog
         as="div"
         className="fixed inset-0 z-10 overflow-y-auto"
@@ -539,13 +608,13 @@ export default function TrackTimeModal({
                       onSave={onSave}
                       title="Project"
                       required
-                      availableItems={
-                        latestProjAndAct ? Object.keys(latestProjAndAct) : []
-                      }
+                      availableItems={latestProjects}
                       selectedItem={project}
                       setSelectedItem={setProject}
                       isValidationEnabled={isValidationEnabled}
-                      isLastThree={false}
+                      showedSuggestionsNumber={
+                        Object.keys(latestProjAndAct).length
+                      }
                       tabIndex={4}
                     />
                   </div>
@@ -558,7 +627,7 @@ export default function TrackTimeModal({
                       }
                       selectedItem={activity}
                       setSelectedItem={setActivity}
-                      isLastThree={true}
+                      showedSuggestionsNumber={3}
                       tabIndex={5}
                     />
                   </div>
@@ -573,7 +642,7 @@ export default function TrackTimeModal({
                       }
                       selectedItem={description}
                       setSelectedItem={setDescription}
-                      isLastThree={true}
+                      showedSuggestionsNumber={3}
                       tabIndex={6}
                     />
                   </div>

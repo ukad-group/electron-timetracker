@@ -3,6 +3,7 @@ import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
 import { useRouter } from "next/router";
 import Loader from "./ui/Loader";
+import isOnline from "is-online";
 
 const TimetrackerWebsiteConnection = () => {
   const router = useRouter();
@@ -18,7 +19,13 @@ const TimetrackerWebsiteConnection = () => {
   const [loading, setLoading] = useState(false);
 
   const handleSignInButton = async () => {
-    global.ipcRenderer.send("azure:login-base");
+    const online = await isOnline();
+
+    if (online) {
+      global.ipcRenderer.send("azure:login-base");
+    } else {
+      global.ipcRenderer.send("app:load-offline-page");
+    }
   };
 
   const handleSignOutButton = () => {

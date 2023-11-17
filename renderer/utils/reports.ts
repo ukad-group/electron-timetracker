@@ -10,6 +10,7 @@ export type ReportActivity = {
   isValid?: boolean;
   mistakes?: string;
   calendarId?: string;
+  isNewProject?:boolean;
 };
 export type ReportAndNotes = [Array<Partial<ReportActivity>>, string];
 export function parseReport(fileContent: string) {
@@ -42,6 +43,7 @@ export function parseReport(fileContent: string) {
         isBreak: false,
         isValid: true,
         mistakes: "",
+        isNewProject: false,
       };
 
       // This code uses the string type to write the time.

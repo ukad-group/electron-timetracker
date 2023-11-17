@@ -43,6 +43,10 @@ export default function ActivitiesTable({
   isLoading,
 }: ActivitiesTableProps) {
   const [ctrlPressed, setCtrlPressed] = useState(false);
+  const [firstKey, setFirstKey] = useState(null);
+  const [secondKey, setSecondtKey] = useState(null);
+  const [firstKeyPressTime, setFirstKeyPressTime] = useState(null);
+  const [timerId, setTimerId] = useState(null);
   const nonBreakActivities = useMemo(() => {
     return validation(activities.filter((activity) => !activity.isBreak));
   }, [activities]);
@@ -114,12 +118,19 @@ export default function ActivitiesTable({
   };
 
   const tableActivities = useMemo(() => {
+    const badgedActivities = nonBreakActivities.map((activity) => {
+      const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+      if (userInfo && !userInfo.yearProjects.includes(activity.project)) {
+        return { ...activity, isNewProject: true };
+      }
+      return activity;
+    });
     const actualEvents = getActualEvents(events);
     const formattedEvents = formatEvents(actualEvents);
 
     return formattedEvents && formattedEvents.length > 0
-      ? concatSortArrays(nonBreakActivities, formattedEvents)
-      : nonBreakActivities;
+      ? concatSortArrays(badgedActivities, formattedEvents)
+      : badgedActivities;
   }, [nonBreakActivities, events]);
 
   const copyToClipboardHandle = (e) => {
@@ -162,28 +173,51 @@ export default function ActivitiesTable({
       (event.ctrlKey && event.key === "ArrowUp") ||
       (event.key === "Meta" && event.key === "ArrowUp")
     ) {
-      if (nonBreakActivities.length > 0) {
-        const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
+      if (tableActivities.length > 0) {
+        const lastActivity = tableActivities[tableActivities.length - 1];
         onEditActivity(lastActivity);
       }
     }
     if (event.key === "Control" || event.key === "Meta") {
       setCtrlPressed(true);
     }
+
     if (
       (event.ctrlKey || event.key === "Control" || event.key === "Meta") &&
-      /^[1-9]$/.test(event.key)
+      /^[0-9]$/.test(event.key)
     ) {
       const number = parseInt(event.key, 10);
-      if (number >= 1 && number <= nonBreakActivities.length) {
-        const selectedActivity = nonBreakActivities[Number(event.key) - 1];
-        if (selectedActivity.calendarId) {
-          onEditActivity({
-            ...selectedActivity,
-            id: null,
-          });
-        } else {
-          onEditActivity(selectedActivity);
+
+      if (!firstKey && number >= 1 && number <= tableActivities.length) {
+        setFirstKey(event.key);
+        const selectedActivity = tableActivities[Number(event.key) - 1];
+        const timerId = setTimeout(() => {
+          if (selectedActivity.calendarId) {
+            onEditActivity({
+              ...selectedActivity,
+              id: null,
+            });
+          } else {
+            onEditActivity(selectedActivity);
+          }
+        }, 500);
+        setTimerId(timerId);
+        setFirstKeyPressTime(Date.now());
+      }
+
+      if (Date.now() - firstKeyPressTime < 500) {
+        clearTimeout(timerId);
+        setSecondtKey(event.key);
+        const selectedActivity =
+          tableActivities[Number(firstKey + event.key) - 1];
+
+        if (selectedActivity) {
+          if (selectedActivity.calendarId) {
+            onEditActivity({
+              ...selectedActivity,
+              id: null,
+            });
+          } else onEditActivity(selectedActivity);
         }
       }
     }
@@ -191,6 +225,8 @@ export default function ActivitiesTable({
 
   const handleKeyUp = (event) => {
     if (event.key === "Control" || event.key === "Meta") {
+      setFirstKey(null);
+      setSecondtKey(null);
       setCtrlPressed(false);
     }
   };
@@ -215,11 +251,12 @@ export default function ActivitiesTable({
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.addEventListener("keyup", handleKeyUp);
     };
-  }, [nonBreakActivities]);
+  }, [firstKey, tableActivities]);
 
   return (
     <table className="min-w-full divide-y divide-gray-300 table-fixed dark:divide-gray-600">
@@ -249,12 +286,6 @@ export default function ActivitiesTable({
           <th scope="col" className="pb-6 px-3 text-left text-sm font-semibold">
             Description
           </th>
-          {/* <th
-            scope="col"
-            className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
-          >
-            <span className="sr-only">Delete</span>
-          </th> */}
           <th
             scope="col"
             className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
@@ -275,13 +306,16 @@ export default function ActivitiesTable({
             <tr
               key={i}
               className={clsx(
-                `border-b border-gray-200 dark:border-gray-300 `,
+                `border-b border-gray-200 dark:border-gray-300 transition-transform `,
                 {
                   "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
                     tableActivities[i].to != tableActivities[i + 1]?.from &&
                     i + 1 !== tableActivities.length &&
                     !activity.calendarId,
                   "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
+                  "scale-105 ":
+                    (Number(firstKey) === i + 1 && !secondKey) ||
+                    (Number(firstKey + secondKey) === i + 1 && secondKey),
                 }
               )}
             >
@@ -316,18 +350,25 @@ export default function ActivitiesTable({
                 </Tooltip>
               </td>
               <td
-                className={`flex flex-col px-3 py-4 ${
+                className={`flex flex-col relative px-3 py-4 ${
                   activity.calendarId ? "opacity-50" : ""
                 }`}
               >
-                <Tooltip>
-                  <p
-                    className="text-sm font-medium text-gray-900 dark:text-dark-heading"
-                    onClick={copyToClipboardHandle}
-                  >
-                    {activity.project}
-                  </p>
-                </Tooltip>
+                <div className="flex">
+                  <Tooltip>
+                    <p
+                      className="text-sm font-medium text-gray-900 dark:text-dark-heading"
+                      onClick={copyToClipboardHandle}
+                    >
+                      {activity.project}
+                    </p>
+                  </Tooltip>
+                  {activity.isNewProject && (
+                    <p className="text-center ml-1 mb-1 w-fit text-xs  px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
+                      new
+                    </p>
+                  )}
+                </div>
                 {activity.activity && (
                   <Tooltip>
                     <p
@@ -348,7 +389,7 @@ export default function ActivitiesTable({
                   <p
                     onClick={copyToClipboardHandle}
                     className={clsx({
-                      "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800":
+                      "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20":
                         activity.mistakes?.includes("startsWith!"),
                     })}
                   >
@@ -384,7 +425,9 @@ export default function ActivitiesTable({
                 <button
                   className="group py-4 px-3"
                   title={activity.calendarId ? "Add" : "Edit"}
-                  onClick={() => editActivityHandler(activity)}
+                  onClick={() => {
+                    editActivityHandler(activity);
+                  }}
                 >
                   {!activity.calendarId && (
                     <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />

@@ -4,9 +4,11 @@ import ActivitiesTable from "./ActivitiesTable";
 import { ReportActivity } from "../utils/reports";
 import { ErrorPlaceholder, RenderError } from "./ui/ErrorPlaceholder";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { checkIsToday } from "../utils/datetime-ui";
 import { loadGoogleEventsFromAllUsers } from "../utils/google";
 import { getOffice365Events } from "../utils/office365";
+import { shallow } from "zustand/shallow";
+import { useGoogleCalendarStore } from "../store/googleCalendarStore";
+import { checkIsToday } from "../utils/datetime-ui";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
@@ -81,18 +83,15 @@ export default function ActivitiesSection({
       setBackgroundError(errorMessage);
       console.log("Error data ", data);
     });
-    global.ipcRenderer.on(
-      "render error",
-      (event, errorTitle, errorMessage, data) => {
-        setRenderError({ errorTitle, errorMessage });
-        console.log("Error data ", data);
-      }
-    );
+    global.ipcRenderer.on("render", (event, errorTitle, errorMessage, data) => {
+      setRenderError({ errorTitle, errorMessage });
+      console.log("Error data ", data);
+    });
 
     return () => {
       document.removeEventListener("keydown", keydownHandler);
       global.ipcRenderer.removeAllListeners("background error");
-      global.ipcRenderer.removeAllListeners("render error");
+      global.ipcRenderer.removeAllListeners("render or fetch error");
     };
   }, []);
 
@@ -110,54 +109,56 @@ export default function ActivitiesSection({
   }
 
   return (
-    <div>
-      {backgroundError && (
-        <div className="border-t-4  border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left dark:text-slate-400">
-          <div className="flex justify-start gap-2 w-full text-gray-900 font-bold dark:text-white">
-            <ExclamationCircleIcon
-              className="w-7 h-7 text-red-700"
-              aria-hidden="true"
-            />
-            <p>Noncritical error</p>
+    <div className="flex flex-col justify-between h-full">
+      <div>
+        {backgroundError && (
+          <div className="border-t-4  border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left dark:text-slate-400">
+            <div className="flex justify-start gap-2 w-full text-gray-900 font-bold dark:text-white">
+              <ExclamationCircleIcon
+                className="w-7 h-7 text-red-700"
+                aria-hidden="true"
+              />
+              <p>Noncritical error</p>
+            </div>
+            <div className="pl-9 pr-8">
+              {backgroundError} Refer to the console for specific error
+              information.
+            </div>
           </div>
-          <div className="pl-9 pr-8">
-            {backgroundError} Refer to the console for specific error
-            information.
-          </div>
-        </div>
-      )}
-
-      <div className="px-4 py-5 sm:px-6">
-        <ActivitiesTable
-          onEditActivity={onEditActivity}
-          activities={activities}
-          onDeleteActivity={onDeleteActivity}
-          selectedDate={selectedDate}
-          availableProjects={availableProjects}
-          events={events}
-          isLoading={isLoading}
-        />
-      </div>
-
-      {/* <div className="flex gap-2 px-6 pb-4 items-center justify-end mr-auto">
-        {today && isShowGoogleEvents && (
-          <GoogleCalendarEventsMessage
-            setShowGoogleEvents={setShowGoogleEvents}
-            formattedGoogleEvents={formattedGoogleEvents}
-          />
         )}
+
+        <div className="px-4 py-5 sm:px-6">
+          <ActivitiesTable
+            onEditActivity={onEditActivity}
+            activities={activities}
+            onDeleteActivity={onDeleteActivity}
+            selectedDate={selectedDate}
+            availableProjects={availableProjects}
+            events={events}
+            isLoading={isLoading}
+          />
+        </div>
+
+        {/* <div className="flex gap-2 px-6 pb-4 items-center justify-end mr-auto">
+        {today && isShowGoogleEvents && (
+            setShowGoogleEvents={setShowGoogleEvents}
+          <GoogleCalendarEventsMessage
+            formattedGoogleEvents={formattedGoogleEvents}
+        )}
+          />
       </div> */}
 
-      <div>
-        <button
-          className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300 sm:rounded-b-lg dark:bg-dark-button-back-gray hover:dark:bg-dark-button-gray-hover dark:text-dark-heading"
-          onClick={() => onEditActivity("new")}
-        >
-          Track more time
-          <span className="block text-blue-500 text-xs dark:text-dark-heading">
-            click or press ctrl + space
-          </span>
-        </button>
+        <div>
+          <button
+            className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300 sm:rounded-b-lg dark:bg-dark-button-back-gray hover:dark:bg-dark-button-gray-hover dark:text-dark-heading"
+            onClick={() => onEditActivity("new")}
+          >
+            Track more time
+            <span className="block text-blue-500 text-xs dark:text-dark-heading">
+              click or press ctrl + space
+            </span>
+          </button>
+        </div>
       </div>
     </div>
   );

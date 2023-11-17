@@ -7,6 +7,7 @@ import {
   getGoogleUserInfo,
 } from "../API/googleCalendarAPI";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
+import isOnline from "is-online";
 
 type GoogleCredentails = {
   access_token: string;
@@ -25,9 +26,14 @@ const GoogleConnection = () => {
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);
   const [loggedUsers, setLoggedUsers] = useState([]);
 
-  const signInHandler = () => {
-    const googleAuthUrl = getGoogleAuthUrl();
-    router.push(googleAuthUrl);
+  const signInHandler = async () => {
+    const online = await isOnline();
+
+    if (online) {
+      router.push(getGoogleAuthUrl());
+    } else {
+      global.ipcRenderer.send("app:load-offline-page");
+    }
   };
 
   const signOutHandler = (id: string) => {

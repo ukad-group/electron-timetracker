@@ -27,10 +27,12 @@ import {
   getAzureAuthUrl,
   getAzureAuthUrlAdditional,
   getAzureTokens,
+  getRefreshedPlannerToken,
   getTimetrackerCookie,
   getTimetrackerHolidays,
   getTimetrackerProjects,
   getTimetrackerVacations,
+  getRefreshedUserInfoToken,
 } from "./TimetrackerWebsiteApi";
 
 initialize("A-EU-9361517871");
@@ -91,7 +93,7 @@ ipcMain.on("install", (event) => {
 });
 
 ipcMain.on("front error", (event, errorTitle, errorMessage, data) => {
-  mainWindow?.webContents.send("render error", errorTitle, errorMessage, data);
+  mainWindow?.webContents.send("render", errorTitle, errorMessage, data);
 });
 
 const userDataDirectory = app.getPath("userData");
@@ -469,6 +471,10 @@ ipcMain.handle(
   }
 );
 
+ipcMain.on("app:load-offline-page", async () => {
+  mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
+});
+
 // TRELLO FUNCTIONS
 
 const getTrelloOptions = () => {
@@ -570,6 +576,15 @@ ipcMain.handle(
   }
 );
 
+ipcMain.handle(
+  "timetracker:refresh-user-info-token",
+  async (event, refreshToken: string) => {
+    const options = getOffice365Options();
+
+    return await getRefreshedUserInfoToken(refreshToken, options);
+  }
+);
+
 ipcMain.on("azure:login-additional", async () => {
   const options = getOffice365Options();
 
@@ -593,6 +608,23 @@ ipcMain.handle(
         "api://d7d02680-bd82-47ed-95f9-e977ab5f0487/access_as_user offline_access",
     };
     return await getAzureTokens(authCode, optionsWithPlannerScope);
+  }
+);
+
+ipcMain.handle(
+  "timetracker:refresh-planner-token",
+  async (event, refreshToken: string) => {
+    const options = getOffice365Options();
+
+    const optionsWithPlannerScope = {
+      ...options,
+      scope:
+        "api://d7d02680-bd82-47ed-95f9-e977ab5f0487/access_as_user offline_access",
+    };
+    return await getRefreshedPlannerToken(
+      refreshToken,
+      optionsWithPlannerScope
+    );
   }
 );
 

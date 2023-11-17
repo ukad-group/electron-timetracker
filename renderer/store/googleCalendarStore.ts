@@ -38,5 +38,5 @@ export const useGoogleCalendarStore =
         setGoogleEvents: (events) => set(() => ({ googleEvents: events })),
       };
     },
-    () => false
+      Object.is
   );
