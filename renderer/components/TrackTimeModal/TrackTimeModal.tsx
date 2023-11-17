@@ -168,30 +168,64 @@ export default function TrackTimeModal({
     }
   };
 
+  const getTimetrackerYearProjects = async () => {
+    const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+
+    if (!userInfo) return;
+
+    const timetrackerCookie = userInfo?.TTCookie;
+
+    try {
+      const yearProjects = await global.ipcRenderer.invoke(
+        "timetracker:get-projects",
+        timetrackerCookie
+      );
+
+      if (yearProjects === "invalid_token") {
+        const refresh_token = userInfo?.userInfoRefreshToken;
+
+        if (!refresh_token) return;
+
+        const updatedCreds = await global.ipcRenderer.invoke(
+          "timetracker:refresh-user-info-token",
+          refresh_token
+        );
+
+        const updatedIdToken = updatedCreds?.id_token;
+
+        const updatedCookie = await global.ipcRenderer.invoke(
+          "timetracker:login",
+          updatedIdToken
+        );
+
+        const updatedUser = {
+          ...userInfo,
+          idToken: updatedIdToken,
+          TTCookie: updatedCookie,
+        };
+
+        localStorage.setItem("timetracker-user", JSON.stringify(updatedUser));
+        getTimetrackerYearProjects();
+        return;
+      }
+
+      const updatedUserInfo = {
+        ...userInfo,
+        yearProjects: yearProjects,
+      };
+
+      localStorage.setItem("timetracker-user", JSON.stringify(updatedUserInfo));
+
+      setWebTrackerProjects(yearProjects);
+    } catch (error) {
+      console.log(error);
+      setWebTrackerProjects(userInfo.yearProjects);
+    }
+  };
+
   useEffect(() => {
     if (trelloUser) (async () => getTrelloCards())();
-    const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
-    if (userInfo) {
-      const timetrackerCookie = userInfo.TTCookie;
-      (async () => {
-        try {
-          userInfo.yearProjects = await global.ipcRenderer.invoke(
-            "timetracker:get-projects",
-            timetrackerCookie
-          );
-          localStorage.setItem("timetracker-user", JSON.stringify(userInfo));
-          setWebTrackerProjects(userInfo.yearProjects);
-        } catch (error) {
-          global.ipcRenderer.send(
-            "front error",
-            "fetch error",
-            "Problems with fetching current projects from the Timetracker website. Please notify us of the error and reconnect to the Timetracker website in the settings. We are already working on fixing the connectivity issue. ",
-            error
-          );
-          setWebTrackerProjects(userInfo.yearProjects);
-        }
-      })();
-    }
+    getTimetrackerYearProjects();
   }, []);
 
   const onSave = (e: FormEvent | MouseEvent) => {
