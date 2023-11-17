@@ -114,17 +114,10 @@ export default function ActivitiesSection({
       setBackgroundError(errorMessage);
       console.log("Error data ", data);
     });
-    global.ipcRenderer.on(
-      "render or fetch error",
-      (event, errorTitle, errorMessage, data) => {
-        if (errorTitle === "fetch error") {
-          setBackgroundError(errorMessage);
-        } else {
-          setRenderError({ errorTitle, errorMessage });
-        }
-        console.log("Error data ", data);
-      }
-    );
+    global.ipcRenderer.on("render", (event, errorTitle, errorMessage, data) => {
+      setRenderError({ errorTitle, errorMessage });
+      console.log("Error data ", data);
+    });
     return () => {
       document.removeEventListener("keydown", keydownHandler);
       global.ipcRenderer.removeAllListeners("background error");

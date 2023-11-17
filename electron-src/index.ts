@@ -32,6 +32,7 @@ import {
   getTimetrackerHolidays,
   getTimetrackerProjects,
   getTimetrackerVacations,
+  getRefreshedUserInfoToken,
 } from "./TimetrackerWebsiteApi";
 
 initialize("A-EU-9361517871");
@@ -92,7 +93,7 @@ ipcMain.on("install", (event) => {
 });
 
 ipcMain.on("front error", (event, errorTitle, errorMessage, data) => {
-  mainWindow?.webContents.send("render or fetch error", errorTitle, errorMessage, data);
+  mainWindow?.webContents.send("render", errorTitle, errorMessage, data);
 });
 
 const userDataDirectory = app.getPath("userData");
@@ -572,6 +573,15 @@ ipcMain.handle(
     const options = getOffice365Options();
 
     return await getAzureTokens(authCode, options);
+  }
+);
+
+ipcMain.handle(
+  "timetracker:refresh-user-info-token",
+  async (event, refreshToken: string) => {
+    const options = getOffice365Options();
+
+    return await getRefreshedUserInfoToken(refreshToken, options);
   }
 );
 

@@ -188,12 +188,6 @@ export default function ActivitiesTable({
           <th scope="col" className="pb-6 px-3 text-left text-sm font-semibold">
             Description
           </th>
-          {/* <th
-            scope="col"
-            className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
-          >
-            <span className="sr-only">Badge</span>
-          </th> */}
           <th
             scope="col"
             className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
@@ -307,13 +301,6 @@ export default function ActivitiesTable({
                 )}
               </Tooltip>
             </td>
-            {/* <td className="relative font-medium text-right whitespace-nowrap text-xs ">
-              {activity.isNewProject && (
-                <p className="text-center px-2.5 py-1 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20">
-                  New <br /> project!
-                </p>
-              )}
-            </td> */}
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
               <div className={`${activity.calendarId ? "invisible" : ""}`}>
                 <button
