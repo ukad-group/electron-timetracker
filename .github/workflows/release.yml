@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
     permissions:
       contents: write
     env:
@@ -127,8 +127,19 @@ jobs:
           files: |
             ./dist/*.exe
             ./dist/*.dmg
+            ./dist/*.deb
             ./dist/latest.yml
             ./dist/latest-mac.yml
+            ./dist/latest-linux.yml
+
+      - name: "Rename latest*.yml to beta*.yml"
+        if: (startsWith(github.ref, 'refs/tags/')) && (contains(github.ref, 'beta'))
+        shell: bash
+        run: |
+          cd ./dist
+          ls -l
+          for f in latest*.yml; do [ -e "$f" ] && mv "$f" "${f/latest/beta}"; done
+          ls -l
 
       - name: Publish pre-release
         uses: softprops/action-gh-release@v1
@@ -141,5 +152,7 @@ jobs:
           files: |
             ./dist/*.exe
             ./dist/*.dmg
-            ./dist/latest.yml
-            ./dist/latest-mac.yml
+            ./dist/*.deb
+            ./dist/beta.yml
+            ./dist/beta-mac.yml
+            ./dist/beta-linux.yml

@@ -10,6 +10,7 @@ import { createWindow } from "./helpers/create-window";
 import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
+import chokidar from 'chokidar';
 import { initialize, trackEvent } from "@aptabase/electron/main";
 import {
   callProfileInfoGraph,
@@ -35,6 +36,7 @@ import {
   getRefreshedUserInfoToken,
 } from "./TimetrackerWebsiteApi";
 
+
 initialize("A-EU-9361517871");
 ipcMain.on(
   "send-analytics-data",
@@ -50,7 +52,7 @@ let updateVersion = "";
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
-ipcMain.on("beta-channel", (event, isBeta: boolean) => {
+ipcMain.on("beta-channel", (event: any, isBeta: boolean) => {
   autoUpdater.allowPrerelease = isBeta;
 });
 
@@ -68,7 +70,7 @@ autoUpdater.on("error", (e: Error, message?: string) => {
   );
 });
 
-ipcMain.on("get-current-version", (event) => {
+ipcMain.on("get-current-version", () => {
   mainWindow &&
     mainWindow.webContents.send("current-version", app.getVersion());
 });
@@ -88,12 +90,12 @@ autoUpdater.on("update-downloaded", (info: UpdateInfo) => {
   }
 });
 
-ipcMain.on("install", (event) => {
+ipcMain.on("install", () => {
   autoUpdater.quitAndInstall(true, true);
 });
 
-ipcMain.on("front error", (event, errorTitle, errorMessage, data) => {
-  mainWindow?.webContents.send("render", errorTitle, errorMessage, data);
+ipcMain.on("front error", (event, errorTitle:string, errorMessage:string, data) => {
+  mainWindow?.webContents.send("render error", errorTitle, errorMessage, data);
 });
 
 const userDataDirectory = app.getPath("userData");
@@ -187,7 +189,7 @@ app.on("ready", async () => {
   if (!gotTheLock) {
     app.quit();
   } else {
-    app.on("second-instance", (event, commandLine, workingDirectory) => {
+    app.on("second-instance", () => {
       if (mainWindow) {
         if (mainWindow.isMinimized()) mainWindow.restore();
         mainWindow.show();
@@ -196,7 +198,7 @@ app.on("ready", async () => {
     });
     generateWindow();
   }
-
+let currentSelectedDate = "";
   if (mainWindow) {
     app.whenReady().then(() => {
       autoUpdater.checkForUpdates();
@@ -218,10 +220,17 @@ app.on("ready", async () => {
         const timereportPath = getPathFromDate(selectedDate, reportsFolder);
 
         try {
+          currentSelectedDate = selectedDate.toDateString();
           if (fs.existsSync(timereportPath)) {
             mainWindow?.webContents.send("file exist", true);
-            fs.watch(timereportPath, (eventType, filename) => {
-              if (eventType === "change") {
+
+            chokidar
+            .watch(timereportPath)
+            .on('change', (timereportPath) => {
+              if (
+                currentSelectedDate === selectedDate.toDateString()
+              ) {
+
                 readDataFromFile(timereportPath, (data: string | null) => {
                   mainWindow &&
                     mainWindow.webContents.send("file-changed", data);
@@ -240,23 +249,25 @@ app.on("ready", async () => {
       }
     );
 
-    ipcMain.on("start-folder-watcher", (event, reportsFolder: string) => {
-      try {
-        if (fs.existsSync(reportsFolder)) {
-          fs.watch(reportsFolder, { recursive: true }, (eventType) => {
-            if (eventType === "change") {
-              mainWindow?.webContents.send("any-file-changed");
-            }
-          });
+    ipcMain.on(
+      "start-folder-watcher",
+      (event, reportsFolder: string, calendarDate: Date) => {
+        try {
+          if (fs.existsSync(reportsFolder)) {
+            chokidar
+            .watch(reportsFolder)
+            .on('change', () =>{
+                mainWindow?.webContents.send("any-file-changed"); 
+            })
+          }
+        } catch (err) {
+          console.log(err);
+          mainWindow?.webContents.send(
+            "background error",
+            "Watcher error. Updates to files might not be accurately displayed within the application. ",
+            err
+          );
         }
-      } catch (err) {
-        console.log(err);
-        mainWindow?.webContents.send(
-          "background error",
-          "Watcher error. Updates to files might not be accurately displayed within the application. ",
-          err
-        );
-      }
     });
   }
 
@@ -266,10 +277,6 @@ app.on("ready", async () => {
 });
 
 app.on("window-all-closed", () => {
-  // if (process.platform !== "darwin") {
-  //   app.quit();
-  // }
-
   app.quit();
 });
 
@@ -327,7 +334,7 @@ const deleteFile = (filePath: string): Promise<void> => {
   });
 };
 
-ipcMain.handle("app:update-status", async (event) => {
+ipcMain.handle("app:update-status", async () => {
   return [updateStatus, updateVersion];
 });
 

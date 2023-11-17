@@ -28,6 +28,7 @@
     "releaseType": "release"
   },
   "build": {
+    "generateUpdatesFilesForAllChannels": true,
     "appId": "com.timetracker.autoupdater",
     "productName": "Timetracker",
     "artifactName": "${productName}-Setup-${version}.${ext}",
@@ -48,6 +49,7 @@
       "icon": "app/images/logo.png"
     },
     "linux": {
+      "target": "deb",
       "icon": "app/images/logo.png"
     }
   },
@@ -62,6 +64,7 @@
     "@headlessui/react": "^1.7.14",
     "@heroicons/react": "^2.0.18",
     "@tailwindcss/forms": "^0.5.3",
+    "chokidar": "^3.5.3",
     "clsx": "^1.2.1",
     "dotenv": "^16.3.1",
     "electron-is-dev": "^1.1.0",

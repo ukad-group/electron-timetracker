@@ -83,7 +83,7 @@ export default function ActivitiesSection({
       setBackgroundError(errorMessage);
       console.log("Error data ", data);
     });
-    global.ipcRenderer.on("render", (event, errorTitle, errorMessage, data) => {
+    global.ipcRenderer.on("render error", (event, errorTitle, errorMessage, data) => {
       setRenderError({ errorTitle, errorMessage });
       console.log("Error data ", data);
     });
