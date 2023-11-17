@@ -130,7 +130,7 @@ export default function Home() {
   }, [selectedDate, reportsFolder, lastRenderedDay]);
 
   useEffect(() => {
-    if (selectedDateReport.length > 0) {
+    if (selectedDateReport?.length > 0) {
       const parsedReportsAndNotes = parseReport(selectedDateReport);
       const parsedActivities = parsedReportsAndNotes[0];
 

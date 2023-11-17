@@ -157,12 +157,12 @@ export default function TrackTimeModal({
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
 
-    let dashedDescription = description;
-
     if (isFormInvalid) {
       setIsValidationEnabled(true);
       return;
     }
+    
+    let dashedDescription = description;
 
     if (description.includes(" - ")) {
       setDescription(description.replace(/ - /g, " -- "));
