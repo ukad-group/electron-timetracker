@@ -12,7 +12,7 @@ type DisclosureSectionProps = {
 
 export default function DisclosureSection(props: DisclosureSectionProps) {
   return (
-    <div className="lg:absolute mt-6 w-full ">
+    <div className="w-full">
       <Disclosure>
         {({ open }) => (
           <div

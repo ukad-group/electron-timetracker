@@ -36,5 +36,5 @@ export const useBetaStore = createWithEqualityFn<BetaStore>()(
       }
     )
   ),
-  () => false
+  Object.is
 );

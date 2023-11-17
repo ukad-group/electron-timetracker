@@ -38,5 +38,5 @@ export const useThemeStore = createWithEqualityFn<ThemeStore>()(
       }
     )
   ),
-  () => false
+  Object.is
 );

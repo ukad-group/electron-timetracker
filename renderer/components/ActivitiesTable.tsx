@@ -27,6 +27,10 @@ export default function ActivitiesTable({
   formattedGoogleEvents,
 }: ActivitiesTableProps) {
   const [ctrlPressed, setCtrlPressed] = useState(false);
+  const [firstKey, setFirstKey] = useState(null);
+  const [secondKey, setSecondtKey] = useState(null);
+  const [firstKeyPressTime, setFirstKeyPressTime] = useState(null);
+  const [timerId, setTimerId] = useState(null);
   const nonBreakActivities = useMemo(() => {
     return validation(activities.filter((activity) => !activity.isBreak));
   }, [activities]);
@@ -83,34 +87,59 @@ export default function ActivitiesTable({
       (event.ctrlKey && event.key === "ArrowUp") ||
       (event.key === "Meta" && event.key === "ArrowUp")
     ) {
-      if (nonBreakActivities.length > 0) {
-        const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
+      if (tableActivities.length > 0) {
+        const lastActivity = tableActivities[tableActivities.length - 1];
         onEditActivity(lastActivity);
       }
     }
     if (event.key === "Control" || event.key === "Meta") {
       setCtrlPressed(true);
     }
+
     if (
       (event.ctrlKey || event.key === "Control" || event.key === "Meta") &&
-      /^[1-9]$/.test(event.key)
+      /^[0-9]$/.test(event.key)
     ) {
       const number = parseInt(event.key, 10);
-      if (number >= 1 && number <= nonBreakActivities.length) {
-        const selectedActivity = nonBreakActivities[Number(event.key) - 1];
-        if (selectedActivity.calendarId) {
-          onEditActivity({
-            ...selectedActivity,
-            id: null,
-          });
-        } else {
-          onEditActivity(selectedActivity);
+
+      if (!firstKey && number >= 1 && number <= tableActivities.length) {
+        setFirstKey(event.key);
+        const selectedActivity = tableActivities[Number(event.key) - 1];
+        const timerId = setTimeout(() => {
+          if (selectedActivity.calendarId) {
+            onEditActivity({
+              ...selectedActivity,
+              id: null,
+            });
+          } else {
+            onEditActivity(selectedActivity);
+          }
+        }, 500);
+        setTimerId(timerId);
+        setFirstKeyPressTime(Date.now());
+      }
+
+      if (Date.now() - firstKeyPressTime < 500) {
+        clearTimeout(timerId);
+        setSecondtKey(event.key);
+        const selectedActivity =
+          tableActivities[Number(firstKey + event.key) - 1];
+
+        if (selectedActivity) {
+          if (selectedActivity.calendarId) {
+            onEditActivity({
+              ...selectedActivity,
+              id: null,
+            });
+          } else onEditActivity(selectedActivity);
         }
       }
     }
   };
   const handleKeyUp = (event) => {
     if (event.key === "Control" || event.key === "Meta") {
+      setFirstKey(null);
+      setSecondtKey(null);
       setCtrlPressed(false);
     }
   };
@@ -122,7 +151,7 @@ export default function ActivitiesTable({
       window.removeEventListener("keydown", handleKeyDown);
       window.addEventListener("keyup", handleKeyUp);
     };
-  }, [nonBreakActivities]);
+  }, [firstKey, tableActivities]);
 
   return (
     <table className="min-w-full divide-y divide-gray-300 table-fixed dark:divide-gray-600">
@@ -176,13 +205,19 @@ export default function ActivitiesTable({
         {tableActivities.map((activity, i) => (
           <tr
             key={i}
-            className={clsx(`border-b border-gray-200 dark:border-gray-300 `, {
-              "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
-                tableActivities[i].to != tableActivities[i + 1]?.from &&
-                i + 1 !== tableActivities.length &&
-                !activity.calendarId,
-              "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
-            })}
+            className={clsx(
+              `border-b border-gray-200 dark:border-gray-300 transition-transform `,
+              {
+                "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
+                  tableActivities[i].to != tableActivities[i + 1]?.from &&
+                  i + 1 !== tableActivities.length &&
+                  !activity.calendarId,
+                "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
+                "scale-105 ":
+                  (Number(firstKey) === i + 1 && !secondKey) ||
+                  (Number(firstKey + secondKey) === i + 1 && secondKey),
+              }
+            )}
           >
             <td
               className={`relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
