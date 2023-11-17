@@ -150,3 +150,11 @@ export const getStringDate = (date: Date): string => {
 
   return `${year}-${month}-${day}`;
 };
+
+export const convertMillisecondsToTime = (milliseconds) => {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, "0");;
+
+  return `${hours}:${minutes}`;
+}

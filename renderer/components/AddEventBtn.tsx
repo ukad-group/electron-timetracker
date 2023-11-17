@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
+import { shallow } from "zustand/shallow";
 import { useGoogleCalendarStore } from "../store/googleCalendarStore";
 import {
   getGoogleEvents,
@@ -36,7 +37,10 @@ export default function AddEventBtn({
   const [office365Events, setOffice365Events] = useState([]);
   const [isError, setIsError] = useState(false);
   const [allEvents, setAllEvents] = useState([]);
-  const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
+  const [googleEvents, setGoogleEvents] = useGoogleCalendarStore(
+    (state) => [state.googleEvents, state.setGoogleEvents],
+    shallow
+  );
 
   const loadGoogleEvents = async (
     accessToken: string,
