@@ -66,6 +66,8 @@ export default function TrackTimeModal({
     (state) => [state.event, state.setEvent],
     shallow
   );
+  const [latestProjects, setLatestProjects] = useState([]);
+  const [webTrackerProjects, setWebTrackerProjects] = useState([]);
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -134,6 +136,15 @@ export default function TrackTimeModal({
 
   useEffect(() => {
     addSuggestions(activities, latestProjAndDesc, latestProjAndAct);
+    const tempProj = Object.keys(latestProjAndAct);
+    if (webTrackerProjects) {
+      for (let i = 0; i < webTrackerProjects.length; i++) {
+        if (!tempProj.includes(webTrackerProjects[i])) {
+          tempProj.push(webTrackerProjects[i]);
+        }
+      }
+    }
+    setLatestProjects(tempProj);
   }, [isOpen, latestProjAndDesc, latestProjAndAct]);
 
   useEffect(() => {
@@ -165,6 +176,28 @@ export default function TrackTimeModal({
 
   useEffect(() => {
     if (trelloUser) (async () => getTrelloCards())();
+    const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+    if (userInfo) {
+      const timetrackerCookie = userInfo.TTCookie;
+      (async () => {
+        try {
+          userInfo.yearProjects = await global.ipcRenderer.invoke(
+            "timetracker:get-projects",
+            timetrackerCookie
+          );
+          localStorage.setItem("timetracker-user", JSON.stringify(userInfo));
+          setWebTrackerProjects(userInfo.yearProjects);
+        } catch (error) {
+          global.ipcRenderer.send(
+            "front error",
+            "fetch error",
+            "Problems with fetching current projects from the Timetracker website. Please notify us of the error and reconnect to the Timetracker website in the settings. We are already working on fixing the connectivity issue. ",
+            error
+          );
+          setWebTrackerProjects(userInfo.yearProjects);
+        }
+      })();
+    }
   }, []);
 
   const onSave = (e: FormEvent | MouseEvent) => {
@@ -532,13 +565,13 @@ export default function TrackTimeModal({
                       onSave={onSave}
                       title="Project"
                       required
-                      availableItems={
-                        latestProjAndAct ? Object.keys(latestProjAndAct) : []
-                      }
+                      availableItems={latestProjects}
                       selectedItem={project}
                       setSelectedItem={setProject}
                       isValidationEnabled={isValidationEnabled}
-                      isLastThree={false}
+                      showedSuggestionsNumber={
+                        Object.keys(latestProjAndAct).length
+                      }
                       tabIndex={4}
                     />
                   </div>
@@ -551,7 +584,7 @@ export default function TrackTimeModal({
                       }
                       selectedItem={activity}
                       setSelectedItem={setActivity}
-                      isLastThree={true}
+                      showedSuggestionsNumber={3}
                       tabIndex={5}
                     />
                   </div>
@@ -566,7 +599,7 @@ export default function TrackTimeModal({
                       }
                       selectedItem={description}
                       setSelectedItem={setDescription}
-                      isLastThree={true}
+                      showedSuggestionsNumber={3}
                       tabIndex={6}
                     />
                   </div>

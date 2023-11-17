@@ -45,7 +45,6 @@ export default function Home() {
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
     []
   );
-
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
 
   useEffect(() => {
@@ -329,7 +328,6 @@ export default function Home() {
       );
       console.log(activity);
     }
-
     setShouldAutosave(true);
   };
 

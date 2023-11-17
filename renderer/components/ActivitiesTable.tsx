@@ -42,9 +42,16 @@ export default function ActivitiesTable({
   }, [nonBreakActivities]);
 
   const tableActivities = useMemo(() => {
+    const badgedActivities = nonBreakActivities.map((activity) => {
+      const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+      if (userInfo && !userInfo.yearProjects.includes(activity.project)) {
+        return { ...activity, isNewProject: true };
+      }
+      return activity;
+    });
     return formattedGoogleEvents && formattedGoogleEvents.length > 0
-      ? concatSortArrays(nonBreakActivities, formattedGoogleEvents)
-      : nonBreakActivities;
+      ? concatSortArrays(badgedActivities, formattedGoogleEvents)
+      : badgedActivities;
   }, [nonBreakActivities, formattedGoogleEvents]);
 
   const copyToClipboardHandle = (e) => {
@@ -185,7 +192,7 @@ export default function ActivitiesTable({
             scope="col"
             className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0"
           >
-            <span className="sr-only">Delete</span>
+            <span className="sr-only">Badge</span>
           </th> */}
           <th
             scope="col"
@@ -248,18 +255,25 @@ export default function ActivitiesTable({
               </Tooltip>
             </td>
             <td
-              className={`flex flex-col px-3 py-4 ${
+              className={`flex flex-col relative px-3 py-4 ${
                 activity.calendarId ? "opacity-50" : ""
               }`}
             >
-              <Tooltip>
-                <p
-                  className="text-sm font-medium text-gray-900 dark:text-dark-heading"
-                  onClick={copyToClipboardHandle}
-                >
-                  {activity.project}
-                </p>
-              </Tooltip>
+              <div className="flex">
+                <Tooltip>
+                  <p
+                    className="text-sm font-medium text-gray-900 dark:text-dark-heading"
+                    onClick={copyToClipboardHandle}
+                  >
+                    {activity.project}
+                  </p>
+                </Tooltip>
+                {activity.isNewProject && (
+                  <p className="text-center ml-1 mb-1 w-fit text-xs  px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
+                    new
+                  </p>
+                )}
+              </div>
               {activity.activity && (
                 <Tooltip>
                   <p
@@ -280,7 +294,7 @@ export default function ActivitiesTable({
                 <p
                   onClick={copyToClipboardHandle}
                   className={clsx({
-                    "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800":
+                    "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20":
                       activity.mistakes?.includes("startsWith!"),
                   })}
                 >
@@ -293,6 +307,13 @@ export default function ActivitiesTable({
                 )}
               </Tooltip>
             </td>
+            {/* <td className="relative font-medium text-right whitespace-nowrap text-xs ">
+              {activity.isNewProject && (
+                <p className="text-center px-2.5 py-1 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20">
+                  New <br /> project!
+                </p>
+              )}
+            </td> */}
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
               <div className={`${activity.calendarId ? "invisible" : ""}`}>
                 <button
