@@ -10,7 +10,7 @@ import {
   addSuggestions,
   addDurationToTime,
 } from "../../utils/reports";
-import { checkIsToday } from "../../utils/datetime-ui";
+import { checkIsToday, padStringToMinutes } from "../../utils/datetime-ui";
 import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
 import { shallow } from "zustand/shallow";
@@ -82,7 +82,17 @@ export default function TrackTimeModal({
       return;
     }
 
-    setFrom(editedActivity.from || "");
+    if (editedActivity?.calendarId) {
+      const lastRegistrationTo = activities[activities?.length - 2]?.to;
+
+      padStringToMinutes(lastRegistrationTo) >
+      padStringToMinutes(editedActivity?.from)
+        ? setFrom(lastRegistrationTo || "")
+        : setFrom(editedActivity?.from || "");
+    } else {
+      setFrom(editedActivity?.from || "");
+    }
+
     setTo(editedActivity.to || "");
     setFormattedDuration(formatDuration(editedActivity.duration) || "");
     setProject(editedActivity.project || "");
