@@ -109,7 +109,7 @@ export function Calendar({
       (async () => {
         setParsedQuarterReports(
           await global.ipcRenderer.invoke(
-            "app:find-month-projects",
+            "app:find-quarter-projects",
             reportsFolder,
             getStringDate(calendarDate)
           )
@@ -120,7 +120,7 @@ export function Calendar({
         (async () => {
           setParsedQuarterReports(
             await global.ipcRenderer.invoke(
-              "app:find-month-projects",
+              "app:find-quarter-projects",
               reportsFolder,
               getStringDate(calendarDate)
             )
@@ -130,6 +130,7 @@ export function Calendar({
 
       return () => {
         global.ipcRenderer.removeAllListeners("any-file-changed");
+        global.ipcRenderer.send("stop-folder-watcher", reportsFolder);
       };
     } catch (err) {
       console.log("Error details ", err);

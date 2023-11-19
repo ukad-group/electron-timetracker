@@ -10,7 +10,7 @@ import { createWindow } from "./helpers/create-window";
 import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
 import { getPathFromDate } from "./helpers/datetime";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
-import chokidar from 'chokidar';
+import chokidar from "chokidar";
 import { initialize, trackEvent } from "@aptabase/electron/main";
 import {
   callProfileInfoGraph,
@@ -35,7 +35,6 @@ import {
   getTimetrackerVacations,
   getRefreshedUserInfoToken,
 } from "./TimetrackerWebsiteApi";
-
 
 initialize("A-EU-9361517871");
 ipcMain.on(
@@ -94,9 +93,17 @@ ipcMain.on("install", () => {
   autoUpdater.quitAndInstall(true, true);
 });
 
-ipcMain.on("front error", (event, errorTitle:string, errorMessage:string, data) => {
-  mainWindow?.webContents.send("render error", errorTitle, errorMessage, data);
-});
+ipcMain.on(
+  "front error",
+  (event, errorTitle: string, errorMessage: string, data) => {
+    mainWindow?.webContents.send(
+      "render error",
+      errorTitle,
+      errorMessage,
+      data
+    );
+  }
+);
 
 const userDataDirectory = app.getPath("userData");
 let mainWindow: Electron.CrossProcessExports.BrowserWindow | null = null;
@@ -198,7 +205,9 @@ app.on("ready", async () => {
     });
     generateWindow();
   }
-let currentSelectedDate = "";
+
+  let currentSelectedDate = "";
+
   if (mainWindow) {
     app.whenReady().then(() => {
       autoUpdater.checkForUpdates();
@@ -224,13 +233,8 @@ let currentSelectedDate = "";
           if (fs.existsSync(timereportPath)) {
             mainWindow?.webContents.send("file exist", true);
 
-            chokidar
-            .watch(timereportPath)
-            .on('change', (timereportPath) => {
-              if (
-                currentSelectedDate === selectedDate.toDateString()
-              ) {
-
+            chokidar.watch(timereportPath).on("change", (timereportPath) => {
+              if (currentSelectedDate === selectedDate.toDateString()) {
                 readDataFromFile(timereportPath, (data: string | null) => {
                   mainWindow &&
                     mainWindow.webContents.send("file-changed", data);
@@ -249,25 +253,45 @@ let currentSelectedDate = "";
       }
     );
 
-    ipcMain.on(
-      "start-folder-watcher",
-      (event, reportsFolder: string, calendarDate: Date) => {
-        try {
-          if (fs.existsSync(reportsFolder)) {
-            chokidar
-            .watch(reportsFolder)
-            .on('change', () =>{
-                mainWindow?.webContents.send("any-file-changed"); 
-            })
-          }
-        } catch (err) {
-          console.log(err);
-          mainWindow?.webContents.send(
-            "background error",
-            "Watcher error. Updates to files might not be accurately displayed within the application. ",
-            err
-          );
+    // common scope watchers for the start/stop-folder-watcher functions
+    const watchers: {
+      [key: string]: chokidar.FSWatcher | undefined;
+    } = {};
+
+    ipcMain.on("start-folder-watcher", (event, reportsFolder: string) => {
+      try {
+        if (fs.existsSync(reportsFolder)) {
+          const folderWatcher = chokidar.watch(reportsFolder);
+          watchers[reportsFolder] = folderWatcher;
+
+          folderWatcher.on("change", () => {
+            mainWindow?.webContents.send("any-file-changed");
+          });
         }
+      } catch (err) {
+        console.log(err);
+        mainWindow?.webContents.send(
+          "background error",
+          "Watcher error. Updates to files might not be accurately displayed within the application. ",
+          err
+        );
+      }
+    });
+
+    ipcMain.on("stop-folder-watcher", (event, folderPath: string) => {
+      try {
+        if (watchers[folderPath]) {
+          watchers[folderPath]?.close();
+          delete watchers[folderPath];
+        }
+      } catch (err) {
+        console.log(err);
+        mainWindow?.webContents.send(
+          "background error",
+          "Watcher error. Updates to files might not be accurately displayed within the application. ",
+          err
+        );
+      }
     });
   }
 
@@ -463,7 +487,7 @@ ipcMain.handle(
 );
 
 ipcMain.handle(
-  "app:find-month-projects",
+  "app:find-quarter-projects",
   (event, reportsFolder: string, stringDate: string) => {
     if (!reportsFolder || !stringDate.length) return [];
 
