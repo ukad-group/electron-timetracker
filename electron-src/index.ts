@@ -223,17 +223,26 @@ app.on("ready", async () => {
       }
     });
 
+    // common scope watchers for the start/stop-folder-watcher functions
+    const watchers: {
+      [key: string]: chokidar.FSWatcher | undefined;
+    } = {};
+
     ipcMain.on(
       "start-file-watcher",
       (event, reportsFolder: string, selectedDate: Date) => {
         const timereportPath = getPathFromDate(selectedDate, reportsFolder);
 
         try {
-          currentSelectedDate = selectedDate.toDateString();
           if (fs.existsSync(timereportPath)) {
             mainWindow?.webContents.send("file exist", true);
 
-            chokidar.watch(timereportPath).on("change", (timereportPath) => {
+            const fileWatcher = chokidar.watch(timereportPath);
+            watchers[timereportPath] = fileWatcher;
+
+            fileWatcher.on("change", (timereportPath) => {
+              currentSelectedDate = selectedDate.toDateString();
+
               if (currentSelectedDate === selectedDate.toDateString()) {
                 readDataFromFile(timereportPath, (data: string | null) => {
                   mainWindow &&
@@ -252,11 +261,6 @@ app.on("ready", async () => {
         }
       }
     );
-
-    // common scope watchers for the start/stop-folder-watcher functions
-    const watchers: {
-      [key: string]: chokidar.FSWatcher | undefined;
-    } = {};
 
     ipcMain.on("start-folder-watcher", (event, reportsFolder: string) => {
       try {
@@ -278,21 +282,30 @@ app.on("ready", async () => {
       }
     });
 
-    ipcMain.on("stop-folder-watcher", (event, folderPath: string) => {
-      try {
-        if (watchers[folderPath]) {
-          watchers[folderPath]?.close();
-          delete watchers[folderPath];
+    ipcMain.on(
+      "stop-path-watcher",
+      (event, reportsFolder: string, selectedDate: Date) => {
+        try {
+          if (selectedDate) {
+            const timereportPath = getPathFromDate(selectedDate, reportsFolder);
+            if (watchers[timereportPath]) {
+              watchers[timereportPath]?.close();
+              delete watchers[timereportPath];
+            }
+          } else if (watchers[reportsFolder]) {
+            watchers[reportsFolder]?.close();
+            delete watchers[reportsFolder];
+          }
+        } catch (err) {
+          console.log(err);
+          mainWindow?.webContents.send(
+            "background error",
+            "Watcher error. Updates to files might not be accurately displayed within the application. ",
+            err
+          );
         }
-      } catch (err) {
-        console.log(err);
-        mainWindow?.webContents.send(
-          "background error",
-          "Watcher error. Updates to files might not be accurately displayed within the application. ",
-          err
-        );
       }
-    });
+    );
   }
 
   mainWindow?.on("restore", () => {

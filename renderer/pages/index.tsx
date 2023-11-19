@@ -127,6 +127,7 @@ export default function Home() {
     return () => {
       global.ipcRenderer.removeAllListeners("file-changed");
       global.ipcRenderer.removeAllListeners("errorMes");
+      global.ipcRenderer.send("stop-path-watcher", reportsFolder, selectedDate);
     };
   }, [selectedDate, reportsFolder, lastRenderedDay]);
 

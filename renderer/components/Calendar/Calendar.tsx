@@ -130,7 +130,7 @@ export function Calendar({
 
       return () => {
         global.ipcRenderer.removeAllListeners("any-file-changed");
-        global.ipcRenderer.send("stop-folder-watcher", reportsFolder);
+        global.ipcRenderer.send("stop-path-watcher", reportsFolder);
       };
     } catch (err) {
       console.log("Error details ", err);
