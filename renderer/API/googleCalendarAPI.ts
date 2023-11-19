@@ -74,17 +74,21 @@ export const getGoogleEvents = async (token: string) => {
 
   googleEventsUrl.search = params.toString();
 
-  const response = await fetch(googleEventsUrl.toString(), {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    const response = await fetch(googleEventsUrl.toString(), {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  if (!response.ok && response.status !== 401) {
-    throw new Error();
+    if (!response.ok && response.status !== 401) {
+      throw new Error();
+    }
+
+    return response.json();
+  } catch (e) {
+    throw new Error(`Network error: ${e}`);
   }
-
-  return response.json();
 };
 
 export const getGoogleUserInfo = async (googleAccessToken: string) => {

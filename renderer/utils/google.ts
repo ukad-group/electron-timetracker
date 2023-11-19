@@ -1,4 +1,7 @@
-import { getGoogleEvents, updateGoogleCredentials } from "../API/googleCalendarAPI";
+import {
+  getGoogleEvents,
+  updateGoogleCredentials,
+} from "../API/googleCalendarAPI";
 
 export const loadGoogleEvents = async (
   accessToken: string,
@@ -22,8 +25,7 @@ export const loadGoogleEvents = async (
 
     return data?.items;
   } catch (error) {
-    console.error(error);
-
+    console.error(error.message);
     return [];
   }
 };
