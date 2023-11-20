@@ -251,9 +251,15 @@ export default function Home() {
           }
 
           activities[activityIndex] = activity;
-
+          console.log(activities);
+          if (activities[activityIndex - 1].isBreak) {
+            activities[activityIndex - 1].to = activity.from;
+          }
           if (activities[activityIndex + 1].isBreak) {
-            activities.splice(activityIndex + 1, 1);
+            activities[activityIndex + 1].from = activity.to;
+            if (activities[activityIndex + 2].from === activity.to) {
+              activities.splice(activityIndex + 1, 1);
+            }
           } else if (
             newActTo > stringToMinutes(activities[activityIndex + 1].from)
           ) {
