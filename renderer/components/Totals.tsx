@@ -124,6 +124,12 @@ const Totals = ({ activities }) => {
     return totals;
   };
 
+  const sortTotals = (totals) => {
+    return totals.sort((totalA, totalB) =>
+      totalA.name.localeCompare(totalB.name)
+    );
+  };
+
   const toggleActivitiesList = (projectName: string) => {
     if (isShowedActivitiesList(projectName)) {
       const filteredShowedProjects = showedProjects.filter(
@@ -165,10 +171,12 @@ const Totals = ({ activities }) => {
     setShowedProjects([]);
 
     const initialProjectTotals = getProjectTotals();
-    const fullProjectTotals = initialProjectTotals.map((total: Total) => {
+    const sortedProjectTotals = sortTotals(initialProjectTotals);
+    const fullProjectTotals = sortedProjectTotals.map((total: Total) => {
       const projectActivities = getActivityTotals(total.name);
+      const sortedProjectActivities = sortTotals(projectActivities);
 
-      return { ...total, activities: projectActivities };
+      return { ...total, activities: sortedProjectActivities };
     });
 
     setTotals(fullProjectTotals);

@@ -252,9 +252,29 @@ export default function Home() {
 
           activities[activityIndex] = activity;
 
-          if (activities[activityIndex + 1].isBreak) {
-            activities.splice(activityIndex + 1, 1);
+          if (
+            activities[activityIndex - 1] &&
+            activities[activityIndex - 1].isBreak
+          ) {
+            activities[activityIndex - 1].to = activity.from;
+            if (activities[activityIndex - 1]?.from === activity.from) {
+              activities.splice(activityIndex - 1, 1);
+            }
+          }
+
+          if (
+            activities[activityIndex + 1] &&
+            activities[activityIndex + 1].isBreak
+          ) {
+            activities[activityIndex + 1].from = activity.to;
+            if (
+              activities[activityIndex + 2] &&
+              activities[activityIndex + 2]?.from === activity.to
+            ) {
+              activities.splice(activityIndex + 1, 1);
+            }
           } else if (
+            activities[activityIndex + 1] &&
             newActTo > stringToMinutes(activities[activityIndex + 1].from)
           ) {
             activities[activityIndex + 1].from = activities[activityIndex].to;

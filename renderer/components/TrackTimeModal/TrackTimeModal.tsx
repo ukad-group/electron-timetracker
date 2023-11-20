@@ -550,7 +550,7 @@ export default function TrackTimeModal({
                       className={clsx(
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:border-dark-form-border dark:text-dark-heading dark:bg-dark-form-back focus:dark:border-focus-border focus:dark:ring-focus-border",
                         {
-                          "border-red-300 text-red-900 placeholder-red-300":
+                          "border-red-300 text-red-900 placeholder-red-300 dark:border-red-700/40 dark:text-red-500 dark:placeholder-red-300":
                             isValidationEnabled && (!from || from.length < 5),
                         }
                       )}
@@ -578,7 +578,7 @@ export default function TrackTimeModal({
                       className={clsx(
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:border-dark-form-border dark:text-dark-heading dark:bg-dark-form-back focus:dark:border-focus-border focus:dark:ring-focus-border",
                         {
-                          "border-red-300 text-red-900 placeholder-red-300":
+                          "border-red-300 text-red-900 placeholder-red-300 dark:border-red-700/40 dark:text-red-500 dark:placeholder-red-300":
                             isValidationEnabled && (!to || to.length < 5),
                         }
                       )}
@@ -605,7 +605,7 @@ export default function TrackTimeModal({
                       className={clsx(
                         "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:border-dark-form-border dark:text-dark-heading dark:bg-dark-form-back focus:dark:border-focus-border focus:dark:ring-focus-border",
                         {
-                          "border-red-300 text-red-900 placeholder-red-300":
+                          "border-red-300 text-red-900 placeholder-red-300 dark:border-red-700/40 dark:text-red-500 dark:placeholder-red-300":
                             isValidationEnabled && (!duration || duration < 0),
                         }
                       )}
