@@ -252,7 +252,10 @@ export default function Home() {
 
           activities[activityIndex] = activity;
 
-          if (activities[activityIndex - 1].isBreak) {
+          if (
+            activities[activityIndex - 1] &&
+            activities[activityIndex - 1].isBreak
+          ) {
             activities[activityIndex - 1].to = activity.from;
           }
           if (activities[activityIndex + 1].isBreak) {
