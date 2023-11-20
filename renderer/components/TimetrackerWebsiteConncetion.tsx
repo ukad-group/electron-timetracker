@@ -11,13 +11,13 @@ const TimetrackerWebsiteConnection = () => {
   const [loggedUser, setLoggedUser] = useState(
     JSON.parse(localStorage.getItem("timetracker-user"))
   );
-  const [holidays, setHolidays] = useState([]);
-  const [showholidays, setShowHolidays] = useState(false);
-  const [vacationsSickDays, setVacationsSickDays] = useState([]);
-  const [showVacationsSickDays, setShowVacationsSickDays] = useState(false);
-  const [projects, setProjects] = useState([]);
-  const [showProjects, setShowProjects] = useState(false);
   const [loading, setLoading] = useState(false);
+  // const [holidays, setHolidays] = useState([]);
+  // const [showholidays, setShowHolidays] = useState(false);
+  // const [vacationsSickDays, setVacationsSickDays] = useState([]);
+  // const [showVacationsSickDays, setShowVacationsSickDays] = useState(false);
+  // const [projects, setProjects] = useState([]);
+  // const [showProjects, setShowProjects] = useState(false);
 
   const handleSignInButton = async () => {
     const online = await isOnline();
@@ -30,35 +30,35 @@ const TimetrackerWebsiteConnection = () => {
   };
 
   const handleSignOutButton = () => {
-    setHolidays([]);
-    setVacationsSickDays([]);
-    setProjects([]);
+    // setHolidays([]);
+    // setVacationsSickDays([]);
+    // setProjects([]);
 
-    setShowProjects(false);
-    setShowVacationsSickDays(false);
-    setShowHolidays(false);
+    // setShowProjects(false);
+    // setShowVacationsSickDays(false);
+    // setShowHolidays(false);
 
     localStorage.removeItem("timetracker-user");
     setLoggedUser(null);
   };
 
-  const handleShowHolidays = () => {
-    setShowProjects(false);
-    setShowVacationsSickDays(false);
-    setShowHolidays(true);
-  };
+  // const handleShowHolidays = () => {
+  //   setShowProjects(false);
+  //   setShowVacationsSickDays(false);
+  //   setShowHolidays(true);
+  // };
 
-  const handleShowSickVac = () => {
-    setShowHolidays(false);
-    setShowProjects(false);
-    setShowVacationsSickDays(true);
-  };
+  // const handleShowSickVac = () => {
+  //   setShowHolidays(false);
+  //   setShowProjects(false);
+  //   setShowVacationsSickDays(true);
+  // };
 
-  const handleShowProjects = () => {
-    setShowHolidays(false);
-    setShowVacationsSickDays(false);
-    setShowProjects(true);
-  };
+  // const handleShowProjects = () => {
+  //   setShowHolidays(false);
+  //   setShowVacationsSickDays(false);
+  //   setShowProjects(true);
+  // };
 
   const loadUserInfo = async () => {
     setLoading(true);
@@ -159,15 +159,15 @@ const TimetrackerWebsiteConnection = () => {
       const userFetchedData = await Promise.all(userPromises);
 
       const userHolidays = userFetchedData[0];
-      setHolidays(userHolidays);
+      // setHolidays(userHolidays);
       userInfo.holidays = userHolidays;
 
       const userVacations = userFetchedData[1].periods;
-      setVacationsSickDays(userVacations);
+      // setVacationsSickDays(userVacations);
       userInfo.vacationsSickdays = userVacations;
 
       const timtrackerYearProjects = userFetchedData[2];
-      setProjects(timtrackerYearProjects);
+      // setProjects(timtrackerYearProjects);
       userInfo.yearProjects = timtrackerYearProjects;
 
       localStorage.setItem("timetracker-user", JSON.stringify(userInfo));
@@ -184,11 +184,11 @@ const TimetrackerWebsiteConnection = () => {
   };
 
   useEffect(() => {
-    if (loggedUser) {
-      setHolidays(loggedUser?.holidays);
-      setVacationsSickDays(loggedUser?.vacationsSickdays);
-      setProjects(loggedUser?.yearProjects);
-    }
+    // if (loggedUser) {
+    //   setHolidays(loggedUser?.holidays);
+    //   setVacationsSickDays(loggedUser?.vacationsSickdays);
+    //   setProjects(loggedUser?.yearProjects);
+    // }
 
     const searchParams = window.location.search;
 
@@ -261,11 +261,12 @@ const TimetrackerWebsiteConnection = () => {
       </div>
       <p className="text-sm text-gray-500 dark:text-dark-main">
         After connection, you will be able to see a company holidays, your
-        vacations and sickdays and all active projects for the last year. Also
-        you can see your days off on the calendar and the required amount of
-        time you need to work in a month.
+        vacations, sickdays and the required amount of time you need to work in
+        a month in calendar. Also active projects of the company will be added
+        to the project selector.
       </p>
-      <div className="flex gap-x-2">
+
+      {/* <div className="flex gap-x-2">
         {holidays?.length > 0 && (
           <Button text="Show holidays" callback={handleShowHolidays} />
         )}
@@ -275,8 +276,9 @@ const TimetrackerWebsiteConnection = () => {
         {projects?.length > 0 && (
           <Button text="Show active projects" callback={handleShowProjects} />
         )}
-      </div>
-      <div>
+      </div> */}
+
+      {/* <div>
         {showholidays &&
           holidays.map((item) => (
             <div
@@ -310,7 +312,7 @@ const TimetrackerWebsiteConnection = () => {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
