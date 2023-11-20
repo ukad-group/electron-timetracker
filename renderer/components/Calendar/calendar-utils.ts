@@ -2,42 +2,44 @@ import {
   extractDatesFromPeriod,
   isTheSameDates,
 } from "../../utils/datetime-ui";
-import { DayOff } from "./Calendar";
+import { DayOff, ApiDayOff, TTUserInfo } from "./Calendar";
 
-type ApiDayOff = {
-  dateFrom: string;
-  dateTo: string;
-  quantity: number;
-  description: string;
-  type: number;
+type VacationSickDaysData = {
+  periods: ApiDayOff[];
 };
 
-export const loadHolidaysAndVacations = async () => {
+export const loadHolidaysAndVacations = async (calendarDate: Date) => {
   try {
-    const timetrackerUserInfo = JSON.parse(
+    const timetrackerUserInfo: TTUserInfo = JSON.parse(
       localStorage.getItem("timetracker-user")
     );
-    const plannerToken = timetrackerUserInfo?.accessToken;
+
+    if (!timetrackerUserInfo) return;
+
+    const plannerToken = timetrackerUserInfo?.plannerAccessToken;
     const userPromises = [];
 
-    const holidaysPromise: Promise<ApiDayOff> = global.ipcRenderer.invoke(
+    const holidaysPromise: Promise<ApiDayOff[]> = global.ipcRenderer.invoke(
       "timetracker:get-holidays",
-      plannerToken
+      plannerToken,
+      calendarDate
     );
 
-    const userEmail: string = timetrackerUserInfo?.email;
-    const vacationsPromise = global.ipcRenderer.invoke(
-      "timetracker:get-vacations",
-      plannerToken,
-      userEmail
-    );
+    const userEmail = timetrackerUserInfo?.email;
+    const vacationsPromise: Promise<VacationSickDaysData> =
+      global.ipcRenderer.invoke(
+        "timetracker:get-vacations",
+        plannerToken,
+        userEmail,
+        calendarDate
+      );
 
     userPromises.push(holidaysPromise, vacationsPromise);
 
     const userFetchedData = await Promise.all(userPromises);
 
     if (userFetchedData.includes("invalid_token")) {
-      const refreshToken = timetrackerUserInfo?.refreshToken;
+      const refreshToken = timetrackerUserInfo?.plannerRefreshToken;
 
       const refreshedPlannerCreds = await global.ipcRenderer.invoke(
         "timetracker:refresh-planner-token",
@@ -46,14 +48,14 @@ export const loadHolidaysAndVacations = async () => {
 
       const refreshedUserInfo = {
         ...timetrackerUserInfo,
-        accessToken: refreshedPlannerCreds?.access_token,
+        plannerAccessToken: refreshedPlannerCreds?.access_token,
       };
 
       localStorage.setItem(
         "timetracker-user",
         JSON.stringify(refreshedUserInfo)
       );
-      loadHolidaysAndVacations();
+      loadHolidaysAndVacations(calendarDate);
       return;
     }
     const holidays: ApiDayOff[] = userFetchedData[0];

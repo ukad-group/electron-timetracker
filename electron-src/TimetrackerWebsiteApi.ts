@@ -122,8 +122,13 @@ export const getRefreshedPlannerToken = async (
   return response.json();
 };
 
-export const getTimetrackerHolidays = async (token: string) => {
-  const currentYear = new Date().getFullYear().toString();
+export const getTimetrackerHolidays = async (
+  token: string,
+  calendarDate: Date
+) => {
+  const currentYear = calendarDate
+    ? calendarDate.getFullYear().toString()
+    : new Date().getFullYear().toString();
 
   const response = await fetch(
     `https://app-pto-planner-api-prod.azurewebsites.net/Periods/getHolidaysForYear/${currentYear}`,
@@ -150,8 +155,14 @@ export const getTimetrackerHolidays = async (token: string) => {
   return response.json();
 };
 
-export const getTimetrackerVacations = async (token: string, email: string) => {
-  const currentYear = new Date().getFullYear().toString();
+export const getTimetrackerVacations = async (
+  token: string,
+  email: string,
+  calendarDate: Date
+) => {
+  const currentYear = calendarDate
+    ? calendarDate.getFullYear().toString()
+    : new Date().getFullYear().toString();
 
   const response = await fetch(
     `https://app-pto-planner-api-prod.azurewebsites.net/Users/getUserInfoByEmail/${email}/${currentYear}`,

@@ -73,6 +73,27 @@ export type DayOff = {
   type: string;
 };
 
+export type ApiDayOff = {
+  dateFrom: string;
+  dateTo: string;
+  quantity: number;
+  description: string;
+  type: number;
+};
+
+export type TTUserInfo = {
+  userInfoIdToken: string;
+  userInfoRefreshToken: string;
+  name: string;
+  email: string;
+  TTCookie: string;
+  holidays: ApiDayOff[];
+  vacationsSickdays: ApiDayOff[];
+  yearProjects: string[];
+  plannerAccessToken: string;
+  plannerRefreshToken: string;
+};
+
 export function Calendar({
   reportsFolder,
   selectedDate,
@@ -93,6 +114,9 @@ export function Calendar({
     errorTitle: "",
     errorMessage: "",
   });
+  const timetrackerUserInfo: TTUserInfo = JSON.parse(
+    localStorage.getItem("timetracker-user")
+  );
 
   const monthWorkedHours = useMemo(() => {
     return formatDuration(
@@ -169,12 +193,12 @@ export function Calendar({
 
   useEffect(() => {
     (async () => {
-      setDaysOff(await loadHolidaysAndVacations());
+      setDaysOff(await loadHolidaysAndVacations(calendarDate));
     })();
 
     global.ipcRenderer.on("window-restored", () => {
       (async () => {
-        setDaysOff(await loadHolidaysAndVacations());
+        setDaysOff(await loadHolidaysAndVacations(calendarDate));
       })();
     });
 
@@ -224,7 +248,7 @@ export function Calendar({
     );
 
     return (
-      <div className="flex flex-col text-xs">
+      <div className="flex flex-col text-xs text-zinc-400">
         <span>week {options.num}</span>
         <span className="self-start">{weekTotalHours}</span>
       </div>
@@ -295,9 +319,11 @@ export function Calendar({
           <p className="text-xs text-gray-500 dark:text-dark-main">
             Total: {monthWorkedHours}
           </p>
-          <p className="text-xs text-gray-500 dark:text-dark-main">
-            Required: {monthRequiredHours}
-          </p>
+          {timetrackerUserInfo && (
+            <p className="text-xs text-gray-500 dark:text-dark-main">
+              Required: {monthRequiredHours}
+            </p>
+          )}
         </div>
         <div className="flex gap-4">
           {calendarDate.getMonth() !== new Date().getMonth() && (

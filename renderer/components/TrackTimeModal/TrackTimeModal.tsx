@@ -205,7 +205,7 @@ export default function TrackTimeModal({
 
         const updatedUser = {
           ...userInfo,
-          idToken: updatedIdToken,
+          userInfoIdToken: updatedIdToken,
           TTCookie: updatedCookie,
         };
 

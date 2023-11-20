@@ -120,7 +120,7 @@ export default function ActivitiesTable({
   const tableActivities = useMemo(() => {
     const badgedActivities = nonBreakActivities.map((activity) => {
       const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
-      if (userInfo && !userInfo.yearProjects.includes(activity.project)) {
+      if (userInfo && !userInfo?.yearProjects?.includes(activity.project)) {
         return { ...activity, isNewProject: true };
       }
       return activity;

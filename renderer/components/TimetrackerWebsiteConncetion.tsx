@@ -4,6 +4,7 @@ import Button from "./ui/Button";
 import { useRouter } from "next/router";
 import Loader from "./ui/Loader";
 import isOnline from "is-online";
+import { TTUserInfo } from "./Calendar/Calendar";
 
 const TimetrackerWebsiteConnection = () => {
   const router = useRouter();
@@ -83,13 +84,15 @@ const TimetrackerWebsiteConnection = () => {
         userCreds?.id_token
       );
 
-      userPromises.push(...[profilePromise, TTCookiePromise]);
+      userPromises.push(profilePromise, TTCookiePromise);
 
       const userFetchedData = await Promise.all(userPromises);
       const userInfo = userFetchedData[0];
       const timetrackerCookie = userFetchedData[1];
 
       const timetrackerUserInfo = {
+        userInfoRefreshToken: userCreds?.refresh_token,
+        userInfoIdToken: userCreds?.id_token,
         name: userInfo?.displayName || "",
         email: userInfo?.userPrincipalName || userInfo?.mail || "",
         TTCookie: timetrackerCookie,
@@ -123,9 +126,11 @@ const TimetrackerWebsiteConnection = () => {
         authorizationCode
       );
 
-      const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
-      userInfo.accessToken = plannerCreds?.access_token;
-      userInfo.refreshToken = plannerCreds?.refresh_token;
+      const userInfo: TTUserInfo = JSON.parse(
+        localStorage.getItem("timetracker-user")
+      );
+      userInfo.plannerAccessToken = plannerCreds?.access_token;
+      userInfo.plannerRefreshToken = plannerCreds?.refresh_token;
 
       const holidaysPromise = global.ipcRenderer.invoke(
         "timetracker:get-holidays",
@@ -146,7 +151,9 @@ const TimetrackerWebsiteConnection = () => {
       );
 
       userPromises.push(
-        ...[holidaysPromise, vacationsPromise, timtrackerProjectsPromise]
+        holidaysPromise,
+        vacationsPromise,
+        timtrackerProjectsPromise
       );
 
       const userFetchedData = await Promise.all(userPromises);
@@ -254,7 +261,9 @@ const TimetrackerWebsiteConnection = () => {
       </div>
       <p className="text-sm text-gray-500 dark:text-dark-main">
         After connection, you will be able to see a company holidays, your
-        vacations and sickdays and all active projects for the last year.
+        vacations and sickdays and all active projects for the last year. Also
+        you can see your days off on the calendar and the required amount of
+        time you need to work in a month.
       </p>
       <div className="flex gap-x-2">
         {holidays?.length > 0 && (

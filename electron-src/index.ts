@@ -672,14 +672,17 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle("timetracker:get-holidays", async (event, token: string) => {
-  return await getTimetrackerHolidays(token);
-});
+ipcMain.handle(
+  "timetracker:get-holidays",
+  async (event, token: string, calendarDate: Date) => {
+    return await getTimetrackerHolidays(token, calendarDate);
+  }
+);
 
 ipcMain.handle(
   "timetracker:get-vacations",
-  async (event, token: string, email: string) => {
-    return await getTimetrackerVacations(token, email);
+  async (event, token: string, email: string, calendarDate: Date) => {
+    return await getTimetrackerVacations(token, email, calendarDate);
   }
 );
 
