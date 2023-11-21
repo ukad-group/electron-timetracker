@@ -272,7 +272,13 @@ export default function TrackTimeModal({
         JSON.stringify(Array.from(uniqueIds))
       );
     }
-
+    if (
+      !scheduledEvents[dashedDescription] &&
+      editedActivity !== "new" &&
+      editedActivity.calendarId?.length > 0
+    ) {
+      scheduledEvents[dashedDescription] = { project: "", activity: "" };
+    }
     if (
       scheduledEvents[dashedDescription] &&
       !scheduledEvents[dashedDescription].project
