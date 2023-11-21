@@ -17,6 +17,8 @@ import {
   Square2StackIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
+import { shallow } from "zustand/shallow";
+import { useScheduledEventsStore } from "../store/googleEventsStore";
 import Tooltip from "./ui/Tooltip/Tooltip";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { concatSortArrays, parseEventTitle } from "../utils/utils";
@@ -47,6 +49,10 @@ export default function ActivitiesTable({
   const [secondKey, setSecondtKey] = useState(null);
   const [firstKeyPressTime, setFirstKeyPressTime] = useState(null);
   const [timerId, setTimerId] = useState(null);
+  const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
+    (state) => [state.event, state.setEvent],
+    shallow
+  );
   const nonBreakActivities = useMemo(() => {
     return validation(activities.filter((activity) => !activity.isBreak));
   }, [activities]);
@@ -126,8 +132,18 @@ export default function ActivitiesTable({
       return activity;
     });
     const actualEvents = getActualEvents(events);
-    const formattedEvents = formatEvents(actualEvents);
+    const formattedEvents: ReportActivity[] = formatEvents(actualEvents);
 
+    for (let i = 0; i < formattedEvents.length; i++) {
+      if (
+        Object.keys(scheduledEvents).includes(formattedEvents[i].description)
+      ) {
+        formattedEvents[i].project =
+          scheduledEvents[formattedEvents[i].description].project;
+        formattedEvents[i].activity =
+          scheduledEvents[formattedEvents[i].description].activity;
+      }
+    }
     return formattedEvents && formattedEvents.length > 0
       ? concatSortArrays(badgedActivities, formattedEvents)
       : badgedActivities;
