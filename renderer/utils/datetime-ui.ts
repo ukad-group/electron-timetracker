@@ -1,4 +1,8 @@
-import { FormattedReport, DayOff } from "../components/Calendar/Calendar";
+import {
+  FormattedReport,
+  DayOff,
+  ApiDayOff,
+} from "../components/Calendar/Calendar";
 
 export function checkIsToday(date: Date): boolean {
   const now = new Date();
@@ -88,9 +92,9 @@ export function getMonthRequiredHours(calendarDate: Date, daysOff: DayOff[]) {
   return totalWorkHours * 3600000;
 }
 
-export function extractDatesFromPeriod(vacation) {
-  const dateStart = new Date(vacation.dateFrom);
-  const dateEnd = new Date(vacation.dateTo);
+export function extractDatesFromPeriod(vacation: ApiDayOff): Date[] {
+  const dateStart = new Date(vacation?.dateFrom);
+  const dateEnd = new Date(vacation?.dateTo);
   const vacationRange = generateDateRange(dateStart, dateEnd);
 
   const datesWithoutWeekends = vacationRange.filter(
@@ -100,7 +104,7 @@ export function extractDatesFromPeriod(vacation) {
   return datesWithoutWeekends;
 }
 
-function generateDateRange(startDate, endDate) {
+function generateDateRange(startDate: Date, endDate: Date) {
   const dateRange = [];
   let currentDate = new Date(startDate);
 
@@ -110,6 +114,42 @@ function generateDateRange(startDate, endDate) {
   }
 
   return dateRange;
+}
+
+export function saveToLocalStorageTransitPeriod(
+  vacation: ApiDayOff,
+  addedHolidays: DayOff[]
+) {
+  const transitDates = extractDatesFromPeriod(vacation);
+
+  const formattedTransitDates = transitDates
+    .filter((date) => {
+      console.log(
+        addedHolidays.some((holiday) => !isTheSameDates(holiday.date, date))
+      );
+      if (
+        addedHolidays.some((holiday) => !isTheSameDates(holiday.date, date))
+      ) {
+        return date;
+      }
+    })
+    .map((date) => {
+      return {
+        date: date,
+        duration: vacation?.quantity,
+        description: vacation?.description,
+        type: vacation?.type === 1 ? "sickday" : "vacation",
+      };
+    });
+
+  localStorage.setItem(
+    "transit-vacation",
+    JSON.stringify(formattedTransitDates)
+  );
+
+  formattedTransitDates.forEach((transitDate) => {
+    addedHolidays.push(transitDate);
+  });
 }
 
 export function getCeiledTime() {
@@ -154,7 +194,9 @@ export const getStringDate = (date: Date): string => {
 export const convertMillisecondsToTime = (milliseconds) => {
   const totalSeconds = Math.floor(milliseconds / 1000);
   const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, "0");;
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+    .toString()
+    .padStart(2, "0");
 
   return `${hours}:${minutes}`;
-}
+};

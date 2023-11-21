@@ -66,6 +66,7 @@ export default function Home() {
       if (currentDay !== lastRenderedDay) {
         setLastRenderedDay(currentDay);
         setSelectedDate(new Date());
+        window.location.reload(); // test this at 23:59
       }
     };
 

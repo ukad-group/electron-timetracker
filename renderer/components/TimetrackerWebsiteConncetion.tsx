@@ -39,6 +39,7 @@ const TimetrackerWebsiteConnection = () => {
     // setShowHolidays(false);
 
     localStorage.removeItem("timetracker-user");
+    localStorage.removeItem("transit-vacation");
     setLoggedUser(null);
   };
 

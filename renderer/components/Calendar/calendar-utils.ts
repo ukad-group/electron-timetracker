@@ -1,6 +1,7 @@
 import {
   extractDatesFromPeriod,
   isTheSameDates,
+  saveToLocalStorageTransitPeriod,
 } from "../../utils/datetime-ui";
 import { DayOff, ApiDayOff, TTUserInfo } from "./Calendar";
 
@@ -71,7 +72,31 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
       });
     });
 
+    const transitVacations = JSON.parse(
+      localStorage.getItem("transit-vacation")
+    );
+
+    if (transitVacations) {
+      transitVacations.forEach((transitDay) => {
+        if (
+          userDaysOff.some((day) => isTheSameDates(day.date, transitDay.date))
+        ) {
+          return;
+        }
+
+        userDaysOff.push(transitDay);
+      });
+    }
+
     vacationsAndSickdays.forEach((item) => {
+      if (
+        userDaysOff.some((dayoff) =>
+          isTheSameDates(dayoff.date, new Date(item.dateFrom))
+        )
+      ) {
+        return;
+      }
+
       const singleDayOff = isTheSameDates(
         new Date(item.dateFrom),
         new Date(item.dateTo)
@@ -85,21 +110,31 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
           type: item?.type === 1 ? "sickday" : "vacation",
         });
       } else {
-        const periodDates = extractDatesFromPeriod(item);
-        periodDates.forEach((date) => {
-          if (
-            userDaysOff.some((item) => isTheSameDates(item.date, date.date))
-          ) {
-            return;
-          }
+        const yearFrom = new Date(item?.dateFrom).getFullYear();
+        const yearTo = new Date(item?.dateTo).getFullYear();
 
-          userDaysOff.push({
-            date: date,
-            duration: item?.quantity,
-            description: item?.description,
-            type: item?.type === 1 ? "sickday" : "vacation",
+        if (yearFrom !== yearTo) {
+          saveToLocalStorageTransitPeriod(item, userDaysOff);
+        } else {
+          const periodDates = extractDatesFromPeriod(item);
+
+          periodDates.forEach((date) => {
+            if (
+              userDaysOff.some((dayoff) => {
+                return isTheSameDates(dayoff.date, date);
+              })
+            ) {
+              return;
+            }
+
+            userDaysOff.push({
+              date: date,
+              duration: item?.quantity,
+              description: item?.description,
+              type: item?.type === 1 ? "sickday" : "vacation",
+            });
           });
-        });
+        }
       }
     });
 

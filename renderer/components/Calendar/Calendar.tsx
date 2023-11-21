@@ -305,6 +305,43 @@ export function Calendar({
     } else {
       return info.dayNumberText;
     }
+
+    const transitPeriod = JSON.parse(localStorage.getItem("transit-vacation"));
+
+    if (transitPeriod && transitPeriod?.length > 0) {
+      const transitDayOff = transitPeriod?.find((transitDay) => {
+        return isTheSameDates(info.date, transitDay.date);
+      });
+
+      if (transitDayOff) {
+        const duration =
+          transitDayOff?.duration === 8
+            ? "all day"
+            : transitDayOff?.duration + "h";
+
+        if (transitDayOff?.type === "vacation") {
+          return (
+            <div>
+              {info.dayNumberText}
+              <CalendarDaysIcon
+                className="absolute top-[30px] right-[2px] w-5 h-5"
+                title={`Vacation, ${duration}`}
+              />
+            </div>
+          );
+        } else if (transitDayOff?.type === "sickday") {
+          return (
+            <div>
+              {info.dayNumberText}
+              <FaceFrownIcon
+                className="absolute top-[30px] right-[2px] w-5 h-5"
+                title={`Sickday, ${duration}`}
+              />
+            </div>
+          );
+        }
+      }
+    }
   };
 
   if (renderError.errorMessage && renderError.errorTitle) {
