@@ -124,9 +124,6 @@ export function saveToLocalStorageTransitPeriod(
 
   const formattedTransitDates = transitDates
     .filter((date) => {
-      console.log(
-        addedHolidays.some((holiday) => !isTheSameDates(holiday.date, date))
-      );
       if (
         addedHolidays.some((holiday) => !isTheSameDates(holiday.date, date))
       ) {
