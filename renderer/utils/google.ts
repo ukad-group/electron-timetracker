@@ -20,10 +20,12 @@ export const loadGoogleEvents = async (
       usersLs[index].googleAccessToken = newAccessToken;
       localStorage.setItem("googleUsers", JSON.stringify(usersLs));
 
-      return "expired-token";
+      return await loadGoogleEvents(newAccessToken, refreshToken, index);
     }
 
-    return data?.items;
+    if (data?.items) return data.items;
+
+    return [];
   } catch (error) {
     console.error(error.message);
     return [];
@@ -39,11 +41,6 @@ export const loadGoogleEventsFromAllUsers = async () => {
     loadGoogleEvents(user.googleAccessToken, user.googleRefreshToken, i)
   );
   const userEvents = await Promise.all(userPromises);
-
-  if (userEvents.includes("expired-token")) {
-    loadGoogleEventsFromAllUsers();
-    return [];
-  }
 
   const flattenedEvents = userEvents.flat();
 

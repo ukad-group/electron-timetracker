@@ -70,9 +70,9 @@ export default function ActivitiesTable({
       const { start, end } = event;
 
       const startDateTime =
-        start.timeZone === "UTC" ? `${start.dateTime}Z` : start.dateTime;
+        start?.timeZone === "UTC" ? `${start?.dateTime}Z` : start?.dateTime;
       const endDateTime =
-        end.timeZone === "UTC" ? `${end.dateTime}Z` : end.dateTime;
+        end?.timeZone === "UTC" ? `${end?.dateTime}Z` : end?.dateTime;
 
       const from = getTimeFromEventObj(startDateTime);
       const to = getTimeFromEventObj(endDateTime);
@@ -103,7 +103,7 @@ export default function ActivitiesTable({
     const actualEvents = events.filter((event) => {
       const { end } = event;
       const endDateTime =
-        end.timeZone === "UTC" ? `${end.dateTime}Z` : end.dateTime;
+        end?.timeZone === "UTC" ? `${end?.dateTime}Z` : end?.dateTime;
       const to = getTimeFromEventObj(endDateTime);
       const isOverlapped = activities.some((activity) => {
         return padStringToMinutes(activity.to) >= padStringToMinutes(to);
