@@ -268,7 +268,20 @@ export function Calendar({
       const duration =
         userDayOff?.duration === 8 ? "all day" : userDayOff?.duration + "h";
 
-      if (userDayOff?.type === "vacation") {
+      if (userDayOff?.type === "holiday") {
+        const desciprion = userDayOff?.description
+          ? userDayOff?.description
+          : "Holiday";
+        return (
+          <div>
+            {info.dayNumberText}
+            <GlobeAltIcon
+              className="absolute top-[30px] right-[2px] w-5 h-5"
+              title={`${desciprion}, ${duration}`}
+            />
+          </div>
+        );
+      } else if (userDayOff?.type === "vacation") {
         return (
           <div>
             {info.dayNumberText}
@@ -285,19 +298,6 @@ export function Calendar({
             <FaceFrownIcon
               className="absolute top-[30px] right-[2px] w-5 h-5"
               title={`Sickday, ${duration}`}
-            />
-          </div>
-        );
-      } else if (userDayOff?.type === "holiday") {
-        const desciprion = userDayOff?.description
-          ? userDayOff?.description
-          : "Holiday";
-        return (
-          <div>
-            {info.dayNumberText}
-            <GlobeAltIcon
-              className="absolute top-[30px] right-[2px] w-5 h-5"
-              title={`${desciprion}, ${duration}`}
             />
           </div>
         );

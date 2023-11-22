@@ -1,7 +1,6 @@
 import {
   extractDatesFromPeriod,
   isTheSameDates,
-  saveToLocalStorageTransitPeriod,
 } from "../../utils/datetime-ui";
 import { DayOff, ApiDayOff, TTUserInfo } from "./Calendar";
 
@@ -72,26 +71,10 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
       });
     });
 
-    const transitVacations = JSON.parse(
-      localStorage.getItem("transit-vacation")
-    );
-
-    if (transitVacations) {
-      transitVacations.forEach((transitDay) => {
-        if (
-          userDaysOff.some((day) => isTheSameDates(day.date, transitDay.date))
-        ) {
-          return;
-        }
-
-        userDaysOff.push(transitDay);
-      });
-    }
-
     vacationsAndSickdays.forEach((item) => {
       if (
-        userDaysOff.some((dayoff) =>
-          isTheSameDates(dayoff.date, new Date(item.dateFrom))
+        userDaysOff.some((day) =>
+          isTheSameDates(day.date, new Date(item.dateFrom))
         )
       ) {
         return;
@@ -113,30 +96,54 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
         const yearFrom = new Date(item?.dateFrom).getFullYear();
         const yearTo = new Date(item?.dateTo).getFullYear();
 
+        // cases when vacation/sickday continue from last year to next year, need presave to LS
         if (yearFrom !== yearTo) {
-          saveToLocalStorageTransitPeriod(item, userDaysOff);
+          const formattedTransitDates = extractDatesFromPeriod(
+            item,
+            userDaysOff
+          );
+
+          formattedTransitDates.forEach((transitDay) => {
+            userDaysOff.push(transitDay);
+          });
+
+          localStorage.setItem(
+            "transit-vacation",
+            JSON.stringify(formattedTransitDates)
+          );
         } else {
-          const periodDates = extractDatesFromPeriod(item);
+          const formattedPeriodDates = extractDatesFromPeriod(
+            item,
+            userDaysOff
+          );
 
-          periodDates.forEach((date) => {
-            if (
-              userDaysOff.some((dayoff) => {
-                return isTheSameDates(dayoff.date, date);
-              })
-            ) {
-              return;
-            }
-
-            userDaysOff.push({
-              date: date,
-              duration: item?.quantity,
-              description: item?.description,
-              type: item?.type === 1 ? "sickday" : "vacation",
-            });
+          formattedPeriodDates.forEach((periodDay) => {
+            userDaysOff.push(periodDay);
           });
         }
       }
     });
+
+    const transitVacations = JSON.parse(
+      localStorage.getItem("transit-vacation")
+    );
+
+    if (transitVacations) {
+      const periodStartYear = new Date(transitVacations[0]?.date).getFullYear();
+
+      // we can't get vacation from api that started last year and continue next year, so use local storage
+      if (periodStartYear !== calendarDate.getFullYear()) {
+        transitVacations.forEach((transitDay: DayOff) => {
+          if (
+            userDaysOff.some(
+              (day) => !isTheSameDates(day.date, transitDay.date)
+            )
+          ) {
+            userDaysOff.push(transitDay);
+          }
+        });
+      }
+    }
 
     return userDaysOff;
   } catch (error) {

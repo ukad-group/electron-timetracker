@@ -92,20 +92,33 @@ export function getMonthRequiredHours(calendarDate: Date, daysOff: DayOff[]) {
   return totalWorkHours * 3600000;
 }
 
-export function extractDatesFromPeriod(vacation: ApiDayOff): Date[] {
-  const dateStart = new Date(vacation?.dateFrom);
-  const dateEnd = new Date(vacation?.dateTo);
+export function extractDatesFromPeriod(dayoff: ApiDayOff, holidays: DayOff[]) {
+  const dateStart = new Date(dayoff?.dateFrom);
+  const dateEnd = new Date(dayoff?.dateTo);
   const vacationRange = generateDateRange(dateStart, dateEnd);
 
-  const datesWithoutWeekends = vacationRange.filter(
-    (date) => date.getDay() >= 1 && date.getDay() <= 5
-  );
+  const datesWithoutWeekendsHolidays = vacationRange
+    .filter((date) => {
+      return (
+        date.getDay() >= 1 &&
+        date.getDay() <= 5 &&
+        holidays.some((holiday) => !isTheSameDates(holiday.date, date))
+      );
+    })
+    .map((date) => {
+      return {
+        date: date,
+        duration: dayoff?.quantity,
+        description: dayoff?.description,
+        type: dayoff?.type === 1 ? "sickday" : "vacation",
+      };
+    });
 
-  return datesWithoutWeekends;
+  return datesWithoutWeekendsHolidays;
 }
 
 function generateDateRange(startDate: Date, endDate: Date) {
-  const dateRange = [];
+  const dateRange: Date[] = [];
   let currentDate = new Date(startDate);
 
   while (currentDate <= endDate) {
@@ -114,39 +127,6 @@ function generateDateRange(startDate: Date, endDate: Date) {
   }
 
   return dateRange;
-}
-
-export function saveToLocalStorageTransitPeriod(
-  vacation: ApiDayOff,
-  addedHolidays: DayOff[]
-) {
-  const transitDates = extractDatesFromPeriod(vacation);
-
-  const formattedTransitDates = transitDates
-    .filter((date) => {
-      if (
-        addedHolidays.some((holiday) => !isTheSameDates(holiday.date, date))
-      ) {
-        return date;
-      }
-    })
-    .map((date) => {
-      return {
-        date: date,
-        duration: vacation?.quantity,
-        description: vacation?.description,
-        type: vacation?.type === 1 ? "sickday" : "vacation",
-      };
-    });
-
-  localStorage.setItem(
-    "transit-vacation",
-    JSON.stringify(formattedTransitDates)
-  );
-
-  formattedTransitDates.forEach((transitDate) => {
-    addedHolidays.push(transitDate);
-  });
 }
 
 export function getCeiledTime() {
