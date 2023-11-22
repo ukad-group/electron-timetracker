@@ -43,7 +43,7 @@ export default function ActivitiesSection({
   const isShowOffice365Events = JSON.parse(
     localStorage.getItem("showOffice365Events")
   );
-  const keydownHandler = (e: KeyboardEvent) => {
+  const ctrlSpaceHandler = (e: KeyboardEvent) => {
     if (e.code === "Space" && e.ctrlKey) {
       onEditActivity("new");
     }
@@ -78,18 +78,21 @@ export default function ActivitiesSection({
   }, [selectedDate]);
 
   useEffect(() => {
-    document.addEventListener("keydown", keydownHandler);
+    document.addEventListener("keyup", ctrlSpaceHandler);
     global.ipcRenderer.on("background error", (event, errorMessage, data) => {
       setBackgroundError(errorMessage);
       console.log("Error data ", data);
     });
-    global.ipcRenderer.on("render error", (event, errorTitle, errorMessage, data) => {
-      setRenderError({ errorTitle, errorMessage });
-      console.log("Error data ", data);
-    });
+    global.ipcRenderer.on(
+      "render error",
+      (event, errorTitle, errorMessage, data) => {
+        setRenderError({ errorTitle, errorMessage });
+        console.log("Error data ", data);
+      }
+    );
 
     return () => {
-      document.removeEventListener("keydown", keydownHandler);
+      document.removeEventListener("keyup", ctrlSpaceHandler);
       global.ipcRenderer.removeAllListeners("background error");
       global.ipcRenderer.removeAllListeners("render or fetch error");
     };
