@@ -11,6 +11,7 @@ import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
 
 type AutocompleteProps = {
+  isNew?: boolean;
   onSave: (e: FormEvent | MouseEvent) => void;
   title: string;
   selectedItem: string;
@@ -24,6 +25,7 @@ type AutocompleteProps = {
 };
 
 export default function AutocompleteSelector({
+  isNew,
   onSave,
   title,
   className = "",
@@ -104,7 +106,7 @@ export default function AutocompleteSelector({
       onChange={setSelectedItem}
     >
       <Combobox.Label className="block text-sm font-medium text-gray-700 dark:text-dark-main">
-        {title}
+        {title} {isNew && "New"}
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input

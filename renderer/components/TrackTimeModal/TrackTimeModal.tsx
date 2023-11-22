@@ -57,7 +57,8 @@ export default function TrackTimeModal({
   );
   const [latestProjects, setLatestProjects] = useState([]);
   const [webTrackerProjects, setWebTrackerProjects] = useState([]);
-
+  const [isNewProject, setIsNewProject] = useState(false);
+  const [isNewActivity, setIsNewActivity] = useState(false);
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
 
@@ -75,6 +76,19 @@ export default function TrackTimeModal({
       from.length < 5
     );
   }, [from, to, duration, project]);
+
+  useEffect(() => {
+    setIsNewProject(project && !latestProjects.includes(project));
+    let tempIsNewActivity = true;
+    for (let i = 0; i < Object.keys(latestProjAndAct).length; i++) {
+      if (
+        latestProjAndAct[Object.keys(latestProjAndAct)[i]].includes(activity)
+      ) {
+        tempIsNewActivity = false;
+      }
+    }
+    setIsNewActivity(activity && tempIsNewActivity);
+  }, [project, activity]);
 
   useEffect(() => {
     if (!editedActivity || editedActivity === "new") {
@@ -621,6 +635,7 @@ export default function TrackTimeModal({
 
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      isNew={isNewProject}
                       onSave={onSave}
                       title="Project"
                       required
@@ -636,6 +651,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      isNew={isNewActivity}
                       onSave={onSave}
                       title="Activity"
                       availableItems={
