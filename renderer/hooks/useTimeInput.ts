@@ -15,7 +15,7 @@ const useTimeInput = (
 
     if (value.split(":").length > 2) return;
     if (value.length > 5) return;
-    if (value.length > 2 && value[2] !== ":") return;
+    // if (value.length > 2 && value[2] !== ":") return;
 
     if (time.length === 1 && value.length === 2 && value.slice(-1) !== ":") {
       value += ":";
@@ -29,7 +29,9 @@ const useTimeInput = (
       value = value.substring(0, value.length - 1);
     }
 
-    if (value[0] === ":") value = "0" + value;
+    // if (value[0] === ":") value = "0" + value;
+
+    if (value.length > 2 && !value.includes(":")) return; // bogdan request to be able change hours in from/to fields, also commented 18 and 32 lines
 
     if (value.includes(":")) {
       const [hours, minutes] = value.split(":");
