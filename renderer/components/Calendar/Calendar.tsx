@@ -209,6 +209,20 @@ export function Calendar({
 
   const getCalendarApi = () => calendarRef.current.getApi();
 
+  useEffect(() => {
+    if (
+      selectedDate.getFullYear() === calendarDate.getFullYear() &&
+      selectedDate.getMonth() === calendarDate.getMonth()
+    )
+      return;
+
+    queueMicrotask(() => {
+      const reportDate = new Date(selectedDate);
+      getCalendarApi().gotoDate(reportDate);
+      setCalendarDate(reportDate);
+    });
+  }, [selectedDate]);
+
   const prevButtonHandle = () => {
     getCalendarApi().prev();
     setCalendarDate((date) => new Date(date.setMonth(date.getMonth() - 1, 1)));
