@@ -265,12 +265,21 @@ app.on("ready", async () => {
     ipcMain.on("start-folder-watcher", (event, reportsFolder: string) => {
       try {
         if (fs.existsSync(reportsFolder)) {
-          const folderWatcher = chokidar.watch(reportsFolder);
+          const folderWatcher = chokidar.watch(reportsFolder, {
+            ignoreInitial: true,
+          });
           watchers[reportsFolder] = folderWatcher;
 
-          folderWatcher.on("change", () => {
-            mainWindow?.webContents.send("any-file-changed");
-          });
+          folderWatcher
+            .on("change", () => {
+              mainWindow?.webContents.send("any-file-changed");
+            })
+            .on("add", () => {
+              mainWindow?.webContents.send("any-file-changed");
+            })
+            .on("unlink", () => {
+              mainWindow?.webContents.send("any-file-changed");
+            });
         }
       } catch (err) {
         console.log(err);
