@@ -45,6 +45,7 @@ ipcMain.on(
 );
 
 const PORT = 51432;
+
 let updateStatus: null | "available" | "downloaded" = null;
 let updateVersion = "";
 
@@ -186,11 +187,39 @@ app.on("ready", async () => {
 
   await nextApp.prepare();
 
-  createServer((req: any, res: any) => {
+  const server = createServer((req: any, res: any) => {
     const parsedUrl = parse(req.url, true);
     requestHandler(req, res, parsedUrl);
-  }).listen(PORT, "127.0.0.1", () => {
+  }).listen(PORT, "1277.0.0.1", () => {
     console.log(`> Ready on http://localhost:${PORT}`);
+  });
+
+  const restartServer = () => {
+    server.close(() => {
+      server.listen(PORT, "127.0.0.1", () => {
+        console.log(`> Ready on http://127.0.0.1:${PORT}`);
+        mainWindow?.loadURL(`http://localhost:${PORT}/`);
+      });
+    });
+  };
+
+  server.on("error", function (error) {
+    if (mainWindow) {
+      const options: Electron.MessageBoxOptions = {
+        type: "error",
+        title: error.message,
+        message: `Error when starting server at http://localhost:${PORT}. Try to restart server. If it doesn't help, check if port ${PORT} is free and write to support`,
+        buttons: ["Close", "Restart", "Quit"],
+      };
+
+      dialog.showMessageBox(mainWindow, options).then((response) => {
+        if (response.response === 1) {
+          restartServer();
+        } else if (response.response === 2) {
+          app.exit();
+        }
+      });
+    }
   });
 
   if (!gotTheLock) {
