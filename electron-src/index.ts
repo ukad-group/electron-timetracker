@@ -190,7 +190,7 @@ app.on("ready", async () => {
   const server = createServer((req: any, res: any) => {
     const parsedUrl = parse(req.url, true);
     requestHandler(req, res, parsedUrl);
-  }).listen(PORT, "1277.0.0.1", () => {
+  }).listen(PORT, "127.0.0.1", () => {
     console.log(`> Ready on http://localhost:${PORT}`);
   });
 
