@@ -106,7 +106,12 @@ export default function AutocompleteSelector({
       onChange={setSelectedItem}
     >
       <Combobox.Label className="block text-sm font-medium text-gray-700 dark:text-dark-main">
-        {title} {isNew && "New"}
+        {title}{" "}
+        {isNew && (
+          <span className="text-center mb-1 w-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
+            New
+          </span>
+        )}
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
