@@ -35,6 +35,7 @@ import {
   getTimetrackerVacations,
   getRefreshedUserInfoToken,
 } from "./TimetrackerWebsiteApi";
+import { exec } from "child_process";
 
 initialize("A-EU-9361517871");
 ipcMain.on(
@@ -61,6 +62,24 @@ function setUpdateStatus(status: "available" | "downloaded", version: string) {
   updateVersion = version;
 }
 
+exec("tasklist", (err, stdout, stderr) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      if (stderr) {
+        console.log(stderr);
+        return;
+      }
+      if (stdout) {
+        const isRunn = stdout.toLowerCase().includes("dropbox");
+        if(isRunn){
+        console.log("> DROPBOOOOOOOOOOOOOOOOOX")
+        } else{
+            console.log("> NOOOOOOOOOOOOOOOTHING")
+        }
+      }
+    });
 autoUpdater.allowDowngrade = true;
 autoUpdater.on("error", (e: Error, message?: string) => {
   mainWindow?.webContents.send(
