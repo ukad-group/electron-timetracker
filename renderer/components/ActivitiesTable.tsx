@@ -366,7 +366,7 @@ export default function ActivitiesTable({
                 </Tooltip>
               </td>
               <td
-                className={`flex flex-col relative px-3 py-4 ${
+                className={`relative px-3 py-4 ${
                   activity.calendarId ? "opacity-50" : ""
                 }`}
               >

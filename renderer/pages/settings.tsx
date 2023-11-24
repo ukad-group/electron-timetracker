@@ -35,7 +35,9 @@ const SettingsPage = () => {
       .addListener(handleThemeChange);
 
     const mode =
-      (theme.os && isOSDarkTheme) || theme.custom === "dark" ? "dark" : "light";
+      (theme.os && isOSDarkTheme) || theme.custom === "dark"
+        ? "dark bg-dark-back"
+        : "light bg-grey-100";
 
     document.body.className = mode;
   }, [theme, isOSDarkTheme]);
