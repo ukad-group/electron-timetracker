@@ -2,6 +2,7 @@ import {
   FormEvent,
   Dispatch,
   SetStateAction,
+  useState,
   useRef,
   ChangeEvent,
   useEffect,
@@ -11,7 +12,7 @@ import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
 
 type AutocompleteProps = {
-  isNew?: boolean;
+  isNewCheck: boolean;
   onSave: (e: FormEvent | MouseEvent) => void;
   title: string;
   selectedItem: string;
@@ -25,7 +26,7 @@ type AutocompleteProps = {
 };
 
 export default function AutocompleteSelector({
-  isNew,
+  isNewCheck,
   onSave,
   title,
   className = "",
@@ -37,6 +38,7 @@ export default function AutocompleteSelector({
   isValidationEnabled,
   showedSuggestionsNumber,
 }: AutocompleteProps) {
+  const [isNew, setIsNew] = useState(false);
   const inputRef = useRef(null);
 
   const filteredList =
@@ -95,6 +97,9 @@ export default function AutocompleteSelector({
   useEffect(() => {
     if (selectedItem.startsWith("TT:: ")) {
       setSelectedItem((prev) => prev.slice(5));
+    }
+    if (isNewCheck) {
+      setIsNew(selectedItem && !availableItems.includes(selectedItem));
     }
   }, [selectedItem]);
 
