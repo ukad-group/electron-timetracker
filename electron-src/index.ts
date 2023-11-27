@@ -72,7 +72,7 @@ exec("tasklist", (err, stdout, stderr) => {
         return;
       }
       if (stdout) {
-        const isRunn = stdout.toLowerCase().includes("dropbox");
+        const isRunn = stdout.toLowerCase().includes("dropbox.exe");
         if(isRunn){
         console.log("> DROPBOOOOOOOOOOOOOOOOOX")
         } else{
