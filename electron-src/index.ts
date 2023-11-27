@@ -321,7 +321,7 @@ app.on("ready", async () => {
       }
     });
 
-    ipcMain.on("check dropbox connection", () => {
+    ipcMain.on("check-dropbox-connection", () => {
       exec("tasklist", (err, stdout, stderr) => {
         if (err) {
           console.log(err);
@@ -333,7 +333,7 @@ app.on("ready", async () => {
         }
         if (stdout) {
           const isRun = stdout.toLowerCase().includes("dropbox.exe");
-          mainWindow?.webContents.send("dropbox connection", isRun);
+          mainWindow?.webContents.send("dropbox-connection", isRun);
         }
       });
     });
