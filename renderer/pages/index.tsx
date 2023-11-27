@@ -47,6 +47,7 @@ export default function Home() {
   );
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
   const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
+  const [isDropboxConnected, setIsDropboxConnected] = useState(true);
   const [theme, setTheme] = useThemeStore(
     (state) => [state.theme, state.setTheme],
     shallow
@@ -59,6 +60,18 @@ export default function Home() {
       setIsOSDarkTheme(false);
     }
   }
+
+  useEffect(() => {
+    global.ipcRenderer.send("check dropbox connection");
+    global.ipcRenderer.on("dropbox connection", (event, data) => {
+      setIsDropboxConnected(data);
+      console.log(data);
+    });
+
+    return () => {
+      global.ipcRenderer.removeAllListeners("Dropbox connection");
+    };
+  }, []);
 
   useEffect(() => {
     const checkDayChange = () => {
@@ -376,6 +389,11 @@ export default function Home() {
 
   return (
     <div className="h-full bg-gray-100 dark:bg-dark-back">
+      {!isDropboxConnected && (
+        <span className="text-yellow-600 inline-flex  items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-400/20">
+          Dropbox is not connected
+        </span>
+      )}
       <VersionMessage />
       <main className="py-10">
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">

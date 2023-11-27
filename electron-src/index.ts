@@ -62,24 +62,6 @@ function setUpdateStatus(status: "available" | "downloaded", version: string) {
   updateVersion = version;
 }
 
-exec("tasklist", (err, stdout, stderr) => {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      if (stderr) {
-        console.log(stderr);
-        return;
-      }
-      if (stdout) {
-        const isRunn = stdout.toLowerCase().includes("dropbox.exe");
-        if(isRunn){
-        console.log("> DROPBOOOOOOOOOOOOOOOOOX")
-        } else{
-            console.log("> NOOOOOOOOOOOOOOOTHING")
-        }
-      }
-    });
 autoUpdater.allowDowngrade = true;
 autoUpdater.on("error", (e: Error, message?: string) => {
   mainWindow?.webContents.send(
@@ -337,6 +319,23 @@ app.on("ready", async () => {
           err
         );
       }
+    });
+
+    ipcMain.on("check dropbox connection", () => {
+      exec("tasklist", (err, stdout, stderr) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        if (stderr) {
+          console.log(stderr);
+          return;
+        }
+        if (stdout) {
+          const isRun = stdout.toLowerCase().includes("dropbox.exe");
+          mainWindow?.webContents.send("dropbox connection", isRun);
+        }
+      });
     });
 
     ipcMain.on(
