@@ -39,7 +39,6 @@ export default function AutocompleteSelector({
   showedSuggestionsNumber,
 }: AutocompleteProps) {
   const [isNew, setIsNew] = useState(false);
-  const [isFocus, setIsFocus] = useState(true);
 
   const inputRef = useRef(null);
 
