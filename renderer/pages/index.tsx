@@ -397,7 +397,7 @@ export default function Home() {
       >
         <svg
           className="p-2 "
-          fill={false ? "#007FE6" : "#64748b"}
+          fill={isDropboxConnected ? "#007FE6" : "#64748b"}
           height="35px"
           width="35px"
           version="1.1"
