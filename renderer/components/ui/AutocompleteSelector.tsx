@@ -95,11 +95,17 @@ export default function AutocompleteSelector({
     setSelectedItem(e.target.value);
   };
 
+  const onBlurHandler = () => {
+    if (isNewCheck && availableItems) {
+      setIsNew(selectedItem && !availableItems.includes(selectedItem));
+    }
+  };
+
   useEffect(() => {
     if (selectedItem.startsWith("TT:: ")) {
       setSelectedItem((prev) => prev.slice(5));
     }
-    if (!selectedItem) {
+    if (isNewCheck && availableItems && availableItems.includes(selectedItem)) {
       setIsNew(false);
     }
   }, [selectedItem]);
@@ -134,11 +140,7 @@ export default function AutocompleteSelector({
           )}
           onChange={onChangeHandler}
           tabIndex={tabIndex}
-          onBlur={() => {
-            if (isNewCheck && availableItems) {
-              setIsNew(selectedItem && !availableItems.includes(selectedItem));
-            }
-          }}
+          onBlur={onBlurHandler}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center px-2 rounded-r-md focus:outline-none">
           <ChevronUpDownIcon
