@@ -65,7 +65,6 @@ export default function Home() {
     global.ipcRenderer.send("check dropbox connection");
     global.ipcRenderer.on("dropbox connection", (event, data) => {
       setIsDropboxConnected(data);
-      console.log(data);
     });
 
     return () => {
