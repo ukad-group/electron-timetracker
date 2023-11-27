@@ -39,6 +39,8 @@ export default function AutocompleteSelector({
   showedSuggestionsNumber,
 }: AutocompleteProps) {
   const [isNew, setIsNew] = useState(false);
+  const [isFocus, setIsFocus] = useState(true);
+
   const inputRef = useRef(null);
 
   const filteredList =
@@ -98,7 +100,7 @@ export default function AutocompleteSelector({
     if (selectedItem.startsWith("TT:: ")) {
       setSelectedItem((prev) => prev.slice(5));
     }
-    if (isNewCheck) {
+    if (isNewCheck && availableItems) {
       setIsNew(selectedItem && !availableItems.includes(selectedItem));
     }
   }, [selectedItem]);
@@ -112,7 +114,7 @@ export default function AutocompleteSelector({
     >
       <Combobox.Label className="block text-sm font-medium text-gray-700 dark:text-dark-main">
         {title}{" "}
-        {isNew && (
+        {isNew && !isFocus && (
           <span className="text-center mb-1 w-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
             New
           </span>
@@ -133,6 +135,7 @@ export default function AutocompleteSelector({
           )}
           onChange={onChangeHandler}
           tabIndex={tabIndex}
+          onBlur={() => setIsFocus(false)}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center px-2 rounded-r-md focus:outline-none">
           <ChevronUpDownIcon
