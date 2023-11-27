@@ -35,6 +35,7 @@ import {
   getTimetrackerVacations,
   getRefreshedUserInfoToken,
 } from "./TimetrackerWebsiteApi";
+import { exec } from "child_process";
 
 initialize("A-EU-9361517871");
 ipcMain.on(
@@ -318,6 +319,23 @@ app.on("ready", async () => {
           err
         );
       }
+    });
+
+    ipcMain.on("check-dropbox-connection", () => {
+      exec("tasklist", (err, stdout, stderr) => {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        if (stderr) {
+          console.log(stderr);
+          return;
+        }
+        if (stdout) {
+          const isRun = stdout.toLowerCase().includes("dropbox.exe");
+          mainWindow?.webContents.send("dropbox-connection", isRun);
+        }
+      });
     });
 
     ipcMain.on(
