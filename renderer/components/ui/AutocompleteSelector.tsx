@@ -2,6 +2,7 @@ import {
   FormEvent,
   Dispatch,
   SetStateAction,
+  useState,
   useRef,
   ChangeEvent,
   useEffect,
@@ -11,6 +12,7 @@ import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
 
 type AutocompleteProps = {
+  isNewCheck: boolean;
   onSave: (e: FormEvent | MouseEvent) => void;
   title: string;
   selectedItem: string;
@@ -24,6 +26,7 @@ type AutocompleteProps = {
 };
 
 export default function AutocompleteSelector({
+  isNewCheck,
   onSave,
   title,
   className = "",
@@ -35,6 +38,8 @@ export default function AutocompleteSelector({
   isValidationEnabled,
   showedSuggestionsNumber,
 }: AutocompleteProps) {
+  const [isNew, setIsNew] = useState(false);
+
   const inputRef = useRef(null);
 
   const filteredList =
@@ -90,9 +95,18 @@ export default function AutocompleteSelector({
     setSelectedItem(e.target.value);
   };
 
+  const onBlurHandler = () => {
+    if (isNewCheck && availableItems) {
+      setIsNew(selectedItem && !availableItems.includes(selectedItem));
+    }
+  };
+
   useEffect(() => {
     if (selectedItem.startsWith("TT:: ")) {
       setSelectedItem((prev) => prev.slice(5));
+    }
+    if (isNewCheck && availableItems && availableItems.includes(selectedItem)) {
+      setIsNew(false);
     }
   }, [selectedItem]);
 
@@ -104,7 +118,12 @@ export default function AutocompleteSelector({
       onChange={setSelectedItem}
     >
       <Combobox.Label className="block text-sm font-medium text-gray-700 dark:text-dark-main">
-        {title}
+        {title}{" "}
+        {isNew && (
+          <span className="text-center mb-1 w-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
+            New
+          </span>
+        )}
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
@@ -121,6 +140,7 @@ export default function AutocompleteSelector({
           )}
           onChange={onChangeHandler}
           tabIndex={tabIndex}
+          onBlur={onBlurHandler}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center px-2 rounded-r-md focus:outline-none">
           <ChevronUpDownIcon

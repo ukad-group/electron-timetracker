@@ -621,6 +621,7 @@ export default function TrackTimeModal({
 
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      isNewCheck={true}
                       onSave={onSave}
                       title="Project"
                       required
@@ -636,6 +637,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      isNewCheck={true}
                       onSave={onSave}
                       title="Activity"
                       availableItems={
@@ -649,6 +651,7 @@ export default function TrackTimeModal({
                   </div>
                   <div className="col-span-6">
                     <AutocompleteSelector
+                      isNewCheck={false}
                       onSave={onSave}
                       title="Description"
                       availableItems={
