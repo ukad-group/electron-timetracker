@@ -1,6 +1,7 @@
 import {
   ChevronRightIcon,
-  Square2StackIcon,
+  DocumentIcon,
+  DocumentPlusIcon,
 } from "@heroicons/react/24/outline";
 import React, { useState, useEffect } from "react";
 import Tooltip from "./ui/Tooltip/Tooltip";
@@ -142,13 +143,20 @@ const Totals = ({ activities }) => {
     }
   };
 
-  const copyDescriptionsHandler = (descriptions: Description[]) => {
+  const copyDescriptionsHandler = (
+    descriptions: Description[],
+    withTime: boolean
+  ) => {
     const formattedDescriptions = descriptions.reduce(
       (acc: string[], curr: Description) => {
         const name = curr.name ? curr.name : "";
         const duration = convertMillisecondsToTime(curr.duration);
 
-        acc.push(`${name} (${duration})`);
+        if (withTime) {
+          acc.push(`${name} (${duration})`);
+        } else {
+          acc.push(`${name}`);
+        }
 
         return acc;
       },
@@ -226,10 +234,23 @@ const Totals = ({ activities }) => {
                 <Tooltip>
                   <button
                     className="group"
-                    title="Copy project descriptions"
-                    onClick={() => copyDescriptionsHandler(total.descriptions)}
+                    title="Copy project descriptions without time"
+                    onClick={() =>
+                      copyDescriptionsHandler(total.descriptions, false)
+                    }
                   >
-                    <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                    <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                  </button>
+                </Tooltip>
+                <Tooltip>
+                  <button
+                    className="group"
+                    title="Copy project descriptions with time"
+                    onClick={() =>
+                      copyDescriptionsHandler(total.descriptions, true)
+                    }
+                  >
+                    <DocumentPlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
                   </button>
                 </Tooltip>
               </div>
@@ -254,12 +275,29 @@ const Totals = ({ activities }) => {
                         <Tooltip>
                           <button
                             className="group"
-                            title="Copy activity descriptions"
+                            title="Copy activity descriptions without time"
                             onClick={() => {
-                              copyDescriptionsHandler(activity.descriptions);
+                              copyDescriptionsHandler(
+                                activity.descriptions,
+                                false
+                              );
                             }}
                           >
-                            <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                            <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                          </button>
+                        </Tooltip>
+                        <Tooltip>
+                          <button
+                            className="group"
+                            title="Copy activity descriptions with time"
+                            onClick={() => {
+                              copyDescriptionsHandler(
+                                activity.descriptions,
+                                true
+                              );
+                            }}
+                          >
+                            <DocumentPlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
                           </button>
                         </Tooltip>
                       </div>
