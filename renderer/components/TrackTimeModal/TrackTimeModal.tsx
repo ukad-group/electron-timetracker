@@ -57,6 +57,7 @@ export default function TrackTimeModal({
   );
   const [latestProjects, setLatestProjects] = useState([]);
   const [webTrackerProjects, setWebTrackerProjects] = useState([]);
+  const [webTrackerProjects2, setWebTrackerProjects2] = useState([]);
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -135,15 +136,26 @@ export default function TrackTimeModal({
 
   useEffect(() => {
     addSuggestions(activities, latestProjAndDesc, latestProjAndAct);
-    const tempProj = Object.keys(latestProjAndAct);
+    // const tempProj = Object.keys(latestProjAndAct);
+    // if (webTrackerProjects) {
+    //   for (let i = 0; i < webTrackerProjects.length; i++) {
+    //     if (!tempProj.includes(webTrackerProjects[i])) {
+    //       tempProj.push(webTrackerProjects[i]);
+    //     }
+    //   }
+    // }
+    // setLatestProjects(tempProj);
+    const tempLatestProj = Object.keys(latestProjAndAct);
     if (webTrackerProjects) {
+      const tempWebTrackerProjects = [];
       for (let i = 0; i < webTrackerProjects.length; i++) {
-        if (!tempProj.includes(webTrackerProjects[i])) {
-          tempProj.push(webTrackerProjects[i]);
+        if (!tempLatestProj.includes(webTrackerProjects[i])) {
+          tempWebTrackerProjects.push(webTrackerProjects[i]);
         }
       }
+      setWebTrackerProjects2(tempWebTrackerProjects);
     }
-    setLatestProjects(tempProj);
+    setLatestProjects(tempLatestProj);
   }, [isOpen, latestProjAndDesc, latestProjAndAct, webTrackerProjects]);
 
   useEffect(() => {
@@ -626,6 +638,7 @@ export default function TrackTimeModal({
                       title="Project"
                       required
                       availableItems={latestProjects}
+                      additionalItems={webTrackerProjects2}
                       selectedItem={project}
                       setSelectedItem={setProject}
                       isValidationEnabled={isValidationEnabled}
