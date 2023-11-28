@@ -151,12 +151,26 @@ const Totals = ({ activities }) => {
       (acc: string[], curr: Description) => {
         const name = curr.name ? curr.name : "";
         const duration = convertMillisecondsToTime(curr.duration);
+        let textForCopying = "";
 
-        if (withTime) {
-          acc.push(`${name} (${duration})`);
-        } else {
-          acc.push(`${name}`);
+        switch (true) {
+          case name.length > 0 && withTime:
+            textForCopying = `${name} (${duration})`;
+            break;
+
+          case !name.length && withTime:
+            textForCopying = `(${duration})`;
+            break;
+
+          case name.length > 0 && !withTime:
+            textForCopying = name;
+            break;
+
+          default:
+            break;
         }
+
+        textForCopying.length > 0 && acc.push(textForCopying);
 
         return acc;
       },
