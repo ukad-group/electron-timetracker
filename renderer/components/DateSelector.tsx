@@ -3,6 +3,7 @@ import NavButtons from "./ui/NavButtons";
 import Button from "../components/ui/Button";
 
 type DateSelectorProps = {
+  isDropboxConnected: boolean;
   selectedDate: Date;
   setSelectedDate: Dispatch<SetStateAction<Date>>;
 };
@@ -10,6 +11,7 @@ type DateSelectorProps = {
 const day = 60 * 60 * 24 * 1000;
 
 export default function DateSelector({
+  isDropboxConnected,
   selectedDate,
   setSelectedDate,
 }: DateSelectorProps) {
@@ -58,8 +60,29 @@ export default function DateSelector({
             </span>
           )}
         </h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
+        <p className="mt-1 text-sm text-gray-500 dark:text-slate-400 flex">
           {selectedDate?.toLocaleDateString("en-US", { weekday: "long" })}
+          {!isDropboxConnected && (
+            <span title="Dropbox is not enabled">
+              <svg
+                className="ml-2 dark:fill-yellow-500/70 fill-yellow-500"
+                height="20px"
+                width="20px"
+                version="1.1"
+                id="Layer_1"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="-271 282 256 238"
+              >
+                <g>
+                  <polygon points="-271,414.5 -195.7,463.6 -143,419.7 -218.9,372.8 	" />
+                  <polygon points="-195.7,282 -271,331.1 -218.9,372.8 -143,325.9 	" />
+                  <polygon points="-15,331.1 -90.3,282 -143,325.9 -67.1,372.8 	" />
+                  <polygon points="-143,419.7 -90.3,463.6 -15,414.5 -67.1,372.8 	" />
+                  <polygon points="-142.8,429.1 -195.7,473 -218.3,458.2 -218.3,474.8 -142.8,520 -67.4,474.8 -67.4,458.2 -90,473 	" />
+                </g>
+              </svg>
+            </span>
+          )}
         </p>
       </div>
       <div className="flex gap-4">
