@@ -388,7 +388,7 @@ export default function ActivitiesTable({
                 {activity.activity && (
                   <Tooltip>
                     <p
-                      className="block text-xs  font-semibold mt-1"
+                      className="block text-xs font-semibold mt-1 old-break-word "
                       onClick={copyToClipboardHandle}
                     >
                       {activity.activity}
@@ -407,6 +407,7 @@ export default function ActivitiesTable({
                     className={clsx({
                       "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20":
                         activity.mistakes?.includes("startsWith!"),
+                      "old-break-word": true,
                     })}
                   >
                     {activity.description}
