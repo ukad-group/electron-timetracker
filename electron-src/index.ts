@@ -170,7 +170,6 @@ const generateTray = () => {
       mainWindow?.show();
     }
     autoUpdater.checkForUpdates();
-    mainWindow?.webContents.send("window-restored");
   });
 };
 
@@ -364,8 +363,8 @@ app.on("ready", async () => {
     );
   }
 
-  mainWindow?.on("restore", () => {
-    mainWindow?.webContents.send("window-restored");
+  mainWindow?.on("focus", () => {
+    mainWindow?.webContents.send("window-focused");
   });
 });
 
