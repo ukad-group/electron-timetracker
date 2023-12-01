@@ -16,6 +16,7 @@ import Button from "../ui/Button";
 import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "../../store/googleEventsStore";
 import { replaceHyphensWithSpaces } from "../../utils/utils";
+import { getAllJiraCards, getJiraResources } from "../../utils/jira";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -49,6 +50,7 @@ export default function TrackTimeModal({
   const [isTypingFromDuration, setIsTypingFromDuration] = useState(false);
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [trelloTasks, setTrelloTasks] = useState([]);
+  const [jiraTasks, setJiraTasks] = useState([]);
   // const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
   const trelloUser = JSON.parse(localStorage.getItem("trello-user")) || null;
   const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
@@ -152,6 +154,18 @@ export default function TrackTimeModal({
     setFormattedDuration(formatDuration(duration));
   }, [from, to]);
 
+  useEffect(() => {
+    if (trelloUser) {
+      (async () => getTrelloCards())();
+    }
+
+    (async () => {
+      setJiraTasks(await getJiraCardsFromAPI());
+    })();
+
+    getTimetrackerYearProjects();
+  }, []);
+  
   const getTrelloCards = async () => {
     try {
       const trelloCards = await global.ipcRenderer.invoke(
@@ -228,10 +242,15 @@ export default function TrackTimeModal({
     }
   };
 
-  useEffect(() => {
-    if (trelloUser) (async () => getTrelloCards())();
-    getTimetrackerYearProjects();
-  }, []);
+  const getJiraCardsFromAPI = async () => {
+    const resourcesData = await getJiraResources();
+    const jiraCardsFromApi = await getAllJiraCards(resourcesData);
+    const newjiraCardsFromApi = jiraCardsFromApi.map((card) =>
+      replaceHyphensWithSpaces(`JI:: ${card}`)
+    );
+
+    return newjiraCardsFromApi;
+  };
 
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
@@ -656,8 +675,12 @@ export default function TrackTimeModal({
                       title="Description"
                       availableItems={
                         latestProjAndDesc[project]
-                          ? [...latestProjAndDesc[project], ...trelloTasks]
-                          : trelloTasks
+                          ? [
+                              ...latestProjAndDesc[project],
+                              ...trelloTasks,
+                              ...jiraTasks,
+                            ]
+                          : [...trelloTasks, ...jiraTasks]
                       }
                       selectedItem={description}
                       setSelectedItem={setDescription}

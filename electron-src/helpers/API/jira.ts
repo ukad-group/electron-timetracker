@@ -36,58 +36,49 @@ export const getJiraTokens = async (authCode: string, options: Options) => {
     body: `code=${authCode}&client_id=${clientId}&client_secret=${clientSecret}&redirect_uri=${redirectUri}&grant_type=authorization_code&scope=${scope}`,
   });
 
-  // if (!response.ok) throw new Error();
-
   return response.json();
 };
 
-export const getRefreshedAccessToken = async (
+export const getJiraRefreshedAccessToken = async (
   refreshToken: string,
   options: Options
 ) => {
   const { clientId, clientSecret, scope } = options;
-  const response = await fetch(
-    "https://login.microsoftonline.com/common/oauth2/v2.0/token",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: `refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}&grant_type=refresh_token&scope=${scope}`,
-    }
-  );
-
-  // if (!response.ok) throw new Error();
+  const response = await fetch("https://auth.atlassian.com/oauth/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      grant_type: "refresh_token",
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+    }),
+  });
 
   return response.json();
 };
-const jqlQuery = `assignee = "Artur Nahaitsev" ORDER BY created DESC`;
 
-export const endpoints = {
-  events: `https://api.atlassian.com/ex/jira/92cd10eb-2102-4be8-a47b-5e70e19a2322/rest/api/3/search?jql=${encodeURIComponent(
-    jqlQuery
-  )}&maxResults=100&fields=summary`,
-  me: "https://api.atlassian.com/me",
-  resources: "https://api.atlassian.com/oauth/token/accessible-resources",
+export const getJiraProfile = async (accessToken: string) => {
+  const endpoint = "https://api.atlassian.com/me";
+  const headers = new Headers();
+  const bearer = `Bearer ${accessToken}`;
+
+  headers.append("Authorization", bearer);
+
+  const options = {
+    method: "GET",
+    headers: headers,
+  };
+
+  return fetch(endpoint, options)
+    .then((response) => response.json())
+    .catch((error) => console.log(error));
 };
 
-export async function getJiraProfile(accessToken: string) {
-  const headers = new Headers();
-  const bearer = `Bearer ${accessToken}`;
-
-  headers.append("Authorization", bearer);
-
-  const options = {
-    method: "GET",
-    headers: headers,
-  };
-
-  return fetch(endpoints.me, options)
-    .then((response) => response.json())
-    .catch((error) => console.log(error));
-}
-
-export async function getJiraResources(accessToken: string) {
+export const getJiraResources = async (accessToken: string) => {
+  const endpoint = "https://api.atlassian.com/oauth/token/accessible-resources";
   const headers = new Headers();
   const bearer = `Bearer ${accessToken}`;
 
@@ -99,12 +90,20 @@ export async function getJiraResources(accessToken: string) {
     headers: headers,
   };
 
-  return fetch(endpoints.resources, options)
+  return fetch(endpoint, options)
     .then((response) => response.json())
     .catch((error) => console.log(error));
-}
+};
 
-export async function getJiraIssue(accessToken: string) {
+export const getJiraIssues = async (
+  accessToken: string,
+  resourceId: string,
+  assignee: string
+) => {
+  const jqlQuery = `assignee = "${assignee}" ORDER BY created DESC`;
+  const endpoint = `https://api.atlassian.com/ex/jira/${resourceId}/rest/api/3/search?jql=${encodeURIComponent(
+    jqlQuery
+  )}&maxResults=100&fields=summary`;
   const headers = new Headers();
   const bearer = `Bearer ${accessToken}`;
 
@@ -116,7 +115,7 @@ export async function getJiraIssue(accessToken: string) {
     headers: headers,
   };
 
-  return fetch(endpoints.events, options)
+  return fetch(endpoint, options)
     .then((response) => response.json())
     .catch((error) => console.log(error));
-}
+};

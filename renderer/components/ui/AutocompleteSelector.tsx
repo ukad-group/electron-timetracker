@@ -52,7 +52,7 @@ export default function AutocompleteSelector({
         })
       : availableItems?.sort().reduce((accumulator, current) => {
           let duplicate = false;
-          if (current.startsWith("TT:: ")) {
+          if (current.startsWith("TT:: ") || current.startsWith("JI:: ")) {
             duplicate = availableItems.includes(current.slice(5));
           }
           if (
@@ -102,7 +102,7 @@ export default function AutocompleteSelector({
   };
 
   useEffect(() => {
-    if (selectedItem.startsWith("TT:: ")) {
+    if (selectedItem.startsWith("TT:: ") || selectedItem.startsWith("JI:: ")) {
       setSelectedItem((prev) => prev.slice(5));
     }
     if (isNewCheck && availableItems && availableItems.includes(selectedItem)) {

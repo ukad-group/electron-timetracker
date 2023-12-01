@@ -2,13 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
 import isOnline from "is-online";
-
-export interface Office365User {
-  accessToken: string;
-  refreshToken: string;
-  userId: string;
-  username: string;
-}
+import { Office365User } from "../utils/office365";
 
 const Office365Connection = () => {
   const [users, setUsers] = useState(

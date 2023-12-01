@@ -2,14 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
 import isOnline from "is-online";
-
-export interface JiraUser {
-  accessToken: string;
-  refreshToken: string;
-  userId: string;
-  username: string;
-  nickname: string;
-}
+import { JiraUser } from "../utils/jira";
 
 const JiraConnection = () => {
   const [users, setUsers] = useState(
@@ -42,7 +35,7 @@ const JiraConnection = () => {
     const params = new URLSearchParams(window.location.search);
     const authorizationCode = params.get("code");
 
-    const { access_token } = await global.ipcRenderer.invoke(
+    const { access_token, refresh_token } = await global.ipcRenderer.invoke(
       "jira:get-tokens",
       authorizationCode
     );
@@ -67,7 +60,7 @@ const JiraConnection = () => {
     const user = {
       userId: account_id,
       accessToken: access_token,
-      // refreshToken: refresh_token,
+      refreshToken: refresh_token,
       username: username,
       nickname: nickname,
     };
@@ -86,21 +79,6 @@ const JiraConnection = () => {
     ) {
       (async () => addUser())();
     }
-
-    users[0]?.accessToken &&
-      (async () => {
-        const res = await global.ipcRenderer.invoke(
-          "jira:get-resources",
-          users[0].accessToken
-        );
-
-        const resp = await global.ipcRenderer.invoke(
-          "jira:get-issue",
-          users[0].accessToken
-        );
-
-        console.log(resp?.issues?.map((issue) => issue?.fields?.summary));
-      })();
   }, []);
 
   return (
