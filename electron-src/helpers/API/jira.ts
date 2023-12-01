@@ -16,7 +16,7 @@ export const getJiraAuthUrl = (options: Options) => {
     redirect_uri: redirectUri,
     state: "jiracode",
     response_type: "code",
-    prompt: "consent",
+    prompt: "select_account",
   });
 
   authUrl.search = params.toString();
