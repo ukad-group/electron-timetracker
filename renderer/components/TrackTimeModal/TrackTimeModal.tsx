@@ -633,6 +633,7 @@ export default function TrackTimeModal({
                         Object.keys(latestProjAndAct).length
                       }
                       tabIndex={4}
+                      spellCheck={false}
                     />
                   </div>
                   <div className="col-span-6">
@@ -647,6 +648,7 @@ export default function TrackTimeModal({
                       setSelectedItem={setActivity}
                       showedSuggestionsNumber={3}
                       tabIndex={5}
+                      spellCheck={false}
                     />
                   </div>
                   <div className="col-span-6">
@@ -663,6 +665,7 @@ export default function TrackTimeModal({
                       setSelectedItem={setDescription}
                       showedSuggestionsNumber={3}
                       tabIndex={6}
+                      spellCheck={true}
                     />
                   </div>
                 </div>
