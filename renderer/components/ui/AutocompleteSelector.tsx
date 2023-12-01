@@ -54,7 +54,7 @@ export default function AutocompleteSelector({
         })
       : availableItems
           ?.sort()
-          .concat(additionalItems.sort())
+          .concat(additionalItems ? additionalItems.sort() : [])
           .reduce((accumulator, current) => {
             let duplicate = false;
             if (current.startsWith("TT:: ")) {

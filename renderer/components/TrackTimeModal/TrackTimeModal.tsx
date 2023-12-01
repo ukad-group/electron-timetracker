@@ -57,7 +57,7 @@ export default function TrackTimeModal({
   );
   const [latestProjects, setLatestProjects] = useState([]);
   const [webTrackerProjects, setWebTrackerProjects] = useState([]);
-  const [webTrackerProjects2, setWebTrackerProjects2] = useState([]);
+  const [uniqueWebTrackerProjects, setUniqueWebTrackerProjects] = useState([]);
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -153,7 +153,7 @@ export default function TrackTimeModal({
           tempWebTrackerProjects.push(webTrackerProjects[i]);
         }
       }
-      setWebTrackerProjects2(tempWebTrackerProjects);
+      setUniqueWebTrackerProjects(tempWebTrackerProjects);
     }
     setLatestProjects(tempLatestProj);
   }, [isOpen, latestProjAndDesc, latestProjAndAct, webTrackerProjects]);
@@ -638,7 +638,9 @@ export default function TrackTimeModal({
                       title="Project"
                       required
                       availableItems={latestProjects}
-                      additionalItems={webTrackerProjects2}
+                      additionalItems={
+                        uniqueWebTrackerProjects ? uniqueWebTrackerProjects : []
+                      }
                       selectedItem={project}
                       setSelectedItem={setProject}
                       isValidationEnabled={isValidationEnabled}
