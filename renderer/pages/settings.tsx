@@ -10,6 +10,7 @@ import Office365Connection from "../components/Office365Connection";
 import GoogleConnection from "../components/GoogleConnection";
 import clsx from "clsx";
 import TimetrackerWebsiteConnection from "../components/TimetrackerWebsiteConncetion";
+import BetaToggle from "../components/ui/BetaToggle";
 
 const SettingsPage = () => {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -164,6 +165,16 @@ const SettingsPage = () => {
             <GoogleConnection />
             <Office365Connection />
             <TimetrackerWebsiteConnection />
+          </div>
+        </section>
+        <section>
+          <div className="bg-white shadow sm:rounded-lg p-6 flex flex-col gap-6 dark:bg-dark-container  dark:border-dark-border">
+            <div className="flex flex-col gap-1">
+              <span className="text-lg font-medium text-gray-900 dark:text-dark-heading">
+                Stable or beta version
+              </span>
+              <BetaToggle />
+            </div>
           </div>
         </section>
       </div>
