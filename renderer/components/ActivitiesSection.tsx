@@ -70,7 +70,7 @@ export default function ActivitiesSection({
   };
 
   useEffect(() => {
-    let isAvailable = { isAvailable: true };
+    const isAvailable = { isAvailable: true };
 
     loadEvents(isAvailable);
 
