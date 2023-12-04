@@ -3,6 +3,7 @@ import { shallow } from "zustand/shallow";
 import { useUpdateStore } from "../store/updateStore";
 import { useBetaStore } from "../store/betaUpdatesStore";
 import DisclosureSection from "./ui/DisclosureSection";
+import { GlobeAltIcon } from "@heroicons/react/24/solid";
 
 type File = {
   url: string;
@@ -85,6 +86,10 @@ export default function UpdateDescription() {
     return tempDiv.innerHTML;
   };
 
+  const suppotClickHandler = (isDesktop: boolean) => {
+    global.ipcRenderer.send("slack redirect", isDesktop);
+  };
+
   return (
     <DisclosureSection
       toggleFunction={isOpenToggle}
@@ -94,34 +99,41 @@ export default function UpdateDescription() {
       <p className="text-xs text-gray-700 font-semibold dark:text-dark-main">
         Current version {currentVersion} {!isUpdate && "(latest)"}
       </p>
-      <div className="relative flex items-start my-4 ">
-        <div className="relative flex items-start my-4">
-          <div className="flex items-center h-5">
-            <input
-              id="comments"
-              aria-describedby="comments-description"
-              name="comments"
-              type="checkbox"
-              defaultChecked={isBeta}
-              onChange={() => setIsBeta(!isBeta)}
-              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-            />
-          </div>
-          <div className="ml-2 text-sm">
-            <label
-              htmlFor="comments"
-              className="font-medium text-gray-700 dark:text-gray-300"
-            >
-              Download beta version
-            </label>
-            <p
-              id="comments-description"
-              className="text-gray-500 dark:text-dark-main"
-            >
-              You need to restart the application (or reopen from the tray)
-            </p>
-          </div>
-        </div>
+
+      <div className="flex flex-col my-5 gap-3 ">
+        <p className=" text-gray-700 font-semibold dark:text-dark-main">
+          You can leave your feedback or questions in our slack channel
+        </p>
+        <button
+          className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
+          onClick={() => suppotClickHandler(true)}
+        >
+          <svg
+            fill="#4b5563"
+            width="24px"
+            height="24px"
+            viewBox="0 0 512 512"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <title>ionicons-v5_logos</title>
+            <path d="M126.12,315.1A47.06,47.06,0,1,1,79.06,268h47.06Z" />
+            <path d="M149.84,315.1a47.06,47.06,0,0,1,94.12,0V432.94a47.06,47.06,0,1,1-94.12,0Z" />
+            <path d="M196.9,126.12A47.06,47.06,0,1,1,244,79.06v47.06Z" />
+            <path d="M196.9,149.84a47.06,47.06,0,0,1,0,94.12H79.06a47.06,47.06,0,0,1,0-94.12Z" />
+            <path d="M385.88,196.9A47.06,47.06,0,1,1,432.94,244H385.88Z" />
+            <path d="M362.16,196.9a47.06,47.06,0,0,1-94.12,0V79.06a47.06,47.06,0,1,1,94.12,0Z" />
+            <path d="M315.1,385.88A47.06,47.06,0,1,1,268,432.94V385.88Z" />
+            <path d="M315.1,362.16a47.06,47.06,0,0,1,0-94.12H432.94a47.06,47.06,0,1,1,0,94.12Z" />
+          </svg>
+          Open in desktop Slack
+        </button>
+        <button
+          className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
+          onClick={() => suppotClickHandler(false)}
+        >
+          <GlobeAltIcon className="w-6 h-6 fill-gray-600" />
+          Open Slack in the browser
+        </button>
       </div>
       <h2 className="font-bold text-gray-700 dark:text-dark-heading">
         In {release?.version ? release?.version : currentVersion} version

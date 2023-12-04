@@ -3,7 +3,7 @@ import path from "path";
 import next from "next";
 import { parse } from "url";
 import { createServer } from "http";
-import { app, dialog, ipcMain, Menu, Tray } from "electron";
+import { app, dialog, ipcMain, Menu, Tray, shell } from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
 import { createWindow } from "./helpers/create-window";
@@ -106,6 +106,14 @@ ipcMain.on(
     );
   }
 );
+
+ipcMain.on("slack redirect", (event, isDesktop: boolean) => {
+  shell.openExternal(
+    isDesktop
+      ? "slack://channel?team=T3PV37ANP&id=C05JN9P19G8"
+      : "https://ukad.slack.com/archives/C05JN9P19G8"
+  );
+});
 
 const userDataDirectory = app.getPath("userData");
 let mainWindow: Electron.CrossProcessExports.BrowserWindow | null = null;
