@@ -208,7 +208,7 @@ app.on("ready", async () => {
       const options: Electron.MessageBoxOptions = {
         type: "error",
         title: error.message,
-        message: `Error when starting server at http://localhost:${PORT}. Try to restart server. If it doesn't help, check if port ${PORT} is free and write to support`,
+        message: `Error when starting server at http://localhost:${PORT}. Try to restart server. If it doesn't help, check if port ${PORT} is free. Also you can try to reset Windows NAT, for this run cmd with administrator rights and write: "net stop winnat", then: "net start winnat". If nothing helps, please, write to support`,
         buttons: ["Close", "Restart", "Quit"],
       };
 
