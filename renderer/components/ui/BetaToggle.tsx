@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { shallow } from "zustand/shallow";
 import { useBetaStore } from "../../store/betaUpdatesStore";
 
@@ -12,8 +12,11 @@ export default function BetaToggle() {
     global.ipcRenderer.send("beta-channel", isBeta);
   }, [isBeta]);
   return (
-    <div className="relative flex flex-col my-4">
-      <div className="flex items-center">
+    <div className="relative flex flex-col">
+      <p className="text-sm text-gray-500 dark:text-dark-main">
+        You need to restart the application (or reopen it from the tray)
+      </p>
+      <div className="flex items-center my-4">
         <label className="relative inline-flex items-center cursor-pointer">
           <input
             type="checkbox"
@@ -28,12 +31,6 @@ export default function BetaToggle() {
           </span>
         </label>
       </div>
-      <p
-        id="comments-description"
-        className="text-gray-500 dark:text-dark-main"
-      >
-        You need to restart the application (or reopen from the tray)
-      </p>
     </div>
   );
 }
