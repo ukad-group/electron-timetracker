@@ -177,16 +177,3 @@ export const convertMillisecondsToTime = (milliseconds) => {
 
   return `${hours}:${minutes}`;
 };
-
-export const getCurrentTimeRoundedUp = () => {
-  const currentTime = new Date();
-  const minutes = currentTime.getMinutes();
-  const minutesToAdd = (15 - (minutes % 15)) % 15;
-  currentTime.setMinutes(minutes + minutesToAdd);
-  const formattedTime = currentTime.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  return `${formattedTime}`;
-};
