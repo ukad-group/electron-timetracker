@@ -135,9 +135,11 @@ const JiraConnection = () => {
       <p className="text-sm text-gray-500  dark:text-dark-main">
         After connection, you will be able to fill in the Description field with
         tasks from the drop-down list. Just begin typing and in the drop-down
-        list you will see Trello tasks that starting with "J::".
+        list you will see Jira tasks that starting with "J::".
         <br />
         You can see only those tasks, where you are an assignee
+        <br />
+        Ensure you have a Jira account connected to your Atlassian account.
       </p>
     </div>
   );
