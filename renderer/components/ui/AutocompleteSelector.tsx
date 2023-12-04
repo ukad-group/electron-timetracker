@@ -41,8 +41,8 @@ export default function AutocompleteSelector({
   showedSuggestionsNumber,
 }: AutocompleteProps) {
   const [isNew, setIsNew] = useState(false);
-
   const inputRef = useRef(null);
+  let allItems=[]
 
   const filteredList =
     selectedItem === ""
@@ -100,24 +100,29 @@ export default function AutocompleteSelector({
   };
 
   const onBlurHandler = () => {
-    const allItems = additionalItems
-      ? availableItems?.concat(additionalItems)
-      : availableItems;
+
     if (isNewCheck) {
       setIsNew(selectedItem && !allItems?.includes(selectedItem));
     }
+
   };
 
-  useEffect(() => {
-    const allItems = additionalItems
+  useEffect(()=>{
+    allItems = additionalItems
       ? availableItems?.concat(additionalItems)
       : availableItems;
+  },[additionalItems, availableItems])
+
+  useEffect(() => {
+
     if (selectedItem.startsWith("TT:: ")) {
       setSelectedItem((prev) => prev.slice(5));
     }
+
     if (isNewCheck && allItems?.includes(selectedItem)) {
       setIsNew(false);
     }
+
   }, [selectedItem]);
 
   return (
