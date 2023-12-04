@@ -70,7 +70,7 @@ export type DayOff = {
   date: Date;
   duration: number;
   description: string;
-  type: string;
+  type: number;
 };
 
 export type ApiDayOff = {
@@ -282,7 +282,7 @@ export function Calendar({
       const duration =
         userDayOff?.duration === 8 ? "all day" : userDayOff?.duration + "h";
 
-      if (userDayOff?.type === "holiday") {
+      if (userDayOff?.type === 2) {
         const desciprion = userDayOff?.description
           ? userDayOff?.description
           : "Holiday";
@@ -295,7 +295,7 @@ export function Calendar({
             />
           </div>
         );
-      } else if (userDayOff?.type === "vacation") {
+      } else if (userDayOff?.type === 0) {
         return (
           <div>
             {info.dayNumberText}
@@ -305,7 +305,7 @@ export function Calendar({
             />
           </div>
         );
-      } else if (userDayOff?.type === "sickday") {
+      } else if (userDayOff?.type === 1) {
         return (
           <div>
             {info.dayNumberText}
@@ -318,43 +318,6 @@ export function Calendar({
       }
     } else {
       return info.dayNumberText;
-    }
-
-    const transitPeriod = JSON.parse(localStorage.getItem("transit-vacation"));
-
-    if (transitPeriod && transitPeriod?.length > 0) {
-      const transitDayOff = transitPeriod?.find((transitDay) => {
-        return isTheSameDates(info.date, transitDay.date);
-      });
-
-      if (transitDayOff) {
-        const duration =
-          transitDayOff?.duration === 8
-            ? "all day"
-            : transitDayOff?.duration + "h";
-
-        if (transitDayOff?.type === "vacation") {
-          return (
-            <div>
-              {info.dayNumberText}
-              <CalendarDaysIcon
-                className="absolute top-[30px] right-[2px] w-5 h-5"
-                title={`Vacation, ${duration}`}
-              />
-            </div>
-          );
-        } else if (transitDayOff?.type === "sickday") {
-          return (
-            <div>
-              {info.dayNumberText}
-              <FaceFrownIcon
-                className="absolute top-[30px] right-[2px] w-5 h-5"
-                title={`Sickday, ${duration}`}
-              />
-            </div>
-          );
-        }
-      }
     }
   };
 
