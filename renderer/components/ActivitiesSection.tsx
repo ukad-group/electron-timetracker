@@ -49,31 +49,39 @@ export default function ActivitiesSection({
     }
   };
 
-  useEffect(() => {
-    let isAvailable = true;
-
+  const loadEvents = async (isAvailable: { isAvailable: boolean }) => {
     if (checkIsToday(selectedDate)) {
-      (async () => {
-        setIsLoading(true);
+      setIsLoading(true);
 
-        const googleEvents = isShowGoogleEvents
-          ? await loadGoogleEventsFromAllUsers()
-          : [];
-        const office365Events = isShowOffice365Events
-          ? await getOffice365Events()
-          : [];
-        const allEvents = [...googleEvents, ...office365Events];
+      const googleEvents = isShowGoogleEvents
+        ? await loadGoogleEventsFromAllUsers()
+        : [];
+      const office365Events = isShowOffice365Events
+        ? await getOffice365Events()
+        : [];
 
-        setIsLoading(false);
-        isAvailable && setEvents(allEvents);
-      })();
+      const allEvents = [...googleEvents, ...office365Events];
+
+      setIsLoading(false);
+      isAvailable.isAvailable && setEvents(allEvents);
     } else {
       setEvents([]);
     }
+  };
+
+  useEffect(() => {
+    const isAvailable = { isAvailable: true };
+
+    loadEvents(isAvailable);
+
+    global.ipcRenderer.on("window-focused", () => {
+      loadEvents(isAvailable);
+    });
 
     return () => {
       setIsLoading(false);
-      isAvailable = false;
+      isAvailable.isAvailable = false;
+      global.ipcRenderer.removeAllListeners("window-focused");
     };
   }, [selectedDate]);
 

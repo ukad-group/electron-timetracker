@@ -196,14 +196,14 @@ export function Calendar({
       setDaysOff(await loadHolidaysAndVacations(calendarDate));
     })();
 
-    global.ipcRenderer.on("window-restored", () => {
+    global.ipcRenderer.on("window-focused", () => {
       (async () => {
         setDaysOff(await loadHolidaysAndVacations(calendarDate));
       })();
     });
 
     return () => {
-      global.ipcRenderer.removeAllListeners("window-restored");
+      global.ipcRenderer.removeAllListeners("window-focused");
     };
   }, [calendarDate]);
 
