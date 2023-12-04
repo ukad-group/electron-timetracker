@@ -24,6 +24,7 @@ type AutocompleteProps = {
   isValidationEnabled?: boolean;
   className?: string;
   showedSuggestionsNumber: number;
+  spellCheck: boolean;
 };
 
 export default function AutocompleteSelector({
@@ -39,6 +40,7 @@ export default function AutocompleteSelector({
   tabIndex,
   isValidationEnabled,
   showedSuggestionsNumber,
+  spellCheck,
 }: AutocompleteProps) {
   const [isNew, setIsNew] = useState(false);
   const inputRef = useRef(null);
@@ -145,7 +147,7 @@ export default function AutocompleteSelector({
           onKeyDown={(event: FormEvent) => handleKey(event)}
           ref={inputRef}
           required={required}
-          spellCheck={false}
+          spellCheck={spellCheck}
           className={clsx(
             "w-full py-2 pl-3 pr-10 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm dark:border-slate-600 dark:text-dark-heading dark:bg-dark-form-back focus:dark:border-focus-border focus:dark:ring-focus-border",
             {
