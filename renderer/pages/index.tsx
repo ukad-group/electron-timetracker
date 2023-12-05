@@ -433,7 +433,7 @@ export default function Home() {
                   </div>
 
                   <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                    <Totals activities={selectedDateActivities} />
+                    <Totals selectedDate={selectedDate} />
                   </div>
                   <UpdateDescription />
                 </div>
