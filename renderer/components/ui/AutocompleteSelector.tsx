@@ -17,12 +17,14 @@ type AutocompleteProps = {
   title: string;
   selectedItem: string;
   availableItems: Array<string>;
+  additionalItems?: Array<string>;
   setSelectedItem: Dispatch<SetStateAction<string>>;
   required?: boolean;
   tabIndex?: number;
   isValidationEnabled?: boolean;
   className?: string;
   showedSuggestionsNumber: number;
+  spellCheck: boolean;
 };
 
 export default function AutocompleteSelector({
@@ -32,15 +34,17 @@ export default function AutocompleteSelector({
   className = "",
   selectedItem,
   availableItems,
+  additionalItems,
   setSelectedItem,
   required = false,
   tabIndex,
   isValidationEnabled,
   showedSuggestionsNumber,
+  spellCheck,
 }: AutocompleteProps) {
   const [isNew, setIsNew] = useState(false);
-
   const inputRef = useRef(null);
+  let allItems=[]
 
   const filteredList =
     selectedItem === ""
@@ -50,25 +54,27 @@ export default function AutocompleteSelector({
           }
           return activity !== "";
         })
-      : availableItems?.sort().reduce((accumulator, current) => {
-          let duplicate = false;
-          if (current.startsWith("TT:: ") || current.startsWith("JI:: ")) {
-            duplicate = availableItems.includes(current.slice(5));
-          }
-          if (
-            !duplicate &&
-            current.toLowerCase() === selectedItem.toLowerCase()
-          ) {
-            accumulator.unshift(current);
-          } else if (
-            !duplicate &&
-            current.toLowerCase().includes((selectedItem || "").toLowerCase())
-          ) {
-            accumulator.push(current);
-          }
-          return accumulator;
-        }, []);
-
+      : availableItems
+          ?.sort()
+          .concat(additionalItems ? additionalItems.sort() : [])
+          .reduce((accumulator, current) => {
+            let duplicate = false;
+            if (current.startsWith("TT:: ") || current.startsWith("JI:: ")) {
+              duplicate = availableItems.includes(current.slice(5));
+            }
+            if (
+              !duplicate &&
+              current.toLowerCase() === selectedItem.toLowerCase()
+            ) {
+              accumulator.unshift(current);
+            } else if (
+              !duplicate &&
+              current.toLowerCase().includes((selectedItem || "").toLowerCase())
+            ) {
+              accumulator.push(current);
+            }
+            return accumulator;
+          }, []);
   const handleKey = (event) => {
     if (event.key === "Home") {
       event.preventDefault();
@@ -96,16 +102,25 @@ export default function AutocompleteSelector({
   };
 
   const onBlurHandler = () => {
-    if (isNewCheck && availableItems) {
-      setIsNew(selectedItem && !availableItems.includes(selectedItem));
+
+    if (isNewCheck) {
+      setIsNew(selectedItem && !allItems?.includes(selectedItem));
     }
+
   };
+
+  useEffect(()=>{
+    allItems = additionalItems
+      ? availableItems?.concat(additionalItems)
+      : availableItems;
+  },[additionalItems, availableItems])
 
   useEffect(() => {
     if (selectedItem.startsWith("TT:: ") || selectedItem.startsWith("JI:: ")) {
       setSelectedItem((prev) => prev.slice(5));
     }
-    if (isNewCheck && availableItems && availableItems.includes(selectedItem)) {
+
+    if (isNewCheck && allItems?.includes(selectedItem)) {
       setIsNew(false);
     }
   }, [selectedItem]);
@@ -130,7 +145,7 @@ export default function AutocompleteSelector({
           onKeyDown={(event: FormEvent) => handleKey(event)}
           ref={inputRef}
           required={required}
-          spellCheck={false}
+          spellCheck={spellCheck}
           className={clsx(
             "w-full py-2 pl-3 pr-10 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm dark:border-slate-600 dark:text-dark-heading dark:bg-dark-form-back focus:dark:border-focus-border focus:dark:ring-focus-border",
             {

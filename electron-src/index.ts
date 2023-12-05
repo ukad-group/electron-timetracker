@@ -3,7 +3,7 @@ import path from "path";
 import next from "next";
 import { parse } from "url";
 import { createServer } from "http";
-import { app, dialog, ipcMain, Menu, Tray } from "electron";
+import { app, dialog, ipcMain, Menu, MenuItem, Tray } from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
 import { createWindow } from "./helpers/create-window";
@@ -123,6 +123,9 @@ const generateWindow = () => {
   mainWindow = createWindow({
     width: 1000,
     height: 600,
+    webPreferences: {
+      spellcheck: true,
+    },
     autoHideMenuBar: true,
     icon: path.join(__dirname, "../renderer/out/images/logo.png"),
   });
@@ -137,6 +140,7 @@ const generateWindow = () => {
       mainWindow?.hide();
     });
   }
+  mainWindow.webContents.session.setSpellCheckerLanguages(["en-US"]);
 };
 
 let tray: Tray | null = null;
@@ -178,7 +182,6 @@ const generateTray = () => {
       mainWindow?.show();
     }
     autoUpdater.checkForUpdates();
-    mainWindow?.webContents.send("window-restored");
   });
 };
 
@@ -217,7 +220,7 @@ app.on("ready", async () => {
       const options: Electron.MessageBoxOptions = {
         type: "error",
         title: error.message,
-        message: `Error when starting server at http://localhost:${PORT}. Try to restart server. If it doesn't help, check if port ${PORT} is free and write to support`,
+        message: `Error when starting server at http://localhost:${PORT}. Try to restart server. If it doesn't help, check if port ${PORT} is free. Also you can try to reset Windows NAT, for this run cmd with administrator rights and write: "net stop winnat", then: "net start winnat". If nothing helps, please, write to support`,
         buttons: ["Close", "Restart", "Quit"],
       };
 
@@ -370,10 +373,40 @@ app.on("ready", async () => {
         }
       }
     );
+
+    mainWindow.webContents.on("context-menu", (event, params) => {
+      const menu = new Menu();
+
+      for (const suggestion of params.dictionarySuggestions) {
+        menu.append(
+          new MenuItem({
+            label: suggestion,
+            click: () =>
+              mainWindow &&
+              mainWindow.webContents.replaceMisspelling(suggestion),
+          })
+        );
+      }
+
+      if (params.misspelledWord && mainWindow) {
+        menu.append(
+          new MenuItem({
+            label: "Add to dictionary",
+            click: () =>
+              mainWindow &&
+              mainWindow.webContents.session.addWordToSpellCheckerDictionary(
+                params.misspelledWord
+              ),
+          })
+        );
+      }
+
+      menu.popup();
+    });
   }
 
-  mainWindow?.on("restore", () => {
-    mainWindow?.webContents.send("window-restored");
+  mainWindow?.on("focus", () => {
+    mainWindow?.webContents.send("window-focused");
   });
 });
 

@@ -89,13 +89,13 @@ import { useEffect, useState, Dispatch, SetStateAction } from "react";
 //     if (googleUsers && showGoogleEventsLs === "true") {
 //       loadGoogleEventsFromAllUsers(googleUsers);
 
-//       global.ipcRenderer.on("window-restored", () => {
+//       global.ipcRenderer.on("window-focused", () => {
 //         loadGoogleEventsFromAllUsers(googleUsers);
 //       });
 //     }
 
 //     return () => {
-//       global.ipcRenderer.removeAllListeners("window-restored");
+//       global.ipcRenderer.removeAllListeners("window-focused");
 //     };
 //   }, []);
 

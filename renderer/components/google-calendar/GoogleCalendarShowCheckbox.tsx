@@ -64,13 +64,13 @@ import { useEffect, useState, Dispatch, SetStateAction } from "react";
 //     if (googleAccessToken) {
 //       loadGoogleEvents(googleAccessToken);
 
-//       global.ipcRenderer.on("window-restored", () => {
+//       global.ipcRenderer.on("window-focused", () => {
 //         loadGoogleEvents(googleAccessToken);
 //       });
 //     }
 
 //     return () => {
-//       global.ipcRenderer.removeAllListeners("window-restored");
+//       global.ipcRenderer.removeAllListeners("window-focused");
 //     };
 //   }, []);
 

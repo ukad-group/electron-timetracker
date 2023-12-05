@@ -196,14 +196,14 @@ export function Calendar({
       setDaysOff(await loadHolidaysAndVacations(calendarDate));
     })();
 
-    global.ipcRenderer.on("window-restored", () => {
+    global.ipcRenderer.on("window-focused", () => {
       (async () => {
         setDaysOff(await loadHolidaysAndVacations(calendarDate));
       })();
     });
 
     return () => {
-      global.ipcRenderer.removeAllListeners("window-restored");
+      global.ipcRenderer.removeAllListeners("window-focused");
     };
   }, [calendarDate]);
 
@@ -413,7 +413,7 @@ function renderEventContent(eventInfo) {
   return (
     <>
       {eventInfo.event.extendedProps.isValid === false && (
-        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[290%] dark:fill-red-500/70" />
+        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[26px] -left-[1px] dark:fill-red-500/70" />
       )}
       {eventInfo.event.extendedProps.workDurationMs ? (
         <p>
