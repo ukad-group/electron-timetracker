@@ -10,6 +10,7 @@ import {
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
+import { useMemo } from "react";
 
 type AutocompleteProps = {
   isNewCheck: boolean;
@@ -44,7 +45,11 @@ export default function AutocompleteSelector({
 }: AutocompleteProps) {
   const [isNew, setIsNew] = useState(false);
   const inputRef = useRef(null);
-  let allItems=[]
+  const allItems = useMemo(() => {
+    return additionalItems
+      ? availableItems?.concat(additionalItems)
+      : availableItems;
+  }, [availableItems, additionalItems]);
 
   const filteredList =
     selectedItem === ""
@@ -75,12 +80,14 @@ export default function AutocompleteSelector({
             }
             return accumulator;
           }, []);
+
   const handleKey = (event) => {
     if (event.key === "Home") {
       event.preventDefault();
       inputRef.current.selectionStart = 0;
       inputRef.current.selectionEnd = 0;
     }
+
     if (event.key === "End") {
       event.preventDefault();
       const input = inputRef.current;
@@ -88,6 +95,7 @@ export default function AutocompleteSelector({
       input.selectionStart = length;
       input.selectionEnd = length;
     }
+
     if (event.ctrlKey && event.key === "Enter") {
       event.preventDefault();
       onSave(event);
@@ -98,22 +106,15 @@ export default function AutocompleteSelector({
     if (e.target.value.startsWith(" ")) {
       e.target.value = e.target.value.trim();
     }
+
     setSelectedItem(e.target.value);
   };
 
   const onBlurHandler = () => {
-
     if (isNewCheck) {
       setIsNew(selectedItem && !allItems?.includes(selectedItem));
     }
-
   };
-
-  useEffect(()=>{
-    allItems = additionalItems
-      ? availableItems?.concat(additionalItems)
-      : availableItems;
-  },[additionalItems, availableItems])
 
   useEffect(() => {
     if (selectedItem.startsWith("TT:: ") || selectedItem.startsWith("JI:: ")) {
@@ -123,7 +124,7 @@ export default function AutocompleteSelector({
     if (isNewCheck && allItems?.includes(selectedItem)) {
       setIsNew(false);
     }
-  }, [selectedItem]);
+  }, [selectedItem, allItems]);
 
   return (
     <Combobox
