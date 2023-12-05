@@ -257,7 +257,7 @@ export default function TrackTimeModal({
   const getJiraCardsFromAPI = async () => {
     const resourcesData = await getJiraResources();
     const jiraCardsFromApi = await getAllJiraCards(resourcesData);
-    const newjiraCardsFromApi = jiraCardsFromApi.map((card) =>
+    const newjiraCardsFromApi = jiraCardsFromApi?.length > 0 && jiraCardsFromApi.map((card) =>
       replaceHyphensWithSpaces(`JI:: ${card}`)
     );
 
