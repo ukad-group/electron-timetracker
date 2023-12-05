@@ -91,6 +91,8 @@ export default function Home() {
       .matchMedia("(prefers-color-scheme: dark)")
       .addListener(handleThemeChange);
 
+    setIsOSDarkTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
+
     const mode =
       (theme.os && isOSDarkTheme) || theme.custom === "dark"
         ? "dark bg-dark-back"
