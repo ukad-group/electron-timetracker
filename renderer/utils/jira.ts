@@ -54,7 +54,7 @@ export const getJiraResources = async () => {
   try {
     const storedUsers = JSON.parse(localStorage.getItem("jira-users")) || [];
 
-    if (!storedUsers.length) return;
+    if (!storedUsers.length) return [];
 
     const resourcesPromises = storedUsers.map(async (user: JiraUser) => {
       const { accessToken, refreshToken, userId, nickname } = user;
@@ -113,7 +113,7 @@ export const getJiraResourcesByUser = async (
 
 export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
   try {
-    if (!resourcesData?.length) return;
+    if (!resourcesData?.length) return [];
 
     let cardsPromises = [];
 
@@ -129,8 +129,6 @@ export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
           );
         });
       }
-
-      return [];
     });
 
     const promisedCards = await Promise.all(cardsPromises);

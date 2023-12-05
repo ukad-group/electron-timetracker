@@ -172,7 +172,9 @@ export default function TrackTimeModal({
     }
 
     (async () => {
-      setJiraTasks(await getJiraCardsFromAPI());
+      const newCardsFromApi = await getJiraCardsFromAPI();
+
+      setJiraTasks(newCardsFromApi);
     })();
 
     getTimetrackerYearProjects();
@@ -257,7 +259,7 @@ export default function TrackTimeModal({
   const getJiraCardsFromAPI = async () => {
     const resourcesData = await getJiraResources();
     const jiraCardsFromApi = await getAllJiraCards(resourcesData);
-    const newjiraCardsFromApi = jiraCardsFromApi?.length > 0 && jiraCardsFromApi.map((card) =>
+    const newjiraCardsFromApi = jiraCardsFromApi.map((card) =>
       replaceHyphensWithSpaces(`JI:: ${card}`)
     );
 
