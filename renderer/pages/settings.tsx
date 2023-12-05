@@ -34,6 +34,8 @@ const SettingsPage = () => {
       .matchMedia("(prefers-color-scheme: dark)")
       .addListener(handleThemeChange);
 
+    setIsOSDarkTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
+
     const mode =
       (theme.os && isOSDarkTheme) || theme.custom === "dark"
         ? "dark bg-dark-back"
@@ -89,13 +91,12 @@ const SettingsPage = () => {
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    value=""
+                    id="deviceTheme"
+                    aria-describedby="comments-description"
                     defaultChecked={theme.os}
+                    name="deviceTheme"
                     onClick={() =>
-                      setTheme({
-                        custom: theme.custom,
-                        os: !theme.os,
-                      })
+                      setTheme({ custom: theme.custom, os: !theme.os })
                     }
                     className="sr-only peer"
                   />
