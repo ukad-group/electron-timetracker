@@ -288,12 +288,13 @@ export default function Home() {
             ) {
               activities.splice(activityIndex + 1, 1);
             }
-          } else if (
-            activities[activityIndex + 1] &&
-            newActTo > stringToMinutes(activities[activityIndex + 1].from)
-          ) {
-            activities[activityIndex + 1].from = activities[activityIndex].to;
           }
+          // else if (
+          //   activities[activityIndex + 1] &&
+          //   newActTo > stringToMinutes(activities[activityIndex + 1].from)
+          // ) {
+          //   activities[activityIndex + 1].from = activities[activityIndex].to;
+          // }
 
           return [...activities];
         } catch (err) {
