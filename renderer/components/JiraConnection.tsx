@@ -85,7 +85,7 @@ const JiraConnection = () => {
     <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">
       <div className="flex justify-between items-center w-full ">
         <span className="font-medium dark:text-dark-heading">
-          Jira Software
+          Jira
         </span>
         {!users.length && (
           <Button
@@ -94,7 +94,7 @@ const JiraConnection = () => {
             type="button"
           />
         )}
-        {users.length > 0 && (
+        {/* {users.length > 0 && (
           <button
             onClick={handleSignInButton}
             type="button"
@@ -104,7 +104,7 @@ const JiraConnection = () => {
               Add another account
             </span>
           </button>
-        )}
+        )} */}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">
         {!users.length && (

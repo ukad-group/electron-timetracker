@@ -113,21 +113,32 @@ export const getJiraResourcesByUser = async (
 
 export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
   try {
-    if (!resourcesData.length) return;
+    if (!resourcesData?.length) return;
 
-    const cardsPromises = resourcesData.map(async (item) => {
+    let cardsPromises = [];
+
+    resourcesData.map(async (item) => {
       const { resources, accessToken, assignee } = item;
 
-      return await getJiraCardsByResourceId(
-        resources[0].id,
-        accessToken,
-        assignee
-      );
-    });
-    const promisedCards = await Promise.all(cardsPromises);
+      if (accessToken && assignee && resources.length > 0) {
+        cardsPromises = resources.map(async (resource) => {
+          return await getJiraCardsByResourceId(
+            resource.id,
+            accessToken,
+            assignee
+          );
+        });
+      }
 
+      return [];
+    });
+
+    const promisedCards = await Promise.all(cardsPromises);
     const cards = promisedCards.reduce((acc, curr) => {
+      if (!curr?.issues?.length) return acc;
+
       const { issues } = curr;
+
       const cardsOfResource = issues.map((issue) => issue?.fields?.summary);
 
       if (!cardsOfResource?.length) {
