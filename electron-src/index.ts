@@ -107,7 +107,7 @@ ipcMain.on(
   }
 );
 
-ipcMain.on("slack redirect", (event, isDesktop: boolean) => {
+ipcMain.on("slack-redirect", (event, isDesktop: boolean) => {
   shell.openExternal(
     isDesktop
       ? "slack://channel?team=T3PV37ANP&id=C05JN9P19G8"

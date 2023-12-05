@@ -4,6 +4,7 @@ import { useUpdateStore } from "../store/updateStore";
 import { useBetaStore } from "../store/betaUpdatesStore";
 import DisclosureSection from "./ui/DisclosureSection";
 import { GlobeAltIcon } from "@heroicons/react/24/solid";
+import SlackIcon from "./ui/SlackIcon";
 
 type File = {
   url: string;
@@ -87,7 +88,7 @@ export default function UpdateDescription() {
   };
 
   const suppotClickHandler = (isDesktop: boolean) => {
-    global.ipcRenderer.send("slack redirect", isDesktop);
+    global.ipcRenderer.send("slack-redirect", isDesktop);
   };
 
   return (
@@ -108,23 +109,7 @@ export default function UpdateDescription() {
           className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
           onClick={() => suppotClickHandler(true)}
         >
-          <svg
-            fill="#4b5563"
-            width="24px"
-            height="24px"
-            viewBox="0 0 512 512"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <title>ionicons-v5_logos</title>
-            <path d="M126.12,315.1A47.06,47.06,0,1,1,79.06,268h47.06Z" />
-            <path d="M149.84,315.1a47.06,47.06,0,0,1,94.12,0V432.94a47.06,47.06,0,1,1-94.12,0Z" />
-            <path d="M196.9,126.12A47.06,47.06,0,1,1,244,79.06v47.06Z" />
-            <path d="M196.9,149.84a47.06,47.06,0,0,1,0,94.12H79.06a47.06,47.06,0,0,1,0-94.12Z" />
-            <path d="M385.88,196.9A47.06,47.06,0,1,1,432.94,244H385.88Z" />
-            <path d="M362.16,196.9a47.06,47.06,0,0,1-94.12,0V79.06a47.06,47.06,0,1,1,94.12,0Z" />
-            <path d="M315.1,385.88A47.06,47.06,0,1,1,268,432.94V385.88Z" />
-            <path d="M315.1,362.16a47.06,47.06,0,0,1,0-94.12H432.94a47.06,47.06,0,1,1,0,94.12Z" />
-          </svg>
+          <SlackIcon />
           Open in desktop Slack
         </button>
         <button
