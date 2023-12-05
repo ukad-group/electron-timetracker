@@ -3,6 +3,7 @@ import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
 import isOnline from "is-online";
 import { JiraUser } from "../utils/jira";
+import { ExclamationCircleIcon, ExclamationTriangleIcon, FlagIcon, LightBulbIcon } from "@heroicons/react/24/outline";
 
 const JiraConnection = () => {
   const [users, setUsers] = useState(
@@ -84,9 +85,7 @@ const JiraConnection = () => {
   return (
     <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">
       <div className="flex justify-between items-center w-full ">
-        <span className="font-medium dark:text-dark-heading">
-          Jira
-        </span>
+        <span className="font-medium dark:text-dark-heading">Jira</span>
         {!users.length && (
           <Button
             text="Add account"
@@ -139,7 +138,10 @@ const JiraConnection = () => {
         <br />
         You can see only those tasks, where you are an assignee
         <br />
-        Ensure you have a Jira account connected to your Atlassian account.
+        <span className="flex gap-2 items-center">
+          <FlagIcon className="w-4 h-4" />
+          Ensure you have a Jira account connected to your Atlassian account.
+        </span>
       </p>
     </div>
   );
