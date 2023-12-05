@@ -282,137 +282,136 @@ const Totals = ({ selectedDate }) => {
 
   return (
     <div>
-      <h2 className="text-lg font-medium text-gray-900 dark:text-dark-heading">
-        Totals
+      <h2 className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading">
+        <div>
+          <label htmlFor="select">Totals</label>
+          <select
+            className="cursor-pointer rounded-lg dark:text-dark-heading px-1 capitalize bg-white dark:bg-dark-container focus:outline-none"
+            id="select"
+            value={period}
+            onChange={(e) => onChangeRange(e.target.value as PeriodName)}
+          >
+            {totalPeriods.map((range) => (
+              <option value={range.name}>{range.name}</option>
+            ))}
+          </select>
+        </div>
       </h2>
 
-      <div className="flex flex-col gap-2 pt-2">
-        <div className="flex gap-1 rounded-lg bg-gray-300 dark:bg-gray-700 p-1 w-fit">
-          {totalPeriods.map((range) => (
-            <div
-              key={range.id}
-              className={`cursor-pointer rounded-lg dark:text-dark-heading px-5 capitalize ${
-                period === range.name
-                  ? "bg-white dark:bg-dark-container"
-                  : "hover:bg-white/50 dark:hover:bg-dark-container/50"
-              }`}
-              onClick={() => onChangeRange(range.name as PeriodName)}
-            >
-              {range.name}
+      {totals.length > 0 && (
+        <div className="flex flex-col gap-2 pt-2">
+          {totals.map((total) => (
+            <div key={total.id} className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 text-sm text-gray-700 font-semibold dark:text-dark-main">
+                <div
+                  className={clsx(
+                    "flex items-center gap-1",
+                    {
+                      "ml-5": total.activities.length <= 1,
+                    },
+                    {
+                      "hover:text-gray-400 dark:hover:text-white ml-0 cursor-pointer":
+                        total.activities.length > 1,
+                    }
+                  )}
+                  onClick={() => {
+                    toggleActivitiesList(total.name);
+                  }}
+                >
+                  {total.activities.length > 1 && (
+                    <ChevronRightIcon
+                      className={clsx("w-4 h-4", {
+                        "rotate-90": isShowedActivitiesList(total.name),
+                      })}
+                    />
+                  )}
+                  <span>
+                    {total.name} - {formatDuration(total.duration)}
+                  </span>
+                </div>
+                {period === "day" && (
+                  <>
+                    <Tooltip>
+                      <button
+                        className="group"
+                        title="Copy project descriptions without time"
+                        onClick={() =>
+                          copyDescriptionsHandler(total.descriptions, false)
+                        }
+                      >
+                        <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                      </button>
+                    </Tooltip>
+                    <Tooltip>
+                      <button
+                        className="group"
+                        title="Copy project descriptions with time"
+                        onClick={() =>
+                          copyDescriptionsHandler(total.descriptions, true)
+                        }
+                      >
+                        <DocumentPlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                      </button>
+                    </Tooltip>
+                  </>
+                )}
+              </div>
+
+              {isShowedActivitiesList(total.name) &&
+                total.activities.length > 1 && (
+                  <div className="flex flex-col gap-1">
+                    {total.activities.map((activity) => (
+                      <div
+                        key={activity.id}
+                        className="flex items-center gap-2 text-sm text-gray-700 font-semibold dark:text-dark-main"
+                      >
+                        <div className="flex items-center gap-1 ml-6">
+                          <span>
+                            &#8226;{" "}
+                            {activity.name ? activity.name : "(no activity)"} -{" "}
+                            {formatDuration(activity.duration)}
+                          </span>
+                        </div>
+                        {period === "day" && (
+                          <>
+                            <Tooltip>
+                              <button
+                                className="group"
+                                title="Copy activity descriptions without time"
+                                onClick={() => {
+                                  copyDescriptionsHandler(
+                                    activity.descriptions,
+                                    false
+                                  );
+                                }}
+                              >
+                                <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                              </button>
+                            </Tooltip>
+                            <Tooltip>
+                              <button
+                                className="group"
+                                title="Copy activity descriptions with time"
+                                onClick={() => {
+                                  copyDescriptionsHandler(
+                                    activity.descriptions,
+                                    true
+                                  );
+                                }}
+                              >
+                                <DocumentPlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                              </button>
+                            </Tooltip>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
             </div>
           ))}
         </div>
-        {totals.map((total) => (
-          <div key={total.id} className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-sm text-gray-700 font-semibold dark:text-dark-main">
-              <div
-                className={clsx(
-                  "flex items-center gap-1",
-                  {
-                    "ml-5": total.activities.length <= 1,
-                  },
-                  {
-                    "hover:text-gray-400 dark:hover:text-white ml-0 cursor-pointer":
-                      total.activities.length > 1,
-                  }
-                )}
-                onClick={() => {
-                  toggleActivitiesList(total.name);
-                }}
-              >
-                {total.activities.length > 1 && (
-                  <ChevronRightIcon
-                    className={clsx("w-4 h-4", {
-                      "rotate-90": isShowedActivitiesList(total.name),
-                    })}
-                  />
-                )}
-                <span>
-                  {total.name} - {formatDuration(total.duration)}
-                </span>
-              </div>
-              {period === "day" && (
-                <>
-                  <Tooltip>
-                    <button
-                      className="group"
-                      title="Copy project descriptions without time"
-                      onClick={() =>
-                        copyDescriptionsHandler(total.descriptions, false)
-                      }
-                    >
-                      <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                    </button>
-                  </Tooltip>
-                  <Tooltip>
-                    <button
-                      className="group"
-                      title="Copy project descriptions with time"
-                      onClick={() =>
-                        copyDescriptionsHandler(total.descriptions, true)
-                      }
-                    >
-                      <DocumentPlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                    </button>
-                  </Tooltip>
-                </>
-              )}
-            </div>
-
-            {isShowedActivitiesList(total.name) &&
-              total.activities.length > 1 && (
-                <div className="flex flex-col gap-1">
-                  {total.activities.map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="flex items-center gap-2 text-sm text-gray-700 font-semibold dark:text-dark-main"
-                    >
-                      <div className="flex items-center gap-1 ml-6">
-                        <span>
-                          &#8226;{" "}
-                          {activity.name ? activity.name : "(no activity)"} -{" "}
-                          {formatDuration(activity.duration)}
-                        </span>
-                      </div>
-                      {period === "day" && (
-                        <>
-                          <Tooltip>
-                            <button
-                              className="group"
-                              title="Copy activity descriptions without time"
-                              onClick={() => {
-                                copyDescriptionsHandler(
-                                  activity.descriptions,
-                                  false
-                                );
-                              }}
-                            >
-                              <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                            </button>
-                          </Tooltip>
-                          <Tooltip>
-                            <button
-                              className="group"
-                              title="Copy activity descriptions with time"
-                              onClick={() => {
-                                copyDescriptionsHandler(
-                                  activity.descriptions,
-                                  true
-                                );
-                              }}
-                            >
-                              <DocumentPlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                            </button>
-                          </Tooltip>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-          </div>
-        ))}
-      </div>
+      )}
 
       {!totals.length && (
         <div className="text-sm text-gray-700 font-semibold pt-2 dark:text-dark-main ml-5">
