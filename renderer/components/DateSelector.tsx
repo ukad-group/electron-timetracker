@@ -142,12 +142,27 @@ export default function DateSelector({
         <Popup
           title="You already have a report for today"
           description="Today's report will be overwritten"
-          okCallback={() => {
-            writeTodayReport();
-            setShowModal(false);
-          }}
-          cancelCallback={() => setShowModal(false)}
           left="20px"
+          buttons={[
+            {
+              text: "ok",
+              color: "green",
+              callback: () => {
+                writeTodayReport();
+                setShowModal(false);
+              },
+            },
+            {
+              text: "cancel",
+              color: "gray",
+              callback: () => setShowModal(false),
+            },
+            {
+              text: "cancel",
+              color: "red",
+              callback: () => setShowModal(false),
+            },
+          ]}
         />
       )}
     </div>

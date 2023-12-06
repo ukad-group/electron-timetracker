@@ -1,19 +1,30 @@
+const buttonColors = {
+  gray: "bg-white ring-1 ring-gray-300 text-gray-900 hover:bg-gray-50 dark:ring-gray-700 dark:text-dark-heading dark:bg-gray-500 hover:dark:bg-gray-400",
+  green:
+    "bg-green-600 hover:bg-green-500 dark:text-dark-heading dark:bg-green-600/70 hover:dark:bg-green-500/70",
+  red: "bg-red-600 hover:bg-red-500 dark:text-dark-heading dark:bg-red-600/70 hover:dark:bg-red-500/70",
+};
+
+type PopupButton = {
+  text: string;
+  color: keyof typeof buttonColors;
+  callback: () => void;
+};
+
 type PopupProps = {
   title: string;
   description: string;
-  okCallback: () => void;
-  cancelCallback: () => void;
   top?: string;
   left?: string;
+  buttons: PopupButton[];
 };
 
 export default function Popup({
   title,
   description,
-  okCallback,
-  cancelCallback,
   top,
   left,
+  buttons,
 }: PopupProps) {
   return (
     <div
@@ -27,18 +38,17 @@ export default function Popup({
         {description}
       </p>
       <div className="flex items-center justify-center gap-6">
-        <button
-          className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto dark:text-dark-heading dark:bg-green-600/70 hover:dark:bg-green-500/70"
-          onClick={okCallback}
-        >
-          Ok
-        </button>
-        <button
-          onClick={cancelCallback}
-          className="inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto dark:ring-gray-700 dark:text-dark-heading dark:bg-gray-500 hover:dark:bg-gray-400"
-        >
-          Cancel
-        </button>
+        {buttons.map((button, i) => (
+          <button
+            key={i}
+            onClick={button.callback}
+            className={`${
+              buttonColors[button.color]
+            } inline-flex w-full justify-center rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-inset sm:mt-0 sm:w-auto`}
+          >
+            {button.text}
+          </button>
+        ))}
       </div>
     </div>
   );
