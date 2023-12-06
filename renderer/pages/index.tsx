@@ -289,6 +289,7 @@ export default function Home() {
               activities.splice(activityIndex + 1, 1);
             }
           }
+          // timeshifting for the next registration (if collision occurs). Commented after alex request
           // else if (
           //   activities[activityIndex + 1] &&
           //   newActTo > stringToMinutes(activities[activityIndex + 1].from)
