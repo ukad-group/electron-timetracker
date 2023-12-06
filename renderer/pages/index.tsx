@@ -27,7 +27,6 @@ export default function Home() {
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );
-
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [selectedDateActivities, setSelectedDateActivities] =
@@ -52,6 +51,7 @@ export default function Home() {
     (state) => [state.theme, state.setTheme],
     shallow
   );
+  const [isMobile, setIsMobile] = useState(false);
 
   function handleThemeChange(e) {
     if (e.matches) {
@@ -66,9 +66,11 @@ export default function Home() {
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
       setIsDropboxConnected(data);
     });
+    window.addEventListener("resize", handleResize);
 
     return () => {
       global.ipcRenderer.removeAllListeners("dropbox-connection");
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -180,6 +182,15 @@ export default function Home() {
       );
     }
   }, [selectedDateActivities]);
+
+  const handleResize = () => {
+    const screenWidth =
+      window.innerWidth ||
+      document.documentElement.clientWidth ||
+      document.body.clientWidth;
+
+    setIsMobile(screenWidth < 1024);
+  };
 
   const saveSerializedReport = (serializedReport: string) => {
     global.ipcRenderer.send("check-dropbox-connection");
@@ -437,15 +448,17 @@ export default function Home() {
                   <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
                     <Totals activities={selectedDateActivities} />
                   </div>
-                  <UpdateDescription />
+                  {!isMobile && <UpdateDescription />}
                 </div>
               </section>
-              <section className="lg:col-span-2">
+
+              <section className="lg:col-span-2 flex flex-col gap-6">
                 <Calendar
                   reportsFolder={reportsFolder}
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
                 />
+                {isMobile && <UpdateDescription />}
               </section>
             </>
           ) : (
