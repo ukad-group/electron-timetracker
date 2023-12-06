@@ -10,6 +10,8 @@ import { getOffice365Events } from "../utils/office365";
 import { checkIsToday, getStringDate } from "../utils/datetime-ui";
 import ButtonTransparent from "./ui/ButtonTransparent";
 import Popup from "./ui/Popup";
+import { useMainStore } from "../store/mainStore";
+import { shallow } from "zustand/shallow";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
@@ -17,7 +19,6 @@ type ActivitiesSectionProps = {
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
   availableProjects: Array<string>;
-  reportsFolder: string;
   setSelectedDateReport: Dispatch<SetStateAction<String>>;
 };
 
@@ -25,7 +26,6 @@ type PlaceholderProps = {
   onEditActivity: (activity: ReportActivity | "new") => void;
   backgroundError: string;
   selectedDate: Date;
-  reportsFolder: string;
   setSelectedDateReport: Dispatch<SetStateAction<String>>;
 };
 
@@ -35,13 +35,11 @@ export default function ActivitiesSection({
   onDeleteActivity,
   selectedDate,
   availableProjects,
-  reportsFolder,
   setSelectedDateReport,
 }: ActivitiesSectionProps) {
   const [backgroundError, setBackgroundError] = useState("");
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [renderError, setRenderError] = useState<RenderError>({
     errorTitle: "",
     errorMessage: "",
@@ -125,7 +123,6 @@ export default function ActivitiesSection({
         onEditActivity={onEditActivity}
         backgroundError={backgroundError}
         selectedDate={selectedDate}
-        reportsFolder={reportsFolder}
         setSelectedDateReport={setSelectedDateReport}
       />
     );
@@ -190,11 +187,14 @@ export default function ActivitiesSection({
 function Placeholder({
   onEditActivity,
   backgroundError,
-  reportsFolder,
   selectedDate,
   setSelectedDateReport,
 }: PlaceholderProps) {
   const [showModal, setShowModal] = useState(false);
+  const [reportsFolder, setReportsFolder] = useMainStore(
+    (state) => [state.reportsFolder, state.setReportsFolder],
+    shallow
+  );
 
   const copyLastReport = async () => {
     const prevDayReport = await global.ipcRenderer.invoke(

@@ -5,14 +5,14 @@ import { getStringDate } from "../utils/datetime-ui";
 import ButtonTransparent from "./ui/ButtonTransparent";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import Popup from "./ui/Popup";
-import Tooltip from "./ui/Tooltip/Tooltip";
+import { useMainStore } from "../store/mainStore";
+import { shallow } from "zustand/shallow";
 
 type DateSelectorProps = {
   isDropboxConnected: boolean;
   selectedDate: Date;
   setSelectedDate: Dispatch<SetStateAction<Date>>;
   selectedDateReport: string;
-  reportsFolder: string;
 };
 
 const day = 60 * 60 * 24 * 1000;
@@ -22,10 +22,13 @@ export default function DateSelector({
   selectedDate,
   setSelectedDate,
   selectedDateReport,
-  reportsFolder,
 }: DateSelectorProps) {
   const today = new Date();
   const [showModal, setShowModal] = useState(false);
+  const [reportsFolder, setReportsFolder] = useMainStore(
+    (state) => [state.reportsFolder, state.setReportsFolder],
+    shallow
+  );
 
   const increaseDate = () => {
     setSelectedDate((date) => new Date(date.getTime() + day));
@@ -38,6 +41,7 @@ export default function DateSelector({
   const todayButtonHandle = () => {
     setSelectedDate(new Date());
   };
+
   const keydownHandler = (e: KeyboardEvent) => {
     if (e.ctrlKey && e.code === "Tab") {
       if (e.shiftKey) {
@@ -52,7 +56,7 @@ export default function DateSelector({
     global.ipcRenderer.invoke(
       "app:write-day-report",
       reportsFolder,
-      getStringDate(new Date()),
+      getStringDate(today),
       selectedDateReport
     );
   };
@@ -61,13 +65,14 @@ export default function DateSelector({
     const todayReportExist = await global.ipcRenderer.invoke(
       "app:check-exist-report",
       reportsFolder,
-      getStringDate(new Date())
+      getStringDate(today)
     );
 
     if (todayReportExist) {
       setShowModal(true);
     } else {
       writeTodayReport();
+      setSelectedDate(today);
     }
   };
 
@@ -122,12 +127,10 @@ export default function DateSelector({
       <div className="flex gap-4">
         {selectedDate.toDateString() !== new Date().toDateString() &&
           selectedDateReport && (
-            <Tooltip>
-              <ButtonTransparent callback={copyCurrentReport}>
-                <Square2StackIcon className="w-5 h-5" />
-                Copy as today
-              </ButtonTransparent>
-            </Tooltip>
+            <ButtonTransparent callback={copyCurrentReport}>
+              <Square2StackIcon className="w-5 h-5" />
+              Copy as today
+            </ButtonTransparent>
           )}
         {selectedDate.toDateString() !== new Date().toDateString() && (
           <Button
@@ -150,6 +153,7 @@ export default function DateSelector({
               callback: () => {
                 writeTodayReport();
                 setShowModal(false);
+                setSelectedDate(today);
               },
             },
             {
