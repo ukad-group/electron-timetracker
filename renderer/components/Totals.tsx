@@ -38,7 +38,7 @@ const totalPeriods = [
   { id: 2, name: "month" },
 ];
 
-const Totals = ({ selectedDate }) => {
+const Totals = ({ selectedDate, selectedDateActivities }) => {
   const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
@@ -84,7 +84,7 @@ const Totals = ({ selectedDate }) => {
 
       setTotals(fullProjectTotals);
     })();
-  }, [selectedDate, period]);
+  }, [selectedDate, period, selectedDateActivities]);
 
   const getDates = () => {
     switch (period) {
@@ -292,7 +292,9 @@ const Totals = ({ selectedDate }) => {
             onChange={(e) => onChangeRange(e.target.value as PeriodName)}
           >
             {totalPeriods.map((range) => (
-              <option value={range.name}>{range.name}</option>
+              <option key={range.id} value={range.name}>
+                {range.name}
+              </option>
             ))}
           </select>
         </div>
