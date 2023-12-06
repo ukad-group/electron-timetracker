@@ -5,6 +5,8 @@ import {
   Dispatch,
   SetStateAction,
   useMemo,
+  cloneElement,
+  ReactElement,
 } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -281,41 +283,40 @@ export function Calendar({
     if (userDayOff) {
       const duration =
         userDayOff?.duration === 8 ? "all day" : userDayOff?.duration + "h";
+      let icon: ReactElement | undefined;
+      let title: string | undefined;
 
-      if (userDayOff?.type === 2) {
-        const desciprion = userDayOff?.description
-          ? userDayOff?.description
-          : "Holiday";
-        return (
-          <div>
-            {info.dayNumberText}
-            <GlobeAltIcon
-              className="absolute top-[30px] right-[2px] w-5 h-5"
-              title={`${desciprion}, ${duration}`}
-            />
-          </div>
-        );
-      } else if (userDayOff?.type === 0) {
-        return (
-          <div>
-            {info.dayNumberText}
-            <CalendarDaysIcon
-              className="absolute top-[30px] right-[2px] w-5 h-5"
-              title={`Vacation, ${duration}`}
-            />
-          </div>
-        );
-      } else if (userDayOff?.type === 1) {
-        return (
-          <div>
-            {info.dayNumberText}
-            <FaceFrownIcon
-              className="absolute top-[30px] right-[2px] w-5 h-5"
-              title={`Sickday, ${duration}`}
-            />
-          </div>
-        );
+      switch (userDayOff?.type) {
+        case 2:
+          icon = (
+            <GlobeAltIcon className="absolute top-[30px] right-[2px] w-5 h-5" />
+          );
+          title = userDayOff?.description
+            ? `${userDayOff?.description}, ${duration}`
+            : "Holiday";
+          break;
+        case 0:
+          icon = (
+            <CalendarDaysIcon className="absolute top-[30px] right-[2px] w-5 h-5" />
+          );
+          title = `Vacation, ${duration}`;
+          break;
+        case 1:
+          icon = (
+            <FaceFrownIcon className="absolute top-[30px] right-[2px] w-5 h-5" />
+          );
+          title = `Sickday, ${duration}`;
+          break;
+        default:
+          return info.dayNumberText;
       }
+
+      return (
+        <div>
+          {info.dayNumberText}
+          {cloneElement(icon, { title })}
+        </div>
+      );
     } else {
       return info.dayNumberText;
     }
