@@ -11,6 +11,7 @@ export default function BetaToggle() {
   useEffect(() => {
     global.ipcRenderer.send("beta-channel", isBeta);
   }, [isBeta]);
+
   return (
     <div className="relative flex flex-col">
       <p className="text-sm text-gray-500 dark:text-dark-main">
