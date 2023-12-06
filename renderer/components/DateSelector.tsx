@@ -145,7 +145,7 @@ export default function DateSelector({
           left="20px"
           buttons={[
             {
-              text: "ok",
+              text: "Ok",
               color: "green",
               callback: () => {
                 writeTodayReport();
@@ -153,13 +153,8 @@ export default function DateSelector({
               },
             },
             {
-              text: "cancel",
+              text: "Cancel",
               color: "gray",
-              callback: () => setShowModal(false),
-            },
-            {
-              text: "cancel",
-              color: "red",
               callback: () => setShowModal(false),
             },
           ]}

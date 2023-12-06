@@ -9,6 +9,7 @@ import { loadGoogleEventsFromAllUsers } from "../utils/google";
 import { getOffice365Events } from "../utils/office365";
 import { checkIsToday, getStringDate } from "../utils/datetime-ui";
 import ButtonTransparent from "./ui/ButtonTransparent";
+import Popup from "./ui/Popup";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
@@ -40,6 +41,7 @@ export default function ActivitiesSection({
   const [backgroundError, setBackgroundError] = useState("");
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [renderError, setRenderError] = useState<RenderError>({
     errorTitle: "",
     errorMessage: "",
@@ -192,6 +194,8 @@ function Placeholder({
   selectedDate,
   setSelectedDateReport,
 }: PlaceholderProps) {
+  const [showModal, setShowModal] = useState(false);
+
   const copyLastReport = async () => {
     const prevDayReport = await global.ipcRenderer.invoke(
       "app:find-last-report",
@@ -208,6 +212,8 @@ function Placeholder({
       );
 
       setSelectedDateReport(prevDayReport);
+    } else {
+      setShowModal(true);
     }
   };
 
@@ -256,6 +262,21 @@ function Placeholder({
         <Square2StackIcon className="w-5 h-5" />
         Copy last report
       </ButtonTransparent>
+      {showModal && (
+        <Popup
+          title="Couldn't find report for last month"
+          description="Most likely you haven't written reports for a long time."
+          left="25%"
+          top="160px"
+          buttons={[
+            {
+              text: "Ok",
+              color: "green",
+              callback: () => setShowModal(false),
+            },
+          ]}
+        />
+      )}
     </div>
   );
 }
