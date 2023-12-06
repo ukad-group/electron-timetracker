@@ -30,11 +30,10 @@ const SettingsPage = () => {
   }
 
   useEffect(() => {
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addListener(handleThemeChange);
+    const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
 
-    setIsOSDarkTheme(window.matchMedia("(prefers-color-scheme: dark)").matches);
+    mediaQueryList.addListener(handleThemeChange);
+    setIsOSDarkTheme(mediaQueryList.matches);
 
     const mode =
       (theme.os && isOSDarkTheme) || (!theme.os && theme.custom === "dark")
@@ -42,6 +41,10 @@ const SettingsPage = () => {
         : "light bg-grey-100";
 
     document.body.className = mode;
+
+    return () => {
+      mediaQueryList.removeListener(handleThemeChange);
+    };
   }, [theme, isOSDarkTheme]);
 
   return (
