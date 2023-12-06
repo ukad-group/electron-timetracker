@@ -1,11 +1,18 @@
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NavButtons from "./ui/NavButtons";
 import Button from "../components/ui/Button";
+import { getStringDate } from "../utils/datetime-ui";
+import ButtonTransparent from "./ui/ButtonTransparent";
+import { Square2StackIcon } from "@heroicons/react/24/outline";
+import Popup from "./ui/Popup";
+import Tooltip from "./ui/Tooltip/Tooltip";
 
 type DateSelectorProps = {
   isDropboxConnected: boolean;
   selectedDate: Date;
   setSelectedDate: Dispatch<SetStateAction<Date>>;
+  selectedDateReport: string;
+  reportsFolder: string;
 };
 
 const day = 60 * 60 * 24 * 1000;
@@ -14,8 +21,12 @@ export default function DateSelector({
   isDropboxConnected,
   selectedDate,
   setSelectedDate,
+  selectedDateReport,
+  reportsFolder,
 }: DateSelectorProps) {
   const today = new Date();
+  const [showModal, setShowModal] = useState(false);
+
   const increaseDate = () => {
     setSelectedDate((date) => new Date(date.getTime() + day));
   };
@@ -37,6 +48,29 @@ export default function DateSelector({
     }
   };
 
+  const writeTodayReport = () => {
+    global.ipcRenderer.invoke(
+      "app:write-day-report",
+      reportsFolder,
+      getStringDate(new Date()),
+      selectedDateReport
+    );
+  };
+
+  const copyCurrentReport = async () => {
+    const todayReportExist = await global.ipcRenderer.invoke(
+      "app:check-exist-report",
+      reportsFolder,
+      getStringDate(new Date())
+    );
+
+    if (todayReportExist) {
+      setShowModal(true);
+    } else {
+      writeTodayReport();
+    }
+  };
+
   useEffect(() => {
     document.addEventListener("keydown", keydownHandler);
     return () => {
@@ -45,7 +79,7 @@ export default function DateSelector({
   }, []);
 
   return (
-    <div className="flex items-center justify-between px-4 py-5 sm:px-6">
+    <div className="flex items-center justify-between px-4 py-5 sm:px-6 relative">
       <div>
         <h1 className="text-lg flex items-center font-semibold leading-6 text-gray-900 dark:text-dark-heading">
           <time dateTime="2022-01-22" className="sm:hidden">
@@ -86,6 +120,15 @@ export default function DateSelector({
         </p>
       </div>
       <div className="flex gap-4">
+        {selectedDate.toDateString() !== new Date().toDateString() &&
+          selectedDateReport && (
+            <Tooltip>
+              <ButtonTransparent callback={copyCurrentReport}>
+                <Square2StackIcon className="w-5 h-5" />
+                Copy as today
+              </ButtonTransparent>
+            </Tooltip>
+          )}
         {selectedDate.toDateString() !== new Date().toDateString() && (
           <Button
             text="Go to current day"
@@ -95,6 +138,18 @@ export default function DateSelector({
         )}
         <NavButtons prevCallback={descreaseDate} nextCallback={increaseDate} />
       </div>
+      {showModal && (
+        <Popup
+          title="You already have a report for today"
+          description="Today's report will be overwritten"
+          okCallback={() => {
+            writeTodayReport();
+            setShowModal(false);
+          }}
+          cancelCallback={() => setShowModal(false)}
+          left="20px"
+        />
+      )}
     </div>
   );
 }

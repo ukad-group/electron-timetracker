@@ -401,6 +401,8 @@ export default function Home() {
                       selectedDate={selectedDate}
                       setSelectedDate={setSelectedDate}
                       isDropboxConnected={isDropboxConnected}
+                      selectedDateReport={selectedDateReport}
+                      reportsFolder={reportsFolder}
                     />
                   </div>
                 </section>
@@ -414,6 +416,8 @@ export default function Home() {
                       availableProjects={
                         latestProjAndAct ? Object.keys(latestProjAndAct) : []
                       }
+                      reportsFolder={reportsFolder}
+                      setSelectedDateReport={setSelectedDateReport}
                     />
                   </div>
                 </section>
