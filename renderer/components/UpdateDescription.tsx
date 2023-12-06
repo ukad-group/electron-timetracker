@@ -87,7 +87,7 @@ export default function UpdateDescription() {
     return tempDiv.innerHTML;
   };
 
-  const suppotClickHandler = (isDesktop: boolean) => {
+  const supportClickHandler = (isDesktop: boolean) => {
     global.ipcRenderer.send("slack-redirect", isDesktop);
   };
 
@@ -107,14 +107,14 @@ export default function UpdateDescription() {
         </p>
         <button
           className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
-          onClick={() => suppotClickHandler(true)}
+          onClick={() => supportClickHandler(true)}
         >
           <SlackIcon />
           Open in desktop Slack
         </button>
         <button
           className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
-          onClick={() => suppotClickHandler(false)}
+          onClick={() => supportClickHandler(false)}
         >
           <GlobeAltIcon className="w-6 h-6 fill-gray-600" />
           Open Slack in the browser
