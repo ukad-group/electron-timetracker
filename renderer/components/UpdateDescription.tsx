@@ -31,14 +31,10 @@ export default function UpdateDescription() {
     (state) => [state.update, state.setUpdate],
     shallow
   );
-  const [isBeta, setIsBeta] = useBetaStore(
-    (state) => [state.isBeta, state.setIsBeta],
-    shallow
-  );
+
   const [isOpen, setIsOpen] = useState(update?.age === "new");
 
   useEffect(() => {
-    global.ipcRenderer.send("beta-channel", isBeta);
     global.ipcRenderer.send("get-current-version");
 
     global.ipcRenderer.on("update-available", (event, data, info) => {
@@ -60,7 +56,7 @@ export default function UpdateDescription() {
       global.ipcRenderer.removeAllListeners("downloaded");
       global.ipcRenderer.removeAllListeners("current-version");
     };
-  }, [isBeta]);
+  }, []);
 
   const isOpenToggle = () => {
     if (isOpen) {
@@ -91,39 +87,10 @@ export default function UpdateDescription() {
       isOpen={isOpen}
       title="What's new?"
     >
-      <p className="text-xs text-gray-700 font-semibold dark:text-dark-main">
+      <p className="text-xs text-gray-700 font-semibold dark:text-dark-main mb-4">
         Current version {currentVersion} {!isUpdate && "(latest)"}
       </p>
-      <div className="relative flex items-start my-4 ">
-        <div className="relative flex items-start my-4">
-          <div className="flex items-center h-5">
-            <input
-              id="comments"
-              aria-describedby="comments-description"
-              name="comments"
-              type="checkbox"
-              defaultChecked={isBeta}
-              onChange={() => setIsBeta(!isBeta)}
-              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-            />
-          </div>
-          <div className="ml-2 text-sm">
-            <label
-              htmlFor="comments"
-              className="font-medium text-gray-700 dark:text-gray-300"
-            >
-              Download beta version
-            </label>
-            <p
-              id="comments-description"
-              className="text-gray-500 dark:text-dark-main"
-            >
-              You need to restart the application (or reopen from the tray)
-            </p>
-          </div>
-        </div>
-      </div>
-      <h2 className="font-bold text-gray-700 dark:text-dark-heading">
+      <h2 className="font-bold text-gray-700 mt-4 dark:text-dark-heading">
         In {release?.version ? release?.version : currentVersion} version
       </h2>
       {update?.description ? (
