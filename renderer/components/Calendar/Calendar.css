@@ -2,29 +2,29 @@
   @apply hover:bg-gray-200 cursor-pointer hover:dark:bg-slate-700 dark:text-dark-heading;
 }
 
-.fc-col-header-cell{
-  @apply dark:bg-dark-container
+.fc-col-header-cell {
+  @apply dark:bg-dark-container;
 }
 
-.fc-theme-standard .fc-scrollgrid{
-  @apply  dark:border-gray-600
+.fc-theme-standard .fc-scrollgrid {
+  @apply dark:border-gray-600;
 }
 
 .fc-theme-standard td,
-.fc-theme-standard th{
-  @apply dark:border dark:border-gray-600
+.fc-theme-standard th {
+  @apply dark:border dark:border-gray-600;
 }
 
-.fc .fc-scrollgrid-section-sticky>*{
-  @apply dark:bg-dark-container
+.fc .fc-scrollgrid-section-sticky > * {
+  @apply dark:bg-dark-container;
 }
 
-.fc-theme-standard td{
-  @apply dark:border dark:border-gray-600
+.fc-theme-standard td {
+  @apply dark:border dark:border-gray-600;
 }
 
-.fc .fc-daygrid-day.fc-day-today{
-  @apply dark:bg-yellow-400/10
+.fc .fc-daygrid-day.fc-day-today {
+  @apply dark:bg-yellow-400/10;
 }
 
 .fc-daygrid-day-top {
@@ -32,7 +32,7 @@
 }
 
 .fc-event {
-  @apply pointer-events-none;
+  @apply pointer-events-none px-1;
 }
 
 .fc-day.fc-custom-today-date {
