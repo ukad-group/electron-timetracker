@@ -47,7 +47,7 @@ export default function Home() {
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
   const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const [isDropboxConnected, setIsDropboxConnected] = useState(true);
-  const [theme, setTheme] = useThemeStore(
+  const [theme] = useThemeStore(
     (state) => [state.theme, state.setTheme],
     shallow
   );
@@ -243,7 +243,7 @@ export default function Home() {
     // }
     const tempActivities: Array<ReportActivity> = [];
     const newActFrom = stringToMinutes(activity.from);
-    const newActTo = stringToMinutes(activity.to);
+    // const newActTo = stringToMinutes(activity.to);
 
     if (!selectedDateActivities.length) {
       activity.id = 1;
@@ -448,9 +448,9 @@ export default function Home() {
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
                 />
-                <div className="block lg:hidden">
-                    <UpdateDescription />
-                  </div>
+                <div className="lg:hidden">
+                  <UpdateDescription />
+                </div>
               </section>
             </>
           ) : (
