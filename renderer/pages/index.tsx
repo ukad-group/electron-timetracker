@@ -160,6 +160,7 @@ export default function Home() {
       return;
     }
 
+    setReportAndNotes([]);
     setSelectedDateActivities([]);
   }, [selectedDateReport]);
 
