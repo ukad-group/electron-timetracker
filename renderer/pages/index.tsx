@@ -51,7 +51,6 @@ export default function Home() {
     (state) => [state.theme, state.setTheme],
     shallow
   );
-  const [isMobile, setIsMobile] = useState(false);
 
   function handleThemeChange(e) {
     if (e.matches) {
@@ -66,11 +65,9 @@ export default function Home() {
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
       setIsDropboxConnected(data);
     });
-    window.addEventListener("resize", handleResize);
 
     return () => {
       global.ipcRenderer.removeAllListeners("dropbox-connection");
-      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -182,15 +179,6 @@ export default function Home() {
       );
     }
   }, [selectedDateActivities]);
-
-  const handleResize = () => {
-    const screenWidth =
-      window.innerWidth ||
-      document.documentElement.clientWidth ||
-      document.body.clientWidth;
-
-    setIsMobile(screenWidth < 1024);
-  };
 
   const saveSerializedReport = (serializedReport: string) => {
     global.ipcRenderer.send("check-dropbox-connection");
@@ -448,7 +436,9 @@ export default function Home() {
                   <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
                     <Totals activities={selectedDateActivities} />
                   </div>
-                  {!isMobile && <UpdateDescription />}
+                  <div className="hidden lg:block">
+                    <UpdateDescription />
+                  </div>
                 </div>
               </section>
 
@@ -458,7 +448,9 @@ export default function Home() {
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
                 />
-                {isMobile && <UpdateDescription />}
+                <div className="block lg:hidden">
+                    <UpdateDescription />
+                  </div>
               </section>
             </>
           ) : (
