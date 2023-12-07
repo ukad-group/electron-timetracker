@@ -55,8 +55,10 @@ const useTimeInput = (
     if (!hours) return;
 
     const formattedMinutes =
-      minutes?.length === 1
-        ? parseInt(minutes) * 10
+      minutes?.length === 1 && minutes !== "0"
+        ? parseInt(minutes) * 10 > 59
+          ? 59
+          : parseInt(minutes) * 10
         : (minutes || "").padStart(2, "0");
 
     setTime(`${hours.padStart(2, "0")}:${formattedMinutes}`);
