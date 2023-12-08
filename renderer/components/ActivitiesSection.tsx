@@ -264,8 +264,8 @@ function Placeholder({
       </ButtonTransparent>
       {showModal && (
         <Popup
-          title="Couldn't find report for last month"
-          description="Most likely you haven't written reports for a long time."
+          title="Failed to copy last report"
+          description="Either the last report is empty or you haven't written it for too long"
           left="25%"
           top="160px"
           buttons={[

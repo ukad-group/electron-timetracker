@@ -471,7 +471,7 @@ ipcMain.handle(
 
     for (let i = 0; i < LAST_PERIOD_DAYS; i++) {
       const date = new Date(stringDate);
-      const prevDay = new Date(date.setDate(date.getDate() - i));
+      const prevDay = new Date(date.setDate(date.getDate() - ++i));
       const timereportPath = getPathFromDate(prevDay, reportsFolder);
 
       if (fs.existsSync(timereportPath)) {
