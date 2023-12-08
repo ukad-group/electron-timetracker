@@ -97,9 +97,6 @@ export default function ActivitiesTable({
   const getActualEvents = (events) => {
     if (!events.length) return [];
 
-    const storedAddedEventsIds =
-      JSON.parse(localStorage.getItem("addedEventsIds")) || [];
-
     const actualEvents = events.filter((event) => {
       const { end } = event;
       const endDateTime =
@@ -108,14 +105,8 @@ export default function ActivitiesTable({
       const isOverlapped = activities.some((activity) => {
         return padStringToMinutes(activity.to) >= padStringToMinutes(to);
       });
-      const isAdded = storedAddedEventsIds.some((id) => id === event.id);
 
-      if (
-        !isAdded &&
-        event?.start?.dateTime &&
-        event?.end?.dateTime &&
-        !isOverlapped
-      ) {
+      if (event?.start?.dateTime && event?.end?.dateTime && !isOverlapped) {
         return event;
       }
     });

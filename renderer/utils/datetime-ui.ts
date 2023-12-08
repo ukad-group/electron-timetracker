@@ -178,6 +178,47 @@ export const convertMillisecondsToTime = (milliseconds) => {
   return `${hours}:${minutes}`;
 };
 
+export const getWeekDates = (inputDate: Date) => {
+  const startDate = new Date(inputDate);
+  startDate.setDate(
+    inputDate.getDate() -
+      inputDate.getDay() +
+      (inputDate.getDay() === 0 ? -6 : 1)
+  );
+
+  const weekDays = [];
+
+  for (let i = 0; i < 7; i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + i);
+    weekDays.push(currentDate);
+  }
+
+  return weekDays;
+};
+
+export const getMonthDates = (inputDate: Date) => {
+  const firstDay = new Date(inputDate.getFullYear(), inputDate.getMonth(), 1);
+
+  const lastDay = new Date(
+    inputDate.getFullYear(),
+    inputDate.getMonth() + 1,
+    0
+  );
+
+  const monthDates = [];
+  for (let i = firstDay.getDate(); i <= lastDay.getDate(); i++) {
+    const currentDate = new Date(
+      inputDate.getFullYear(),
+      inputDate.getMonth(),
+      i
+    );
+    monthDates.push(currentDate);
+  }
+
+  return monthDates;
+};
+
 export const getCurrentTimeRoundedUp = () => {
   const currentTime = new Date();
   const minutes = currentTime.getMinutes();
