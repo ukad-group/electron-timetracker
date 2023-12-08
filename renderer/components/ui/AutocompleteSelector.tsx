@@ -88,6 +88,10 @@ export default function AutocompleteSelector({
     }
   };
 
+  const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setSelectedItem(e.target.value);
+  };
+
   const onBlurHandler = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.startsWith(" ")) {
       e.target.value = e.target.value.trim();
@@ -135,6 +139,7 @@ export default function AutocompleteSelector({
                 required && isValidationEnabled && !selectedItem,
             }
           )}
+          onChange={onChangeHandler}
           tabIndex={tabIndex}
           onBlur={onBlurHandler}
         />
