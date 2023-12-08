@@ -5,6 +5,8 @@ import {
   Dispatch,
   SetStateAction,
   useMemo,
+  cloneElement,
+  ReactElement,
 } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
@@ -70,7 +72,7 @@ export type DayOff = {
   date: Date;
   duration: number;
   description: string;
-  type: string;
+  type: number;
 };
 
 export type ApiDayOff = {
@@ -281,80 +283,42 @@ export function Calendar({
     if (userDayOff) {
       const duration =
         userDayOff?.duration === 8 ? "all day" : userDayOff?.duration + "h";
+      let icon: ReactElement | undefined;
+      let title: string | undefined;
 
-      if (userDayOff?.type === "holiday") {
-        const desciprion = userDayOff?.description
-          ? userDayOff?.description
-          : "Holiday";
-        return (
-          <div>
-            {info.dayNumberText}
-            <GlobeAltIcon
-              className="absolute top-[30px] right-[2px] w-5 h-5"
-              title={`${desciprion}, ${duration}`}
-            />
-          </div>
-        );
-      } else if (userDayOff?.type === "vacation") {
-        return (
-          <div>
-            {info.dayNumberText}
-            <CalendarDaysIcon
-              className="absolute top-[30px] right-[2px] w-5 h-5"
-              title={`Vacation, ${duration}`}
-            />
-          </div>
-        );
-      } else if (userDayOff?.type === "sickday") {
-        return (
-          <div>
-            {info.dayNumberText}
-            <FaceFrownIcon
-              className="absolute top-[30px] right-[2px] w-5 h-5"
-              title={`Sickday, ${duration}`}
-            />
-          </div>
-        );
+      switch (userDayOff?.type) {
+        case 2:
+          icon = (
+            <GlobeAltIcon className="absolute top-[30px] right-[2px] w-5 h-5" />
+          );
+          title = userDayOff?.description
+            ? `${userDayOff?.description}, ${duration}`
+            : "Holiday";
+          break;
+        case 0:
+          icon = (
+            <CalendarDaysIcon className="absolute top-[30px] right-[2px] w-5 h-5" />
+          );
+          title = `Vacation, ${duration}`;
+          break;
+        case 1:
+          icon = (
+            <FaceFrownIcon className="absolute top-[30px] right-[2px] w-5 h-5" />
+          );
+          title = `Sickday, ${duration}`;
+          break;
+        default:
+          return info.dayNumberText;
       }
+
+      return (
+        <div>
+          {info.dayNumberText}
+          {cloneElement(icon, { title })}
+        </div>
+      );
     } else {
       return info.dayNumberText;
-    }
-
-    const transitPeriod = JSON.parse(localStorage.getItem("transit-vacation"));
-
-    if (transitPeriod && transitPeriod?.length > 0) {
-      const transitDayOff = transitPeriod?.find((transitDay) => {
-        return isTheSameDates(info.date, transitDay.date);
-      });
-
-      if (transitDayOff) {
-        const duration =
-          transitDayOff?.duration === 8
-            ? "all day"
-            : transitDayOff?.duration + "h";
-
-        if (transitDayOff?.type === "vacation") {
-          return (
-            <div>
-              {info.dayNumberText}
-              <CalendarDaysIcon
-                className="absolute top-[30px] right-[2px] w-5 h-5"
-                title={`Vacation, ${duration}`}
-              />
-            </div>
-          );
-        } else if (transitDayOff?.type === "sickday") {
-          return (
-            <div>
-              {info.dayNumberText}
-              <FaceFrownIcon
-                className="absolute top-[30px] right-[2px] w-5 h-5"
-                title={`Sickday, ${duration}`}
-              />
-            </div>
-          );
-        }
-      }
     }
   };
 

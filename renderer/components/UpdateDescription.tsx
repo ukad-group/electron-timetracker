@@ -33,14 +33,10 @@ export default function UpdateDescription() {
     (state) => [state.update, state.setUpdate],
     shallow
   );
-  const [isBeta, setIsBeta] = useBetaStore(
-    (state) => [state.isBeta, state.setIsBeta],
-    shallow
-  );
+
   const [isOpen, setIsOpen] = useState(update?.age === "new");
 
   useEffect(() => {
-    global.ipcRenderer.send("beta-channel", isBeta);
     global.ipcRenderer.send("get-current-version");
 
     global.ipcRenderer.on("update-available", (event, data, info) => {
@@ -62,7 +58,7 @@ export default function UpdateDescription() {
       global.ipcRenderer.removeAllListeners("downloaded");
       global.ipcRenderer.removeAllListeners("current-version");
     };
-  }, [isBeta]);
+  }, []);
 
   const isOpenToggle = () => {
     if (isOpen) {
@@ -97,7 +93,7 @@ export default function UpdateDescription() {
       isOpen={isOpen}
       title="What's new?"
     >
-      <p className="text-xs text-gray-700 font-semibold dark:text-dark-main">
+      <p className="text-xs text-gray-700 font-semibold dark:text-dark-main mb-4">
         Current version {currentVersion} {!isUpdate && "(latest)"}
       </p>
 

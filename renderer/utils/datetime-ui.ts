@@ -92,9 +92,9 @@ export function getMonthRequiredHours(calendarDate: Date, daysOff: DayOff[]) {
   return totalWorkHours * 3600000;
 }
 
-export function extractDatesFromPeriod(dayoff: ApiDayOff, holidays: DayOff[]) {
-  const dateStart = new Date(dayoff?.dateFrom);
-  const dateEnd = new Date(dayoff?.dateTo);
+export function extractDatesFromPeriod(period: ApiDayOff, holidays: DayOff[]) {
+  const dateStart = new Date(period?.dateFrom);
+  const dateEnd = new Date(period?.dateTo);
   const vacationRange = generateDateRange(dateStart, dateEnd);
 
   const datesWithoutWeekendsHolidays = vacationRange
@@ -108,9 +108,9 @@ export function extractDatesFromPeriod(dayoff: ApiDayOff, holidays: DayOff[]) {
     .map((date) => {
       return {
         date: date,
-        duration: dayoff?.quantity,
-        description: dayoff?.description,
-        type: dayoff?.type === 1 ? "sickday" : "vacation",
+        duration: period?.quantity,
+        description: period?.description,
+        type: period?.type,
       };
     });
 
@@ -176,4 +176,59 @@ export const convertMillisecondsToTime = (milliseconds) => {
     .padStart(2, "0");
 
   return `${hours}:${minutes}`;
+};
+
+export const getWeekDates = (inputDate: Date) => {
+  const startDate = new Date(inputDate);
+  startDate.setDate(
+    inputDate.getDate() -
+      inputDate.getDay() +
+      (inputDate.getDay() === 0 ? -6 : 1)
+  );
+
+  const weekDays = [];
+
+  for (let i = 0; i < 7; i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + i);
+    weekDays.push(currentDate);
+  }
+
+  return weekDays;
+};
+
+export const getMonthDates = (inputDate: Date) => {
+  const firstDay = new Date(inputDate.getFullYear(), inputDate.getMonth(), 1);
+
+  const lastDay = new Date(
+    inputDate.getFullYear(),
+    inputDate.getMonth() + 1,
+    0
+  );
+
+  const monthDates = [];
+  for (let i = firstDay.getDate(); i <= lastDay.getDate(); i++) {
+    const currentDate = new Date(
+      inputDate.getFullYear(),
+      inputDate.getMonth(),
+      i
+    );
+    monthDates.push(currentDate);
+  }
+
+  return monthDates;
+};
+
+export const getCurrentTimeRoundedUp = () => {
+  const currentTime = new Date();
+  const minutes = currentTime.getMinutes();
+  const minutesToAdd = (15 - (minutes % 15)) % 15;
+  currentTime.setMinutes(minutes + minutesToAdd);
+  const formattedTime = currentTime.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  return `${formattedTime}`;
 };

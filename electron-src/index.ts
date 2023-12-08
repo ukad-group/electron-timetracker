@@ -216,7 +216,14 @@ app.on("ready", async () => {
       const options: Electron.MessageBoxOptions = {
         type: "error",
         title: error.message,
-        message: `Error when starting server at http://localhost:${PORT}. Try to restart server. If it doesn't help, check if port ${PORT} is free. Also you can try to reset Windows NAT, for this run cmd with administrator rights and write: "net stop winnat", then: "net start winnat". If nothing helps, please, write to support`,
+        message: `Can't start server at http://localhost:${PORT}. To resolve the server error, follow these steps: 
+  1. Restart the application.
+  2. Check if port 51432 is available. 
+  3. If the issue persists Reset Windows NAT:
+      - Open Command Prompt as Administrator
+      - Type "net stop winnat" and press Enter
+      - Then, type "net start winnat" and press Enter
+  4. If none of these steps work, contact support for further assistance`,
         buttons: ["Close", "Restart", "Quit"],
       };
 
