@@ -3,7 +3,7 @@ import path from "path";
 import next from "next";
 import { parse } from "url";
 import { createServer } from "http";
-import { app, dialog, ipcMain, Menu, Tray } from "electron";
+import { app, dialog, ipcMain, Menu, MenuItem, Tray } from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
 import { createWindow } from "./helpers/create-window";
@@ -115,6 +115,9 @@ const generateWindow = () => {
   mainWindow = createWindow({
     width: 1000,
     height: 600,
+    webPreferences: {
+      spellcheck: true,
+    },
     autoHideMenuBar: true,
     icon: path.join(__dirname, "../renderer/out/images/logo.png"),
   });
@@ -129,6 +132,7 @@ const generateWindow = () => {
       mainWindow?.hide();
     });
   }
+  mainWindow.webContents.session.setSpellCheckerLanguages(["en-US"]);
 };
 
 let tray: Tray | null = null;
@@ -208,14 +212,7 @@ app.on("ready", async () => {
       const options: Electron.MessageBoxOptions = {
         type: "error",
         title: error.message,
-        message: `Can't start server at http://localhost:${PORT}. To resolve the server error, follow these steps: 
-  1. Restart the application.
-  2. Check if port 51432 is available. 
-  3. If the issue persists Reset Windows NAT:
-      - Open Command Prompt as Administrator
-      - Type "net stop winnat" and press Enter
-      - Then, type "net start winnat" and press Enter
-  4. If none of these steps work, contact support for further assistance`,
+        message: `Error when starting server at http://localhost:${PORT}. Try to restart server. If it doesn't help, check if port ${PORT} is free. Also you can try to reset Windows NAT, for this run cmd with administrator rights and write: "net stop winnat", then: "net start winnat". If nothing helps, please, write to support`,
         buttons: ["Close", "Restart", "Quit"],
       };
 
@@ -368,6 +365,36 @@ app.on("ready", async () => {
         }
       }
     );
+
+    mainWindow.webContents.on("context-menu", (event, params) => {
+      const menu = new Menu();
+
+      for (const suggestion of params.dictionarySuggestions) {
+        menu.append(
+          new MenuItem({
+            label: suggestion,
+            click: () =>
+              mainWindow &&
+              mainWindow.webContents.replaceMisspelling(suggestion),
+          })
+        );
+      }
+
+      if (params.misspelledWord && mainWindow) {
+        menu.append(
+          new MenuItem({
+            label: "Add to dictionary",
+            click: () =>
+              mainWindow &&
+              mainWindow.webContents.session.addWordToSpellCheckerDictionary(
+                params.misspelledWord
+              ),
+          })
+        );
+      }
+
+      menu.popup();
+    });
   }
 
   mainWindow?.on("focus", () => {
@@ -509,6 +536,10 @@ ipcMain.handle(
         .sort()
         .reduce((accumulator: Record<string, string[]>, key) => {
           const activitySet = new Set<string>();
+
+          if (mainWindow) {
+            mainWindow.webContents.session.addWordToSpellCheckerDictionary(key);
+          }
 
           parsedProjects[key].forEach((activity: Activity) => {
             if (activity.activity) {
