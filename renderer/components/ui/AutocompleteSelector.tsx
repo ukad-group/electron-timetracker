@@ -10,6 +10,7 @@ import {
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 
 type AutocompleteProps = {
   isNewCheck: boolean;
@@ -117,8 +118,14 @@ export default function AutocompleteSelector({
       value={selectedItem}
       onChange={setSelectedItem}
     >
-      <Combobox.Label className="block text-sm font-medium text-gray-700 dark:text-dark-main">
+      <Combobox.Label className="flex items-center gap-1 text-sm font-medium text-gray-700 dark:text-dark-main ">
         {title}{" "}
+        {title === "Activity" && (
+          <QuestionMarkCircleIcon
+            className="w-4 h-4 inline-block"
+            title="Usually the project manager will provide information on when and how to fill this field. Otherwise, you are not required to do this"
+          />
+        )}
         {isNew && (
           <span className="text-center mb-1 w-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
             New
