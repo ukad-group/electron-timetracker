@@ -1,4 +1,5 @@
 import Loader from "./Loader";
+import { ReactNode } from "react";
 
 type ButtonProps = {
   text: string;
@@ -7,10 +8,11 @@ type ButtonProps = {
   status?: string;
   type?: "button" | "submit" | "reset";
   tabIndex?: number;
+  children?: ReactNode;
 };
 
 const basicStyles =
-  "inline-flex items-center justify-center px-4 py-2 text-sm font-medium border rounded-md shadow-sm dark:border-dark-form-back ";
+  "inline-flex items-center justify-center px-4 py-2 gap-2 text-sm font-medium border rounded-md shadow-sm dark:border-dark-form-back ";
 const defaultStyles = "bg-blue-600 text-white dark:bg-dark-button-back ";
 const saveHoverStyles = "hover:bg-blue-700 hover:dark:bg-dark-button-hover ";
 const cancelHoverStyles = "hover:bg-gray-50 ";
@@ -26,6 +28,7 @@ export default function Button({
   status,
   type = "button",
   tabIndex,
+  children,
 }: ButtonProps) {
   const saveBtnStatuses = {
     enabled: {
@@ -78,6 +81,7 @@ export default function Button({
       disabled={disabled ? disabled : false}
       tabIndex={tabIndex}
     >
+      {children}
       {status && status === "inprogress" && <Loader />}
       {status && status === "loading" && <Loader />}
       {saveBtnStatuses[status] ? saveBtnStatuses[status].text : text}

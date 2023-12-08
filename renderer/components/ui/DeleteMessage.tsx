@@ -26,6 +26,10 @@ export default function DeleteMessage({
     global.ipcRenderer.on("file exist", (event, data) => {
       setIsFileExist(data);
     });
+
+    return () => {
+      global.ipcRenderer.removeAllListeners("file exist");
+    };
   }, [selectedDate]);
 
   const deleteFile = () => {

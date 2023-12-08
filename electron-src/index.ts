@@ -3,7 +3,7 @@ import path from "path";
 import next from "next";
 import { parse } from "url";
 import { createServer } from "http";
-import { app, dialog, ipcMain, Menu, Tray } from "electron";
+import { app, dialog, ipcMain, Menu, Tray, shell } from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
 import { createWindow } from "./helpers/create-window";
@@ -107,6 +107,14 @@ ipcMain.on(
   }
 );
 
+ipcMain.on("slack-redirect", (event, isDesktop: boolean) => {
+  shell.openExternal(
+    isDesktop
+      ? "slack://channel?team=T3PV37ANP&id=C05JN9P19G8"
+      : "https://ukad.slack.com/archives/C05JN9P19G8"
+  );
+});
+
 const userDataDirectory = app.getPath("userData");
 let mainWindow: Electron.CrossProcessExports.BrowserWindow | null = null;
 const gotTheLock = app.requestSingleInstanceLock();
@@ -208,7 +216,14 @@ app.on("ready", async () => {
       const options: Electron.MessageBoxOptions = {
         type: "error",
         title: error.message,
-        message: `Error when starting server at http://localhost:${PORT}. Try to restart server. If it doesn't help, check if port ${PORT} is free. Also you can try to reset Windows NAT, for this run cmd with administrator rights and write: "net stop winnat", then: "net start winnat". If nothing helps, please, write to support`,
+        message: `Can't start server at http://localhost:${PORT}. To resolve the server error, follow these steps: 
+  1. Restart the application.
+  2. Check if port 51432 is available. 
+  3. If the issue persists Reset Windows NAT:
+      - Open Command Prompt as Administrator
+      - Type "net stop winnat" and press Enter
+      - Then, type "net start winnat" and press Enter
+  4. If none of these steps work, contact support for further assistance`,
         buttons: ["Close", "Restart", "Quit"],
       };
 
@@ -463,6 +478,39 @@ ipcMain.handle(
 );
 
 ipcMain.handle(
+  "app:find-last-report",
+  (event, reportsFolder: string, stringDate: string) => {
+    if (!reportsFolder || !stringDate.length) return null;
+
+    const LAST_PERIOD_DAYS = 31;
+
+    for (let i = 0; i < LAST_PERIOD_DAYS; i++) {
+      const date = new Date(stringDate);
+      const prevDay = new Date(date.setDate(date.getDate() - ++i));
+      const timereportPath = getPathFromDate(prevDay, reportsFolder);
+
+      if (fs.existsSync(timereportPath)) {
+        try {
+          const data = fs.readFileSync(timereportPath, "utf8");
+          return data;
+        } catch (err) {
+          console.error(err);
+          mainWindow?.webContents.send(
+            "background error",
+            "Error when finding last report",
+            err
+          );
+
+          return null;
+        }
+      }
+    }
+
+    return null;
+  }
+);
+
+ipcMain.handle(
   "app:write-day-report",
   (event, reportsFolder: string, stringDate: string, report: string) => {
     if (!reportsFolder || !stringDate.length) return null;
@@ -483,6 +531,27 @@ ipcMain.handle(
       );
 
       return;
+    }
+  }
+);
+
+ipcMain.handle(
+  "app:check-exist-report",
+  (event, reportsFolder: string, stringDate: string) => {
+    if (!reportsFolder || !stringDate.length) return false;
+
+    const date = new Date(stringDate);
+    const timereportPath = getPathFromDate(date, reportsFolder);
+
+    try {
+      return fs.existsSync(timereportPath) ? true : false;
+    } catch (err) {
+      console.log(err);
+      mainWindow?.webContents.send(
+        "background error",
+        "Error when checking existing project.",
+        err
+      );
     }
   }
 );

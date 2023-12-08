@@ -259,19 +259,6 @@ export default function TrackTimeModal({
       calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
     });
 
-    if (editedActivity !== "new" && editedActivity.calendarId?.length > 0) {
-      const storedAddedEventsIds =
-        JSON.parse(localStorage.getItem("addedEventsIds")) || [];
-      const uniqueIds = new Set([
-        ...storedAddedEventsIds,
-        editedActivity.calendarId,
-      ]);
-
-      localStorage.setItem(
-        "addedEventsIds",
-        JSON.stringify(Array.from(uniqueIds))
-      );
-    }
     if (
       !scheduledEvents[dashedDescription] &&
       editedActivity !== "new" &&

@@ -87,16 +87,21 @@ export default function Home() {
   }, [lastRenderedDay]);
 
   useEffect(() => {
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addListener(handleThemeChange);
+    const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
+
+    mediaQueryList.addListener(handleThemeChange);
+    setIsOSDarkTheme(mediaQueryList.matches);
 
     const mode =
-      (theme.os && isOSDarkTheme) || theme.custom === "dark"
+      (theme.os && isOSDarkTheme) || (!theme.os && theme.custom === "dark")
         ? "dark bg-dark-back"
         : "light bg-grey-100";
 
     document.body.className = mode;
+
+    return () => {
+      mediaQueryList.removeListener(handleThemeChange);
+    };
   }, [theme, isOSDarkTheme]);
 
   useEffect(() => {
@@ -155,6 +160,7 @@ export default function Home() {
       return;
     }
 
+    setReportAndNotes([]);
     setSelectedDateActivities([]);
   }, [selectedDateReport]);
 
@@ -403,6 +409,7 @@ export default function Home() {
                       selectedDate={selectedDate}
                       setSelectedDate={setSelectedDate}
                       isDropboxConnected={isDropboxConnected}
+                      selectedDateReport={selectedDateReport}
                     />
                   </div>
                 </section>
@@ -416,6 +423,7 @@ export default function Home() {
                       availableProjects={
                         latestProjAndAct ? Object.keys(latestProjAndAct) : []
                       }
+                      setSelectedDateReport={setSelectedDateReport}
                     />
                   </div>
                 </section>
@@ -435,7 +443,10 @@ export default function Home() {
                   </div>
 
                   <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                    <Totals activities={selectedDateActivities} />
+                    <Totals
+                      selectedDate={selectedDate}
+                      selectedDateActivities={selectedDateActivities}
+                    />
                   </div>
                   <UpdateDescription />
                 </div>

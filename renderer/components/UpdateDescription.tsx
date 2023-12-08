@@ -3,6 +3,8 @@ import { shallow } from "zustand/shallow";
 import { useUpdateStore } from "../store/updateStore";
 import { useBetaStore } from "../store/betaUpdatesStore";
 import DisclosureSection from "./ui/DisclosureSection";
+import { GlobeAltIcon } from "@heroicons/react/24/solid";
+import SlackIcon from "./ui/SlackIcon";
 
 type File = {
   url: string;
@@ -31,14 +33,10 @@ export default function UpdateDescription() {
     (state) => [state.update, state.setUpdate],
     shallow
   );
-  const [isBeta, setIsBeta] = useBetaStore(
-    (state) => [state.isBeta, state.setIsBeta],
-    shallow
-  );
+
   const [isOpen, setIsOpen] = useState(update?.age === "new");
 
   useEffect(() => {
-    global.ipcRenderer.send("beta-channel", isBeta);
     global.ipcRenderer.send("get-current-version");
 
     global.ipcRenderer.on("update-available", (event, data, info) => {
@@ -60,7 +58,7 @@ export default function UpdateDescription() {
       global.ipcRenderer.removeAllListeners("downloaded");
       global.ipcRenderer.removeAllListeners("current-version");
     };
-  }, [isBeta]);
+  }, []);
 
   const isOpenToggle = () => {
     if (isOpen) {
@@ -85,43 +83,38 @@ export default function UpdateDescription() {
     return tempDiv.innerHTML;
   };
 
+  const supportClickHandler = (isDesktop: boolean) => {
+    global.ipcRenderer.send("slack-redirect", isDesktop);
+  };
+
   return (
     <DisclosureSection
       toggleFunction={isOpenToggle}
       isOpen={isOpen}
       title="What's new?"
     >
-      <p className="text-xs text-gray-700 font-semibold dark:text-dark-main">
+      <p className="text-xs text-gray-700 font-semibold dark:text-dark-main mb-4">
         Current version {currentVersion} {!isUpdate && "(latest)"}
       </p>
-      <div className="relative flex items-start my-4 ">
-        <div className="relative flex items-start my-4">
-          <div className="flex items-center h-5">
-            <input
-              id="comments"
-              aria-describedby="comments-description"
-              name="comments"
-              type="checkbox"
-              defaultChecked={isBeta}
-              onChange={() => setIsBeta(!isBeta)}
-              className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-            />
-          </div>
-          <div className="ml-2 text-sm">
-            <label
-              htmlFor="comments"
-              className="font-medium text-gray-700 dark:text-gray-300"
-            >
-              Download beta version
-            </label>
-            <p
-              id="comments-description"
-              className="text-gray-500 dark:text-dark-main"
-            >
-              You need to restart the application (or reopen from the tray)
-            </p>
-          </div>
-        </div>
+
+      <div className="flex flex-col my-5 gap-3 ">
+        <p className=" text-gray-700 font-semibold dark:text-dark-main">
+          You can leave your feedback or questions in our slack channel
+        </p>
+        <button
+          className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
+          onClick={() => supportClickHandler(true)}
+        >
+          <SlackIcon />
+          Open in desktop Slack
+        </button>
+        <button
+          className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
+          onClick={() => supportClickHandler(false)}
+        >
+          <GlobeAltIcon className="w-6 h-6 fill-gray-600" />
+          Open Slack in the browser
+        </button>
       </div>
       <h2 className="font-bold text-gray-700 dark:text-dark-heading">
         In {release?.version ? release?.version : currentVersion} version
