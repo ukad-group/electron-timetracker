@@ -73,8 +73,14 @@ const SettingsPage = () => {
                 Folder with reports
               </span>
               <p className="text-sm text-gray-500 dark:text-dark-main">
-                Specify the path on your computer where your reports will be
-                saved
+                Choose a folder to store your reports. <br />
+                Inside this folder, the application will generate the specified
+                file and folder structure: '2024 {">"} week 06 {">"} timereport
+                - 20230210'. <br />
+                If you already have a similar file/folder structure, choose the
+                folder one level above. For instance, if you have a structure
+                like 'John Galt {">"} 2024 {">"} week 05', select the 'John
+                Galt' folder."
               </p>
             </div>
             <div className="flex w-full items-center flex-shrink min-w-0 gap-4">

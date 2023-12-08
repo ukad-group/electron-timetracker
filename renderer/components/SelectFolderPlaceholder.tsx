@@ -37,8 +37,14 @@ const SelectFolderPlaceholder = ({
       <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-dark-heading">
         Select a Folder
       </h3>
-      <p className="mt-1 text-sm text-gray-500 dark:text-dark-main">
-        To get started, select a folder to save the reports.
+      <p className="mt-1 text-sm text-gray-500 dark:text-dark-main max-w-xl mx-auto">
+        To get started, choose a folder to store your reports. <br />
+        Inside this folder, the application will generate the specified file and
+        folder structure: '2024 {">"} week 06 {">"} timereport - 20230210'.{" "}
+        <br />
+        If you already have a similar file/folder structure, choose the folder
+        one level above. For instance, if you have a structure like 'John Galt{" "}
+        {">"} 2024 {">"} week 05', select the 'John Galt' folder."
       </p>
       <div className="mt-6">
         <button
