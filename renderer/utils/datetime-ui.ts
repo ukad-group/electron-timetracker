@@ -217,7 +217,8 @@ export const getMonthDates = (inputDate: Date) => {
   }
 
   return monthDates;
-  
+};
+
 export const getCurrentTimeRoundedUp = () => {
   const currentTime = new Date();
   const minutes = currentTime.getMinutes();
