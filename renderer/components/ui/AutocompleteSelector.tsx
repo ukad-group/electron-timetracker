@@ -93,9 +93,7 @@ export default function AutocompleteSelector({
   };
 
   const onBlurHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.value.startsWith(" ")) {
-      e.target.value = e.target.value.trim();
-    }
+    e.target.value = e.target.value.trim();
     setSelectedItem(e.target.value);
     if (isNewCheck && availableItems) {
       setIsNew(selectedItem && !availableItems.includes(selectedItem));
