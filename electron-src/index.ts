@@ -133,8 +133,13 @@ const generateWindow = () => {
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.on("close", (event) => {
-      event.preventDefault();
-      mainWindow?.hide();
+      if (
+        process.platform !== "darwin" ||
+        (process.platform === "darwin" && mainWindow?.isVisible())
+      ) {
+        event.preventDefault();
+        mainWindow?.hide();
+      }
     });
   }
 };
@@ -255,6 +260,8 @@ app.on("ready", async () => {
   if (mainWindow) {
     app.whenReady().then(() => {
       autoUpdater.checkForUpdates();
+      if (process.platform === "darwin") return;
+
       try {
         generateTray();
       } catch (err) {
@@ -381,6 +388,10 @@ app.on("ready", async () => {
   mainWindow?.on("focus", () => {
     mainWindow?.webContents.send("window-focused");
   });
+});
+
+app.on("activate", () => {
+  if (process.platform === "darwin") mainWindow?.show();
 });
 
 app.on("window-all-closed", () => {
