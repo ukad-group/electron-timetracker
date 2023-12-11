@@ -140,6 +140,7 @@ export default function TrackTimeModal({
       for (let i = 0; i < webTrackerProjects.length; i++) {
         if (!tempProj.includes(webTrackerProjects[i])) {
           tempProj.push(webTrackerProjects[i]);
+          global.ipcRenderer.send("dictionaty-update", webTrackerProjects[i]);
         }
       }
     }

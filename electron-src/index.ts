@@ -106,6 +106,9 @@ ipcMain.on(
     );
   }
 );
+ipcMain.on("dictionaty-update", (event, word: string) => {
+  mainWindow?.webContents.session.addWordToSpellCheckerDictionary(word);
+});
 
 const userDataDirectory = app.getPath("userData");
 let mainWindow: Electron.CrossProcessExports.BrowserWindow | null = null;
