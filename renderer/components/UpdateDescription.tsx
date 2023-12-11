@@ -3,6 +3,8 @@ import { shallow } from "zustand/shallow";
 import { useUpdateStore } from "../store/updateStore";
 import { useBetaStore } from "../store/betaUpdatesStore";
 import DisclosureSection from "./ui/DisclosureSection";
+import { GlobeAltIcon } from "@heroicons/react/24/solid";
+import SlackIcon from "./ui/SlackIcon";
 
 type File = {
   url: string;
@@ -81,6 +83,10 @@ export default function UpdateDescription() {
     return tempDiv.innerHTML;
   };
 
+  const supportClickHandler = (isDesktop: boolean) => {
+    global.ipcRenderer.send("slack-redirect", isDesktop);
+  };
+
   return (
     <DisclosureSection
       toggleFunction={isOpenToggle}
@@ -90,7 +96,27 @@ export default function UpdateDescription() {
       <p className="text-xs text-gray-700 font-semibold dark:text-dark-main mb-4">
         Current version {currentVersion} {!isUpdate && "(latest)"}
       </p>
-      <h2 className="font-bold text-gray-700 mt-4 dark:text-dark-heading">
+
+      <div className="flex flex-col my-5 gap-3 ">
+        <p className=" text-gray-700 font-semibold dark:text-dark-main">
+          You can leave your feedback or questions in our slack channel
+        </p>
+        <button
+          className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
+          onClick={() => supportClickHandler(true)}
+        >
+          <SlackIcon />
+          Open in desktop Slack
+        </button>
+        <button
+          className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
+          onClick={() => supportClickHandler(false)}
+        >
+          <GlobeAltIcon className="w-6 h-6 fill-gray-600" />
+          Open Slack in the browser
+        </button>
+      </div>
+      <h2 className="font-bold text-gray-700 dark:text-dark-heading">
         In {release?.version ? release?.version : currentVersion} version
       </h2>
       {update?.description ? (

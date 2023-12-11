@@ -27,7 +27,6 @@ export default function Home() {
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );
-
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [selectedDateActivities, setSelectedDateActivities] =
@@ -48,7 +47,7 @@ export default function Home() {
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
   const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const [isDropboxConnected, setIsDropboxConnected] = useState(true);
-  const [theme, setTheme] = useThemeStore(
+  const [theme] = useThemeStore(
     (state) => [state.theme, state.setTheme],
     shallow
   );
@@ -250,7 +249,7 @@ export default function Home() {
     // }
     const tempActivities: Array<ReportActivity> = [];
     const newActFrom = stringToMinutes(activity.from);
-    const newActTo = stringToMinutes(activity.to);
+    // const newActTo = stringToMinutes(activity.to);
 
     if (!selectedDateActivities.length) {
       activity.id = 1;
@@ -409,6 +408,7 @@ export default function Home() {
                       selectedDate={selectedDate}
                       setSelectedDate={setSelectedDate}
                       isDropboxConnected={isDropboxConnected}
+                      selectedDateReport={selectedDateReport}
                     />
                   </div>
                 </section>
@@ -422,6 +422,7 @@ export default function Home() {
                       availableProjects={
                         latestProjAndAct ? Object.keys(latestProjAndAct) : []
                       }
+                      setSelectedDateReport={setSelectedDateReport}
                     />
                   </div>
                 </section>
@@ -446,15 +447,21 @@ export default function Home() {
                       selectedDateActivities={selectedDateActivities}
                     />
                   </div>
-                  <UpdateDescription />
+                  <div className="hidden lg:block">
+                    <UpdateDescription />
+                  </div>
                 </div>
               </section>
-              <section className="lg:col-span-2">
+
+              <section className="lg:col-span-2 flex flex-col gap-6">
                 <Calendar
                   reportsFolder={reportsFolder}
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
                 />
+                <div className="lg:hidden">
+                  <UpdateDescription />
+                </div>
               </section>
             </>
           ) : (

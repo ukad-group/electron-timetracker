@@ -72,10 +72,36 @@ const SettingsPage = () => {
               <span className="text-lg font-medium text-gray-900 dark:text-dark-heading">
                 Folder with reports
               </span>
-              <p className="text-sm text-gray-500 dark:text-dark-main">
-                Specify the path on your computer where your reports will be
-                saved
-              </p>
+              <div className="mt-4 max-w-3xl mx-auto">
+                <div className="mb-4">
+                  <h4 className="text-gray-900 dark:text-dark-heading mb-1">
+                    For UKAD Users
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-dark-main mx-auto">
+                    The designated folder should be created and shared with you
+                    on Dropbox by the UKAD DevOps team. <br /> To locate your
+                    Dropbox root folder, please navigate to C:\Users[Windows
+                    user]\Dropbox. <br /> Our application's folder structure
+                    mirrors the format 'John Galt {">"} 2024 {">"} week 05.'{" "}
+                    <br /> Kindly select the 'John Galt' folder as your
+                    designated storage location.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-gray-900 dark:text-dark-heading mb-1">
+                    For other Users
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-dark-main mx-auto">
+                    As a Non-UKAD user, you have the flexibility to choose any
+                    folder of your preference for storing your reports. However,
+                    we strongly recommend utilizing cloud storage services like
+                    Dropbox, Google Drive, etc. These services facilitate
+                    seamless report synchronization across your devices, offer
+                    automatic backups, and preserve a historical record of your
+                    data.
+                  </p>
+                </div>
+              </div>
             </div>
             <div className="flex w-full items-center flex-shrink min-w-0 gap-4">
               <FolderSelector

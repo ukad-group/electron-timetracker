@@ -110,6 +110,14 @@ ipcMain.on("dictionaty-update", (event, word: string) => {
   mainWindow?.webContents.session.addWordToSpellCheckerDictionary(word);
 });
 
+ipcMain.on("slack-redirect", (event, isDesktop: boolean) => {
+  shell.openExternal(
+    isDesktop
+      ? "slack://channel?team=T3PV37ANP&id=C05JN9P19G8"
+      : "https://ukad.slack.com/archives/C05JN9P19G8"
+  );
+});
+
 const userDataDirectory = app.getPath("userData");
 let mainWindow: Electron.CrossProcessExports.BrowserWindow | null = null;
 const gotTheLock = app.requestSingleInstanceLock();
@@ -507,6 +515,39 @@ ipcMain.handle(
 );
 
 ipcMain.handle(
+  "app:find-last-report",
+  (event, reportsFolder: string, stringDate: string) => {
+    if (!reportsFolder || !stringDate.length) return null;
+
+    const LAST_PERIOD_DAYS = 31;
+
+    for (let i = 0; i < LAST_PERIOD_DAYS; i++) {
+      const date = new Date(stringDate);
+      const prevDay = new Date(date.setDate(date.getDate() - ++i));
+      const timereportPath = getPathFromDate(prevDay, reportsFolder);
+
+      if (fs.existsSync(timereportPath)) {
+        try {
+          const data = fs.readFileSync(timereportPath, "utf8");
+          return data;
+        } catch (err) {
+          console.error(err);
+          mainWindow?.webContents.send(
+            "background error",
+            "Error when finding last report",
+            err
+          );
+
+          return null;
+        }
+      }
+    }
+
+    return null;
+  }
+);
+
+ipcMain.handle(
   "app:write-day-report",
   (event, reportsFolder: string, stringDate: string, report: string) => {
     if (!reportsFolder || !stringDate.length) return null;
@@ -527,6 +568,27 @@ ipcMain.handle(
       );
 
       return;
+    }
+  }
+);
+
+ipcMain.handle(
+  "app:check-exist-report",
+  (event, reportsFolder: string, stringDate: string) => {
+    if (!reportsFolder || !stringDate.length) return false;
+
+    const date = new Date(stringDate);
+    const timereportPath = getPathFromDate(date, reportsFolder);
+
+    try {
+      return fs.existsSync(timereportPath) ? true : false;
+    } catch (err) {
+      console.log(err);
+      mainWindow?.webContents.send(
+        "background error",
+        "Error when checking existing project.",
+        err
+      );
     }
   }
 );
