@@ -61,6 +61,8 @@ export default function Home() {
   }
 
   useEffect(() => {
+    global.ipcRenderer.send("start-folder-watcher", reportsFolder);
+
     global.ipcRenderer.send("check-dropbox-connection");
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
       setIsDropboxConnected(data);
@@ -68,6 +70,7 @@ export default function Home() {
 
     return () => {
       global.ipcRenderer.removeAllListeners("dropbox-connection");
+      global.ipcRenderer.send("stop-path-watcher", reportsFolder);
     };
   }, []);
 

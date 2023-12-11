@@ -55,36 +55,48 @@ const Totals = ({ selectedDate, selectedDateActivities }) => {
   }, [selectedDate]);
 
   useEffect(() => {
+    getTotals();
+
+    const fileChangeListener = (event) => {
+      getTotals();
+    };
+
+    global.ipcRenderer.on("any-file-changed", fileChangeListener);
+
+    return () => {
+      global.ipcRenderer.removeListener("any-file-changed", fileChangeListener);
+    };
+  }, [selectedDate, period]);
+
+  const getTotals = async () => {
     const dates = getDates();
 
-    (async () => {
-      const parsedActivities = await Promise.all(
-        dates.map((date) => getParsedActivities(date))
+    const parsedActivities = await Promise.all(
+      dates.map((date) => getParsedActivities(date))
+    );
+
+    const combinedActivities = parsedActivities.reduce((acc, act) => {
+      if (act) {
+        return [...acc, ...act];
+      }
+
+      return acc;
+    }, []);
+
+    const initialProjectTotals = getProjectTotals(combinedActivities);
+    const sortedProjectTotals = sortTotals(initialProjectTotals);
+    const fullProjectTotals = sortedProjectTotals.map((total: Total) => {
+      const projectActivities = getActivityTotals(
+        total.name,
+        combinedActivities
       );
+      const sortedProjectActivities = sortTotals(projectActivities);
 
-      const combinedActivities = parsedActivities.reduce((acc, act) => {
-        if (act) {
-          return [...acc, ...act];
-        }
+      return { ...total, activities: sortedProjectActivities };
+    });
 
-        return acc;
-      }, []);
-
-      const initialProjectTotals = getProjectTotals(combinedActivities);
-      const sortedProjectTotals = sortTotals(initialProjectTotals);
-      const fullProjectTotals = sortedProjectTotals.map((total: Total) => {
-        const projectActivities = getActivityTotals(
-          total.name,
-          combinedActivities
-        );
-        const sortedProjectActivities = sortTotals(projectActivities);
-
-        return { ...total, activities: sortedProjectActivities };
-      });
-
-      setTotals(fullProjectTotals);
-    })();
-  }, [selectedDate, period, selectedDateActivities]);
+    setTotals(fullProjectTotals);
+  };
 
   const getDates = () => {
     switch (period) {

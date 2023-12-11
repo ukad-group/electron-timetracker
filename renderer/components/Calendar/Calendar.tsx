@@ -141,8 +141,8 @@ export function Calendar({
           )
         );
       })();
-      global.ipcRenderer.send("start-folder-watcher", reportsFolder);
-      global.ipcRenderer.on("any-file-changed", (event, data) => {
+
+      const fileChangeListener = (event, data) => {
         (async () => {
           setParsedQuarterReports(
             await global.ipcRenderer.invoke(
@@ -152,11 +152,15 @@ export function Calendar({
             )
           );
         })();
-      });
+      };
+
+      global.ipcRenderer.on("any-file-changed", fileChangeListener);
 
       return () => {
-        global.ipcRenderer.removeAllListeners("any-file-changed");
-        global.ipcRenderer.send("stop-path-watcher", reportsFolder);
+        global.ipcRenderer.removeListener(
+          "any-file-changed",
+          fileChangeListener
+        );
       };
     } catch (err) {
       console.log("Error details ", err);
