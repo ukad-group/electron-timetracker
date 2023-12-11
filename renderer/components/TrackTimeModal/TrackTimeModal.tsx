@@ -138,26 +138,19 @@ export default function TrackTimeModal({
 
   useEffect(() => {
     addSuggestions(activities, latestProjAndDesc, latestProjAndAct);
-    // const tempProj = Object.keys(latestProjAndAct);
-    // if (webTrackerProjects) {
-    //   for (let i = 0; i < webTrackerProjects.length; i++) {
-    //     if (!tempProj.includes(webTrackerProjects[i])) {
-    //       tempProj.push(webTrackerProjects[i]);
-    //     }
-    //   }
-    // }
-    // setLatestProjects(tempProj);
     const tempLatestProj = Object.keys(latestProjAndAct);
+
     if (webTrackerProjects) {
       const tempWebTrackerProjects = [];
       for (let i = 0; i < webTrackerProjects.length; i++) {
         if (!tempLatestProj.includes(webTrackerProjects[i])) {
           tempWebTrackerProjects.push(webTrackerProjects[i]);
-		  global.ipcRenderer.send("dictionaty-update", webTrackerProjects[i]);
+          global.ipcRenderer.send("dictionaty-update", webTrackerProjects[i]);
         }
       }
       setUniqueWebTrackerProjects(tempWebTrackerProjects);
     }
+
     setLatestProjects(tempLatestProj);
   }, [isOpen, latestProjAndDesc, latestProjAndAct, webTrackerProjects]);
 
@@ -180,7 +173,7 @@ export default function TrackTimeModal({
 
     getTimetrackerYearProjects();
   }, []);
-  
+
   const getTrelloCards = async () => {
     try {
       const trelloCards = await global.ipcRenderer.invoke(
