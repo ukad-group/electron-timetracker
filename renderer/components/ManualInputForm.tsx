@@ -39,14 +39,6 @@ export default function ManualInputForm({
     setReportHandler(selectedDateReport);
   }, [selectedDateReport]);
 
-  useEffect(() => {
-    textareaRef.current.focus();
-
-    setTimeout(() => {
-      textareaRef.current.blur();
-    }, 0);
-  }, []);
-
   const saveReportHandler = () => {
     global.ipcRenderer.send("send-analytics-data", "manuall_save");
     onSave(report, true);
