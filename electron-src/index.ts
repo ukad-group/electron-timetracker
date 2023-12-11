@@ -3,7 +3,7 @@ import path from "path";
 import next from "next";
 import { parse } from "url";
 import { createServer } from "http";
-import { app, dialog, ipcMain, Menu, Tray, shell } from "electron";
+import { app, dialog, ipcMain, Menu, MenuItem, shell, Tray } from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
 import { createWindow } from "./helpers/create-window";
@@ -106,6 +106,9 @@ ipcMain.on(
     );
   }
 );
+ipcMain.on("dictionaty-update", (event, word: string) => {
+  mainWindow?.webContents.session.addWordToSpellCheckerDictionary(word);
+});
 
 ipcMain.on("slack-redirect", (event, isDesktop: boolean) => {
   shell.openExternal(
@@ -123,6 +126,9 @@ const generateWindow = () => {
   mainWindow = createWindow({
     width: 1000,
     height: 600,
+    webPreferences: {
+      spellcheck: true,
+    },
     autoHideMenuBar: true,
     icon: path.join(__dirname, "../renderer/out/images/logo.png"),
   });
@@ -142,6 +148,7 @@ const generateWindow = () => {
       }
     });
   }
+  mainWindow.webContents.session.setSpellCheckerLanguages(["en-US"]);
 };
 
 let tray: Tray | null = null;
@@ -383,6 +390,36 @@ app.on("ready", async () => {
         }
       }
     );
+
+    mainWindow.webContents.on("context-menu", (event, params) => {
+      const menu = new Menu();
+
+      for (const suggestion of params.dictionarySuggestions) {
+        menu.append(
+          new MenuItem({
+            label: suggestion,
+            click: () =>
+              mainWindow &&
+              mainWindow.webContents.replaceMisspelling(suggestion),
+          })
+        );
+      }
+
+      if (params.misspelledWord && mainWindow) {
+        menu.append(
+          new MenuItem({
+            label: "Add to dictionary",
+            click: () =>
+              mainWindow &&
+              mainWindow.webContents.session.addWordToSpellCheckerDictionary(
+                params.misspelledWord
+              ),
+          })
+        );
+      }
+
+      menu.popup();
+    });
   }
 
   mainWindow?.on("focus", () => {
@@ -582,6 +619,10 @@ ipcMain.handle(
         .sort()
         .reduce((accumulator: Record<string, string[]>, key) => {
           const activitySet = new Set<string>();
+
+          if (mainWindow) {
+            mainWindow.webContents.session.addWordToSpellCheckerDictionary(key);
+          }
 
           parsedProjects[key].forEach((activity: Activity) => {
             if (activity.activity) {
