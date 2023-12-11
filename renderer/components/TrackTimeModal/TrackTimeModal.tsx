@@ -153,6 +153,7 @@ export default function TrackTimeModal({
       for (let i = 0; i < webTrackerProjects.length; i++) {
         if (!tempLatestProj.includes(webTrackerProjects[i])) {
           tempWebTrackerProjects.push(webTrackerProjects[i]);
+		  global.ipcRenderer.send("dictionaty-update", webTrackerProjects[i]);
         }
       }
       setUniqueWebTrackerProjects(tempWebTrackerProjects);
@@ -292,19 +293,6 @@ export default function TrackTimeModal({
       calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
     });
 
-    if (editedActivity !== "new" && editedActivity.calendarId?.length > 0) {
-      const storedAddedEventsIds =
-        JSON.parse(localStorage.getItem("addedEventsIds")) || [];
-      const uniqueIds = new Set([
-        ...storedAddedEventsIds,
-        editedActivity.calendarId,
-      ]);
-
-      localStorage.setItem(
-        "addedEventsIds",
-        JSON.stringify(Array.from(uniqueIds))
-      );
-    }
     if (
       !scheduledEvents[dashedDescription] &&
       editedActivity !== "new" &&

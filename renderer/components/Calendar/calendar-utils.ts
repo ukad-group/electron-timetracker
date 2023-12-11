@@ -17,15 +17,11 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
     if (!timetrackerUserInfo) return;
 
     const plannerToken = timetrackerUserInfo?.plannerAccessToken;
-    const userPromises = [];
-
-    const holidaysPromise: Promise<ApiDayOff[]> = global.ipcRenderer.invoke(
-      "timetracker:get-holidays",
-      plannerToken,
-      calendarDate
-    );
-
     const userEmail = timetrackerUserInfo?.email;
+    const userPromises = [];
+    let nextYearVacationsPromise: Promise<VacationSickDaysData> | undefined;
+    let prevYearVacationsPromise: Promise<VacationSickDaysData> | undefined;
+
     const vacationsPromise: Promise<VacationSickDaysData> =
       global.ipcRenderer.invoke(
         "timetracker:get-vacations",
@@ -34,7 +30,39 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
         calendarDate
       );
 
-    userPromises.push(holidaysPromise, vacationsPromise);
+    // if calendar is in december - get next year info
+    if (calendarDate.getMonth() === 11) {
+      const currentDate = new Date(calendarDate);
+      const nextYear = new Date(
+        currentDate.setFullYear(currentDate.getFullYear() + 1)
+      );
+
+      nextYearVacationsPromise = global.ipcRenderer.invoke(
+        "timetracker:get-vacations",
+        plannerToken,
+        userEmail,
+        nextYear
+      );
+    }
+
+    // if calendar is in january - get previous year info
+    if (calendarDate.getMonth() === 0) {
+      const currentDate = new Date(calendarDate);
+      const prevYear = new Date(
+        currentDate.setFullYear(currentDate.getFullYear() - 1)
+      );
+
+      prevYearVacationsPromise = global.ipcRenderer.invoke(
+        "timetracker:get-vacations",
+        plannerToken,
+        userEmail,
+        prevYear
+      );
+    }
+
+    userPromises.push(vacationsPromise);
+    if (nextYearVacationsPromise) userPromises.push(nextYearVacationsPromise);
+    if (prevYearVacationsPromise) userPromises.push(prevYearVacationsPromise);
 
     const userFetchedData = await Promise.all(userPromises);
 
@@ -55,31 +83,19 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
         "timetracker-user",
         JSON.stringify(refreshedUserInfo)
       );
-      loadHolidaysAndVacations(calendarDate);
-      return;
+
+      return await loadHolidaysAndVacations(calendarDate);
     }
-    const holidays: ApiDayOff[] = userFetchedData[0];
-    const vacationsAndSickdays: ApiDayOff[] = userFetchedData[1]?.periods;
+
+    const vacationsAndSickdays: ApiDayOff[] = [];
+
+    userFetchedData.forEach((data) =>
+      data.periods.forEach((period) => vacationsAndSickdays.push(period))
+    );
+
     const userDaysOff: DayOff[] = [];
 
-    holidays.forEach((holiday) => {
-      userDaysOff.push({
-        date: new Date(holiday?.dateFrom),
-        duration: holiday?.quantity,
-        description: holiday?.description,
-        type: "holiday",
-      });
-    });
-
     vacationsAndSickdays.forEach((item) => {
-      if (
-        userDaysOff.some((day) =>
-          isTheSameDates(day.date, new Date(item.dateFrom))
-        )
-      ) {
-        return;
-      }
-
       const singleDayOff = isTheSameDates(
         new Date(item.dateFrom),
         new Date(item.dateTo)
@@ -90,60 +106,25 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
           date: new Date(item?.dateFrom),
           duration: item?.quantity,
           description: item?.description,
-          type: item?.type === 1 ? "sickday" : "vacation",
+          type: item?.type,
         });
-      } else {
-        const yearFrom = new Date(item?.dateFrom).getFullYear();
-        const yearTo = new Date(item?.dateTo).getFullYear();
-
-        // cases when vacation/sickday continue from last year to next year, need presave to LS
-        if (yearFrom !== yearTo) {
-          const formattedTransitDates = extractDatesFromPeriod(
-            item,
-            userDaysOff
-          );
-
-          formattedTransitDates.forEach((transitDay) => {
-            userDaysOff.push(transitDay);
-          });
-
-          localStorage.setItem(
-            "transit-vacation",
-            JSON.stringify(formattedTransitDates)
-          );
-        } else {
-          const formattedPeriodDates = extractDatesFromPeriod(
-            item,
-            userDaysOff
-          );
-
-          formattedPeriodDates.forEach((periodDay) => {
-            userDaysOff.push(periodDay);
-          });
-        }
       }
     });
 
-    const transitVacations = JSON.parse(
-      localStorage.getItem("transit-vacation")
-    );
+    vacationsAndSickdays.forEach((item) => {
+      const periodDayOff = !isTheSameDates(
+        new Date(item.dateFrom),
+        new Date(item.dateTo)
+      );
 
-    if (transitVacations) {
-      const periodStartYear = new Date(transitVacations[0]?.date).getFullYear();
+      if (periodDayOff) {
+        const formattedPeriodDates = extractDatesFromPeriod(item, userDaysOff);
 
-      // we can't get vacation from api that started last year and continue next year, so use local storage
-      if (periodStartYear !== calendarDate.getFullYear()) {
-        transitVacations.forEach((transitDay: DayOff) => {
-          if (
-            userDaysOff.some(
-              (day) => !isTheSameDates(day.date, transitDay.date)
-            )
-          ) {
-            userDaysOff.push(transitDay);
-          }
+        formattedPeriodDates.forEach((periodDay) => {
+          userDaysOff.push(periodDay);
         });
       }
-    }
+    });
 
     return userDaysOff;
   } catch (error) {

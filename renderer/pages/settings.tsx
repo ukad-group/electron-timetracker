@@ -10,6 +10,7 @@ import Office365Connection from "../components/Office365Connection";
 import GoogleConnection from "../components/GoogleConnection";
 import clsx from "clsx";
 import TimetrackerWebsiteConnection from "../components/TimetrackerWebsiteConncetion";
+import BetaToggle from "../components/ui/BetaToggle";
 import JiraConnection from "../components/JiraConnection";
 
 const SettingsPage = () => {
@@ -31,16 +32,21 @@ const SettingsPage = () => {
   }
 
   useEffect(() => {
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addListener(handleThemeChange);
+    const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
+
+    mediaQueryList.addListener(handleThemeChange);
+    setIsOSDarkTheme(mediaQueryList.matches);
 
     const mode =
-      (theme.os && isOSDarkTheme) || theme.custom === "dark"
+      (theme.os && isOSDarkTheme) || (!theme.os && theme.custom === "dark")
         ? "dark bg-dark-back"
         : "light bg-grey-100";
 
     document.body.className = mode;
+
+    return () => {
+      mediaQueryList.removeListener(handleThemeChange);
+    };
   }, [theme, isOSDarkTheme]);
 
   return (
@@ -67,10 +73,36 @@ const SettingsPage = () => {
               <span className="text-lg font-medium text-gray-900 dark:text-dark-heading">
                 Folder with reports
               </span>
-              <p className="text-sm text-gray-500 dark:text-dark-main">
-                Specify the path on your computer where your reports will be
-                saved
-              </p>
+              <div className="mt-4 max-w-3xl mx-auto">
+                <div className="mb-4">
+                  <h4 className="text-gray-900 dark:text-dark-heading mb-1">
+                    For UKAD Users
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-dark-main mx-auto">
+                    The designated folder should be created and shared with you
+                    on Dropbox by the UKAD DevOps team. <br /> To locate your
+                    Dropbox root folder, please navigate to C:\Users[Windows
+                    user]\Dropbox. <br /> Our application's folder structure
+                    mirrors the format 'John Galt {">"} 2024 {">"} week 05.'{" "}
+                    <br /> Kindly select the 'John Galt' folder as your
+                    designated storage location.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="text-gray-900 dark:text-dark-heading mb-1">
+                    For other Users
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-dark-main mx-auto">
+                    As a Non-UKAD user, you have the flexibility to choose any
+                    folder of your preference for storing your reports. However,
+                    we strongly recommend utilizing cloud storage services like
+                    Dropbox, Google Drive, etc. These services facilitate
+                    seamless report synchronization across your devices, offer
+                    automatic backups, and preserve a historical record of your
+                    data.
+                  </p>
+                </div>
+              </div>
             </div>
             <div className="flex w-full items-center flex-shrink min-w-0 gap-4">
               <FolderSelector
@@ -82,27 +114,27 @@ const SettingsPage = () => {
         </section>
         <section>
           <div className="bg-white shadow sm:rounded-lg p-6 flex flex-col gap-6 dark:bg-dark-container  dark:border-dark-border">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-3">
               <span className="text-lg font-medium text-gray-900 dark:text-dark-heading">
                 Theme
               </span>
-              <div className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  id="deviceTheme"
-                  aria-describedby="comments-description"
-                  defaultChecked={theme.os}
-                  name="deviceTheme"
-                  onClick={() =>
-                    setTheme({ custom: theme.custom, os: !theme.os })
-                  }
-                  className="w-5 mr-7 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-0 dark:bg-gray-700 dark:border-gray-600"
-                />
-                <label
-                  htmlFor="deviceTheme"
-                  className="ml-2 text-sm font-medium text-gray-500 dark:text-dark-main"
-                >
-                  Use device theme
+              <div className="flex items-center">
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    id="deviceTheme"
+                    aria-describedby="comments-description"
+                    defaultChecked={theme.os}
+                    name="deviceTheme"
+                    onClick={() =>
+                      setTheme({ custom: theme.custom, os: !theme.os })
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 dark:peer-focus:ring-dark-button-back rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-dark-button-hover"></div>
+                  <span className="ml-3 text-sm font-medium text-gray-500 dark:text-dark-main">
+                    Use device theme
+                  </span>
                 </label>
               </div>
               <div className="flex items-center">
@@ -166,6 +198,16 @@ const SettingsPage = () => {
             <Office365Connection />
             <JiraConnection />
             <TimetrackerWebsiteConnection />
+          </div>
+        </section>
+        <section>
+          <div className="bg-white shadow sm:rounded-lg p-6 flex flex-col gap-6 dark:bg-dark-container  dark:border-dark-border">
+            <div className="flex flex-col gap-1">
+              <span className="text-lg font-medium text-gray-900 dark:text-dark-heading">
+                Stable or beta version
+              </span>
+              <BetaToggle />
+            </div>
           </div>
         </section>
       </div>
