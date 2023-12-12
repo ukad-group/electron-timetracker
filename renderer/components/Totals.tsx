@@ -38,7 +38,7 @@ const TOTAL_PERIODS = [
   { id: 2, name: "month" },
 ];
 
-const Totals = ({ selectedDate, selectedDateActivities }) => {
+const Totals = ({ selectedDate }) => {
   const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
