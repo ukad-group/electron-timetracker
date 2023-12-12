@@ -36,6 +36,14 @@ import {
   getRefreshedUserInfoToken,
 } from "./TimetrackerWebsiteApi";
 import { exec } from "child_process";
+import {
+  getJiraAuthUrl,
+  getJiraIssues,
+  getJiraProfile,
+  getJiraRefreshedAccessToken,
+  getJiraResources,
+  getJiraTokens,
+} from "./helpers/API/jira";
 
 initialize("A-EU-9361517871");
 ipcMain.on(
@@ -725,6 +733,54 @@ ipcMain.handle("trello:get-cards", async (event, accessToken: string) => {
 
   return await getCardsOfMember(accessToken, options);
 });
+
+// JIRA FUNCTIONS
+
+const getJiraOptions = () => {
+  return {
+    clientId: process.env.NEXT_PUBLIC_JIRA_CLIENT_ID || "",
+    clientSecret: process.env.NEXT_PUBLIC_JIRA_CLIENT_SECRET || "",
+    redirectUri: process.env.NEXT_PUBLIC_JIRA_REDIRECT_URI || "",
+    scope: process.env.NEXT_PUBLIC_JIRA_SCOPE || "",
+  };
+};
+
+ipcMain.on("jira:login", async () => {
+  const options = getJiraOptions();
+  const jiraAuthUrl = getJiraAuthUrl(options);
+
+  mainWindow?.loadURL(jiraAuthUrl);
+});
+
+ipcMain.handle("jira:get-tokens", async (event, authCode: string) => {
+  const options = getJiraOptions();
+
+  return await getJiraTokens(authCode, options);
+});
+
+ipcMain.handle(
+  "jira:refresh-access-token",
+  async (event, refreshToken: string) => {
+    const options = getJiraOptions();
+
+    return await getJiraRefreshedAccessToken(refreshToken, options);
+  }
+);
+
+ipcMain.handle("jira:get-profile", async (event, accessToken: string) => {
+  return await getJiraProfile(accessToken);
+});
+
+ipcMain.handle("jira:get-resources", async (event, accessToken: string) => {
+  return await getJiraResources(accessToken);
+});
+
+ipcMain.handle(
+  "jira:get-issues",
+  async (event, accessToken: string, resourceId: string, assignee: string) => {
+    return await getJiraIssues(accessToken, resourceId, assignee);
+  }
+);
 
 // MICROSOFT OFFICE365 FUNCTIONS
 
