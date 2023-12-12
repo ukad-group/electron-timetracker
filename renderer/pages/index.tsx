@@ -16,6 +16,7 @@ import VersionMessage from "../components/ui/VersionMessages";
 import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
 import { useThemeStore } from "../store/themeStore";
+import { useBetaStore } from "../store/betaUpdatesStore";
 import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
@@ -51,6 +52,10 @@ export default function Home() {
     (state) => [state.theme, state.setTheme],
     shallow
   );
+  const [isBeta] = useBetaStore(
+    (state) => [state.isBeta, state.setIsBeta],
+    shallow
+  );
 
   function handleThemeChange(e) {
     if (e.matches) {
@@ -67,6 +72,7 @@ export default function Home() {
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
       setIsDropboxConnected(data);
     });
+    global.ipcRenderer.send("beta-channel", isBeta);
 
     return () => {
       global.ipcRenderer.removeAllListeners("dropbox-connection");
