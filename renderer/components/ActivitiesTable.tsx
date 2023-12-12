@@ -180,8 +180,8 @@ export default function ActivitiesTable({
       (event.ctrlKey && event.key === "ArrowUp") ||
       (event.key === "Meta" && event.key === "ArrowUp")
     ) {
-      if (tableActivities.length > 0) {
-        const lastActivity = tableActivities[tableActivities.length - 1];
+      if (nonBreakActivities.length > 0) {
+        const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
         onEditActivity(lastActivity);
       }
     }
