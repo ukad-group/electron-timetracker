@@ -117,7 +117,9 @@ export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
 
     let cardsPromises = [];
 
-    resourcesData.map(async (item) => {
+    resourcesData.forEach(async (item) => {
+      if (!item) return;
+
       const { resources, accessToken, assignee } = item;
 
       if (accessToken && assignee && resources.length > 0) {
