@@ -68,16 +68,20 @@ export const concatSortArrays = (
 //   });
 // };
 
-export function parseEventTitle(event, availableProjects: Array<string>) {
+export function parseEventTitle(
+  event,
+  latestProjAndAct: Record<string, [string]>
+) {
   const { summary } = event; // Google
   const { subject } = event; // Office365
   const eventTitle = summary || subject;
   const items = eventTitle ? eventTitle.split(" - ") : "";
-  let allProjects:Array<string>=availableProjects
+  const words = eventTitle ? eventTitle.split(" ") : "";
+  let allProjects: Array<string> = Object.keys(latestProjAndAct);
   const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
 
   if (userInfo && userInfo.yearProjects) {
-    allProjects = availableProjects.concat(userInfo.yearProjects)
+    allProjects = Object.keys(latestProjAndAct).concat(userInfo.yearProjects);
   }
 
   switch (items.length) {
@@ -109,6 +113,22 @@ export function parseEventTitle(event, availableProjects: Array<string>) {
       if (items) {
         event.description = items.join(" - ");
       }
+  }
+
+  for (let i = 0; words.length > i; i++) {
+    console.log(words[i]);
+    if (allProjects.includes(words[i].toLowerCase())) {
+      event.project = words[i].toLowerCase();
+      for (let j = 0; words.length > j; j++) {
+        if (
+          latestProjAndAct[words[i].toLowerCase()].includes(
+            words[j].toLowerCase()
+          )
+        ) {
+          event.activity = words[j].toLowerCase();
+        }
+      }
+    }
   }
 
   return event;

@@ -428,9 +428,7 @@ export default function Home() {
                       onEditActivity={setTrackTimeModalActivity}
                       onDeleteActivity={onDeleteActivity}
                       selectedDate={selectedDate}
-                      availableProjects={
-                        latestProjAndAct ? Object.keys(latestProjAndAct) : []
-                      }
+                      latestProjAndAct={latestProjAndAct}
                       setSelectedDateReport={setSelectedDateReport}
                     />
                   </div>
