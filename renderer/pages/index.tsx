@@ -339,10 +339,12 @@ export default function Home() {
           tempActivities.push(activity);
           isPastTime = true;
         }
+
         if (!i && newActFrom < indexActFrom) {
           tempActivities.push(...selectedDateActivities);
           break;
         }
+
         if (newActFrom === indexActFrom) {
           tempActivities.push(activity);
           isPastTime = true;
@@ -385,6 +387,7 @@ export default function Home() {
       );
       console.log(activity);
     }
+
     setShouldAutosave(true);
   };
 
@@ -401,6 +404,21 @@ export default function Home() {
   const handleSave = (report: string, shouldAutosave: boolean) => {
     setSelectedDateReport(report);
     setShouldAutosave(shouldAutosave);
+  };
+
+  const setFocusOnNewActivityBtn = () => {
+    const newActivityBtn = document.getElementById("newActivityBtn");
+
+    if (newActivityBtn) {
+      setTimeout(() => {
+        newActivityBtn.focus();
+      }, 0);
+    }
+  };
+
+  const closeModalHandler = () => {
+    setTrackTimeModalActivity(null);
+    setFocusOnNewActivityBtn();
   };
 
   return (
@@ -490,7 +508,7 @@ export default function Home() {
           editedActivity={trackTimeModalActivity}
           latestProjAndAct={latestProjAndAct}
           latestProjAndDesc={latestProjAndDesc}
-          close={() => setTrackTimeModalActivity(null)}
+          close={closeModalHandler}
           submitActivity={submitActivity}
           selectedDate={selectedDate}
         />

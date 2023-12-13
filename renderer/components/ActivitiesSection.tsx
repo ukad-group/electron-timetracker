@@ -170,6 +170,7 @@ export default function ActivitiesSection({
 
         <div>
           <button
+            id="newActivityBtn"
             className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300 sm:rounded-b-lg dark:bg-dark-button-back-gray hover:dark:bg-dark-button-gray-hover dark:text-dark-heading"
             onClick={() => onEditActivity("new")}
           >
