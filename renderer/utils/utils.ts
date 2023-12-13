@@ -104,8 +104,16 @@ export function parseEventTitle(
       break;
 
     case 3:
+      if (allProjects.includes(items[1].toLowerCase())) {
+        const activities = latestProjAndAct[items[1].toLowerCase()];
+
+        if (activities && activities.includes(items[1].toLowerCase())) {
+          event.activity =
+            activities[activities.indexOf(items[1].toLowerCase())];
+        }
+      } else event.activity = items[1];
+
       event.project = items[0];
-      event.activity = items[1];
       event.description = items[2];
       break;
 
@@ -121,15 +129,12 @@ export function parseEventTitle(
 
       for (let j = 0; words.length > j; j++) {
         const activities = latestProjAndAct[words[i].toLowerCase()];
-        if (
-          latestProjAndAct[words[i].toLowerCase()].includes(
-            words[j].toLowerCase()
-          )
-        ) {
+        if (activities && activities.includes(words[j].toLowerCase())) {
           event.activity =
             activities[activities.indexOf(words[j].toLowerCase())];
         }
       }
+      break;
     }
   }
 
