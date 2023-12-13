@@ -116,9 +116,9 @@ export function parseEventTitle(
   }
 
   for (let i = 0; words.length > i; i++) {
-    console.log(words[i]);
     if (allProjects.includes(words[i].toLowerCase())) {
       event.project = words[i].toLowerCase();
+
       for (let j = 0; words.length > j; j++) {
         if (
           latestProjAndAct[words[i].toLowerCase()].includes(
