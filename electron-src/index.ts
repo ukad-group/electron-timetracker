@@ -121,8 +121,8 @@ ipcMain.on("dictionaty-update", (event, word: string) => {
 ipcMain.on("slack-redirect", (event, isDesktop: boolean) => {
   shell.openExternal(
     isDesktop
-      ? "slack://channel?team=T3PV37ANP&id=C05JN9P19G8"
-      : "https://ukad.slack.com/archives/C05JN9P19G8"
+      ? "slack://channel?team=T3PV37ANP&id=C069N5LUP3M"
+      : "https://ukad.slack.com/archives/C069N5LUP3M"
   );
 });
 
