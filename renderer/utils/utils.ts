@@ -120,12 +120,14 @@ export function parseEventTitle(
       event.project = words[i].toLowerCase();
 
       for (let j = 0; words.length > j; j++) {
+        const activities = latestProjAndAct[words[i].toLowerCase()];
         if (
           latestProjAndAct[words[i].toLowerCase()].includes(
             words[j].toLowerCase()
           )
         ) {
-          event.activity = words[j].toLowerCase();
+          event.activity =
+            activities[activities.indexOf(words[j].toLowerCase())];
         }
       }
     }
