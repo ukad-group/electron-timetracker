@@ -1,6 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import TrackTimeModal, { TrackTimeModalProps } from "./TrackTimeModal";
-import GoogleCalendarAddEventBtn from "../AddEventBtn";
 import "@testing-library/jest-dom";
 
 const mockedActivities = [
@@ -78,16 +77,17 @@ class ResizeObserver {
 describe("toInput prefilled value depends on the date", () => {
   window.ResizeObserver = ResizeObserver;
 
-  test("should be preffiled if today date", () => {
-    render(<TrackTimeModal {...mockedProps} />);
+  test("should be preffiled if today date", async () => {
+    await act(async () => render(<TrackTimeModal {...mockedProps} />));
+
     const toInput = screen.getByLabelText("To");
 
     expect(toInput).not.toHaveValue("");
   });
 
-  test("shouldn't be preffiled if not today date", () => {
+  test("shouldn't be preffiled if not today date", async () => {
     const mockedPropsYesterday = { ...mockedProps, selectedDate: yesterday };
-    render(<TrackTimeModal {...mockedPropsYesterday} />);
+    await act(async () => render(<TrackTimeModal {...mockedPropsYesterday} />));
     const toInput = screen.getByLabelText("To");
 
     expect(toInput).toHaveValue("");
@@ -95,8 +95,8 @@ describe("toInput prefilled value depends on the date", () => {
 });
 
 describe("durationInput changing", () => {
-  test("should changes toInput value correctly", () => {
-    render(<TrackTimeModal {...mockedProps} />);
+  test("should changes toInput value correctly", async () => {
+    await act(async () => render(<TrackTimeModal {...mockedProps} />));
 
     const durationInput = screen.getByLabelText("Duration");
     const toInput = screen.getByLabelText("To");

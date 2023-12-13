@@ -1,5 +1,5 @@
 .tooltip-wrapper {
-  @apply relative cursor-pointer inline-block;
+  @apply relative cursor-pointer inline-flex;
 }
 
 .tooltip {

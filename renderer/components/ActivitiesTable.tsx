@@ -97,9 +97,6 @@ export default function ActivitiesTable({
   const getActualEvents = (events) => {
     if (!events.length) return [];
 
-    const storedAddedEventsIds =
-      JSON.parse(localStorage.getItem("addedEventsIds")) || [];
-
     const actualEvents = events.filter((event) => {
       const { end } = event;
       const endDateTime =
@@ -108,14 +105,8 @@ export default function ActivitiesTable({
       const isOverlapped = activities.some((activity) => {
         return padStringToMinutes(activity.to) >= padStringToMinutes(to);
       });
-      const isAdded = storedAddedEventsIds.some((id) => id === event.id);
 
-      if (
-        !isAdded &&
-        event?.start?.dateTime &&
-        event?.end?.dateTime &&
-        !isOverlapped
-      ) {
+      if (event?.start?.dateTime && event?.end?.dateTime && !isOverlapped) {
         return event;
       }
     });
@@ -189,8 +180,8 @@ export default function ActivitiesTable({
       (event.ctrlKey && event.key === "ArrowUp") ||
       (event.key === "Meta" && event.key === "ArrowUp")
     ) {
-      if (tableActivities.length > 0) {
-        const lastActivity = tableActivities[tableActivities.length - 1];
+      if (nonBreakActivities.length > 0) {
+        const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
         onEditActivity(lastActivity);
       }
     }
@@ -388,7 +379,7 @@ export default function ActivitiesTable({
                 {activity.activity && (
                   <Tooltip>
                     <p
-                      className="block text-xs  font-semibold mt-1"
+                      className="block text-xs font-semibold mt-1 old-break-word "
                       onClick={copyToClipboardHandle}
                     >
                       {activity.activity}
@@ -404,7 +395,7 @@ export default function ActivitiesTable({
                 <Tooltip>
                   <p
                     onClick={copyToClipboardHandle}
-                    className={clsx({
+                    className={clsx("old-break-word", {
                       "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20":
                         activity.mistakes?.includes("startsWith!"),
                     })}

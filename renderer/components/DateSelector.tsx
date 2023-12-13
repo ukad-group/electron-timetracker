@@ -1,11 +1,18 @@
-import { Dispatch, SetStateAction, useEffect } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NavButtons from "./ui/NavButtons";
 import Button from "../components/ui/Button";
+import { getStringDate } from "../utils/datetime-ui";
+import ButtonTransparent from "./ui/ButtonTransparent";
+import { Square2StackIcon } from "@heroicons/react/24/outline";
+import Popup from "./ui/Popup";
+import { useMainStore } from "../store/mainStore";
+import { shallow } from "zustand/shallow";
 
 type DateSelectorProps = {
   isDropboxConnected: boolean;
   selectedDate: Date;
   setSelectedDate: Dispatch<SetStateAction<Date>>;
+  selectedDateReport: string;
 };
 
 const day = 60 * 60 * 24 * 1000;
@@ -14,8 +21,15 @@ export default function DateSelector({
   isDropboxConnected,
   selectedDate,
   setSelectedDate,
+  selectedDateReport,
 }: DateSelectorProps) {
   const today = new Date();
+  const [showModal, setShowModal] = useState(false);
+  const [reportsFolder, setReportsFolder] = useMainStore(
+    (state) => [state.reportsFolder, state.setReportsFolder],
+    shallow
+  );
+
   const increaseDate = () => {
     setSelectedDate((date) => new Date(date.getTime() + day));
   };
@@ -27,6 +41,7 @@ export default function DateSelector({
   const todayButtonHandle = () => {
     setSelectedDate(new Date());
   };
+
   const keydownHandler = (e: KeyboardEvent) => {
     if (e.ctrlKey && e.code === "Tab") {
       if (e.shiftKey) {
@@ -34,6 +49,30 @@ export default function DateSelector({
       } else {
         increaseDate();
       }
+    }
+  };
+
+  const writeTodayReport = () => {
+    global.ipcRenderer.invoke(
+      "app:write-day-report",
+      reportsFolder,
+      getStringDate(today),
+      selectedDateReport
+    );
+  };
+
+  const copyCurrentReport = async () => {
+    const todayReportExist = await global.ipcRenderer.invoke(
+      "app:check-exist-report",
+      reportsFolder,
+      getStringDate(today)
+    );
+
+    if (todayReportExist) {
+      setShowModal(true);
+    } else {
+      writeTodayReport();
+      setSelectedDate(today);
     }
   };
 
@@ -45,7 +84,7 @@ export default function DateSelector({
   }, []);
 
   return (
-    <div className="flex items-center justify-between px-4 py-5 sm:px-6">
+    <div className="flex items-center justify-between px-4 py-5 sm:px-6 relative">
       <div>
         <h1 className="text-lg flex items-center font-semibold leading-6 text-gray-900 dark:text-dark-heading">
           <time dateTime="2022-01-22" className="sm:hidden">
@@ -86,6 +125,13 @@ export default function DateSelector({
         </p>
       </div>
       <div className="flex gap-4">
+        {selectedDate.toDateString() !== new Date().toDateString() &&
+          selectedDateReport && (
+            <ButtonTransparent callback={copyCurrentReport}>
+              <Square2StackIcon className="w-5 h-5" />
+              Copy as today
+            </ButtonTransparent>
+          )}
         {selectedDate.toDateString() !== new Date().toDateString() && (
           <Button
             text="Go to current day"
@@ -95,6 +141,29 @@ export default function DateSelector({
         )}
         <NavButtons prevCallback={descreaseDate} nextCallback={increaseDate} />
       </div>
+      {showModal && (
+        <Popup
+          title="You already have a report for today"
+          description="Today's report will be overwritten"
+          left="20px"
+          buttons={[
+            {
+              text: "Ok",
+              color: "green",
+              callback: () => {
+                writeTodayReport();
+                setShowModal(false);
+                setSelectedDate(today);
+              },
+            },
+            {
+              text: "Cancel",
+              color: "gray",
+              callback: () => setShowModal(false),
+            },
+          ]}
+        />
+      )}
     </div>
   );
 }

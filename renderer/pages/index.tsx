@@ -16,6 +16,7 @@ import VersionMessage from "../components/ui/VersionMessages";
 import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
 import { useThemeStore } from "../store/themeStore";
+import { useBetaStore } from "../store/betaUpdatesStore";
 import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
@@ -27,7 +28,6 @@ export default function Home() {
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );
-
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [selectedDateActivities, setSelectedDateActivities] =
@@ -48,8 +48,12 @@ export default function Home() {
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
   const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const [isDropboxConnected, setIsDropboxConnected] = useState(true);
-  const [theme, setTheme] = useThemeStore(
+  const [theme] = useThemeStore(
     (state) => [state.theme, state.setTheme],
+    shallow
+  );
+  const [isBeta] = useBetaStore(
+    (state) => [state.isBeta, state.setIsBeta],
     shallow
   );
 
@@ -62,13 +66,17 @@ export default function Home() {
   }
 
   useEffect(() => {
+    global.ipcRenderer.send("start-folder-watcher", reportsFolder);
+
     global.ipcRenderer.send("check-dropbox-connection");
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
       setIsDropboxConnected(data);
     });
+    global.ipcRenderer.send("beta-channel", isBeta);
 
     return () => {
       global.ipcRenderer.removeAllListeners("dropbox-connection");
+      global.ipcRenderer.send("stop-path-watcher", reportsFolder);
     };
   }, []);
 
@@ -87,16 +95,21 @@ export default function Home() {
   }, [lastRenderedDay]);
 
   useEffect(() => {
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addListener(handleThemeChange);
+    const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
+
+    mediaQueryList.addListener(handleThemeChange);
+    setIsOSDarkTheme(mediaQueryList.matches);
 
     const mode =
-      (theme.os && isOSDarkTheme) || theme.custom === "dark"
+      (theme.os && isOSDarkTheme) || (!theme.os && theme.custom === "dark")
         ? "dark bg-dark-back"
         : "light bg-grey-100";
 
     document.body.className = mode;
+
+    return () => {
+      mediaQueryList.removeListener(handleThemeChange);
+    };
   }, [theme, isOSDarkTheme]);
 
   useEffect(() => {
@@ -155,6 +168,7 @@ export default function Home() {
       return;
     }
 
+    setReportAndNotes([]);
     setSelectedDateActivities([]);
   }, [selectedDateReport]);
 
@@ -244,7 +258,7 @@ export default function Home() {
     // }
     const tempActivities: Array<ReportActivity> = [];
     const newActFrom = stringToMinutes(activity.from);
-    const newActTo = stringToMinutes(activity.to);
+    // const newActTo = stringToMinutes(activity.to);
 
     if (!selectedDateActivities.length) {
       activity.id = 1;
@@ -288,12 +302,14 @@ export default function Home() {
             ) {
               activities.splice(activityIndex + 1, 1);
             }
-          } else if (
-            activities[activityIndex + 1] &&
-            newActTo > stringToMinutes(activities[activityIndex + 1].from)
-          ) {
-            activities[activityIndex + 1].from = activities[activityIndex].to;
           }
+          // timeshifting for the next registration (if collision occurs). Commented after alex request
+          // else if (
+          //   activities[activityIndex + 1] &&
+          //   newActTo > stringToMinutes(activities[activityIndex + 1].from)
+          // ) {
+          //   activities[activityIndex + 1].from = activities[activityIndex].to;
+          // }
 
           return [...activities];
         } catch (err) {
@@ -401,6 +417,7 @@ export default function Home() {
                       selectedDate={selectedDate}
                       setSelectedDate={setSelectedDate}
                       isDropboxConnected={isDropboxConnected}
+                      selectedDateReport={selectedDateReport}
                     />
                   </div>
                 </section>
@@ -414,6 +431,7 @@ export default function Home() {
                       availableProjects={
                         latestProjAndAct ? Object.keys(latestProjAndAct) : []
                       }
+                      setSelectedDateReport={setSelectedDateReport}
                     />
                   </div>
                 </section>
@@ -433,17 +451,26 @@ export default function Home() {
                   </div>
 
                   <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                    <Totals activities={selectedDateActivities} />
+                    <Totals
+                      selectedDate={selectedDate}
+                      selectedDateActivities={selectedDateActivities}
+                    />
                   </div>
-                  <UpdateDescription />
+                  <div className="hidden lg:block">
+                    <UpdateDescription />
+                  </div>
                 </div>
               </section>
-              <section className="lg:col-span-2">
+
+              <section className="lg:col-span-2 flex flex-col gap-6">
                 <Calendar
                   reportsFolder={reportsFolder}
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
                 />
+                <div className="lg:hidden">
+                  <UpdateDescription />
+                </div>
               </section>
             </>
           ) : (

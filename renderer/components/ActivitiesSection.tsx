@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { ClockIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import ActivitiesTable from "./ActivitiesTable";
 import { ReportActivity } from "../utils/reports";
 import { ErrorPlaceholder, RenderError } from "./ui/ErrorPlaceholder";
 import { PlusIcon } from "@heroicons/react/24/solid";
+import { Square2StackIcon } from "@heroicons/react/24/outline";
 import { loadGoogleEventsFromAllUsers } from "../utils/google";
 import { getOffice365Events } from "../utils/office365";
+import { checkIsToday, getStringDate } from "../utils/datetime-ui";
+import ButtonTransparent from "./ui/ButtonTransparent";
+import Popup from "./ui/Popup";
+import { useMainStore } from "../store/mainStore";
 import { shallow } from "zustand/shallow";
-import { useGoogleCalendarStore } from "../store/googleCalendarStore";
-import { checkIsToday } from "../utils/datetime-ui";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
@@ -16,11 +19,14 @@ type ActivitiesSectionProps = {
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
   availableProjects: Array<string>;
+  setSelectedDateReport: Dispatch<SetStateAction<String>>;
 };
 
 type PlaceholderProps = {
   onEditActivity: (activity: ReportActivity | "new") => void;
   backgroundError: string;
+  selectedDate: Date;
+  setSelectedDateReport: Dispatch<SetStateAction<String>>;
 };
 
 export default function ActivitiesSection({
@@ -29,6 +35,7 @@ export default function ActivitiesSection({
   onDeleteActivity,
   selectedDate,
   availableProjects,
+  setSelectedDateReport,
 }: ActivitiesSectionProps) {
   const [backgroundError, setBackgroundError] = useState("");
   const [events, setEvents] = useState([]);
@@ -49,31 +56,39 @@ export default function ActivitiesSection({
     }
   };
 
-  useEffect(() => {
-    let isAvailable = true;
-
+  const loadEvents = async (isAvailable: { isAvailable: boolean }) => {
     if (checkIsToday(selectedDate)) {
-      (async () => {
-        setIsLoading(true);
+      setIsLoading(true);
 
-        const googleEvents = isShowGoogleEvents
-          ? await loadGoogleEventsFromAllUsers()
-          : [];
-        const office365Events = isShowOffice365Events
-          ? await getOffice365Events()
-          : [];
-        const allEvents = [...googleEvents, ...office365Events];
+      const googleEvents = isShowGoogleEvents
+        ? await loadGoogleEventsFromAllUsers()
+        : [];
+      const office365Events = isShowOffice365Events
+        ? await getOffice365Events()
+        : [];
 
-        setIsLoading(false);
-        isAvailable && setEvents(allEvents);
-      })();
+      const allEvents = [...googleEvents, ...office365Events];
+
+      setIsLoading(false);
+      isAvailable.isAvailable && setEvents(allEvents);
     } else {
       setEvents([]);
     }
+  };
+
+  useEffect(() => {
+    const isAvailable = { isAvailable: true };
+
+    loadEvents(isAvailable);
+
+    global.ipcRenderer.on("window-focused", () => {
+      loadEvents(isAvailable);
+    });
 
     return () => {
       setIsLoading(false);
-      isAvailable = false;
+      isAvailable.isAvailable = false;
+      global.ipcRenderer.removeAllListeners("window-focused");
     };
   }, [selectedDate]);
 
@@ -107,6 +122,8 @@ export default function ActivitiesSection({
       <Placeholder
         onEditActivity={onEditActivity}
         backgroundError={backgroundError}
+        selectedDate={selectedDate}
+        setSelectedDateReport={setSelectedDateReport}
       />
     );
   }
@@ -167,7 +184,39 @@ export default function ActivitiesSection({
   );
 }
 
-function Placeholder({ onEditActivity, backgroundError }: PlaceholderProps) {
+function Placeholder({
+  onEditActivity,
+  backgroundError,
+  selectedDate,
+  setSelectedDateReport,
+}: PlaceholderProps) {
+  const [showModal, setShowModal] = useState(false);
+  const [reportsFolder, setReportsFolder] = useMainStore(
+    (state) => [state.reportsFolder, state.setReportsFolder],
+    shallow
+  );
+
+  const copyLastReport = async () => {
+    const prevDayReport = await global.ipcRenderer.invoke(
+      "app:find-last-report",
+      reportsFolder,
+      getStringDate(selectedDate)
+    );
+
+    if (prevDayReport) {
+      global.ipcRenderer.invoke(
+        "app:write-day-report",
+        reportsFolder,
+        getStringDate(selectedDate),
+        prevDayReport
+      );
+
+      setSelectedDateReport(prevDayReport);
+    } else {
+      setShowModal(true);
+    }
+  };
+
   return (
     <div className="py-6 text-center">
       {backgroundError && (
@@ -196,7 +245,7 @@ function Placeholder({ onEditActivity, backgroundError }: PlaceholderProps) {
       <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
         Get started by tracking some activity
       </p>
-      <div className="mt-6">
+      <div className="mt-6 mb-2">
         <button
           onClick={() => onEditActivity("new")}
           type="button"
@@ -209,6 +258,25 @@ function Placeholder({ onEditActivity, backgroundError }: PlaceholderProps) {
           or press ctrl + space
         </span>
       </div>
+      <ButtonTransparent callback={copyLastReport}>
+        <Square2StackIcon className="w-5 h-5" />
+        Copy last report
+      </ButtonTransparent>
+      {showModal && (
+        <Popup
+          title="Failed to copy last report"
+          description="Either the last report is empty or you haven't written it for too long"
+          left="25%"
+          top="160px"
+          buttons={[
+            {
+              text: "Ok",
+              color: "green",
+              callback: () => setShowModal(false),
+            },
+          ]}
+        />
+      )}
     </div>
   );
 }
