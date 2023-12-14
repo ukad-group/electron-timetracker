@@ -149,7 +149,7 @@ const Bookings = ({ calendarDate }: BookingProps) => {
       timetrackerUserName
     );
 
-    if (bookedProjects?.length === 0) {
+    if (!bookedProjects || bookedProjects?.length === 0) {
       setBookedProjects([]);
       setBookedSpentStatistic([]);
       return;
