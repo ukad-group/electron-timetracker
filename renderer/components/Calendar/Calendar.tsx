@@ -32,24 +32,10 @@ import {
   getStringDate,
   getWeekNumber,
   isTheSameDates,
+  MONTHS,
 } from "../../utils/datetime-ui";
 import { loadHolidaysAndVacations } from "./calendar-utils";
 import { BookingFromApi } from "../Bookings";
-
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-] as const;
 
 type CalendarProps = {
   reportsFolder: string;

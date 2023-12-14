@@ -1,27 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useMainStore } from "../store/mainStore";
 import { shallow } from "zustand/shallow";
-import { getStringDate } from "../utils/datetime-ui";
+import { getStringDate, MONTHS } from "../utils/datetime-ui";
 import { ReportActivity, formatDuration, parseReport } from "../utils/reports";
 import { ParsedReport, TTUserInfo } from "./Calendar/Calendar";
 import Loader from "./ui/Loader";
 
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-] as const;
-
-type BookingProps = {
+type BookingsProps = {
   calendarDate: Date;
 };
 
@@ -38,8 +23,8 @@ type BookedSpentStat = {
   spent: number;
 };
 
-const Bookings = ({ calendarDate }: BookingProps) => {
-  const [timetrackerLooged, setTimetrackerLooged] = useState(false);
+const Bookings = ({ calendarDate }: BookingsProps) => {
+  const [isTimetrackerLooged, setIsTimetrackerLooged] = useState(false);
   const [bookedProjects, setBookedProjects] = useState<BookingFromApi[]>([]);
   const [bookedSpentStatistic, setBookedSpentStatistic] = useState<
     BookedSpentStat[]
@@ -139,7 +124,7 @@ const Bookings = ({ calendarDate }: BookingProps) => {
 
     if (!TTUserInfo) return;
 
-    setTimetrackerLooged(true);
+    setIsTimetrackerLooged(true);
 
     const timetrackerCookie = TTUserInfo?.TTCookie;
     const timetrackerUserName = TTUserInfo?.name;
@@ -197,7 +182,7 @@ const Bookings = ({ calendarDate }: BookingProps) => {
           <Loader />
         </div>
       )}
-      {timetrackerLooged ? (
+      {isTimetrackerLooged ? (
         <div className="relative overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="text-gray-900 dark:text-dark-heading border-b dark:border-gray-700">
