@@ -28,7 +28,7 @@ const SettingsPage = () => {
   );
   const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const [currentMenuItem, setCurrentMenuItem] = useState<SidebarNavItem>(
-    SidebarNavItem.ReportsFolder
+    SidebarNavItem.Connections
   );
 
   useEffect(() => {
