@@ -29,7 +29,7 @@ type ActivitiesTableProps = {
   onEditActivity: (activity: ReportActivity) => void;
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
-  availableProjects: string[];
+  latestProjAndAct: Record<string, [string]>;
   events: ReportActivity[];
   isLoading: boolean;
 };
@@ -40,7 +40,7 @@ export default function ActivitiesTable({
   activities,
   onEditActivity,
   selectedDate,
-  availableProjects,
+  latestProjAndAct,
   events,
   isLoading,
 }: ActivitiesTableProps) {
@@ -77,7 +77,7 @@ export default function ActivitiesTable({
       const from = getTimeFromEventObj(startDateTime);
       const to = getTimeFromEventObj(endDateTime);
 
-      event = parseEventTitle(event, availableProjects);
+      event = parseEventTitle(event, latestProjAndAct);
 
       return {
         from: from,
@@ -129,10 +129,12 @@ export default function ActivitiesTable({
       if (
         Object.keys(scheduledEvents).includes(formattedEvents[i].description)
       ) {
-        formattedEvents[i].project =
-          scheduledEvents[formattedEvents[i].description].project;
-        formattedEvents[i].activity =
-          scheduledEvents[formattedEvents[i].description].activity;
+        formattedEvents[i].project = formattedEvents[i].project
+          ? formattedEvents[i].project
+          : scheduledEvents[formattedEvents[i].description].project;
+        formattedEvents[i].activity = formattedEvents[i].activity
+          ? formattedEvents[i].activity
+          : scheduledEvents[formattedEvents[i].description].activity;
       }
     }
     return formattedEvents && formattedEvents.length > 0

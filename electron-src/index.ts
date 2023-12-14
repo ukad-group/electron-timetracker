@@ -121,8 +121,8 @@ ipcMain.on("dictionaty-update", (event, word: string) => {
 ipcMain.on("slack-redirect", (event, isDesktop: boolean) => {
   shell.openExternal(
     isDesktop
-      ? "slack://channel?team=T3PV37ANP&id=C05JN9P19G8"
-      : "https://ukad.slack.com/archives/C05JN9P19G8"
+      ? "slack://channel?team=T3PV37ANP&id=C069N5LUP3M"
+      : "https://ukad.slack.com/archives/C069N5LUP3M"
   );
 });
 
@@ -147,8 +147,13 @@ const generateWindow = () => {
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.on("close", (event) => {
-      event.preventDefault();
-      mainWindow?.hide();
+      if (
+        process.platform !== "darwin" ||
+        (process.platform === "darwin" && mainWindow?.isVisible())
+      ) {
+        event.preventDefault();
+        mainWindow?.hide();
+      }
     });
   }
   mainWindow.webContents.session.setSpellCheckerLanguages(["en-US"]);
@@ -270,6 +275,8 @@ app.on("ready", async () => {
   if (mainWindow) {
     app.whenReady().then(() => {
       autoUpdater.checkForUpdates();
+      if (process.platform === "darwin") return;
+
       try {
         generateTray();
       } catch (err) {
@@ -426,6 +433,10 @@ app.on("ready", async () => {
   mainWindow?.on("focus", () => {
     mainWindow?.webContents.send("window-focused");
   });
+});
+
+app.on("activate", () => {
+  if (process.platform === "darwin") mainWindow?.show();
 });
 
 app.on("window-all-closed", () => {
