@@ -343,6 +343,7 @@ export default function Home() {
           tempActivities.push(...selectedDateActivities);
           break;
         }
+        // // rewriting activity if start time the same. Commented after arthur request
         // if (newActFrom === indexActFrom) {
         //   tempActivities.push(activity);
         //   isPastTime = true;
