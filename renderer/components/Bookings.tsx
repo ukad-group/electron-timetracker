@@ -24,7 +24,7 @@ type BookedSpentStat = {
 };
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
-  const [isTimetrackerLoogged, setIsTimetrackerLoogged] = useState(false);
+  const [isTimetrackerLogged, setIsTimetrackerLogged] = useState(false);
   const [bookedProjects, setBookedProjects] = useState<BookingFromApi[]>([]);
   const [bookedSpentStatistic, setBookedSpentStatistic] = useState<
     BookedSpentStat[]
@@ -124,7 +124,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
     if (!TTUserInfo) return;
 
-    setIsTimetrackerLoogged(true);
+    setIsTimetrackerLogged(true);
 
     const timetrackerCookie = TTUserInfo?.TTCookie;
     const timetrackerUserName = TTUserInfo?.name;
@@ -182,7 +182,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
           <Loader />
         </div>
       )}
-      {isTimetrackerLoogged ? (
+      {isTimetrackerLogged ? (
         <div className="relative overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="text-gray-900 dark:text-dark-heading border-b dark:border-gray-700">
