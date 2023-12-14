@@ -79,7 +79,8 @@ export default function AutocompleteSelector({
               accumulator.push(current);
             }
             return accumulator;
-          }, []);
+          }, [])
+          .slice(0, 15);
 
   const handleKey = (event) => {
     if (event.key === "Home") {
