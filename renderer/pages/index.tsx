@@ -22,6 +22,7 @@ import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 import { getStringDate } from "../utils/datetime-ui";
 import Totals from "../components/Totals";
+import Bookings from "../components/Bookings";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -32,6 +33,7 @@ export default function Home() {
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [selectedDateActivities, setSelectedDateActivities] =
     useState<Array<ReportActivity> | null>([]);
+  const [calendarDate, setCalendarDate] = useState(new Date());
   const [shouldAutosave, setShouldAutosave] = useState(false);
   const [trackTimeModalActivity, setTrackTimeModalActivity] = useState<
     ReportActivity | "new"
@@ -456,6 +458,7 @@ export default function Home() {
                       selectedDateActivities={selectedDateActivities}
                     />
                   </div>
+                  <Bookings calendarDate={calendarDate} />
                   <div className="hidden lg:block">
                     <UpdateDescription />
                   </div>
@@ -467,6 +470,8 @@ export default function Home() {
                   reportsFolder={reportsFolder}
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
+                  calendarDate={calendarDate}
+                  setCalendarDate={setCalendarDate}
                 />
                 <div className="lg:hidden">
                   <UpdateDescription />

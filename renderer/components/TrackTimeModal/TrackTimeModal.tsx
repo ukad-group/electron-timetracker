@@ -232,8 +232,7 @@ export default function TrackTimeModal({
         };
 
         localStorage.setItem("timetracker-user", JSON.stringify(updatedUser));
-        getTimetrackerYearProjects();
-        return;
+        return await getTimetrackerYearProjects();
       }
 
       const updatedUserInfo = {

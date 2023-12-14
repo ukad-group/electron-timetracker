@@ -34,6 +34,7 @@ import {
   getTimetrackerProjects,
   getTimetrackerVacations,
   getRefreshedUserInfoToken,
+  getTimetrackerBookings,
 } from "./TimetrackerWebsiteApi";
 import { exec } from "child_process";
 import {
@@ -692,6 +693,24 @@ ipcMain.on("app:load-offline-page", async () => {
   mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
 });
 
+ipcMain.handle(
+  "app:find-month-projects",
+  (event, reportsFolder: string, stringDate: string) => {
+    if (!reportsFolder || !stringDate.length) return [];
+
+    const date = new Date(stringDate);
+    const year = date.getFullYear().toString();
+    const currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
+    const queries = [year + currentMonth];
+
+    return searchReadFiles(reportsFolder, queries, year);
+  }
+);
+
+ipcMain.on("app:load-offline-page", async () => {
+  mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
+});
+
 // TRELLO FUNCTIONS
 
 const getTrelloOptions = () => {
@@ -914,3 +933,10 @@ ipcMain.handle("timetracker:login", async (event, idToken: string) => {
 ipcMain.handle("timetracker:get-projects", async (event, cookie: string) => {
   return await getTimetrackerProjects(cookie);
 });
+
+ipcMain.handle(
+  "timetracker:get-bookings",
+  async (event, cookie: string, name: string, calendarDate: Date) => {
+    return await getTimetrackerBookings(cookie, name, calendarDate);
+  }
+);
