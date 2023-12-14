@@ -36,12 +36,17 @@ export const removeJiraStoredUser = (userId: string) => {
 
 export const updateJiraStoredUser = (
   userId: string,
-  newAccessToken: string
+  newAccessToken: string,
+  newRefreshToken: string
 ) => {
   const storedUsers = JSON.parse(localStorage.getItem("jira-users")) || [];
   const updatedUsers = storedUsers.map((user: JiraUser) => {
     if (user.userId === userId) {
-      return { ...user, accessToken: newAccessToken };
+      return {
+        ...user,
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      };
     } else {
       return user;
     }
@@ -91,15 +96,15 @@ export const getJiraResourcesByUser = async (
   if (resources?.code === 401) {
     const data = await updateJiraAccessToken(refreshToken);
 
-    if (!data?.access_token) {
+    if (!data?.access_token || !data?.refresh_token) {
       removeJiraStoredUser(userId);
       return;
     } else {
-      updateJiraStoredUser(userId, data.access_token);
+      updateJiraStoredUser(userId, data.access_token, data.refresh_token);
 
       return await getJiraResourcesByUser(
         data.access_token,
-        refreshToken,
+        data.refresh_token,
         userId,
         nickname
       );
@@ -117,7 +122,9 @@ export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
 
     let cardsPromises = [];
 
-    resourcesData.map(async (item) => {
+    resourcesData.forEach(async (item) => {
+      if (!item) return;
+
       const { resources, accessToken, assignee } = item;
 
       if (accessToken && assignee && resources.length > 0) {

@@ -16,6 +16,7 @@ import VersionMessage from "../components/ui/VersionMessages";
 import UpdateDescription from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
 import { useThemeStore } from "../store/themeStore";
+import { useBetaStore } from "../store/betaUpdatesStore";
 import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
@@ -51,6 +52,10 @@ export default function Home() {
     (state) => [state.theme, state.setTheme],
     shallow
   );
+  const [isBeta] = useBetaStore(
+    (state) => [state.isBeta, state.setIsBeta],
+    shallow
+  );
 
   function handleThemeChange(e) {
     if (e.matches) {
@@ -67,6 +72,7 @@ export default function Home() {
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
       setIsDropboxConnected(data);
     });
+    global.ipcRenderer.send("beta-channel", isBeta);
 
     return () => {
       global.ipcRenderer.removeAllListeners("dropbox-connection");
@@ -333,10 +339,12 @@ export default function Home() {
           tempActivities.push(activity);
           isPastTime = true;
         }
+
         if (!i && newActFrom < indexActFrom) {
           tempActivities.push(...selectedDateActivities);
           break;
         }
+
         if (newActFrom === indexActFrom) {
           tempActivities.push(activity);
           isPastTime = true;
@@ -379,6 +387,7 @@ export default function Home() {
       );
       console.log(activity);
     }
+
     setShouldAutosave(true);
   };
 
@@ -395,6 +404,21 @@ export default function Home() {
   const handleSave = (report: string, shouldAutosave: boolean) => {
     setSelectedDateReport(report);
     setShouldAutosave(shouldAutosave);
+  };
+
+  const setFocusOnNewActivityBtn = () => {
+    const newActivityBtn = document.getElementById("newActivityBtn");
+
+    if (newActivityBtn) {
+      setTimeout(() => {
+        newActivityBtn.focus();
+      }, 0);
+    }
+  };
+
+  const closeModalHandler = () => {
+    setTrackTimeModalActivity(null);
+    setFocusOnNewActivityBtn();
   };
 
   return (
@@ -445,10 +469,7 @@ export default function Home() {
                   </div>
 
                   <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                    <Totals
-                      selectedDate={selectedDate}
-                      selectedDateActivities={selectedDateActivities}
-                    />
+                    <Totals selectedDate={selectedDate} />
                   </div>
                   <div className="hidden lg:block">
                     <UpdateDescription />
@@ -473,7 +494,7 @@ export default function Home() {
         </div>
         <Link
           href="/settings"
-          className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold before:dark:text-blue-700/50"
+          className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold before:dark:text-gray-100"
         >
           <span className="w-8 flex items-center justify-center text-white ">
             <Cog8ToothIcon />
@@ -487,7 +508,7 @@ export default function Home() {
           editedActivity={trackTimeModalActivity}
           latestProjAndAct={latestProjAndAct}
           latestProjAndDesc={latestProjAndDesc}
-          close={() => setTrackTimeModalActivity(null)}
+          close={closeModalHandler}
           submitActivity={submitActivity}
           selectedDate={selectedDate}
         />

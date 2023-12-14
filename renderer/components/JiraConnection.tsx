@@ -3,7 +3,7 @@ import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import Button from "./ui/Button";
 import isOnline from "is-online";
 import { JiraUser } from "../utils/jira";
-import { ExclamationCircleIcon, ExclamationTriangleIcon, FlagIcon, LightBulbIcon } from "@heroicons/react/24/outline";
+import { FlagIcon } from "@heroicons/react/24/outline";
 
 const JiraConnection = () => {
   const [users, setUsers] = useState(
