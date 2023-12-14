@@ -32,13 +32,13 @@ interface Total extends Activity {
 
 type PeriodName = "day" | "week" | "month";
 
-const totalPeriods = [
+const TOTAL_PERIODS = [
   { id: 0, name: "day" },
   { id: 1, name: "week" },
   { id: 2, name: "month" },
 ];
 
-const Totals = ({ selectedDate, selectedDateActivities }) => {
+const Totals = ({ selectedDate }) => {
   const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
@@ -303,7 +303,7 @@ const Totals = ({ selectedDate, selectedDateActivities }) => {
             value={period}
             onChange={(e) => onChangeRange(e.target.value as PeriodName)}
           >
-            {totalPeriods.map((range) => (
+            {TOTAL_PERIODS.map((range) => (
               <option key={range.id} value={range.name}>
                 {range.name}
               </option>
@@ -314,67 +314,71 @@ const Totals = ({ selectedDate, selectedDateActivities }) => {
 
       {totals.length > 0 && (
         <div className="flex flex-col gap-2 pt-2">
-          {totals.map((total) => (
-            <div key={total.id} className="flex flex-col gap-1">
-              <div className="flex items-center gap-2 text-sm text-gray-700 font-semibold dark:text-dark-main">
-                <div
-                  className={clsx(
-                    "flex items-center gap-1",
-                    {
-                      "ml-5": total.activities.length <= 1,
-                    },
-                    {
-                      "hover:text-gray-400 dark:hover:text-white ml-0 cursor-pointer":
-                        total.activities.length > 1,
-                    }
-                  )}
-                  onClick={() => {
-                    toggleActivitiesList(total.name);
-                  }}
-                >
-                  {total.activities.length > 1 && (
-                    <ChevronRightIcon
-                      className={clsx("w-4 h-4", {
-                        "rotate-90": isShowedActivitiesList(total.name),
-                      })}
-                    />
-                  )}
-                  <span>
-                    {total.name} - {formatDuration(total.duration)}
-                  </span>
-                </div>
-                {period === "day" && (
-                  <>
-                    <Tooltip>
-                      <button
-                        className="group"
-                        title="Copy project descriptions without time"
-                        onClick={() =>
-                          copyDescriptionsHandler(total.descriptions, false)
-                        }
-                      >
-                        <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                      </button>
-                    </Tooltip>
-                    <Tooltip>
-                      <button
-                        className="group"
-                        title="Copy project descriptions with time"
-                        onClick={() =>
-                          copyDescriptionsHandler(total.descriptions, true)
-                        }
-                      >
-                        <DocumentPlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                      </button>
-                    </Tooltip>
-                  </>
-                )}
-              </div>
+          {totals.map(({ id, name, duration, activities, descriptions }) => {
+            const showActivity =
+              activities.length > 1 ||
+              (activities.length === 1 && activities[0].name.length > 0);
 
-              {isShowedActivitiesList(total.name) &&
-                total.activities.length > 1 && (
+            return (
+              <div key={id} className="flex flex-col gap-1">
+                <div className="flex items-center gap-2 text-sm text-gray-700 font-semibold dark:text-dark-main">
+                  <div
+                    className={clsx(
+                      "flex items-center gap-1",
+                      {
+                        "ml-5": !showActivity,
+                      },
+                      {
+                        "hover:text-gray-400 dark:hover:text-white ml-0 cursor-pointer":
+                          showActivity,
+                      }
+                    )}
+                    onClick={() => {
+                      toggleActivitiesList(name);
+                    }}
+                  >
+                    {showActivity && (
+                      <ChevronRightIcon
+                        className={clsx("w-4 h-4", {
+                          "rotate-90": isShowedActivitiesList(name),
+                        })}
+                      />
+                    )}
+                    <span>
+                      {name} - {formatDuration(duration)}
+                    </span>
+                  </div>
+                  {period === "day" && (
+                    <>
+                      <Tooltip>
+                        <button
+                          className="group"
+                          title="Copy project descriptions without time"
+                          onClick={() =>
+                            copyDescriptionsHandler(descriptions, false)
+                          }
+                        >
+                          <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                        </button>
+                      </Tooltip>
+                      <Tooltip>
+                        <button
+                          className="group"
+                          title="Copy project descriptions with time"
+                          onClick={() =>
+                            copyDescriptionsHandler(descriptions, true)
+                          }
+                        >
+                          <DocumentPlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                        </button>
+                      </Tooltip>
+                    </>
+                  )}
+                </div>
+
+                {isShowedActivitiesList(name) && showActivity && (
                   <div className="flex flex-col gap-1">
-                    {total.activities.map((activity) => (
+                    {activities.map((activity) => (
                       <div
                         key={activity.id}
                         className="flex items-center gap-2 text-sm text-gray-700 font-semibold dark:text-dark-main"
@@ -422,8 +426,9 @@ const Totals = ({ selectedDate, selectedDateActivities }) => {
                     ))}
                   </div>
                 )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
       )}
 

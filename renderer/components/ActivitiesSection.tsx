@@ -18,7 +18,7 @@ type ActivitiesSectionProps = {
   onEditActivity: (activity: ReportActivity | "new") => void;
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
-  availableProjects: Array<string>;
+  latestProjAndAct: Record<string, [string]>;
   setSelectedDateReport: Dispatch<SetStateAction<String>>;
 };
 
@@ -34,7 +34,7 @@ export default function ActivitiesSection({
   activities,
   onDeleteActivity,
   selectedDate,
-  availableProjects,
+  latestProjAndAct,
   setSelectedDateReport,
 }: ActivitiesSectionProps) {
   const [backgroundError, setBackgroundError] = useState("");
@@ -153,7 +153,7 @@ export default function ActivitiesSection({
             activities={activities}
             onDeleteActivity={onDeleteActivity}
             selectedDate={selectedDate}
-            availableProjects={availableProjects}
+            latestProjAndAct={latestProjAndAct}
             events={events}
             isLoading={isLoading}
           />
@@ -170,6 +170,7 @@ export default function ActivitiesSection({
 
         <div>
           <button
+            id="newActivityBtn"
             className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300 sm:rounded-b-lg dark:bg-dark-button-back-gray hover:dark:bg-dark-button-gray-hover dark:text-dark-heading"
             onClick={() => onEditActivity("new")}
           >
