@@ -280,6 +280,7 @@ export function validation(activities: Array<ReportActivity>) {
     for (let i = 0; i < activities.length; i++) {
       const [toHours, toMinutes] = activities[i].to.split(":");
       const [fromHours, fromMinutes] = activities[i].from.split(":");
+      
       if (
         i > 0 &&
         checkIntersection(activities[i - 1].to, activities[i].from)
