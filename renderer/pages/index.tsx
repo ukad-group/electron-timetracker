@@ -344,13 +344,13 @@ export default function Home() {
           tempActivities.push(...selectedDateActivities);
           break;
         }
-
-        if (newActFrom === indexActFrom) {
-          tempActivities.push(activity);
-          isPastTime = true;
-          activity.isValid = true;
-          continue;
-        }
+        // // rewriting activity if start time the same. Commented after arthur request
+        // if (newActFrom === indexActFrom) {
+        //   tempActivities.push(activity);
+        //   isPastTime = true;
+        //   activity.isValid = true;
+        //   continue;
+        // }
       } catch (err) {
         global.ipcRenderer.send(
           "front error",
