@@ -129,10 +129,12 @@ export default function ActivitiesTable({
       if (
         Object.keys(scheduledEvents).includes(formattedEvents[i].description)
       ) {
-        formattedEvents[i].project =
-          scheduledEvents[formattedEvents[i].description].project;
-        formattedEvents[i].activity =
-          scheduledEvents[formattedEvents[i].description].activity;
+        formattedEvents[i].project = formattedEvents[i].project
+          ? formattedEvents[i].project
+          : scheduledEvents[formattedEvents[i].description].project;
+        formattedEvents[i].activity = formattedEvents[i].activity
+          ? formattedEvents[i].activity
+          : scheduledEvents[formattedEvents[i].description].activity;
       }
     }
     return formattedEvents && formattedEvents.length > 0
