@@ -13,6 +13,7 @@ import BetaToggle from "../components/ui/BetaToggle";
 import JiraConnection from "../components/JiraConnection";
 import MenuItem from "../components/ui/MenuItem";
 import ButtonTransparent from "../components/ui/ButtonTransparent";
+import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 
 enum SidebarNavItem {
   Connections = "Connections",
@@ -76,7 +77,7 @@ const SettingsPage = () => {
 
   return (
     <div className="w-full overflow-hidden h-screen bg-gray-100 dark:bg-dark-back">
-      <div className="h-full overflow-hidden mx-auto sm:px-6 max-w-3xl lg:max-w-[1200px] flex flex-col gap-6 px-6 py-10 dark:bg-dark-back">
+      <div className="h-full overflow-hidden mx-auto sm:px-6 max-w-3xl lg:max-w-[1400px] flex flex-col gap-6 px-6 py-10 dark:bg-dark-back">
         <div className="h-full overflow-hidden flex flex-col gap-6 bg-white shadow sm:rounded-lg p-6 dark:bg-dark-container dark:border-dark-border">
           <div className="flex items-center justify-between gap-6">
             <div className="flex flex-col">
@@ -88,7 +89,9 @@ const SettingsPage = () => {
               </span>
             </div>
             <Link href="/">
-              <ButtonTransparent>Back</ButtonTransparent>
+              <ButtonTransparent>
+                <ChevronLeftIcon className="w-5 h-5" /> Back
+              </ButtonTransparent>
             </Link>
           </div>
           <div className="border dark:border-dark-form-border"></div>
