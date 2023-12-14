@@ -91,22 +91,22 @@ export function parseEventTitle(
 
     case 1:
       for (let i = 0; words.length > i; i++) {
+        const project = words[i].toLowerCase();
 
-        if (allProjects.includes(words[i].toLowerCase())) {
-          event.project = words[i].toLowerCase();
-
+        if (allProjects.includes(project)) {
+          event.project = project;
           for (let j = 0; words.length > j; j++) {
-            const activities = latestProjAndAct[words[i].toLowerCase()];
+            const activities = latestProjAndAct[project];
             if (activities && activities.includes(words[j].toLowerCase())) {
               event.activity =
                 activities[activities.indexOf(words[j].toLowerCase())];
             }
           }
           break;
-        } 
+        }
       }
 
-      event.description = items[0]
+      event.description = items[0];
       break;
 
     case 2:
@@ -120,18 +120,21 @@ export function parseEventTitle(
       break;
 
     case 3:
-      if (allProjects.includes(items[1].toLowerCase())) {
-        const activities = latestProjAndAct[items[1].toLowerCase()];
+      const project = items[0].toLowerCase();
+      const activity = items[1];
+      const description = items[2];
 
-        if (activities && activities.includes(items[1].toLowerCase())) {
+      if (allProjects.includes(project)) {
+        const activities = latestProjAndAct[project];
+
+        if (activities && activities.includes(activity.toLowerCase())) {
           event.activity =
-            activities[activities.indexOf(items[1].toLowerCase())];
-        } else event.activity = items[1];
-  
-      } else event.activity = items[1];
+            activities[activities.indexOf(activity.toLowerCase())];
+        } else event.activity = activity;
+      } else event.activity = activity;
 
-      event.project = items[0];
-      event.description = items[2];
+      event.project = project;
+      event.description = description;
       break;
 
     default:
@@ -139,8 +142,6 @@ export function parseEventTitle(
         event.description = items.join(" - ");
       }
   }
-
-  
 
   return event;
 }
