@@ -25,6 +25,7 @@ type Card = {
   id: string;
   name: string;
   shortUrl: string;
+  idMembers: string[];
 };
 
 type Member = {
@@ -32,13 +33,25 @@ type Member = {
   username: string;
 };
 
-export const getMember = async (
-  token: string,
-  options: Options
-): Promise<Member> => {
+type Board = {
+  id: string;
+};
+
+type ReturnedCardsData = {
+  assignedCards: Card[];
+  notAssignedCards: Card[];
+};
+
+export const getTrelloMember = async ({
+  accessToken,
+  options,
+}: {
+  accessToken: string;
+  options: Options;
+}): Promise<Member> => {
   try {
     const response = await fetch(
-      `https://api.trello.com/1/members/me?key=${options.key}&token=${token}`
+      `https://api.trello.com/1/members/me?key=${options.key}&token=${accessToken}`
     );
 
     const data = await response.json();
@@ -49,26 +62,42 @@ export const getMember = async (
   }
 };
 
-export const getCardsOfMember = async (
-  token: string,
-  options: Options
-): Promise<Card[]> => {
+export const getTrelloCardsOfAllBoards = async ({
+  memberId,
+  options,
+  accessToken,
+}: {
+  memberId: string;
+  options: Options;
+  accessToken: string;
+}): Promise<ReturnedCardsData> => {
   try {
-    const member = await getMember(token, options);
-
     const response = await fetch(
-      `https://api.trello.com/1/members/${member.id}/cards?key=${options.key}&token=${token}`
+      `https://api.trello.com/1/members/${memberId}/boards?key=${options.key}&token=${accessToken}`
+    );
+    const boards = await response.json();
+    const cardsListsPromises = boards.map(async (board: Board) => {
+      return await fetch(
+        `https://api.trello.com/1/boards/${board.id}/cards?key=${options.key}&token=${accessToken}`
+      );
+    });
+
+    const cardsListsResponses = await Promise.all(cardsListsPromises);
+    const cardsLists = await Promise.all(
+      cardsListsResponses.map(async (list) => await list.json())
+    );
+    const cards = cardsLists.reduce((acc, item) => [...acc, ...item], []);
+    const assignedCards = cards.filter((card: Card) =>
+      card?.idMembers?.includes(memberId)
+    );
+    const notAssignedCards = cards.filter(
+      (card: Card) => !card?.idMembers?.includes(memberId)
     );
 
-    const data = await response.json();
-
-    if (data && data.length > 0) {
-      return data;
-    }
-
-    return [];
+    return { assignedCards, notAssignedCards };
   } catch (error) {
-    console.error("Error fetching cards of a member:", error);
-    throw error;
+    console.error("Error fetching Trello cards of all member's boards:", error);
+
+    return { assignedCards: [], notAssignedCards: [] };
   }
 };

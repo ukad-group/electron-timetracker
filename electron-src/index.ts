@@ -20,8 +20,8 @@ import {
   getTokens,
 } from "./helpers/API/office365Api";
 import {
-  getCardsOfMember,
-  getMember,
+  getTrelloCardsOfAllBoards,
+  getTrelloMember,
   getTrelloAuthUrl,
 } from "./helpers/API/trelloApi";
 import {
@@ -713,15 +713,18 @@ ipcMain.handle(
   async (event, accessToken: string) => {
     const options = getTrelloOptions();
 
-    return await getMember(accessToken, options);
+    return await getTrelloMember({ accessToken, options });
   }
 );
 
-ipcMain.handle("trello:get-cards", async (event, accessToken: string) => {
-  const options = getTrelloOptions();
+ipcMain.handle(
+  "trello:get-cards-of-all-boards",
+  async (event, memberId: string, accessToken: string) => {
+    const options = getTrelloOptions();
 
-  return await getCardsOfMember(accessToken, options);
-});
+    return await getTrelloCardsOfAllBoards({ memberId, accessToken, options });
+  }
+);
 
 // JIRA FUNCTIONS
 

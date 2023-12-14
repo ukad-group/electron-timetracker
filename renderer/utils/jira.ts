@@ -1,4 +1,5 @@
 import { Office365User } from "./office365";
+import { replaceHyphensWithSpaces } from "./utils";
 
 export interface JiraUser extends Office365User {
   nickname: string;
@@ -53,6 +54,16 @@ export const updateJiraStoredUser = (
   });
 
   localStorage.setItem("jira-users", JSON.stringify(updatedUsers));
+};
+
+export const getJiraCardsFromAPI = async () => {
+  const resourcesData = await getJiraResources();
+  const jiraCardsFromApi = await getAllJiraCards(resourcesData);
+  const newjiraCardsFromApi = jiraCardsFromApi.map((card) =>
+    replaceHyphensWithSpaces(`JI:: ${card}`)
+  );
+
+  return newjiraCardsFromApi;
 };
 
 export const getJiraResources = async () => {
