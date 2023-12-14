@@ -90,7 +90,23 @@ export function parseEventTitle(
       break;
 
     case 1:
-      event.description = items[0];
+      for (let i = 0; words.length > i; i++) {
+
+        if (allProjects.includes(words[i].toLowerCase())) {
+          event.project = words[i].toLowerCase();
+
+          for (let j = 0; words.length > j; j++) {
+            const activities = latestProjAndAct[words[i].toLowerCase()];
+            if (activities && activities.includes(words[j].toLowerCase())) {
+              event.activity =
+                activities[activities.indexOf(words[j].toLowerCase())];
+            }
+          }
+          break;
+        } 
+      }
+
+      event.description = items[0]
       break;
 
     case 2:
@@ -110,7 +126,8 @@ export function parseEventTitle(
         if (activities && activities.includes(items[1].toLowerCase())) {
           event.activity =
             activities[activities.indexOf(items[1].toLowerCase())];
-        }
+        } else event.activity = items[1];
+  
       } else event.activity = items[1];
 
       event.project = items[0];
@@ -123,20 +140,7 @@ export function parseEventTitle(
       }
   }
 
-  for (let i = 0; words.length > i; i++) {
-    if (allProjects.includes(words[i].toLowerCase())) {
-      event.project = words[i].toLowerCase();
-
-      for (let j = 0; words.length > j; j++) {
-        const activities = latestProjAndAct[words[i].toLowerCase()];
-        if (activities && activities.includes(words[j].toLowerCase())) {
-          event.activity =
-            activities[activities.indexOf(words[j].toLowerCase())];
-        }
-      }
-      break;
-    }
-  }
+  
 
   return event;
 }
