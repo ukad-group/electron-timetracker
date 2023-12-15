@@ -170,6 +170,16 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
   useEffect(() => {
     getBookedStatistic();
+
+    const fileChangeListener = (event) => {
+      getBookedStatistic();
+    };
+
+    global.ipcRenderer.on("any-file-changed", fileChangeListener);
+
+    return () => {
+      global.ipcRenderer.removeListener("any-file-changed", fileChangeListener);
+    };
   }, [calendarDate]);
 
   return (
