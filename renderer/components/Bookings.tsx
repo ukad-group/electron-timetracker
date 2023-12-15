@@ -117,7 +117,42 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
     }
   };
 
-  const getBookedStatistic = async () => {
+  const calculateBookedSpentStat = (
+    bookedProjects: BookingFromApi[],
+    monthActivities: ReportActivity[]
+  ): BookedSpentStat[] => {
+    return bookedProjects.map((booking) => {
+      const spentProjectTime = monthActivities.reduce((acc, activity) => {
+        if (activity?.project === booking?.name) {
+          return acc + activity?.duration;
+        } else {
+          return acc;
+        }
+      }, 0);
+
+      return {
+        project: booking?.name,
+        booked: booking?.plans[0]?.hours,
+        spent: spentProjectTime,
+      };
+    });
+  };
+
+  const updateLocalStatistic = async () => {
+    try {
+      const monthLocalActivities = await getMonthLocalActivities();
+      const bookedSpentStatisticArray = calculateBookedSpentStat(
+        bookedProjects,
+        monthLocalActivities
+      );
+
+      setBookedSpentStatistic(bookedSpentStatisticArray);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getFullStatistic = async () => {
     const TTUserInfo: TTUserInfo = JSON.parse(
       localStorage.getItem("timetracker-user")
     );
@@ -144,33 +179,29 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
     const monthLocalActivities = await getMonthLocalActivities();
 
-    const bookedSpentStatisticArray: BookedSpentStat[] = bookedProjects.map(
-      (booking) => {
-        const spentProjectTime = monthLocalActivities.reduce(
-          (acc, activity) => {
-            if (activity?.project === booking?.name) {
-              return acc + activity?.duration;
-            } else {
-              return acc;
-            }
-          },
-          0
-        );
-
-        return {
-          project: booking?.name,
-          booked: booking?.plans[0]?.hours,
-          spent: spentProjectTime,
-        };
-      }
+    const bookedSpentStatisticArray = calculateBookedSpentStat(
+      bookedProjects,
+      monthLocalActivities
     );
 
     setBookedSpentStatistic(bookedSpentStatisticArray);
   };
 
   useEffect(() => {
-    getBookedStatistic();
+    getFullStatistic();
   }, [calendarDate]);
+
+  useEffect(() => {
+    const fileChangeListener = (event) => {
+      updateLocalStatistic();
+    };
+
+    global.ipcRenderer.on("any-file-changed", fileChangeListener);
+
+    return () => {
+      global.ipcRenderer.removeListener("any-file-changed", fileChangeListener);
+    };
+  }, [bookedProjects]);
 
   return (
     <div className="relative px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
