@@ -141,8 +141,7 @@ export const getJiraIssues = async (
         )
         .map(({ fields }: Fields) =>
           replaceHyphensWithSpaces(`JI:: ${fields?.summary}`)
-        )
-        .sort((a: string, b: string) => a.localeCompare(b)) || [];
+        ) || [];
     const notAssignedCards =
       cards?.issues
         .filter(
@@ -150,8 +149,7 @@ export const getJiraIssues = async (
         )
         .map(({ fields }: Fields) =>
           replaceHyphensWithSpaces(`JI:: ${fields?.summary}`)
-        )
-        .sort((a: string, b: string) => a.localeCompare(b)) || [];
+        ) || [];
 
     return [assignedCards, notAssignedCards];
   } catch (error) {

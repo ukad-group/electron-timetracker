@@ -137,15 +137,19 @@ export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
 
     const promisedCards = await Promise.all(cardsPromises);
 
-    const cards = promisedCards.reduce(
-      (acc, curr) => {
-        acc[0].push(...curr[0]);
-        acc[1].push(...curr[1]);
+    const cards = promisedCards
+      .reduce(
+        (acc, curr) => {
+          acc[0].push(...curr[0]);
+          acc[1].push(...curr[1]);
 
-        return acc;
-      },
-      [[], []]
-    );
+          return acc;
+        },
+        [[], []]
+      )
+      .map((list: string[]) =>
+        list.sort((a: string, b: string) => a.localeCompare(b))
+      );
 
     return cards || [[], []];
   } catch (error) {
