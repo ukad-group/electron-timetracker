@@ -51,7 +51,8 @@ export default function TrackTimeModal({
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
   const [userTrelloTasks, setUserTrelloTasks] = useState([]);
   const [otherTrelloTasks, setOtherTrelloTasks] = useState([]);
-  const [jiraTasks, setJiraTasks] = useState([]);
+  const [userJiraTasks, setUserJiraTasks] = useState([]);
+  const [otherJiraTasks, setOtherJiraTasks] = useState([]);
   const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
     (state) => [state.event, state.setEvent],
     shallow
@@ -83,18 +84,25 @@ export default function TrackTimeModal({
       return [
         ...latestProjAndDesc[project].sort(),
         ...userTrelloTasks,
+        ...userJiraTasks,
         ...otherTrelloTasks,
-        ...jiraTasks,
+        ...otherJiraTasks,
       ];
     } else {
-      return [...userTrelloTasks, ...otherTrelloTasks, ...jiraTasks];
+      return [
+        ...userTrelloTasks,
+        ...userJiraTasks,
+        ...otherTrelloTasks,
+        ...otherJiraTasks,
+      ];
     }
   }, [
     latestProjAndDesc,
     project,
     userTrelloTasks,
     otherTrelloTasks,
-    jiraTasks,
+    userJiraTasks,
+    otherJiraTasks,
   ]);
 
   useEffect(() => {
@@ -184,8 +192,9 @@ export default function TrackTimeModal({
       setUserTrelloTasks(allTrelloCards[0]);
       setOtherTrelloTasks(allTrelloCards[1]);
 
-      const newCardsFromApi = await getJiraCardsFromAPI();
-      setJiraTasks(newCardsFromApi);
+      const allJiraCards = await getJiraCardsFromAPI();
+      setUserJiraTasks(allJiraCards[0]);
+      setOtherJiraTasks(allJiraCards[1]);
     })();
 
     getTimetrackerYearProjects();

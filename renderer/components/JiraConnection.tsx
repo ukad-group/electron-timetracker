@@ -43,12 +43,12 @@ const JiraConnection = () => {
 
     if (!access_token) return;
 
-    const { account_id, email, nickname } = await global.ipcRenderer.invoke(
+    const { account_id, email } = await global.ipcRenderer.invoke(
       "jira:get-profile",
       access_token
     );
 
-    const username = email || nickname || "";
+    const username = email || "";
     const isUserExists = users.some(
       (user: JiraUser) => account_id === user.userId
     );
@@ -63,7 +63,6 @@ const JiraConnection = () => {
       accessToken: access_token,
       refreshToken: refresh_token,
       username: username,
-      nickname: nickname,
     };
 
     const newUsers = [...users, user];
