@@ -79,31 +79,14 @@ export default function TrackTimeModal({
     );
   }, [from, to, duration, project]);
 
-  const descriptionItems = useMemo(() => {
-    if (latestProjAndDesc[project]) {
-      return [
-        ...latestProjAndDesc[project].sort(),
-        ...userTrelloTasks,
-        ...userJiraTasks,
-        ...otherTrelloTasks,
-        ...otherJiraTasks,
-      ];
-    } else {
-      return [
-        ...userTrelloTasks,
-        ...userJiraTasks,
-        ...otherTrelloTasks,
-        ...otherJiraTasks,
-      ];
-    }
-  }, [
-    latestProjAndDesc,
-    project,
-    userTrelloTasks,
-    otherTrelloTasks,
-    userJiraTasks,
-    otherJiraTasks,
-  ]);
+  const thirdPartyItems = useMemo(() => {
+    return [
+      ...userTrelloTasks,
+      ...userJiraTasks,
+      ...otherTrelloTasks,
+      ...otherJiraTasks,
+    ];
+  }, [userTrelloTasks, otherTrelloTasks, userJiraTasks, otherJiraTasks]);
 
   useEffect(() => {
     if (!editedActivity || editedActivity === "new") {
@@ -633,11 +616,9 @@ export default function TrackTimeModal({
                       onSave={onSave}
                       title="Project"
                       required
-                      availableItems={latestProjects.sort()}
+                      availableItems={latestProjects}
                       additionalItems={
-                        uniqueWebTrackerProjects
-                          ? uniqueWebTrackerProjects.sort()
-                          : []
+                        uniqueWebTrackerProjects ? uniqueWebTrackerProjects : []
                       }
                       selectedItem={project}
                       setSelectedItem={setProject}
@@ -656,7 +637,7 @@ export default function TrackTimeModal({
                       title="Activity"
                       availableItems={
                         latestProjAndAct[project]
-                          ? latestProjAndAct[project].sort()
+                          ? latestProjAndAct[project]
                           : []
                       }
                       selectedItem={activity}
@@ -671,7 +652,12 @@ export default function TrackTimeModal({
                       isNewCheck={false}
                       onSave={onSave}
                       title="Description"
-                      availableItems={descriptionItems}
+                      availableItems={
+                        latestProjAndDesc[project]
+                          ? latestProjAndDesc[project]
+                          : []
+                      }
+                      additionalItems={thirdPartyItems}
                       selectedItem={description}
                       setSelectedItem={setDescription}
                       showedSuggestionsNumber={3}
