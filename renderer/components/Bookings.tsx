@@ -144,8 +144,8 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
     const monthLocalActivities = await getMonthLocalActivities();
 
-    const bookedSpentStatisticArray: BookedSpentStat[] = bookedProjects.map(
-      (booking) => {
+    const bookedSpentStatisticArray: BookedSpentStat[] = bookedProjects
+      .map((booking) => {
         const spentProjectTime = monthLocalActivities.reduce(
           (acc, activity) => {
             if (activity?.project === booking?.name) {
@@ -162,8 +162,19 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
           booked: booking?.plans[0]?.hours,
           spent: spentProjectTime,
         };
-      }
-    );
+      })
+      .sort((a, b) => {
+        const nameA = a.project.toLowerCase();
+        const nameB = b.project.toLowerCase();
+
+        if (nameA < nameB) {
+          return -1;
+        } else if (nameA > nameB) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
 
     setBookedSpentStatistic(bookedSpentStatisticArray);
   };

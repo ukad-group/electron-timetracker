@@ -51,7 +51,7 @@ export default function ActivitiesSection({
     localStorage.getItem("showOffice365Events")
   );
   const ctrlSpaceHandler = (e: KeyboardEvent) => {
-    if (e.code === "Space" && e.ctrlKey) {
+    if ((e.ctrlKey || e.metaKey) && e.code === "Space") {
       onEditActivity("new");
     }
   };

@@ -43,7 +43,7 @@ export default function DateSelector({
   };
 
   const keydownHandler = (e: KeyboardEvent) => {
-    if (e.ctrlKey && e.code === "Tab") {
+    if ((e.ctrlKey || e.metaKey) && e.code === "Tab") {
       if (e.shiftKey) {
         descreaseDate();
       } else {
