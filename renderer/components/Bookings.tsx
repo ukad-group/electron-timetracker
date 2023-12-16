@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useMainStore } from "../store/mainStore";
 import { shallow } from "zustand/shallow";
-import { getStringDate, MONTHS } from "../utils/datetime-ui";
+import { MONTHS } from "../utils/datetime-ui";
 import { ReportActivity, formatDuration, parseReport } from "../utils/reports";
 import { ParsedReport, TTUserInfo } from "./Calendar/Calendar";
 import Loader from "./ui/Loader";
@@ -98,7 +98,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
       const monthLocalReports = await global.ipcRenderer.invoke(
         "app:find-month-projects",
         reportsFolder,
-        getStringDate(calendarDate)
+        calendarDate
       );
 
       const monthParsedActivities = monthLocalReports.map(

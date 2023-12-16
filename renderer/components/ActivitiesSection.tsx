@@ -7,7 +7,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import { loadGoogleEventsFromAllUsers } from "../utils/google";
 import { getOffice365Events } from "../utils/office365";
-import { checkIsToday, getStringDate } from "../utils/datetime-ui";
+import { checkIsToday } from "../utils/datetime-ui";
 import ButtonTransparent from "./ui/ButtonTransparent";
 import Popup from "./ui/Popup";
 import { useMainStore } from "../store/mainStore";
@@ -201,14 +201,14 @@ function Placeholder({
     const prevDayReport = await global.ipcRenderer.invoke(
       "app:find-last-report",
       reportsFolder,
-      getStringDate(selectedDate)
+      selectedDate
     );
 
     if (prevDayReport) {
       global.ipcRenderer.invoke(
         "app:write-day-report",
         reportsFolder,
-        getStringDate(selectedDate),
+        selectedDate,
         prevDayReport
       );
 
