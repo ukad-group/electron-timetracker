@@ -148,15 +148,18 @@ const generateWindow = () => {
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.on("close", (event) => {
-      if (
-        process.platform !== "darwin" ||
-        (process.platform === "darwin" && mainWindow?.isVisible())
-      ) {
-        event.preventDefault();
-        mainWindow?.hide();
-      }
+      event.preventDefault();
+      mainWindow?.hide();
     });
   }
+
+  // define "quit" context menu click on macos
+  if (process.platform === "darwin") {
+    app.on("before-quit", (e) => {
+      app.exit();
+    });
+  }
+
   mainWindow.webContents.session.setSpellCheckerLanguages(["en-US"]);
 };
 
