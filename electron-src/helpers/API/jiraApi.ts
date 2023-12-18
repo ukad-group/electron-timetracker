@@ -1,8 +1,20 @@
+import { formatDateWithHyphens } from "../datetime";
+
 export type Options = {
   clientId: string;
   clientSecret: string;
   redirectUri: string;
   scope: string;
+};
+
+type Fields = {
+  fields: { assignee: { accountId: string }; summary: string };
+};
+
+export const replaceHyphensWithSpaces = (inputString: string): string => {
+  const resultString = inputString.replace(/ - /g, " ");
+
+  return resultString;
 };
 
 export const getJiraAuthUrl = (options: Options) => {
@@ -100,10 +112,13 @@ export const getJiraIssues = async (
   resourceId: string,
   assignee: string
 ) => {
-  const jqlQuery = `assignee = "${assignee}" ORDER BY created DESC`;
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  const formattedDate = formatDateWithHyphens(oneYearAgo);
+  const jqlQuery = `updated >= "${formattedDate}" ORDER BY updated DESC`;
   const endpoint = `https://api.atlassian.com/ex/jira/${resourceId}/rest/api/3/search?jql=${encodeURIComponent(
     jqlQuery
-  )}&maxResults=100&fields=summary`;
+  )}&maxResults=100&fields=summary,assignee`;
   const headers = new Headers();
   const bearer = `Bearer ${accessToken}`;
 
@@ -115,7 +130,31 @@ export const getJiraIssues = async (
     headers: headers,
   };
 
-  return fetch(endpoint, options)
-    .then((response) => response.json())
-    .catch((error) => console.log(error));
+  try {
+    const response = await fetch(endpoint, options);
+    const cards = await response.json();
+
+    const assignedCards =
+      cards?.issues
+        .filter(
+          ({ fields }: Fields) => fields?.assignee?.accountId === assignee
+        )
+        .map(({ fields }: Fields) =>
+          replaceHyphensWithSpaces(`JI:: ${fields?.summary}`)
+        ) || [];
+    const notAssignedCards =
+      cards?.issues
+        .filter(
+          ({ fields }: Fields) => fields?.assignee?.accountId !== assignee
+        )
+        .map(({ fields }: Fields) =>
+          replaceHyphensWithSpaces(`JI:: ${fields?.summary}`)
+        ) || [];
+
+    return [assignedCards, notAssignedCards];
+  } catch (error) {
+    console.error("Error fetching Jira cards:", error);
+
+    return [[], []];
+  }
 };

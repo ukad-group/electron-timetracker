@@ -61,6 +61,7 @@ export default function AutocompleteSelector({
           return activity !== "";
         })
       : availableItems
+          .sort()
           .concat(additionalItems ? additionalItems : [])
           .reduce((accumulator, current) => {
             let duplicate = false;
