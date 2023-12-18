@@ -20,7 +20,6 @@ import { useBetaStore } from "../store/betaUpdatesStore";
 import { Calendar } from "../components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
-import { getStringDate } from "../utils/datetime-ui";
 import Totals from "../components/Totals";
 import Bookings from "../components/Bookings";
 
@@ -120,7 +119,7 @@ export default function Home() {
         const dayReport = await global.ipcRenderer.invoke(
           "app:read-day-report",
           reportsFolder,
-          getStringDate(selectedDate)
+          selectedDate
         );
 
         setSelectedDateReport(dayReport || "");
@@ -128,7 +127,7 @@ export default function Home() {
         const sortedActAndDesc = await global.ipcRenderer.invoke(
           "app:find-latest-projects",
           reportsFolder,
-          getStringDate(selectedDate)
+          selectedDate
         );
 
         setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct || {});
@@ -202,7 +201,7 @@ export default function Home() {
     global.ipcRenderer.invoke(
       "app:write-day-report",
       reportsFolder,
-      getStringDate(selectedDate),
+      selectedDate,
       serializedReport
     );
     setSelectedDateReport(serializedReport);

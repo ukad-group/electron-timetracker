@@ -1,9 +1,6 @@
 import { Office365User } from "./office365";
-import { replaceHyphensWithSpaces } from "./utils";
 
-export interface JiraUser extends Office365User {
-  nickname: string;
-}
+export interface JiraUser extends Office365User {}
 
 interface JiraResource {
   id: string;
@@ -58,12 +55,8 @@ export const updateJiraStoredUser = (
 
 export const getJiraCardsFromAPI = async () => {
   const resourcesData = await getJiraResources();
-  const jiraCardsFromApi = await getAllJiraCards(resourcesData);
-  const newjiraCardsFromApi = jiraCardsFromApi.map((card) =>
-    replaceHyphensWithSpaces(`JI:: ${card}`)
-  );
 
-  return newjiraCardsFromApi;
+  return await getAllJiraCards(resourcesData);
 };
 
 export const getJiraResources = async () => {
@@ -73,14 +66,9 @@ export const getJiraResources = async () => {
     if (!storedUsers.length) return [];
 
     const resourcesPromises = storedUsers.map(async (user: JiraUser) => {
-      const { accessToken, refreshToken, userId, nickname } = user;
+      const { accessToken, refreshToken, userId } = user;
 
-      return getJiraResourcesByUser(
-        accessToken,
-        refreshToken,
-        userId,
-        nickname
-      );
+      return getJiraResourcesByUser(accessToken, refreshToken, userId);
     });
 
     const resources = await Promise.all(resourcesPromises);
@@ -96,8 +84,7 @@ export const getJiraResources = async () => {
 export const getJiraResourcesByUser = async (
   accessToken: string,
   refreshToken: string,
-  userId: string,
-  nickname: string
+  userId: string
 ) => {
   const resources = await global.ipcRenderer.invoke(
     "jira:get-resources",
@@ -116,20 +103,19 @@ export const getJiraResourcesByUser = async (
       return await getJiraResourcesByUser(
         data.access_token,
         data.refresh_token,
-        userId,
-        nickname
+        userId
       );
     }
   }
 
-  if (resources) return { resources, accessToken, assignee: nickname };
+  if (resources) return { resources, accessToken, assignee: userId };
 
   return [];
 };
 
 export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
   try {
-    if (!resourcesData?.length) return [];
+    if (!resourcesData?.length) return [[], []];
 
     let cardsPromises = [];
 
@@ -150,25 +136,26 @@ export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
     });
 
     const promisedCards = await Promise.all(cardsPromises);
-    const cards = promisedCards.reduce((acc, curr) => {
-      if (!curr?.issues?.length) return acc;
 
-      const { issues } = curr;
+    const cards = promisedCards
+      .reduce(
+        (acc, curr) => {
+          acc[0].push(...curr[0]);
+          acc[1].push(...curr[1]);
 
-      const cardsOfResource = issues.map((issue) => issue?.fields?.summary);
+          return acc;
+        },
+        [[], []]
+      )
+      .map((list: string[]) =>
+        list.sort((a: string, b: string) => a.localeCompare(b))
+      );
 
-      if (!cardsOfResource?.length) {
-        return acc;
-      } else {
-        return [...acc, ...cardsOfResource];
-      }
-    }, []);
-
-    return cards || [];
+    return cards || [[], []];
   } catch (error) {
     console.log("Error while getting cards", error);
 
-    return [];
+    return [[], []];
   }
 };
 

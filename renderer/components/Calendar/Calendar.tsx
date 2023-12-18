@@ -29,7 +29,6 @@ import { ErrorPlaceholder, RenderError } from "../ui/ErrorPlaceholder";
 import {
   getMonthWorkHours,
   getMonthRequiredHours,
-  getStringDate,
   getWeekNumber,
   isTheSameDates,
   MONTHS,
@@ -128,7 +127,7 @@ export function Calendar({
           await global.ipcRenderer.invoke(
             "app:find-quarter-projects",
             reportsFolder,
-            getStringDate(calendarDate)
+            calendarDate
           )
         );
       })();
@@ -139,7 +138,7 @@ export function Calendar({
             await global.ipcRenderer.invoke(
               "app:find-quarter-projects",
               reportsFolder,
-              getStringDate(calendarDate)
+              calendarDate
             )
           );
         })();

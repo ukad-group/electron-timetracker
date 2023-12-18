@@ -108,8 +108,10 @@ export function getMonthRequiredHours(calendarDate: Date, daysOff: DayOff[]) {
 }
 
 export function extractDatesFromPeriod(period: ApiDayOff, holidays: DayOff[]) {
-  const dateStart = new Date(period?.dateFrom);
-  const dateEnd = new Date(period?.dateTo);
+  const dateStart = new Date(
+    new Date(period?.dateFrom).toISOString().slice(0, -1)
+  );
+  const dateEnd = new Date(new Date(period?.dateTo).toISOString().slice(0, -1));
   const vacationRange = generateDateRange(dateStart, dateEnd);
 
   const datesWithoutWeekendsHolidays = vacationRange
@@ -175,13 +177,13 @@ export const padStringToMinutes = (timeString: string) => {
   return hours * 60 + minutes;
 };
 
-export const getStringDate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const day = date.getDate().toString().padStart(2, "0");
+// export const getStringDate = (date: Date): string => {
+//   const year = date.getFullYear();
+//   const month = (date.getMonth() + 1).toString().padStart(2, "0");
+//   const day = date.getDate().toString().padStart(2, "0");
 
-  return `${year}-${month}-${day}`;
-};
+//   return `${year}-${month}-${day}`;
+// };
 
 export const convertMillisecondsToTime = (milliseconds) => {
   const totalSeconds = Math.floor(milliseconds / 1000);

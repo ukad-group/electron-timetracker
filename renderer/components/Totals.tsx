@@ -10,7 +10,6 @@ import { ReportActivity, formatDuration, parseReport } from "../utils/reports";
 import {
   convertMillisecondsToTime,
   getMonthDates,
-  getStringDate,
   getWeekDates,
 } from "../utils/datetime-ui";
 import { useMainStore } from "../store/mainStore";
@@ -116,7 +115,7 @@ const Totals = ({ selectedDate }) => {
     const dayReport = await global.ipcRenderer.invoke(
       "app:read-day-report",
       reportsFolder,
-      getStringDate(day)
+      day
     );
 
     const parsedReportsAndNotes = parseReport(dayReport);
