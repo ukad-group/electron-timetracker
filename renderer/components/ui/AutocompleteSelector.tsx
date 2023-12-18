@@ -171,12 +171,12 @@ export default function AutocompleteSelector({
           />
         </Combobox.Button>
 
-        {filteredList?.length > 0 ? (
+        {filteredList?.length > 0 && (
           <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm dark:bg-dark-container dark:shadow-lg dark:shadow-slate-900">
             <div className="block text-xs text-gray-500 text-center">
               tab to choose
             </div>
-            {filteredList?.map((item, i) => (
+            {[selectedItem, ...filteredList].map((item, i) => (
               <Combobox.Option
                 key={i}
                 value={item}
@@ -215,49 +215,7 @@ export default function AutocompleteSelector({
               </Combobox.Option>
             ))}
           </Combobox.Options>
-        ) : (
-          filteredList &&
-          selectedItem && (
-            <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm dark:bg-dark-container dark:shadow-lg dark:shadow-slate-900">
-              <Combobox.Option
-                key={1}
-                value={selectedItem}
-                className={({ active }) =>
-                  clsx(
-                    "relative cursor-default select-none py-2 pl-3 pr-9",
-                    active
-                      ? "bg-blue-600 text-white dark:bg-indigo-800"
-                      : "text-gray-900 dark:text-dark-main"
-                  )
-                }
-              >
-                {({ active, selected }) => (
-                  <>
-                    <span
-                      className={clsx(
-                        "block truncate",
-                        selected && "font-semibold"
-                      )}
-                    >
-                      {selectedItem}
-                    </span>
-
-                    {selected && (
-                      <span
-                        className={clsx(
-                          "absolute inset-y-0 right-0 flex items-center pr-4",
-                          active ? "text-white" : "text-blue-600"
-                        )}
-                      >
-                        <CheckIcon className="w-5 h-5" aria-hidden="true" />
-                      </span>
-                    )}
-                  </>
-                )}
-              </Combobox.Option>
-            </Combobox.Options>
-          )
-        )}
+        ) }
       </div>
     </Combobox>
   );
