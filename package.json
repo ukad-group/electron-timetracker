@@ -45,7 +45,7 @@
       "icon": "app/images/logo.png"
     },
     "mac": {
-      "target": "dmg",
+      "target": "default",
       "icon": "app/images/logo.png"
     },
     "linux": {
