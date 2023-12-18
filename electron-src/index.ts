@@ -534,7 +534,7 @@ ipcMain.handle(
 
 ipcMain.handle(
   "app:find-last-report",
-  (event, reportsFolder: string, selectedDate) => {
+  (event, reportsFolder: string, selectedDate: Date) => {
     if (!reportsFolder || !selectedDate) return null;
 
     const LAST_PERIOD_DAYS = 31;
