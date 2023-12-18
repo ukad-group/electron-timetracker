@@ -103,6 +103,8 @@ export default function ActivitiesSection({
       (event, errorTitle, errorMessage, data) => {
         setRenderError({ errorTitle, errorMessage });
         console.log("Error data ", data);
+        console.log(errorTitle);
+        console.log(errorMessage);
       }
     );
 
