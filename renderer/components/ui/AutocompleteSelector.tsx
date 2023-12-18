@@ -12,6 +12,7 @@ import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
+import useUndoManager from "../../hooks/useUndoManager";
 
 type AutocompleteProps = {
   isNewCheck: boolean;
@@ -51,6 +52,7 @@ export default function AutocompleteSelector({
       ? availableItems?.concat(additionalItems)
       : availableItems;
   }, [availableItems, additionalItems]);
+  const undoManager = useUndoManager(selectedItem);
 
   const filteredList =
     selectedItem === ""
@@ -102,25 +104,47 @@ export default function AutocompleteSelector({
       event.preventDefault();
       onSave(event);
     }
+
+    if (event.ctrlKey && event.key === "z") {
+      event.preventDefault();
+      const currentValue = undoManager.undo();
+
+      if (currentValue !== undefined) {
+        setSelectedItem(currentValue as string);
+      }
+    }
+
+    if (event.ctrlKey && event.key === "y") {
+      event.preventDefault();
+      const currentValue = undoManager.redo();
+
+      if (currentValue !== undefined) {
+        setSelectedItem(currentValue as string);
+      }
+    }
   };
 
-  const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    setSelectedItem(e.target.value);
+  const onChangeHandler = (value) => {
+    let newValue = value;
+
+    if (value.startsWith("TT:: ") || value.startsWith("JI:: ")) {
+      newValue = newValue.slice(5);
+    }
+
+    setSelectedItem(newValue);
+    undoManager.setValue(newValue);
   };
 
   const onBlurHandler = (e: ChangeEvent<HTMLInputElement>) => {
     e.target.value = e.target.value.trim();
-    setSelectedItem(e.target.value);
+    onChangeHandler(e.target.value);
+
     if (isNewCheck && availableItems) {
       setIsNew(selectedItem && !availableItems.includes(selectedItem));
     }
   };
 
   useEffect(() => {
-    if (selectedItem.startsWith("TT:: ") || selectedItem.startsWith("JI:: ")) {
-      setSelectedItem((prev) => prev.slice(5));
-    }
-
     if (isNewCheck && allItems?.includes(selectedItem)) {
       setIsNew(false);
     }
@@ -131,7 +155,7 @@ export default function AutocompleteSelector({
       className={className}
       as="div"
       value={selectedItem}
-      onChange={setSelectedItem}
+      onChange={onChangeHandler}
     >
       <Combobox.Label className="flex items-center gap-1 text-sm font-medium text-gray-700 dark:text-dark-main ">
         {title}{" "}
@@ -151,6 +175,7 @@ export default function AutocompleteSelector({
         <Combobox.Input
           onKeyDown={(event: FormEvent) => handleKey(event)}
           ref={inputRef}
+          value={selectedItem}
           required={required}
           spellCheck={spellCheck}
           className={clsx(
@@ -160,7 +185,7 @@ export default function AutocompleteSelector({
                 required && isValidationEnabled && !selectedItem,
             }
           )}
-          onChange={onChangeHandler}
+          onChange={(e) => onChangeHandler(e.target.value)}
           tabIndex={tabIndex}
           onBlur={onBlurHandler}
         />
