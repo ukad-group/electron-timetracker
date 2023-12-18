@@ -279,11 +279,11 @@ export function validation(activities: Array<ReportActivity>) {
   try {
     for (let i = 0; i < activities.length; i++) {
       const [toHours, toMinutes] = activities[i].to
-        .split(":")
-        .map((item) => Number(item));
+        ? activities[i].to.split(":").map((item) => Number(item))
+        : [];
       const [fromHours, fromMinutes] = activities[i].from
-        .split(":")
-        .map((item) => Number(item));
+        ? activities[i].from?.split(":")?.map((item) => Number(item))
+        : [];
 
       if (
         i > 0 &&
