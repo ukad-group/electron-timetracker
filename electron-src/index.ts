@@ -44,7 +44,7 @@ import {
   getJiraRefreshedAccessToken,
   getJiraResources,
   getJiraTokens,
-} from "./helpers/API/jira";
+} from "./helpers/API/jiraApi";
 
 initialize("A-EU-9361517871");
 ipcMain.on(
@@ -722,7 +722,7 @@ ipcMain.on("app:load-offline-page", async () => {
   mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
 });
 
-// TRELLO FUNCTIONS
+//#region TRELLO FUNCTIONS
 
 const getTrelloOptions = () => {
   return {
@@ -756,7 +756,9 @@ ipcMain.handle(
   }
 );
 
-// JIRA FUNCTIONS
+//#endregion
+
+//#region JIRA FUNCTIONS
 
 const getJiraOptions = () => {
   return {
@@ -804,7 +806,9 @@ ipcMain.handle(
   }
 );
 
-// MICROSOFT OFFICE365 FUNCTIONS
+//#endregion
+
+//#region MICROSOFT OFFICE365 FUNCTIONS
 
 const getOffice365Options = () => {
   return {
@@ -851,7 +855,9 @@ ipcMain.handle(
   }
 );
 
-// TIMETRACKER WEBSITE
+//#endregion
+
+//#region TIMETRACKER WEBSITE
 
 ipcMain.on("azure:login-base", async () => {
   const options = getOffice365Options();
@@ -954,3 +960,5 @@ ipcMain.handle(
     return await getTimetrackerBookings(cookie, name, calendarDate);
   }
 );
+
+//#endregion
