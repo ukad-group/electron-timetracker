@@ -103,7 +103,7 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
 
       if (singleDayOff) {
         userDaysOff.push({
-          date: new Date(item?.dateFrom),
+          date: new Date(new Date(item?.dateFrom).toISOString().slice(0, -1)), // avoid timezone
           duration: item?.quantity,
           description: item?.description,
           type: item?.type,

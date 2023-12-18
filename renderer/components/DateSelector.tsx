@@ -1,7 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import NavButtons from "./ui/NavButtons";
 import Button from "../components/ui/Button";
-import { getStringDate } from "../utils/datetime-ui";
 import ButtonTransparent from "./ui/ButtonTransparent";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
 import Popup from "./ui/Popup";
@@ -43,7 +42,7 @@ export default function DateSelector({
   };
 
   const keydownHandler = (e: KeyboardEvent) => {
-    if (e.ctrlKey && e.code === "Tab") {
+    if ((e.ctrlKey || e.metaKey) && e.code === "Tab") {
       if (e.shiftKey) {
         descreaseDate();
       } else {
@@ -56,7 +55,7 @@ export default function DateSelector({
     global.ipcRenderer.invoke(
       "app:write-day-report",
       reportsFolder,
-      getStringDate(today),
+      today,
       selectedDateReport
     );
   };
@@ -65,7 +64,7 @@ export default function DateSelector({
     const todayReportExist = await global.ipcRenderer.invoke(
       "app:check-exist-report",
       reportsFolder,
-      getStringDate(today)
+      today
     );
 
     if (todayReportExist) {

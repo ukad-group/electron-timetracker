@@ -23,7 +23,11 @@ export default function ManualInputForm({
   const textareaRef = useRef(null);
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
-    if (e.code === "KeyS" && e.ctrlKey && saveBtnStatus === "enabled") {
+    if (
+      (e.ctrlKey || e.metaKey) &&
+      e.code === "KeyS" &&
+      saveBtnStatus === "enabled"
+    ) {
       saveReportHandler();
     }
   };
@@ -58,7 +62,7 @@ export default function ManualInputForm({
   };
 
   const copyLineHandler = (event) => {
-    if ((event.ctrlKey || event.metaKey) && event.key === "d") {
+    if ((event.ctrlKey || event.metaKey) && event.code === "KeyD") {
       event.preventDefault();
       copyCurrentLine();
     }

@@ -44,7 +44,7 @@ import {
   getJiraRefreshedAccessToken,
   getJiraResources,
   getJiraTokens,
-} from "./helpers/API/jira";
+} from "./helpers/API/jiraApi";
 
 initialize("A-EU-9361517871");
 ipcMain.on(
@@ -507,9 +507,8 @@ ipcMain.handle("app:update-status", async () => {
 
 ipcMain.handle(
   "app:delete-file",
-  async (event, reportsFolder: string, stringDate: string) => {
-    const date = new Date(stringDate);
-    const timereportPath = getPathFromDate(date, reportsFolder);
+  async (event, reportsFolder: string, selectedDate: Date) => {
+    const timereportPath = getPathFromDate(selectedDate, reportsFolder);
 
     try {
       await deleteFile(timereportPath);
@@ -523,11 +522,10 @@ ipcMain.handle(
 
 ipcMain.handle(
   "app:read-day-report",
-  (event, reportsFolder: string, stringDate: string) => {
-    if (!reportsFolder || !stringDate.length) return null;
+  (event, reportsFolder: string, selectedDate: Date) => {
+    if (!reportsFolder || !selectedDate) return null;
 
-    const date = new Date(stringDate);
-    const timereportPath = getPathFromDate(date, reportsFolder);
+    const timereportPath = getPathFromDate(selectedDate, reportsFolder);
 
     return new Promise((resolve) => {
       readDataFromFile(timereportPath, (data) => {
@@ -539,13 +537,13 @@ ipcMain.handle(
 
 ipcMain.handle(
   "app:find-last-report",
-  (event, reportsFolder: string, stringDate: string) => {
-    if (!reportsFolder || !stringDate.length) return null;
+  (event, reportsFolder: string, selectedDate: Date) => {
+    if (!reportsFolder || !selectedDate) return null;
 
     const LAST_PERIOD_DAYS = 31;
 
     for (let i = 0; i < LAST_PERIOD_DAYS; i++) {
-      const date = new Date(stringDate);
+      const date = new Date(selectedDate);
       const prevDay = new Date(date.setDate(date.getDate() - ++i));
       const timereportPath = getPathFromDate(prevDay, reportsFolder);
 
@@ -572,11 +570,10 @@ ipcMain.handle(
 
 ipcMain.handle(
   "app:write-day-report",
-  (event, reportsFolder: string, stringDate: string, report: string) => {
-    if (!reportsFolder || !stringDate.length) return null;
+  (event, reportsFolder: string, selectedDate: Date, report: string) => {
+    if (!reportsFolder || !selectedDate) return null;
 
-    const date = new Date(stringDate);
-    const timereportPath = getPathFromDate(date, reportsFolder);
+    const timereportPath = getPathFromDate(selectedDate, reportsFolder);
 
     try {
       createDirByPath(timereportPath.slice(0, timereportPath.lastIndexOf("/")));
@@ -597,11 +594,10 @@ ipcMain.handle(
 
 ipcMain.handle(
   "app:check-exist-report",
-  (event, reportsFolder: string, stringDate: string) => {
-    if (!reportsFolder || !stringDate.length) return false;
+  (event, reportsFolder: string, selectedDate: Date) => {
+    if (!reportsFolder || !selectedDate) return false;
 
-    const date = new Date(stringDate);
-    const timereportPath = getPathFromDate(date, reportsFolder);
+    const timereportPath = getPathFromDate(selectedDate, reportsFolder);
 
     try {
       return fs.existsSync(timereportPath) ? true : false;
@@ -618,13 +614,11 @@ ipcMain.handle(
 
 ipcMain.handle(
   "app:find-latest-projects",
-  (event, reportsFolder: string, stringDate: string) => {
-    if (!reportsFolder || !stringDate.length) return [];
-
-    const date = new Date(stringDate);
+  (event, reportsFolder: string, selectedDate: Date) => {
+    if (!reportsFolder || !selectedDate) return [];
 
     try {
-      const parsedProjects = parseReportsInfo(reportsFolder, date);
+      const parsedProjects = parseReportsInfo(reportsFolder, selectedDate);
       const sortedProjAndAct: Record<string, string[]> = Object.keys(
         parsedProjects
       )
@@ -689,32 +683,30 @@ ipcMain.handle(
 
 ipcMain.handle(
   "app:find-quarter-projects",
-  (event, reportsFolder: string, stringDate: string) => {
-    if (!reportsFolder || !stringDate.length) return [];
+  (event, reportsFolder: string, calendarDate: Date) => {
+    if (!reportsFolder || !calendarDate) return [];
 
-    const date = new Date(stringDate);
-    const year = date.getFullYear().toString();
-    const prevMonth = date.getMonth().toString().padStart(2, "0");
-    const currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
-    const nextMonth = (date.getMonth() + 2).toString().padStart(2, "0");
+    const year = calendarDate.getFullYear().toString();
+    const prevMonth = calendarDate.getMonth().toString().padStart(2, "0");
+    const currentMonth = (calendarDate.getMonth() + 1)
+      .toString()
+      .padStart(2, "0");
+    const nextMonth = (calendarDate.getMonth() + 2).toString().padStart(2, "0");
     const queries = [year + currentMonth, year + prevMonth, year + nextMonth];
 
     return searchReadFiles(reportsFolder, queries, year);
   }
 );
 
-ipcMain.on("app:load-offline-page", async () => {
-  mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
-});
-
 ipcMain.handle(
   "app:find-month-projects",
-  (event, reportsFolder: string, stringDate: string) => {
-    if (!reportsFolder || !stringDate.length) return [];
+  (event, reportsFolder: string, selectedDate: Date) => {
+    if (!reportsFolder || !selectedDate) return [];
 
-    const date = new Date(stringDate);
-    const year = date.getFullYear().toString();
-    const currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = selectedDate.getFullYear().toString();
+    const currentMonth = (selectedDate.getMonth() + 1)
+      .toString()
+      .padStart(2, "0");
     const queries = [year + currentMonth];
 
     return searchReadFiles(reportsFolder, queries, year);
@@ -725,7 +717,7 @@ ipcMain.on("app:load-offline-page", async () => {
   mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
 });
 
-// TRELLO FUNCTIONS
+//#region TRELLO FUNCTIONS
 
 const getTrelloOptions = () => {
   return {
@@ -759,7 +751,9 @@ ipcMain.handle(
   }
 );
 
-// JIRA FUNCTIONS
+//#endregion
+
+//#region JIRA FUNCTIONS
 
 const getJiraOptions = () => {
   return {
@@ -807,7 +801,9 @@ ipcMain.handle(
   }
 );
 
-// MICROSOFT OFFICE365 FUNCTIONS
+//#endregion
+
+//#region MICROSOFT OFFICE365 FUNCTIONS
 
 const getOffice365Options = () => {
   return {
@@ -854,7 +850,9 @@ ipcMain.handle(
   }
 );
 
-// TIMETRACKER WEBSITE
+//#endregion
+
+//#region TIMETRACKER WEBSITE
 
 ipcMain.on("azure:login-base", async () => {
   const options = getOffice365Options();
@@ -957,3 +955,5 @@ ipcMain.handle(
     return await getTimetrackerBookings(cookie, name, calendarDate);
   }
 );
+
+//#endregion
