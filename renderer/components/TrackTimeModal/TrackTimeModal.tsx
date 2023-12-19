@@ -15,8 +15,8 @@ import AutocompleteSelector from "../ui/AutocompleteSelector";
 import Button from "../ui/Button";
 import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "../../store/googleEventsStore";
-import { replaceHyphensWithSpaces } from "../../utils/utils";
-import { getAllJiraCards, getJiraResources } from "../../utils/jira";
+import { getJiraCardsFromAPI } from "../../utils/jira";
+import { getAllTrelloCardsFromApi } from "../../utils/trello";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -49,10 +49,9 @@ export default function TrackTimeModal({
   const [description, setDescription] = useState("");
   const [isTypingFromDuration, setIsTypingFromDuration] = useState(false);
   const [isValidationEnabled, setIsValidationEnabled] = useState(false);
-  const [trelloTasks, setTrelloTasks] = useState([]);
+  const [userTrelloTasks, setUserTrelloTasks] = useState([]);
+  const [otherTrelloTasks, setOtherTrelloTasks] = useState([]);
   const [jiraTasks, setJiraTasks] = useState([]);
-  // const { googleEvents, setGoogleEvents } = useGoogleCalendarStore();
-  const trelloUser = JSON.parse(localStorage.getItem("trello-user")) || null;
   const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
     (state) => [state.event, state.setEvent],
     shallow
@@ -78,6 +77,25 @@ export default function TrackTimeModal({
       from.length < 5
     );
   }, [from, to, duration, project]);
+
+  const descriptionItems = useMemo(() => {
+    if (latestProjAndDesc[project]) {
+      return [
+        ...latestProjAndDesc[project].sort(),
+        ...userTrelloTasks,
+        ...otherTrelloTasks,
+        ...jiraTasks,
+      ];
+    } else {
+      return [...userTrelloTasks, ...otherTrelloTasks, ...jiraTasks];
+    }
+  }, [
+    latestProjAndDesc,
+    project,
+    userTrelloTasks,
+    otherTrelloTasks,
+    jiraTasks,
+  ]);
 
   useEffect(() => {
     if (!editedActivity || editedActivity === "new") {
@@ -161,39 +179,17 @@ export default function TrackTimeModal({
   }, [from, to]);
 
   useEffect(() => {
-    if (trelloUser) {
-      (async () => getTrelloCards())();
-    }
-
     (async () => {
-      const newCardsFromApi = await getJiraCardsFromAPI();
+      const allTrelloCards = await getAllTrelloCardsFromApi();
+      setUserTrelloTasks(allTrelloCards[0]);
+      setOtherTrelloTasks(allTrelloCards[1]);
 
+      const newCardsFromApi = await getJiraCardsFromAPI();
       setJiraTasks(newCardsFromApi);
     })();
 
     getTimetrackerYearProjects();
   }, []);
-
-  const getTrelloCards = async () => {
-    try {
-      const trelloCards = await global.ipcRenderer.invoke(
-        "trello:get-cards",
-        trelloUser.accessToken
-      );
-
-      const newTrelloTasks = trelloCards.map((card) =>
-        replaceHyphensWithSpaces(`TT:: ${card.name} ${card.shortUrl}`)
-      );
-
-      setTrelloTasks(newTrelloTasks);
-    } catch (error) {
-      console.log(
-        "Try to re-login to Trello or check your internet connection",
-        error
-      );
-      setTrelloTasks([]);
-    }
-  };
 
   const getTimetrackerYearProjects = async () => {
     const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
@@ -232,8 +228,7 @@ export default function TrackTimeModal({
         };
 
         localStorage.setItem("timetracker-user", JSON.stringify(updatedUser));
-        getTimetrackerYearProjects();
-        return;
+        return await getTimetrackerYearProjects();
       }
 
       const updatedUserInfo = {
@@ -248,16 +243,6 @@ export default function TrackTimeModal({
       console.log(error);
       setWebTrackerProjects(userInfo.yearProjects);
     }
-  };
-
-  const getJiraCardsFromAPI = async () => {
-    const resourcesData = await getJiraResources();
-    const jiraCardsFromApi = await getAllJiraCards(resourcesData);
-    const newjiraCardsFromApi = jiraCardsFromApi.map((card) =>
-      replaceHyphensWithSpaces(`JI:: ${card}`)
-    );
-
-    return newjiraCardsFromApi;
   };
 
   const onSave = (e: FormEvent | MouseEvent) => {
@@ -639,9 +624,11 @@ export default function TrackTimeModal({
                       onSave={onSave}
                       title="Project"
                       required
-                      availableItems={latestProjects}
+                      availableItems={latestProjects.sort()}
                       additionalItems={
-                        uniqueWebTrackerProjects ? uniqueWebTrackerProjects : []
+                        uniqueWebTrackerProjects
+                          ? uniqueWebTrackerProjects.sort()
+                          : []
                       }
                       selectedItem={project}
                       setSelectedItem={setProject}
@@ -659,7 +646,9 @@ export default function TrackTimeModal({
                       onSave={onSave}
                       title="Activity"
                       availableItems={
-                        latestProjAndAct ? latestProjAndAct[project] : []
+                        latestProjAndAct[project]
+                          ? latestProjAndAct[project].sort()
+                          : []
                       }
                       selectedItem={activity}
                       setSelectedItem={setActivity}
@@ -673,15 +662,7 @@ export default function TrackTimeModal({
                       isNewCheck={false}
                       onSave={onSave}
                       title="Description"
-                      availableItems={
-                        latestProjAndDesc[project]
-                          ? [
-                              ...latestProjAndDesc[project],
-                              ...trelloTasks,
-                              ...jiraTasks,
-                            ]
-                          : [...trelloTasks, ...jiraTasks]
-                      }
+                      availableItems={descriptionItems}
                       selectedItem={description}
                       setSelectedItem={setDescription}
                       showedSuggestionsNumber={3}

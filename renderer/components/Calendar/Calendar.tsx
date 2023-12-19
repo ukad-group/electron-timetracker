@@ -32,31 +32,20 @@ import {
   getStringDate,
   getWeekNumber,
   isTheSameDates,
+  MONTHS,
 } from "../../utils/datetime-ui";
 import { loadHolidaysAndVacations } from "./calendar-utils";
-
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-] as const;
+import { BookingFromApi } from "../Bookings";
 
 type CalendarProps = {
   reportsFolder: string;
+  calendarDate: Date;
+  setCalendarDate: Dispatch<SetStateAction<Date>>;
   selectedDate: Date;
   setSelectedDate: Dispatch<SetStateAction<Date>>;
 };
 
-type ParsedReport = {
+export type ParsedReport = {
   data: string;
   reportDate: string;
 };
@@ -94,14 +83,16 @@ export type TTUserInfo = {
   yearProjects: string[];
   plannerAccessToken: string;
   plannerRefreshToken: string;
+  monthBookings: BookingFromApi[];
 };
 
 export function Calendar({
   reportsFolder,
   selectedDate,
   setSelectedDate,
+  calendarDate,
+  setCalendarDate,
 }: CalendarProps) {
-  const [calendarDate, setCalendarDate] = useState(new Date());
   const [parsedQuarterReports, setParsedQuarterReports] = useState<
     ParsedReport[]
   >([]);

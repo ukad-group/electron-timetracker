@@ -4,6 +4,21 @@ import {
   ApiDayOff,
 } from "../components/Calendar/Calendar";
 
+export const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
+
 export function checkIsToday(date: Date): boolean {
   const now = new Date();
   const chosenDate = new Date(date);

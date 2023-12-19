@@ -68,16 +68,20 @@ export const concatSortArrays = (
 //   });
 // };
 
-export function parseEventTitle(event, availableProjects: Array<string>) {
+export function parseEventTitle(
+  event,
+  latestProjAndAct: Record<string, [string]>
+) {
   const { summary } = event; // Google
   const { subject } = event; // Office365
   const eventTitle = summary || subject;
   const items = eventTitle ? eventTitle.split(" - ") : "";
-  let allProjects:Array<string>=availableProjects
+  const words = eventTitle ? eventTitle.split(" ") : "";
+  let allProjects: Array<string> = Object.keys(latestProjAndAct);
   const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
 
   if (userInfo && userInfo.yearProjects) {
-    allProjects = availableProjects.concat(userInfo.yearProjects)
+    allProjects = Object.keys(latestProjAndAct).concat(userInfo.yearProjects);
   }
 
   switch (items.length) {
@@ -86,6 +90,22 @@ export function parseEventTitle(event, availableProjects: Array<string>) {
       break;
 
     case 1:
+      for (let i = 0; words.length > i; i++) {
+        const project = words[i].toLowerCase();
+
+        if (allProjects.includes(project)) {
+          event.project = project;
+          for (let j = 0; words.length > j; j++) {
+            const activities = latestProjAndAct[project];
+            if (activities && activities.includes(words[j].toLowerCase())) {
+              event.activity =
+                activities[activities.indexOf(words[j].toLowerCase())];
+            }
+          }
+          break;
+        }
+      }
+
       event.description = items[0];
       break;
 
@@ -100,9 +120,21 @@ export function parseEventTitle(event, availableProjects: Array<string>) {
       break;
 
     case 3:
-      event.project = items[0];
-      event.activity = items[1];
-      event.description = items[2];
+      const project = items[0].toLowerCase();
+      const activity = items[1];
+      const description = items[2];
+
+      if (allProjects.includes(project)) {
+        const activities = latestProjAndAct[project];
+
+        if (activities && activities.includes(activity.toLowerCase())) {
+          event.activity =
+            activities[activities.indexOf(activity.toLowerCase())];
+        } else event.activity = activity;
+      } else event.activity = activity;
+
+      event.project = project;
+      event.description = description;
       break;
 
     default:

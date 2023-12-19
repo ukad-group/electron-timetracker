@@ -20,8 +20,8 @@ import {
   getTokens,
 } from "./helpers/API/office365Api";
 import {
-  getCardsOfMember,
-  getMember,
+  getTrelloCardsOfAllBoards,
+  getTrelloMember,
   getTrelloAuthUrl,
 } from "./helpers/API/trelloApi";
 import {
@@ -34,6 +34,7 @@ import {
   getTimetrackerProjects,
   getTimetrackerVacations,
   getRefreshedUserInfoToken,
+  getTimetrackerBookings,
 } from "./TimetrackerWebsiteApi";
 import { exec } from "child_process";
 import {
@@ -147,8 +148,13 @@ const generateWindow = () => {
     mainWindow.webContents.openDevTools();
   } else {
     mainWindow.on("close", (event) => {
-      event.preventDefault();
-      mainWindow?.hide();
+      if (
+        process.platform !== "darwin" ||
+        (process.platform === "darwin" && mainWindow?.isVisible())
+      ) {
+        event.preventDefault();
+        mainWindow?.hide();
+      }
     });
   }
   mainWindow.webContents.session.setSpellCheckerLanguages(["en-US"]);
@@ -270,6 +276,8 @@ app.on("ready", async () => {
   if (mainWindow) {
     app.whenReady().then(() => {
       autoUpdater.checkForUpdates();
+      if (process.platform === "darwin") return;
+
       try {
         generateTray();
       } catch (err) {
@@ -427,6 +435,10 @@ app.on("ready", async () => {
   mainWindow?.on("focus", () => {
     mainWindow?.webContents.send("window-focused");
   });
+});
+
+app.on("activate", () => {
+  if (process.platform === "darwin") mainWindow?.show();
 });
 
 app.on("window-all-closed", () => {
@@ -693,6 +705,24 @@ ipcMain.on("app:load-offline-page", async () => {
   mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
 });
 
+ipcMain.handle(
+  "app:find-month-projects",
+  (event, reportsFolder: string, stringDate: string) => {
+    if (!reportsFolder || !stringDate.length) return [];
+
+    const date = new Date(stringDate);
+    const year = date.getFullYear().toString();
+    const currentMonth = (date.getMonth() + 1).toString().padStart(2, "0");
+    const queries = [year + currentMonth];
+
+    return searchReadFiles(reportsFolder, queries, year);
+  }
+);
+
+ipcMain.on("app:load-offline-page", async () => {
+  mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
+});
+
 // TRELLO FUNCTIONS
 
 const getTrelloOptions = () => {
@@ -714,15 +744,18 @@ ipcMain.handle(
   async (event, accessToken: string) => {
     const options = getTrelloOptions();
 
-    return await getMember(accessToken, options);
+    return await getTrelloMember({ accessToken, options });
   }
 );
 
-ipcMain.handle("trello:get-cards", async (event, accessToken: string) => {
-  const options = getTrelloOptions();
+ipcMain.handle(
+  "trello:get-cards-of-all-boards",
+  async (event, memberId: string, accessToken: string) => {
+    const options = getTrelloOptions();
 
-  return await getCardsOfMember(accessToken, options);
-});
+    return await getTrelloCardsOfAllBoards({ memberId, accessToken, options });
+  }
+);
 
 // JIRA FUNCTIONS
 
@@ -915,3 +948,10 @@ ipcMain.handle("timetracker:login", async (event, idToken: string) => {
 ipcMain.handle("timetracker:get-projects", async (event, cookie: string) => {
   return await getTimetrackerProjects(cookie);
 });
+
+ipcMain.handle(
+  "timetracker:get-bookings",
+  async (event, cookie: string, name: string, calendarDate: Date) => {
+    return await getTimetrackerBookings(cookie, name, calendarDate);
+  }
+);

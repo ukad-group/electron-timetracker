@@ -22,6 +22,7 @@ import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 import { getStringDate } from "../utils/datetime-ui";
 import Totals from "../components/Totals";
+import Bookings from "../components/Bookings";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -32,6 +33,7 @@ export default function Home() {
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [selectedDateActivities, setSelectedDateActivities] =
     useState<Array<ReportActivity> | null>([]);
+  const [calendarDate, setCalendarDate] = useState(new Date());
   const [shouldAutosave, setShouldAutosave] = useState(false);
   const [trackTimeModalActivity, setTrackTimeModalActivity] = useState<
     ReportActivity | "new"
@@ -339,16 +341,18 @@ export default function Home() {
           tempActivities.push(activity);
           isPastTime = true;
         }
+
         if (!i && newActFrom < indexActFrom) {
           tempActivities.push(...selectedDateActivities);
           break;
         }
-        if (newActFrom === indexActFrom) {
-          tempActivities.push(activity);
-          isPastTime = true;
-          activity.isValid = true;
-          continue;
-        }
+        // // rewriting activity if start time the same. Commented after arthur request
+        // if (newActFrom === indexActFrom) {
+        //   tempActivities.push(activity);
+        //   isPastTime = true;
+        //   activity.isValid = true;
+        //   continue;
+        // }
       } catch (err) {
         global.ipcRenderer.send(
           "front error",
@@ -385,6 +389,7 @@ export default function Home() {
       );
       console.log(activity);
     }
+
     setShouldAutosave(true);
   };
 
@@ -401,6 +406,21 @@ export default function Home() {
   const handleSave = (report: string, shouldAutosave: boolean) => {
     setSelectedDateReport(report);
     setShouldAutosave(shouldAutosave);
+  };
+
+  const setFocusOnNewActivityBtn = () => {
+    const newActivityBtn = document.getElementById("newActivityBtn");
+
+    if (newActivityBtn) {
+      setTimeout(() => {
+        newActivityBtn.focus();
+      }, 0);
+    }
+  };
+
+  const closeModalHandler = () => {
+    setTrackTimeModalActivity(null);
+    setFocusOnNewActivityBtn();
   };
 
   return (
@@ -428,9 +448,7 @@ export default function Home() {
                       onEditActivity={setTrackTimeModalActivity}
                       onDeleteActivity={onDeleteActivity}
                       selectedDate={selectedDate}
-                      availableProjects={
-                        latestProjAndAct ? Object.keys(latestProjAndAct) : []
-                      }
+                      latestProjAndAct={latestProjAndAct}
                       setSelectedDateReport={setSelectedDateReport}
                     />
                   </div>
@@ -451,11 +469,9 @@ export default function Home() {
                   </div>
 
                   <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                    <Totals
-                      selectedDate={selectedDate}
-                      selectedDateActivities={selectedDateActivities}
-                    />
+                    <Totals selectedDate={selectedDate} />
                   </div>
+                  <Bookings calendarDate={calendarDate} />
                   <div className="hidden lg:block">
                     <UpdateDescription />
                   </div>
@@ -467,6 +483,8 @@ export default function Home() {
                   reportsFolder={reportsFolder}
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
+                  calendarDate={calendarDate}
+                  setCalendarDate={setCalendarDate}
                 />
                 <div className="lg:hidden">
                   <UpdateDescription />
@@ -479,7 +497,7 @@ export default function Home() {
         </div>
         <Link
           href="/settings"
-          className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold before:dark:text-blue-700/50"
+          className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold before:dark:text-gray-100"
         >
           <span className="w-8 flex items-center justify-center text-white ">
             <Cog8ToothIcon />
@@ -493,7 +511,7 @@ export default function Home() {
           editedActivity={trackTimeModalActivity}
           latestProjAndAct={latestProjAndAct}
           latestProjAndDesc={latestProjAndDesc}
-          close={() => setTrackTimeModalActivity(null)}
+          close={closeModalHandler}
           submitActivity={submitActivity}
           selectedDate={selectedDate}
         />

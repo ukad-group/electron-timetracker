@@ -12,12 +12,6 @@ const TimetrackerWebsiteConnection = () => {
     JSON.parse(localStorage.getItem("timetracker-user"))
   );
   const [loading, setLoading] = useState(false);
-  // const [holidays, setHolidays] = useState([]);
-  // const [showholidays, setShowHolidays] = useState(false);
-  // const [vacationsSickDays, setVacationsSickDays] = useState([]);
-  // const [showVacationsSickDays, setShowVacationsSickDays] = useState(false);
-  // const [projects, setProjects] = useState([]);
-  // const [showProjects, setShowProjects] = useState(false);
 
   const handleSignInButton = async () => {
     const online = await isOnline();
@@ -30,36 +24,9 @@ const TimetrackerWebsiteConnection = () => {
   };
 
   const handleSignOutButton = () => {
-    // setHolidays([]);
-    // setVacationsSickDays([]);
-    // setProjects([]);
-
-    // setShowProjects(false);
-    // setShowVacationsSickDays(false);
-    // setShowHolidays(false);
-
     localStorage.removeItem("timetracker-user");
-    localStorage.removeItem("transit-vacation");
     setLoggedUser(null);
   };
-
-  // const handleShowHolidays = () => {
-  //   setShowProjects(false);
-  //   setShowVacationsSickDays(false);
-  //   setShowHolidays(true);
-  // };
-
-  // const handleShowSickVac = () => {
-  //   setShowHolidays(false);
-  //   setShowProjects(false);
-  //   setShowVacationsSickDays(true);
-  // };
-
-  // const handleShowProjects = () => {
-  //   setShowHolidays(false);
-  //   setShowVacationsSickDays(false);
-  //   setShowProjects(true);
-  // };
 
   const loadUserInfo = async () => {
     setLoading(true);
@@ -151,25 +118,33 @@ const TimetrackerWebsiteConnection = () => {
         timetrackerCookie
       );
 
+      const userName = userInfo.name;
+      const bookingsPromise = global.ipcRenderer.invoke(
+        "timetracker:get-bookings",
+        timetrackerCookie,
+        userName
+      );
+
       userPromises.push(
         holidaysPromise,
         vacationsPromise,
-        timtrackerProjectsPromise
+        timtrackerProjectsPromise,
+        bookingsPromise
       );
 
       const userFetchedData = await Promise.all(userPromises);
 
       const userHolidays = userFetchedData[0];
-      // setHolidays(userHolidays);
       userInfo.holidays = userHolidays;
 
       const userVacations = userFetchedData[1].periods;
-      // setVacationsSickDays(userVacations);
       userInfo.vacationsSickdays = userVacations;
 
       const timtrackerYearProjects = userFetchedData[2];
-      // setProjects(timtrackerYearProjects);
       userInfo.yearProjects = timtrackerYearProjects;
+
+      const monthBookings = userFetchedData[3];
+      userInfo.monthBookings = monthBookings;
 
       localStorage.setItem("timetracker-user", JSON.stringify(userInfo));
       setLoggedUser(userInfo);
@@ -185,29 +160,24 @@ const TimetrackerWebsiteConnection = () => {
   };
 
   useEffect(() => {
-    // if (loggedUser) {
-    //   setHolidays(loggedUser?.holidays);
-    //   setVacationsSickDays(loggedUser?.vacationsSickdays);
-    //   setProjects(loggedUser?.yearProjects);
-    // }
-
     const searchParams = window.location.search;
+
+    if (searchParams.includes("error")) {
+      console.log("There are some problems with authorize");
+      console.log(searchParams);
+      return;
+    }
 
     if (
       searchParams.includes("code") &&
-      searchParams.includes("state=azure-base") &&
-      !searchParams.includes("error")
+      searchParams.includes("state=azure-base")
     ) {
-      (async () => loadUserInfo())();
+      loadUserInfo();
     } else if (
       searchParams.includes("code") &&
-      searchParams.includes("state=azure-additional") &&
-      !searchParams.includes("error")
+      searchParams.includes("state=azure-additional")
     ) {
-      (async () => loadPlannerInfo())();
-    } else if (searchParams.includes("error")) {
-      console.log("There are some problems with authorize");
-      console.log(searchParams);
+      loadPlannerInfo();
     }
   }, []);
 
@@ -266,54 +236,6 @@ const TimetrackerWebsiteConnection = () => {
         a month in calendar. Also active projects of the company will be added
         to the project selector.
       </p>
-
-      {/* <div className="flex gap-x-2">
-        {holidays?.length > 0 && (
-          <Button text="Show holidays" callback={handleShowHolidays} />
-        )}
-        {vacationsSickDays?.length > 0 && (
-          <Button text="Show vacation/sickdays" callback={handleShowSickVac} />
-        )}
-        {projects?.length > 0 && (
-          <Button text="Show active projects" callback={handleShowProjects} />
-        )}
-      </div> */}
-
-      {/* <div>
-        {showholidays &&
-          holidays.map((item) => (
-            <div
-              className="flex items-center gap-2 text-sm text-gray-900 dark:text-dark-main"
-              key={item.id}
-            >
-              <p>{item.description}</p>
-              <p>{new Date(item.dateFrom).toLocaleDateString("en-GB")}</p>
-            </div>
-          ))}
-        {showVacationsSickDays &&
-          vacationsSickDays.map((item) => (
-            <div
-              className="flex items-center gap-2 text-sm text-gray-900 dark:text-dark-main"
-              key={item.id}
-            >
-              <p>{item.description}</p>
-              <p>{new Date(item.dateFrom).toLocaleDateString("en-GB")}</p>
-              <p>{item?.quantity}h</p>
-            </div>
-          ))}
-        {showProjects && (
-          <div className="grid grid-cols-6 gap-2">
-            {projects.map((item) => (
-              <p
-                className="text-xs col-span-1 text-gray-900 dark:text-dark-main"
-                key={item}
-              >
-                {item}
-              </p>
-            ))}
-          </div>
-        )}
-      </div> */}
     </div>
   );
 };

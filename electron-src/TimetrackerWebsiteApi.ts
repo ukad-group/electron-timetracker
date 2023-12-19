@@ -226,3 +226,32 @@ export const getTimetrackerProjects = async (cookie: string) => {
 
   return response.json();
 };
+
+export const getTimetrackerBookings = async (
+  cookie: string,
+  name: string,
+  calendarDate: Date
+) => {
+  const date = calendarDate ? calendarDate : new Date();
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  const formattedDate = `${year}${month}${day}`;
+
+  const response = await fetch(
+    `https://tt-api.ukad-demo.com/integrations/planning/${name}/${formattedDate}`,
+    {
+      headers: {
+        Cookie: cookie,
+      },
+    }
+  );
+
+  if (!response.ok && response.status === 401) {
+    return "invalid_token";
+  } else if (!response.ok) {
+    throw new Error();
+  }
+
+  return response.json();
+};

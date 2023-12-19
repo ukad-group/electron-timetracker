@@ -10,7 +10,7 @@ export type ReportActivity = {
   isValid?: boolean;
   mistakes?: string;
   calendarId?: string;
-  isNewProject?:boolean;
+  isNewProject?: boolean;
 };
 export type ReportAndNotes = [Array<Partial<ReportActivity>>, string];
 export function parseReport(fileContent: string) {
@@ -144,7 +144,7 @@ export function parseReport(fileContent: string) {
 
 export function serializeReport(activities: Array<Partial<ReportActivity>>) {
   let report = "";
-  
+
   try {
     for (const [i, activity] of activities.entries()) {
       const parts: Array<string> = [activity.from];
@@ -278,6 +278,13 @@ export function checkIntersection(previousTo: string, currentFrom: string) {
 export function validation(activities: Array<ReportActivity>) {
   try {
     for (let i = 0; i < activities.length; i++) {
+      const [toHours, toMinutes] = activities[i].to
+        ? activities[i].to.split(":").map((item) => Number(item))
+        : [];
+      const [fromHours, fromMinutes] = activities[i].from
+        ? activities[i].from?.split(":")?.map((item) => Number(item))
+        : [];
+
       if (
         i > 0 &&
         checkIntersection(activities[i - 1].to, activities[i].from)
@@ -297,6 +304,18 @@ export function validation(activities: Array<ReportActivity>) {
         activities[i].isValid = false;
       }
       if (!activities[i].project) {
+        activities[i].isValid = false;
+      }
+      if (
+        toHours < 0 ||
+        toHours > 23 ||
+        fromHours < 0 ||
+        fromHours > 23 ||
+        toMinutes < 0 ||
+        toMinutes > 59 ||
+        fromMinutes < 0 ||
+        fromMinutes > 59
+      ) {
         activities[i].isValid = false;
       }
     }
