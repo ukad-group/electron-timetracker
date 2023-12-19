@@ -84,13 +84,23 @@ export default function AutocompleteSelector({
           .slice(0, 15);
 
   const handleKey = (event) => {
-    if (event.key === "Home") {
+    if (
+      !event.ctrlKey &&
+      !event.shiftKey &&
+      !event.metaKey &&
+      event.key === "Home"
+    ) {
       event.preventDefault();
       inputRef.current.selectionStart = 0;
       inputRef.current.selectionEnd = 0;
     }
 
-    if (event.key === "End") {
+    if (
+      !event.ctrlKey &&
+      !event.shiftKey &&
+      !event.metaKey &&
+      event.key === "End"
+    ) {
       event.preventDefault();
       const input = inputRef.current;
       const length = input.value.length;
