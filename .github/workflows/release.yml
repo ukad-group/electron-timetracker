@@ -122,6 +122,12 @@ jobs:
           cat .env
 
       # - run: npm run build
+      - name: "sign mac application"
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          codesign --deep --force --verbose --sign - node_modules/electron/dist/Electron.app
+
       - run: npm run test
       - run: npm run dist
 
