@@ -85,28 +85,28 @@ export default function AutocompleteSelector({
           }, [])
           .slice(0, 15);
 
-  const handleKey = (event) => {
-    if (event.key === "Home") {
-      event.preventDefault();
+  const handleKey = (e) => {
+    if (e.key === "Home") {
+      e.preventDefault();
       inputRef.current.selectionStart = 0;
       inputRef.current.selectionEnd = 0;
     }
 
-    if (event.key === "End") {
-      event.preventDefault();
+    if (e.key === "End") {
+      e.preventDefault();
       const input = inputRef.current;
       const length = input.value.length;
       input.selectionStart = length;
       input.selectionEnd = length;
     }
 
-    if (event.ctrlKey && event.key === "Enter") {
-      event.preventDefault();
-      onSave(event);
+    if (e.ctrlKey && e.key === "Enter") {
+      e.preventDefault();
+      onSave(e);
     }
 
-    if (event.ctrlKey && event.key === "z") {
-      event.preventDefault();
+    if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+      e.preventDefault();
       const currentValue = undoManager.undo();
 
       if (currentValue !== undefined) {
@@ -114,8 +114,8 @@ export default function AutocompleteSelector({
       }
     }
 
-    if (event.ctrlKey && event.key === "y") {
-      event.preventDefault();
+    if ((e.ctrlKey || e.metaKey) && e.key === "y") {
+      e.preventDefault();
       const currentValue = undoManager.redo();
 
       if (currentValue !== undefined) {
