@@ -52,36 +52,49 @@ export default function AutocompleteSelector({
       : availableItems;
   }, [availableItems, additionalItems]);
 
-  const filteredList =
-    selectedItem === ""
-      ? availableItems?.filter((activity, i) => {
-          if (showedSuggestionsNumber) {
-            return activity !== "" && i < showedSuggestionsNumber;
-          }
-          return activity !== "";
-        })
-      : availableItems
-          .sort()
-          .concat(additionalItems ? additionalItems : [])
-          .reduce((accumulator, current) => {
-            let duplicate = false;
-            if (current.startsWith("TT:: ") || current.startsWith("JI:: ")) {
-              duplicate = availableItems.includes(current.slice(5));
-            }
-            if (
-              !duplicate &&
-              current.toLowerCase() === selectedItem.toLowerCase()
-            ) {
-              accumulator.unshift(current);
-            } else if (
-              !duplicate &&
-              current.toLowerCase().includes((selectedItem || "").toLowerCase())
-            ) {
-              accumulator.push(current);
-            }
-            return accumulator;
-          }, [])
-          .slice(0, 15);
+  const filteredList = useMemo(() => {
+    return selectedItem === ""
+      ? availableItems &&
+          [...availableItems]
+            .concat(additionalItems ? additionalItems : [])
+            .filter((activity, i) => {
+              if (showedSuggestionsNumber) {
+                return activity !== "" && i < showedSuggestionsNumber;
+              }
+              return activity !== "";
+            })
+      : availableItems &&
+          [...availableItems]
+            .sort()
+            .concat(additionalItems ? additionalItems : [])
+            .reduce((accumulator, current) => {
+              let duplicate = false;
+              if (current.startsWith("TT:: ") || current.startsWith("JI:: ")) {
+                duplicate = availableItems.includes(current.slice(5));
+              }
+              if (
+                !duplicate &&
+                current.toLowerCase() === selectedItem.toLowerCase()
+              ) {
+                accumulator.unshift(current);
+              } else if (
+                !duplicate &&
+                current
+                  .toLowerCase()
+                  .includes((selectedItem || "").toLowerCase())
+              ) {
+                accumulator.push(current);
+              }
+              return accumulator;
+            }, [])
+            .slice(0, 15);
+  }, [selectedItem, availableItems, additionalItems]);
+
+  const fullSuggestionsList = useMemo(() => {
+    return selectedItem.trim() === ""
+      ? filteredList
+      : [selectedItem, ...filteredList];
+  }, [selectedItem, filteredList]);
 
   const handleKey = (event) => {
     if (event.key === "Home") {
@@ -171,12 +184,12 @@ export default function AutocompleteSelector({
           />
         </Combobox.Button>
 
-        {filteredList?.length > 0 && (
+        {fullSuggestionsList?.length > 0 && (
           <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm dark:bg-dark-container dark:shadow-lg dark:shadow-slate-900">
             <div className="block text-xs text-gray-500 text-center">
               tab to choose
             </div>
-            {[selectedItem, ...filteredList].map((item, i) => (
+            {fullSuggestionsList.map((item, i) => (
               <Combobox.Option
                 key={i}
                 value={item}
@@ -215,7 +228,7 @@ export default function AutocompleteSelector({
               </Combobox.Option>
             ))}
           </Combobox.Options>
-        ) }
+        )}
       </div>
     </Combobox>
   );
