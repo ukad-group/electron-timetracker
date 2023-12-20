@@ -49,6 +49,8 @@ export default function Home() {
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
   const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const [isDropboxConnected, setIsDropboxConnected] = useState(true);
+  const isManualInputMain =
+    localStorage.getItem("is-manual-input-main-section") === "true";
   const [theme] = useThemeStore(
     (state) => [state.theme, state.setTheme],
     shallow
@@ -429,19 +431,18 @@ export default function Home() {
         <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
           {reportsFolder ? (
             <>
-              <div className="space-y-6 lg:col-start-1 lg:col-span-2 flex flex-col">
-                <section>
-                  <div className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
-                    <DateSelector
-                      selectedDate={selectedDate}
-                      setSelectedDate={setSelectedDate}
-                      isDropboxConnected={isDropboxConnected}
-                      selectedDateReport={selectedDateReport}
-                    />
-                  </div>
+              <div className="lg:col-start-1 lg:col-span-2 flex flex-col gap-6">
+                <section className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
+                  <DateSelector
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                    isDropboxConnected={isDropboxConnected}
+                    selectedDateReport={selectedDateReport}
+                  />
                 </section>
-                <section className="flex-grow">
-                  <div className="bg-white shadow sm:rounded-lg h-full dark:bg-dark-container dark:border dark:border-dark-border">
+
+                {!isManualInputMain && (
+                  <section className="bg-white shadow sm:rounded-lg h-full dark:bg-dark-container dark:border dark:border-dark-border">
                     <ActivitiesSection
                       activities={selectedDateActivities}
                       onEditActivity={setTrackTimeModalActivity}
@@ -449,46 +450,75 @@ export default function Home() {
                       selectedDate={selectedDate}
                       latestProjAndAct={latestProjAndAct}
                       setSelectedDateReport={setSelectedDateReport}
+                      showAsMain={!isManualInputMain}
                     />
-                  </div>
-                </section>
-              </div>
+                  </section>
+                )}
 
-              <section
-                aria-labelledby="manual-input-title"
-                className="lg:col-start-3 lg:col-span-1 lg:row-span-2 relative"
-              >
-                <div className="flex flex-col gap-6">
-                  <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
+                {isManualInputMain && (
+                  <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
                     <ManualInputForm
                       onSave={handleSave}
                       selectedDateReport={selectedDateReport}
                       selectedDate={selectedDate}
                     />
-                  </div>
+                  </section>
+                )}
 
-                  <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                    <Totals selectedDate={selectedDate} />
-                  </div>
-                  <Bookings calendarDate={calendarDate} />
-                  <div className="hidden lg:block">
-                    <UpdateDescription />
-                  </div>
-                </div>
-              </section>
+                <section className="hidden lg:block lg:col-span-2">
+                  <Calendar
+                    reportsFolder={reportsFolder}
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                    calendarDate={calendarDate}
+                    setCalendarDate={setCalendarDate}
+                  />
+                </section>
+              </div>
 
-              <section className="lg:col-span-2 flex flex-col gap-6">
-                <Calendar
-                  reportsFolder={reportsFolder}
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                  calendarDate={calendarDate}
-                  setCalendarDate={setCalendarDate}
-                />
-                <div className="lg:hidden">
+              <aside className="lg:col-start-3 lg:col-span-1 lg:row-span-2 relative flex flex-col gap-6">
+                {isManualInputMain && (
+                  <section className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
+                    <ActivitiesSection
+                      activities={selectedDateActivities}
+                      onEditActivity={setTrackTimeModalActivity}
+                      onDeleteActivity={onDeleteActivity}
+                      selectedDate={selectedDate}
+                      latestProjAndAct={latestProjAndAct}
+                      setSelectedDateReport={setSelectedDateReport}
+                      showAsMain={!isManualInputMain}
+                    />
+                  </section>
+                )}
+
+                {!isManualInputMain && (
+                  <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
+                    <ManualInputForm
+                      onSave={handleSave}
+                      selectedDateReport={selectedDateReport}
+                      selectedDate={selectedDate}
+                    />
+                  </section>
+                )}
+
+                <Totals selectedDate={selectedDate} />
+
+                <Bookings calendarDate={calendarDate} />
+
+                <section className="lg:hidden lg:col-span-2">
+                  <Calendar
+                    reportsFolder={reportsFolder}
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                    calendarDate={calendarDate}
+                    setCalendarDate={setCalendarDate}
+                  />
+                </section>
+
+                <section>
                   <UpdateDescription />
-                </div>
-              </section>
+                </section>
+              </aside>
             </>
           ) : (
             <SelectFolderPlaceholder setFolder={setReportsFolder} />
