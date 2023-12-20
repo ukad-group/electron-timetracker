@@ -177,7 +177,7 @@ export default function ActivitiesTable({
       });
   };
 
-  const copyRegistration = (activity) => {
+  const copyActivityHandler = (activity) => {
     global.ipcRenderer.send("send-analytics-data", "copy_registration");
     onEditActivity({
       ...activity,
@@ -429,7 +429,7 @@ export default function ActivitiesTable({
                     className="group py-4 px-3"
                     title="Copy"
                     onClick={() => {
-                      copyRegistration(activity);
+                      copyActivityHandler(activity);
                     }}
                   >
                     <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
