@@ -177,6 +177,17 @@ export default function ActivitiesTable({
       });
   };
 
+  const copyRegistration = (activity) => {
+    global.ipcRenderer.send("send-analytics-data", "copy_registration");
+    onEditActivity({
+      ...activity,
+      id: null,
+      from: activities[activities.length - 2].to,
+      to: checkIsToday(selectedDate) ? getCeiledTime() : "",
+      duration: null,
+    });
+  };
+
   const handleKeyDown = (event) => {
     if (
       (event.ctrlKey && event.key === "ArrowUp") ||
@@ -241,6 +252,7 @@ export default function ActivitiesTable({
   };
 
   const editActivityHandler = (activity) => {
+    global.ipcRenderer.send("send-analytics-data", "edit_registration");
     if (activity.calendarId) {
       onEditActivity({
         ...activity,
@@ -417,13 +429,7 @@ export default function ActivitiesTable({
                     className="group py-4 px-3"
                     title="Copy"
                     onClick={() => {
-                      onEditActivity({
-                        ...activity,
-                        id: null,
-                        from: activities[activities.length - 2].to,
-                        to: checkIsToday(selectedDate) ? getCeiledTime() : "",
-                        duration: null,
-                      });
+                      copyRegistration(activity);
                     }}
                   >
                     <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
