@@ -71,7 +71,7 @@ export default function Home() {
 
     global.ipcRenderer.send("check-dropbox-connection");
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
-      setIsDropboxConnected(data);
+      setIsDropboxConnected(!reportsFolder.includes("Dropbox") || data);
     });
     global.ipcRenderer.send("beta-channel", isBeta);
 
