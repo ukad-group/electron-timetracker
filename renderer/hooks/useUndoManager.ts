@@ -1,6 +1,7 @@
 import { useReducer, useCallback } from "react";
 
 interface UndoState<T> {
+  // в UndoState redoStack? назви це щось типу EditingHistoryState
   undoStack: T[];
   redoStack: T[];
 }
@@ -9,6 +10,8 @@ type UndoAction<T> =
   | { type: "SET_VALUE"; value: T }
   | { type: "UNDO" }
   | { type: "REDO" };
+
+// чому у UndoAction може бути тип SET_VALUE або REDO. назва невдала.
 
 const undoReducer = <T>(
   state: UndoState<T>,
@@ -56,31 +59,33 @@ const undoReducer = <T>(
   }
 };
 
-const useUndoManager = (initialValue: string) => {
-  const [state, dispatch] = useReducer(undoReducer, {
+const useUndoManager = <T>(initialValue: T) => {
+  const undoState: UndoState<T> = {
     undoStack: [initialValue],
     redoStack: [],
-  });
+  };
+  const [state, dispatch] = useReducer(undoReducer<T>, undoState);
 
   const setValue = useCallback(
     (value) => {
-      dispatch({ type: "SET_VALUE", value });
+      dispatch({ type: "SET_VALUE", value }); // краще зробити action creator function
     },
     [dispatch]
   );
 
   const undo = useCallback(() => {
-    dispatch({ type: "UNDO" });
+    dispatch({ type: "UNDO" }); // same here
 
     if (state.undoStack.length > 2) {
       return state.undoStack[state.undoStack.length - 2];
     } else {
+      // else не потрібно, просто return після умови
       return state.undoStack[0];
     }
   }, [dispatch, state]);
 
   const redo = useCallback(() => {
-    dispatch({ type: "REDO" });
+    dispatch({ type: "REDO" }); // same here
 
     return state.redoStack[state.redoStack.length - 1];
   }, [dispatch, state]);
