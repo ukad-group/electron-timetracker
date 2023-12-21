@@ -139,8 +139,8 @@ export default function AutocompleteSelector({
     e.target.value = e.target.value.trim();
     onChangeHandler(e.target.value);
 
-    if (isNewCheck && availableItems) {
-      setIsNew(selectedItem && !availableItems.includes(selectedItem));
+    if (isNewCheck && allItems) {
+      setIsNew(selectedItem && !allItems.includes(selectedItem));
     }
   };
 
