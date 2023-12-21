@@ -148,7 +148,7 @@ const Totals = ({ selectedDate }) => {
           activities: [],
         });
       } else {
-        existingTotal.duration += curr.duration;
+        existingTotal.duration += curr.duration ? curr.duration : 0;
 
         const existingDescription = existingTotal.descriptions.find(
           (desc) => desc.name === name
