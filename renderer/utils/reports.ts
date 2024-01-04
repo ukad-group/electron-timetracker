@@ -235,6 +235,15 @@ export function formatDuration(ms: number): string {
   return `${Math.floor(hours * 100) / 100}h`;
 }
 
+export function formatDurationAsDecimals(ms: number): string {
+  if (ms == undefined) return;
+
+  const minutes = ms / 1000 / 60;
+  const hours = minutes / 60;
+
+  return `${Math.floor(hours * 100) / 100}h`;
+}
+
 export function addDurationToTime(fromTime: string, duration: string) {
   const [fromHours, fromMinutes] = fromTime.split(":").map(Number);
 
