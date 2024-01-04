@@ -244,6 +244,26 @@ export function formatDurationAsDecimals(ms: number): string {
   return `${Math.floor(hours * 100) / 100}h`;
 }
 
+export function formatDurationAsHoursAndMinutes(ms: number): string {
+  if (ms == undefined) return;
+
+  const msPerMinute = 60 * 1000;
+  const msPerHour = 60 * msPerMinute;
+
+  const hours = Math.floor(ms / msPerHour);
+  const minutes = Math.floor((ms % msPerHour) / msPerMinute);
+
+  if (hours === 0) {
+    return `${minutes}m`;
+  }
+
+  if (minutes === 0) {
+    return `${hours}h`;
+  }
+
+  return `${hours}h ${minutes}m`;
+}
+
 export function addDurationToTime(fromTime: string, duration: string) {
   const [fromHours, fromMinutes] = fromTime.split(":").map(Number);
 

@@ -3,7 +3,7 @@ import { useMemo, useEffect, useState } from "react";
 import {
   ReportActivity,
   calcDurationBetweenTimes,
-  formatDuration,
+  formatDurationAsHoursAndMinutes,
   validation,
 } from "../utils/reports";
 import {
@@ -354,7 +354,7 @@ export default function ActivitiesTable({
               >
                 <Tooltip>
                   <p data-column="duration" onClick={copyToClipboardHandle}>
-                    {formatDuration(activity.duration)}
+                    {formatDurationAsHoursAndMinutes(activity.duration)}
                   </p>
                 </Tooltip>
               </td>
@@ -458,7 +458,9 @@ export default function ActivitiesTable({
             onClick={copyToClipboardHandle}
           >
             <Tooltip>
-              <p data-column="total">{formatDuration(totalDuration)}</p>
+              <p data-column="total">
+                {formatDurationAsHoursAndMinutes(totalDuration)}
+              </p>
             </Tooltip>
           </td>
           <td className="px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap">
