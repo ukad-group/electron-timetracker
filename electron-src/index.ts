@@ -359,7 +359,8 @@ app.on("ready", async () => {
     });
 
     ipcMain.on("check-dropbox-connection", () => {
-      exec("tasklist", (err, stdout, stderr) => {
+      const command = process.platform === "win32" ? "tasklist" : "ps aux";
+      exec(command, (err, stdout, stderr) => {
         if (err) {
           console.log(err);
           return;
