@@ -105,7 +105,7 @@ export default function AutocompleteSelector({
       onSave(e);
     }
 
-    if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+    if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
       const currentValue = undoManager.undo();
 
@@ -114,7 +114,7 @@ export default function AutocompleteSelector({
       }
     }
 
-    if ((e.ctrlKey || e.metaKey) && e.key === "y") {
+    if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
       const currentValue = undoManager.redo();
 
