@@ -225,27 +225,6 @@ export function calcDurationBetweenTimes(from: string, to: string): number {
 
 export function formatDuration(ms: number): string {
   if (ms == undefined) return;
-  const minutes = ms / 1000 / 60;
-  const hours = minutes / 60;
-
-  if (Math.abs(hours) < 1) {
-    const minutes = Math.round(ms / 1000 / 60);
-    return `${minutes}m`;
-  }
-  return `${Math.floor(hours * 100) / 100}h`;
-}
-
-export function formatDurationAsDecimals(ms: number): string {
-  if (ms == undefined) return;
-
-  const minutes = ms / 1000 / 60;
-  const hours = minutes / 60;
-
-  return `${Math.floor(hours * 100) / 100}h`;
-}
-
-export function formatDurationAsHoursAndMinutes(ms: number): string {
-  if (ms == undefined) return;
 
   const msPerMinute = 60 * 1000;
   const msPerHour = 60 * msPerMinute;
@@ -262,6 +241,15 @@ export function formatDurationAsHoursAndMinutes(ms: number): string {
   }
 
   return `${hours}h ${minutes}m`;
+}
+
+export function formatDurationAsDecimals(ms: number): string {
+  if (ms == undefined) return;
+
+  const minutes = ms / 1000 / 60;
+  const hours = minutes / 60;
+
+  return `${Math.floor(hours * 100) / 100}h`;
 }
 
 export function addDurationToTime(fromTime: string, duration: string) {
