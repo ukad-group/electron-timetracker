@@ -305,7 +305,7 @@ app.on("ready", async () => {
 
         try {
           if (fs.existsSync(timereportPath)) {
-            mainWindow?.webContents.send("file exist", true);
+            mainWindow?.webContents.send("file-exist", true);
 
             const fileWatcher = chokidar.watch(timereportPath);
             watchers[timereportPath] = fileWatcher;

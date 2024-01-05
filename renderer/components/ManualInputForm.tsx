@@ -21,6 +21,9 @@ export default function ManualInputForm({
   const [report, setReport] = useState("");
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
   const textareaRef = useRef(null);
+  const [showDeleteMessage, setShowDeleteMessage] = useState(false);
+  const [showDeleteButton, setShowDeleteButton] = useState(false);
+  const [isFileExist, setIsFileExist] = useState(false);
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if (
@@ -33,7 +36,23 @@ export default function ManualInputForm({
   };
 
   useEffect(() => {
+    setShowDeleteMessage(false);
+    setIsFileExist(false);
+
+    global.ipcRenderer.on("file-exist", (event, data) => {
+      setIsFileExist(data);
+    });
+
+    return () => {
+      global.ipcRenderer.removeAllListeners("file-exist");
+    };
+  }, [selectedDate]);
+
+  useEffect(() => {
+    setShowDeleteButton(isFileExist && !report.length ? true : false);
+
     document.addEventListener("keydown", saveOnPressHandler);
+
     return () => {
       document.removeEventListener("keydown", saveOnPressHandler);
     };
@@ -47,17 +66,11 @@ export default function ManualInputForm({
     global.ipcRenderer.send("send-analytics-data", "manuall_save");
     onSave(report, true);
     setSaveBtnStatus("inprogress");
+    setIsFileExist(true);
   };
 
   const setReportHandler = (report: string) => {
-    if (selectedDateReport !== report) {
-      setSaveBtnStatus("enabled");
-    }
-
-    if (!report || selectedDateReport === report) {
-      setSaveBtnStatus("disabled");
-    }
-
+    setSaveBtnStatus(selectedDateReport !== report ? "enabled" : "disabled");
     setReport(report);
   };
 
@@ -157,21 +170,35 @@ export default function ManualInputForm({
         ref={textareaRef}
         onKeyDown={copyLineHandler}
       />
-      <div className="relative flex flex-col mt-6 justify-stretch">
-        <DeleteMessage
-          selectedDateReport={selectedDateReport}
-          selectedDate={selectedDate}
-        />
-        <Button
-          text="Save"
-          callback={saveReportHandler}
-          status={saveBtnStatus}
-          disabled={saveBtnStatus === "disabled"}
-          type={"button"}
-        />
-        <span className="block text-xs text-gray-500 text-center">
-          or press ctrl + s
-        </span>
+      <div className="relative flex flex-col gap-4 mt-6 justify-stretch">
+        {showDeleteMessage && (
+          <DeleteMessage
+            setShowDeleteButton={setShowDeleteButton}
+            setShowDeleteMessage={setShowDeleteMessage}
+            selectedDate={selectedDate}
+          />
+        )}
+        <div className="flex flex-col justify-stretch">
+          <Button
+            text="Save"
+            callback={saveReportHandler}
+            status={saveBtnStatus}
+            disabled={saveBtnStatus === "disabled"}
+            type={"button"}
+          />
+          <span className="block text-xs text-gray-500 text-center">
+            or press ctrl + s
+          </span>
+        </div>
+        {showDeleteButton && (
+          <button
+            onClick={() => setShowDeleteMessage(true)}
+            type="button"
+            className="inline-flex w-full justify-center rounded-md bg-red-100 px-3 py-2 text-sm font-semibold text-red-800 hover:text-white shadow-sm hover:bg-red-600 sm:w-auto dark:text-dark-heading dark:border dark:border-red-500/50 hover:dark:border-transparent dark:bg-transparent hover:dark:bg-red-400/20"
+          >
+            Remove an empty file
+          </button>
+        )}
       </div>
     </div>
   );
