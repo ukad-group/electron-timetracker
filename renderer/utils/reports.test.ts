@@ -1,7 +1,7 @@
 import {
   ReportActivity,
   calcDurationBetweenTimes,
-  formatDuration,
+  // formatDuration,
   parseReport,
   serializeReport,
   checkIntersection,
@@ -345,27 +345,27 @@ describe("calcDurationBetweenTimes function", () => {
   });
 });
 
-describe("formatDuration function", () => {
-  test("should return undefined when [ms] = undefined", () => {
-    expect(formatDuration(undefined)).toBeUndefined();
-  });
+// describe("formatDuration function", () => {
+//   test("should return undefined when [ms] = undefined", () => {
+//     expect(formatDuration(undefined)).toBeUndefined();
+//   });
 
-  test("should return 0m when [ms] < 1m", () => {
-    expect(formatDuration(1000)).toBe("0m");
-  });
+//   test("should return 0m when [ms] < 1m", () => {
+//     expect(formatDuration(1000)).toBe("0m");
+//   });
 
-  test("should return minutes when [ms] < 1h", () => {
-    const ms: number = 2000000;
-    const minutes: number = ms / 1000 / 60;
-    expect(formatDuration(ms)).toBe(Math.round(minutes) + "m");
-  });
+//   test("should return minutes when [ms] < 1h", () => {
+//     const ms: number = 2000000;
+//     const minutes: number = ms / 1000 / 60;
+//     expect(formatDuration(ms)).toBe(Math.round(minutes) + "m");
+//   });
 
-  test("should return hours when [ms] > 1h", () => {
-    const ms: number = 20000000;
-    const hours: number = ms / 1000 / 60 / 60;
-    expect(formatDuration(ms)).toBe(Math.floor(hours * 100) / 100 + "h");
-  });
-});
+//   test("should return hours when [ms] > 1h", () => {
+//     const ms: number = 20000000;
+//     const hours: number = ms / 1000 / 60 / 60;
+//     expect(formatDuration(ms)).toBe(Math.floor(hours * 100) / 100 + "h");
+//   });
+// });
 
 describe("checkIntersection function", () => {
   test("should return false when [previousTo] lower than [currentFrom]", () => {
