@@ -318,7 +318,16 @@ export function validation(activities: Array<ReportActivity>) {
       ) {
         activities[i].isValid = false;
       }
+      if (
+        activities[i].project &&
+        !activities[i].project.startsWith("!") &&
+        !activities[i].activity &&
+        !activities[i].description
+      ) {
+        activities[i].isValid = false;
+      }
     }
+
     return activities;
   } catch (err) {
     console.log(err);
