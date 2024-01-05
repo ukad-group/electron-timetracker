@@ -18,7 +18,7 @@ import {
   GlobeAltIcon,
 } from "@heroicons/react/24/outline";
 import {
-  formatDuration,
+  formatDurationAsHoursAndMinutes,
   parseReport,
   validation,
   ReportActivity,
@@ -111,13 +111,15 @@ export function Calendar({
   );
 
   const monthWorkedHours = useMemo(() => {
-    return formatDuration(
+    return formatDurationAsHoursAndMinutes(
       getMonthWorkHours(formattedQuarterReports, calendarDate)
     );
   }, [formattedQuarterReports, calendarDate]);
 
   const monthRequiredHours = useMemo(() => {
-    return formatDuration(getMonthRequiredHours(calendarDate, daysOff));
+    return formatDurationAsHoursAndMinutes(
+      getMonthRequiredHours(calendarDate, daysOff)
+    );
   }, [daysOff, calendarDate]);
 
   useEffect(() => {
@@ -248,7 +250,7 @@ export function Calendar({
   };
 
   const weekNumberContent = (options) => {
-    const weekTotalHours = formatDuration(
+    const weekTotalHours = formatDurationAsHoursAndMinutes(
       formattedQuarterReports.reduce((acc, report) => {
         if (report.week === options.num) {
           acc += report.workDurationMs;
@@ -374,11 +376,14 @@ function renderEventContent(eventInfo) {
         <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[26px] -left-[1px] dark:fill-red-500/70" />
       )}
       {eventInfo.event.extendedProps.workDurationMs ? (
-        <p>
-          Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}
+        <p className="whitespace-normal">
+          Logged:{" "}
+          {formatDurationAsHoursAndMinutes(
+            eventInfo.event.extendedProps.workDurationMs
+          )}
         </p>
       ) : (
-        <p>File is empty</p>
+        <p className="whitespace-normal">File is empty</p>
       )}
     </>
   );
