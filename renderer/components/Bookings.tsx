@@ -14,6 +14,8 @@ export type BookingFromApi = {
   name: string;
   plans: Array<{
     hours: number;
+    month: number;
+    year: number;
   }>;
 };
 
@@ -82,7 +84,17 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
       maxRecurse = 0;
 
       const bookedProjects = allLoggedProjects.filter(
-        (projects: BookingFromApi) => projects?.plans[0]?.hours !== 0
+        (project: BookingFromApi) => {
+          const projectBooking = project?.plans[0];
+
+          if (
+            projectBooking?.hours !== 0 &&
+            projectBooking?.month === calendarDate?.getMonth() + 1 &&
+            projectBooking?.year === calendarDate?.getFullYear()
+          ) {
+            return project;
+          }
+        }
       );
 
       return bookedProjects;
@@ -194,66 +206,63 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   }, [calendarDate]);
 
   return (
-    <div className="relative px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-      <h2 className="text-lg font-medium text-gray-900 dark:text-dark-heading mb-2">
-        Bookings in {currentReadableMonth}
-      </h2>
-      {loading && (
-        <div className="absolute top-5 right-4">
-          <Loader />
-        </div>
-      )}
-      {isTimetrackerLogged ? (
-        <div className="relative overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-gray-900 dark:text-dark-heading border-b dark:border-gray-700">
-              <tr>
-                <th scope="col" className="pr-6 py-3 font-semibold">
-                  Project
-                </th>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Booked
-                </th>
-                <th scope="col" className="px-6 py-3 font-semibold">
-                  Spent
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookedSpentStatistic.map((project, i) => (
-                <tr key={i} className="border-b dark:border-gray-700">
-                  <td className="pr-6 py-2 text-gray-700 dark:text-dark-main">
-                    {project.project}
+    <>
+      {isTimetrackerLogged && (
+        <div className="relative px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-dark-heading mb-2">
+            Bookings in {currentReadableMonth}
+          </h2>
+          {loading && (
+            <div className="absolute top-5 right-4">
+              <Loader />
+            </div>
+          )}
+          <div className="relative overflow-x-auto">
+            <table className="w-full text-sm text-left">
+              <thead className="text-gray-900 dark:text-dark-heading border-b dark:border-gray-700">
+                <tr>
+                  <th scope="col" className="pr-6 py-3 font-semibold">
+                    Project
+                  </th>
+                  <th scope="col" className="px-6 py-3 font-semibold">
+                    Booked
+                  </th>
+                  <th scope="col" className="px-6 py-3 font-semibold">
+                    Spent
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {bookedSpentStatistic.map((project, i) => (
+                  <tr key={i} className="border-b dark:border-gray-700">
+                    <td className="pr-6 py-2 text-gray-700 dark:text-dark-main">
+                      {project.project}
+                    </td>
+                    <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
+                      {project.booked}h
+                    </td>
+                    <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
+                      {formatDuration(project.spent)}
+                    </td>
+                  </tr>
+                ))}
+                <tr>
+                  <td className="pr-6 py-2 text-gray-700 dark:text-dark-main ">
+                    Total:
                   </td>
                   <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                    {project.booked}h
+                    {totalBookingTime}h
                   </td>
                   <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                    {formatDuration(project.spent)}
+                    {formatDuration(totalSpentTime)}
                   </td>
                 </tr>
-              ))}
-              <tr>
-                <td className="pr-6 py-2 text-gray-700 dark:text-dark-main ">
-                  Total:
-                </td>
-                <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                  {totalBookingTime}h
-                </td>
-                <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                  {formatDuration(totalSpentTime)}
-                </td>
-              </tr>
-            </tbody>
-          </table>
+              </tbody>
+            </table>
+          </div>
         </div>
-      ) : (
-        <p className="text-gray-700 dark:text-dark-main text-sm">
-          To see booked hours, you need to log in to the timetracker website on
-          settings page
-        </p>
       )}
-    </div>
+    </>
   );
 };
 
