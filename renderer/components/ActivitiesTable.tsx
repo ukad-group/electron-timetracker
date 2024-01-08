@@ -526,12 +526,10 @@ export default function ActivitiesTable({
                         )}
                         <Tooltip>
                           <p
-                            className="text-sm font-medium text-gray-900 dark:text-dark-heading"
+                            className="text-sm font-medium text-gray-900 dark:text-dark-heading old-break-word"
                             onClick={copyToClipboardHandle}
                           >
-                            <div className="old-break-word">
-                              {activity.project}
-                            </div>
+                            {activity.project}
                           </p>
                         </Tooltip>
                       </div>
@@ -648,17 +646,15 @@ export default function ActivitiesTable({
             ))}
           <tr>
             <td className="pt-4 px-3 text-sm whitespace-nowrap">
-              <p>
-                Total{" "}
-                <Tooltip>
-                  <p
-                    data-column="total"
-                    className="px-1 py-1 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap"
-                  >
-                    {formatDuration(totalDuration)}
-                  </p>
-                </Tooltip>
-              </p>
+              Total{" "}
+              <Tooltip>
+                <p
+                  data-column="total"
+                  className="px-1 py-1 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap"
+                >
+                  {formatDuration(totalDuration)}
+                </p>
+              </Tooltip>
             </td>
             <td className="px-1 pt-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap">
               {tableActivities.length > 0 && (
