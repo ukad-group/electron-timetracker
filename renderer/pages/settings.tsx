@@ -90,7 +90,7 @@ const SettingsPage = () => {
             </div>
             <Link href="/">
               <ButtonTransparent>
-                <ChevronLeftIcon className="w-5 h-5" /> Back
+                <ChevronLeftIcon className="w-4 h-4" /> Back
               </ButtonTransparent>
             </Link>
           </div>
