@@ -57,6 +57,7 @@ export default function Home() {
     (state) => [state.isBeta, state.setIsBeta],
     shallow
   );
+  const showBookings = !!JSON.parse(localStorage.getItem("timetracker-user"));
 
   function handleThemeChange(e) {
     if (e.matches) {
@@ -470,7 +471,7 @@ export default function Home() {
                   <div className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
                     <Totals selectedDate={selectedDate} />
                   </div>
-                  <Bookings calendarDate={calendarDate} />
+                  {showBookings && <Bookings calendarDate={calendarDate} />}
                   <div className="hidden lg:block">
                     <UpdateDescription />
                   </div>
