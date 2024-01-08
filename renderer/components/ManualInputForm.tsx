@@ -22,7 +22,7 @@ export default function ManualInputForm({
   const [report, setReport] = useState("");
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
   const textareaRef = useRef(null);
-  const undoManager = useUndoManager<string>(report);
+  const undoManager = useUndoManager(report);
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if (
@@ -36,6 +36,7 @@ export default function ManualInputForm({
 
   useEffect(() => {
     undoManager.setValue(report);
+    setReportHandler(report);
     document.addEventListener("keydown", saveOnPressHandler);
     return () => {
       document.removeEventListener("keydown", saveOnPressHandler);
@@ -70,20 +71,18 @@ export default function ManualInputForm({
       copyCurrentLine();
     }
 
-    if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+    if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
       const currentValue = undoManager.undo();
-      console.log(currentValue);
-      if (currentValue !== undefined) {
+      if (typeof currentValue === "string") {
         setReport(currentValue);
       }
     }
 
-    if ((e.ctrlKey || e.metaKey) && e.key === "y") {
+    if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
       const currentValue = undoManager.redo();
-
-      if (currentValue !== undefined) {
+      if (typeof currentValue === "string") {
         setReport(currentValue);
       }
     }
