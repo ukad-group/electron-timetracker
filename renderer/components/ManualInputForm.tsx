@@ -3,21 +3,29 @@ import Button from "./ui/Button";
 import DeleteMessage from "./ui/DeleteMessage";
 import { parseReport, serializeReport } from "../utils/reports";
 import { getCurrentTimeRoundedUp } from "../utils/datetime-ui";
+import { useMainStore } from "../store/mainStore";
+import { shallow } from "zustand/shallow";
 
 type ManualInputFormProps = {
-  selectedDateReport: string;
   onSave: (
     selectedDateReport: SetStateAction<string>,
     shouldAutosave: SetStateAction<boolean>
   ) => void;
+  selectedDateReport: string;
   selectedDate: Date;
+  setSelectedDateReport: (value: string) => void;
 };
 
 export default function ManualInputForm({
-  selectedDateReport,
   onSave,
+  selectedDateReport,
   selectedDate,
+  setSelectedDateReport,
 }: ManualInputFormProps) {
+  const [reportsFolder] = useMainStore(
+    (state) => [state.reportsFolder, state.setReportsFolder],
+    shallow
+  );
   const [report, setReport] = useState("");
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
   const textareaRef = useRef(null);
@@ -36,31 +44,39 @@ export default function ManualInputForm({
   };
 
   useEffect(() => {
-    setShowDeleteMessage(false);
-    setIsFileExist(false);
-
-    global.ipcRenderer.on("file-exist", (event, data) => {
-      setIsFileExist(data);
-    });
-
-    return () => {
-      global.ipcRenderer.removeAllListeners("file-exist");
-    };
-  }, [selectedDate]);
-
-  useEffect(() => {
-    setShowDeleteButton(isFileExist && !report.length ? true : false);
-
     document.addEventListener("keydown", saveOnPressHandler);
 
     return () => {
       document.removeEventListener("keydown", saveOnPressHandler);
     };
-  }, [report]);
+  }, []);
+
+  useEffect(() => {
+    setShowDeleteMessage(false);
+
+    (async () => {
+      const dayReport = await global.ipcRenderer.invoke(
+        "app:read-day-report",
+        reportsFolder,
+        selectedDate
+      );
+
+      setIsFileExist(dayReport !== null);
+      setShowDeleteButton(dayReport === "");
+    })();
+  }, [selectedDate]);
 
   useEffect(() => {
     setReportHandler(selectedDateReport);
   }, [selectedDateReport]);
+
+  useEffect(() => {
+    if (isFileExist) {
+      setShowDeleteButton(!report.length);
+    } else {
+      setShowDeleteButton(false);
+    }
+  }, [report]);
 
   const saveReportHandler = () => {
     global.ipcRenderer.send("send-analytics-data", "manuall_save");
@@ -176,6 +192,7 @@ export default function ManualInputForm({
             setShowDeleteButton={setShowDeleteButton}
             setShowDeleteMessage={setShowDeleteMessage}
             selectedDate={selectedDate}
+            setSelectedDateReport={setSelectedDateReport}
           />
         )}
         <div className="flex flex-col justify-stretch">

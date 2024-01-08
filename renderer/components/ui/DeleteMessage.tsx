@@ -5,12 +5,14 @@ type DeleteMessageProps = {
   setShowDeleteButton: (value: boolean) => void;
   setShowDeleteMessage: (value: boolean) => void;
   selectedDate: Date;
+  setSelectedDateReport: (value: string) => void;
 };
 
 export default function DeleteMessage({
   setShowDeleteButton,
   setShowDeleteMessage,
   selectedDate,
+  setSelectedDateReport,
 }: DeleteMessageProps) {
   const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
@@ -20,6 +22,7 @@ export default function DeleteMessage({
   const deleteFileHandler = () => {
     setShowDeleteButton(false);
     setShowDeleteMessage(false);
+    setSelectedDateReport("");
 
     global.ipcRenderer
       .invoke("app:delete-file", reportsFolder, selectedDate)
