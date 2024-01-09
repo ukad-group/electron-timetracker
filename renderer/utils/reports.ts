@@ -225,13 +225,30 @@ export function calcDurationBetweenTimes(from: string, to: string): number {
 
 export function formatDuration(ms: number): string {
   if (ms == undefined) return;
+
+  const msPerMinute = 60 * 1000;
+  const msPerHour = 60 * msPerMinute;
+
+  const hours = Math.floor(ms / msPerHour);
+  const minutes = Math.floor((ms % msPerHour) / msPerMinute);
+
+  if (hours === 0) {
+    return `${minutes}m`;
+  }
+
+  if (minutes === 0) {
+    return `${hours}h`;
+  }
+
+  return `${hours}h ${minutes}m`;
+}
+
+export function formatDurationAsDecimals(ms: number): string {
+  if (ms == undefined) return;
+
   const minutes = ms / 1000 / 60;
   const hours = minutes / 60;
 
-  if (Math.abs(hours) < 1) {
-    const minutes = Math.round(ms / 1000 / 60);
-    return `${minutes}m`;
-  }
   return `${Math.floor(hours * 100) / 100}h`;
 }
 
@@ -279,11 +296,11 @@ export function validation(activities: Array<ReportActivity>) {
   try {
     for (let i = 0; i < activities.length; i++) {
       const [toHours, toMinutes] = activities[i].to
-        .split(":")
-        .map((item) => Number(item));
+        ? activities[i].to.split(":").map((item) => Number(item))
+        : [];
       const [fromHours, fromMinutes] = activities[i].from
-        .split(":")
-        .map((item) => Number(item));
+        ? activities[i].from?.split(":")?.map((item) => Number(item))
+        : [];
 
       if (
         i > 0 &&
@@ -318,7 +335,17 @@ export function validation(activities: Array<ReportActivity>) {
       ) {
         activities[i].isValid = false;
       }
+      if (
+        activities[i].project &&
+        !activities[i].project.startsWith("!") &&
+        !activities[i].activity &&
+        !activities[i].description
+      ) {
+        activities[i].isValid = false;
+        activities[i].mistakes += "No activity or description";
+      }
     }
+
     return activities;
   } catch (err) {
     console.log(err);

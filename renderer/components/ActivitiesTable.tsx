@@ -179,6 +179,17 @@ export default function ActivitiesTable({
       });
   };
 
+  const copyActivityHandler = (activity) => {
+    global.ipcRenderer.send("send-analytics-data", "copy_registration");
+    onEditActivity({
+      ...activity,
+      id: null,
+      from: activities[activities.length - 2].to,
+      to: checkIsToday(selectedDate) ? getCeiledTime() : "",
+      duration: null,
+    });
+  };
+
   const handleKeyDown = (event) => {
     if (
       (event.ctrlKey && event.key === "ArrowUp") ||
@@ -243,6 +254,7 @@ export default function ActivitiesTable({
   };
 
   const editActivityHandler = (activity) => {
+    global.ipcRenderer.send("send-analytics-data", "edit_registration");
     if (activity.calendarId) {
       onEditActivity({
         ...activity,
@@ -396,22 +408,24 @@ export default function ActivitiesTable({
                   activity.calendarId ? "opacity-50" : ""
                 }`}
               >
-                <Tooltip>
+                {activity.description && (
+                  <Tooltip>
+                    <p
+                      onClick={copyToClipboardHandle}
+                      className="old-break-word"
+                    >
+                      {activity.description}
+                    </p>
+                  </Tooltip>
+                )}
+                {activity.mistakes && (
                   <p
                     onClick={copyToClipboardHandle}
-                    className={clsx("old-break-word", {
-                      "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20":
-                        activity.mistakes?.includes("startsWith!"),
-                    })}
+                    className="w-fit old-break-word py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20"
                   >
-                    {activity.description}
+                    {activity.mistakes}
                   </p>
-                  {activity.mistakes?.includes("startsWith!") && (
-                    <span className="block text-xs mt-1">
-                      Perhaps you wanted to report a break
-                    </span>
-                  )}
-                </Tooltip>
+                )}
               </td>
               <td className="relative text-sm font-medium text-right whitespace-nowrap">
                 <div className={`${activity.calendarId ? "invisible" : ""}`}>
@@ -419,13 +433,7 @@ export default function ActivitiesTable({
                     className="group py-4 px-3"
                     title="Copy"
                     onClick={() => {
-                      onEditActivity({
-                        ...activity,
-                        id: null,
-                        from: activities[activities.length - 2].to,
-                        to: checkIsToday(selectedDate) ? getCeiledTime() : "",
-                        duration: null,
-                      });
+                      copyActivityHandler(activity);
                     }}
                   >
                     <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
@@ -598,7 +606,7 @@ export default function ActivitiesTable({
                         <p
                           data-column="duration"
                           onClick={copyToClipboardHandle}
-                          className={`w-9 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
+                          className={`w-12 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
                             activity.calendarId ? "opacity-50" : ""
                           }`}
                         >

@@ -59,6 +59,7 @@ export default function Home() {
     (state) => [state.isBeta, state.setIsBeta],
     shallow
   );
+  const showBookings = !!JSON.parse(localStorage.getItem("timetracker-user"));
 
   function handleThemeChange(e) {
     if (e.matches) {
@@ -73,7 +74,7 @@ export default function Home() {
 
     global.ipcRenderer.send("check-dropbox-connection");
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
-      setIsDropboxConnected(data);
+      setIsDropboxConnected(!reportsFolder.includes("Dropbox") || data);
     });
     global.ipcRenderer.send("beta-channel", isBeta);
 
@@ -461,6 +462,7 @@ export default function Home() {
                       onSave={handleSave}
                       selectedDateReport={selectedDateReport}
                       selectedDate={selectedDate}
+                      setSelectedDateReport={setSelectedDateReport}
                     />
                   </section>
                 )}
@@ -503,7 +505,7 @@ export default function Home() {
 
                 <Totals selectedDate={selectedDate} />
 
-                <Bookings calendarDate={calendarDate} />
+                {showBookings && <Bookings calendarDate={calendarDate} />}
 
                 <section className="lg:hidden lg:col-span-2">
                   <Calendar

@@ -2,7 +2,7 @@
   "private": true,
   "name": "timetracker",
   "description": "Timetracker app",
-  "version": "1.48.0-beta.2",
+  "version": "1.50.0-beta.1",
   "author": "mmmykhailo <mmmykhailo@proton.me>",
   "main": "main/index.js",
   "scripts": {
@@ -55,8 +55,6 @@
   },
   "dependencies": {
     "@aptabase/electron": "^0.2.2",
-    "@azure/msal-browser": "^3.2.0",
-    "@azure/msal-react": "^2.0.4",
     "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.8",
     "@fullcalendar/interaction": "^6.1.8",
@@ -90,8 +88,8 @@
     "@types/react": "^16.9.9",
     "@types/react-dom": "^16.9.9",
     "autoprefixer": "^10.4.16",
-    "electron": "^26.2.2",
-    "electron-builder": "^23.0.3",
+    "electron": "^28.1.1",
+    "electron-builder": "^24.9.1",
     "jest": "^29.6.2",
     "jest-date-mock": "^1.0.8",
     "jest-environment-jsdom": "^29.6.4",
