@@ -17,7 +17,7 @@ const SettingsPage = () => {
     SidebarNavItem.Connections,
   );
 
-  const settingSections = SETTING_SECTIONS[currentMenuItem];
+  const settingSection = SETTING_SECTIONS[currentMenuItem];
 
   const handleThemeChange = (e) =>
     e.matches ? setIsOSDarkTheme(true) : setIsOSDarkTheme(false);
@@ -37,7 +37,7 @@ const SettingsPage = () => {
     };
   }, [theme, isOSDarkTheme]);
 
-  const renderSidebarNavItem = () =>
+  const renderSidebarNavItems = () =>
     Object.values(SidebarNavItem).map((value) => (
       <li
         key={value}
@@ -77,10 +77,10 @@ const SettingsPage = () => {
           <div className="h-full overflow-hidden inline-flex flex-col lg:grid lg:grid-cols-[250px_auto] gap-6">
             <nav>
               <ul className="flex flex-wrap lg:flex-col gap-2 lg:gap-3 rounded-md p-2 lg:p-3 ">
-                {renderSidebarNavItem()}
+                {renderSidebarNavItems()}
               </ul>
             </nav>
-            <div className="h-full overflow-hidden">{settingSections}</div>
+            <div className="h-full overflow-hidden">{settingSection}</div>
           </div>
         </div>
       </div>
