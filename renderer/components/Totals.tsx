@@ -6,7 +6,7 @@ import {
 import React, { useState, useEffect } from "react";
 import Tooltip from "./ui/Tooltip/Tooltip";
 import clsx from "clsx";
-import { ReportActivity, formatDuration, parseReport } from "../utils/reports";
+import { ReportActivity, formatDurationAsDecimals, parseReport } from "../utils/reports";
 import {
   convertMillisecondsToTime,
   getMonthDates,
@@ -344,7 +344,7 @@ const Totals = ({ selectedDate }) => {
                       />
                     )}
                     <span>
-                      {name} - {formatDuration(duration)}
+                      {name} - {formatDurationAsDecimals(duration)}
                     </span>
                   </div>
                   {period === "day" && (
@@ -386,7 +386,7 @@ const Totals = ({ selectedDate }) => {
                           <span>
                             &#8226;{" "}
                             {activity.name ? activity.name : "(no activity)"} -{" "}
-                            {formatDuration(activity.duration)}
+                            {formatDurationAsDecimals(activity.duration)}
                           </span>
                         </div>
                         {period === "day" && (
