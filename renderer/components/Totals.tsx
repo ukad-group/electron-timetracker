@@ -292,7 +292,7 @@ const Totals = ({ selectedDate }) => {
   };
 
   return (
-    <div>
+    <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
       <h2 className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading">
         <div>
           <label htmlFor="select">Totals</label>
@@ -436,7 +436,7 @@ const Totals = ({ selectedDate }) => {
           No tracked time this {period}
         </div>
       )}
-    </div>
+    </section>
   );
 };
 
