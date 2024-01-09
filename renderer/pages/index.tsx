@@ -465,6 +465,7 @@ export default function Home() {
                       onSave={handleSave}
                       selectedDateReport={selectedDateReport}
                       selectedDate={selectedDate}
+                      setSelectedDateReport={setSelectedDateReport}
                     />
                   </div>
 
