@@ -74,6 +74,7 @@ export default function ManualInputForm({
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
       const currentValue = undoManager.undo();
+
       if (typeof currentValue === "string") {
         setReport(currentValue);
       }
@@ -82,6 +83,7 @@ export default function ManualInputForm({
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
       const currentValue = undoManager.redo();
+
       if (typeof currentValue === "string") {
         setReport(currentValue);
       }
