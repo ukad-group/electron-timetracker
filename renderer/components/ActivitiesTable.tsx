@@ -394,22 +394,24 @@ export default function ActivitiesTable({
                   activity.calendarId ? "opacity-50" : ""
                 }`}
               >
-                <Tooltip>
+                {activity.description && (
+                  <Tooltip>
+                    <p
+                      onClick={copyToClipboardHandle}
+                      className="old-break-word"
+                    >
+                      {activity.description}
+                    </p>
+                  </Tooltip>
+                )}
+                {activity.mistakes && (
                   <p
                     onClick={copyToClipboardHandle}
-                    className={clsx("old-break-word", {
-                      "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20":
-                        activity.mistakes?.includes("startsWith!"),
-                    })}
+                    className="w-fit old-break-word py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20"
                   >
-                    {activity.description}
+                    {activity.mistakes}
                   </p>
-                  {activity.mistakes?.includes("startsWith!") && (
-                    <span className="block text-xs mt-1">
-                      Perhaps you wanted to report a break
-                    </span>
-                  )}
-                </Tooltip>
+                )}
               </td>
               <td className="relative text-sm font-medium text-right whitespace-nowrap">
                 <div className={`${activity.calendarId ? "invisible" : ""}`}>

@@ -325,6 +325,7 @@ export function validation(activities: Array<ReportActivity>) {
         !activities[i].description
       ) {
         activities[i].isValid = false;
+        activities[i].mistakes += "No activity or description";
       }
     }
 
