@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-type MenuItemProps = {
+type MenuItemProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
   callback?: () => void;
   isActive?: boolean;
@@ -10,6 +10,7 @@ export default function MenuItem({
   children,
   callback,
   isActive,
+  ...props
 }: MenuItemProps) {
   return (
     <button
@@ -18,6 +19,7 @@ export default function MenuItem({
         isActive &&
         "shadow-sm hover:no-underline bg-gray-100 hover:bg-gray-100 dark:bg-dark-button-back-gray dark:hover:bg-dark-button-back-gray"
       }, ${!isActive && "hover:underline"}`}
+      {...props}
     >
       {children}
     </button>
