@@ -39,14 +39,14 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
   const totalBookingTime: number = useMemo(() => {
     return bookedProjects.reduce(
-      (acc, project) => acc + project?.plans[0]?.hours,
+      (acc, project) => acc + (project?.plans[0]?.hours || 0),
       0
     );
   }, [bookedProjects]);
 
   const totalSpentTime: number = useMemo(() => {
     return bookedSpentStatistic.reduce(
-      (acc, project) => acc + project?.spent,
+      (acc, project) => acc + (project?.spent || 0),
       0
     );
   }, [bookedSpentStatistic]);
