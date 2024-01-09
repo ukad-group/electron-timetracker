@@ -46,8 +46,6 @@ export default function ManualInputForm({
   };
 
   useEffect(() => {
-    undoManager.setValue(report);
-    setReportHandler(report);
     document.addEventListener("keydown", saveOnPressHandler);
 
     return () => {
@@ -75,6 +73,9 @@ export default function ManualInputForm({
   }, [selectedDateReport]);
 
   useEffect(() => {
+    undoManager.setValue(report);
+    setReportHandler(report);
+
     if (isFileExist) {
       setShowDeleteButton(!report.length);
     } else {
