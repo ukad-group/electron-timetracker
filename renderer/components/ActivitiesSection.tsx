@@ -20,6 +20,7 @@ type ActivitiesSectionProps = {
   selectedDate: Date;
   latestProjAndAct: Record<string, [string]>;
   setSelectedDateReport: Dispatch<SetStateAction<String>>;
+  showAsMain: boolean;
 };
 
 type PlaceholderProps = {
@@ -36,6 +37,7 @@ export default function ActivitiesSection({
   selectedDate,
   latestProjAndAct,
   setSelectedDateReport,
+  showAsMain,
 }: ActivitiesSectionProps) {
   const [backgroundError, setBackgroundError] = useState("");
   const [events, setEvents] = useState([]);
@@ -132,7 +134,7 @@ export default function ActivitiesSection({
     <div className="flex flex-col justify-between h-full">
       <div>
         {backgroundError && (
-          <div className="border-t-4  border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left dark:text-slate-400">
+          <div className="border-t-4 border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left dark:text-slate-400">
             <div className="flex justify-start gap-2 w-full text-gray-900 font-bold dark:text-white">
               <ExclamationCircleIcon
                 className="w-7 h-7 text-red-700"
@@ -156,6 +158,7 @@ export default function ActivitiesSection({
             latestProjAndAct={latestProjAndAct}
             events={events}
             isLoading={isLoading}
+            showAsMain={showAsMain}
           />
         </div>
 

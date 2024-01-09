@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, Fragment } from "react";
 import {
   ReportActivity,
   calcDurationBetweenTimes,
@@ -32,6 +32,7 @@ type ActivitiesTableProps = {
   latestProjAndAct: Record<string, [string]>;
   events: ReportActivity[];
   isLoading: boolean;
+  showAsMain: boolean;
 };
 
 const MS_PER_HOUR = 60 * 60 * 1000;
@@ -43,13 +44,14 @@ export default function ActivitiesTable({
   latestProjAndAct,
   events,
   isLoading,
+  showAsMain,
 }: ActivitiesTableProps) {
   const [ctrlPressed, setCtrlPressed] = useState(false);
   const [firstKey, setFirstKey] = useState(null);
   const [secondKey, setSecondtKey] = useState(null);
   const [firstKeyPressTime, setFirstKeyPressTime] = useState(null);
   const [timerId, setTimerId] = useState(null);
-  const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
+  const [scheduledEvents] = useScheduledEventsStore(
     (state) => [state.event, state.setEvent],
     shallow
   );
@@ -177,6 +179,17 @@ export default function ActivitiesTable({
       });
   };
 
+  const copyActivityHandler = (activity) => {
+    global.ipcRenderer.send("send-analytics-data", "copy_registration");
+    onEditActivity({
+      ...activity,
+      id: null,
+      from: activities[activities.length - 2].to,
+      to: checkIsToday(selectedDate) ? getCeiledTime() : "",
+      duration: null,
+    });
+  };
+
   const handleKeyDown = (event) => {
     if (
       (event.ctrlKey && event.key === "ArrowUp") ||
@@ -241,6 +254,7 @@ export default function ActivitiesTable({
   };
 
   const editActivityHandler = (activity) => {
+    global.ipcRenderer.send("send-analytics-data", "edit_registration");
     if (activity.calendarId) {
       onEditActivity({
         ...activity,
@@ -267,7 +281,139 @@ export default function ActivitiesTable({
     };
   }, [firstKey, tableActivities]);
 
-  return (
+  const renderMainViewTable = () =>
+    tableActivities.length > 0 &&
+    tableActivities?.map((activity, i) => (
+      <tr
+        key={i}
+        className={clsx(
+          `border-b border-gray-200 dark:border-gray-300 transition-transform `,
+          {
+            "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
+              tableActivities[i].to != tableActivities[i + 1]?.from &&
+              i + 1 !== tableActivities.length &&
+              !activity.calendarId,
+            "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
+            "scale-105 ":
+              (Number(firstKey) === i + 1 && !secondKey) ||
+              (Number(firstKey + secondKey) === i + 1 && secondKey),
+          }
+        )}
+      >
+        <td
+          className={`relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
+            activity.calendarId ? "opacity-50" : ""
+          }`}
+        >
+          {ctrlPressed && (
+            <span className="absolute -left-4 text-blue-700">{i + 1}</span>
+          )}
+          <span
+            className={clsx({
+              "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
+                !activity.isValid,
+            })}
+          >
+            {activity.from} - {activity.to}
+          </span>
+        </td>
+        <td
+          className={`px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
+            activity.calendarId ? "opacity-50" : ""
+          }`}
+        >
+          <Tooltip>
+            <p data-column="duration" onClick={copyToClipboardHandle}>
+              {formatDuration(activity.duration)}
+            </p>
+          </Tooltip>
+        </td>
+        <td
+          className={`relative px-3 py-4 ${
+            activity.calendarId ? "opacity-50" : ""
+          }`}
+        >
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <p
+                className="text-sm font-medium text-gray-900 dark:text-dark-heading"
+                onClick={copyToClipboardHandle}
+              >
+                {activity.project}
+              </p>
+            </Tooltip>
+            {activity.isNewProject && (
+              <p className="flex items-center h-fit w-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
+                new
+              </p>
+            )}
+          </div>
+          {activity.activity && (
+            <Tooltip>
+              <p
+                className="block text-xs font-semibold mt-1 old-break-word "
+                onClick={copyToClipboardHandle}
+              >
+                {activity.activity}
+              </p>
+            </Tooltip>
+          )}
+        </td>
+        <td
+          className={`px-3 py-4 text-sm ${
+            activity.calendarId ? "opacity-50" : ""
+          }`}
+        >
+          {activity.description && (
+            <Tooltip>
+              <p onClick={copyToClipboardHandle} className="old-break-word">
+                {activity.description}
+              </p>
+            </Tooltip>
+          )}
+          {activity.mistakes && (
+            <p
+              onClick={copyToClipboardHandle}
+              className="w-fit old-break-word py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20"
+            >
+              {activity.mistakes}
+            </p>
+          )}
+        </td>
+        <td className="relative text-sm font-medium text-right whitespace-nowrap">
+          <div className={`${activity.calendarId ? "invisible" : ""}`}>
+            <button
+              className="group py-4 px-3"
+              title="Copy"
+              onClick={() => {
+                copyActivityHandler(activity);
+              }}
+            >
+              <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+            </button>
+          </div>
+        </td>
+        <td className="relative text-sm font-medium text-right whitespace-nowrap">
+          <button
+            className="group py-4 px-3"
+            title={activity.calendarId ? "Add" : "Edit"}
+            onClick={() => {
+              editActivityHandler(activity);
+            }}
+          >
+            {!activity.calendarId && (
+              <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+            )}
+
+            {activity.calendarId && (
+              <PlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+            )}
+          </button>
+        </td>
+      </tr>
+    ));
+
+  const mainView = (
     <table className="min-w-full divide-y divide-gray-300 table-fixed dark:divide-gray-600">
       <thead className="text-gray-900 dark:text-dark-heading">
         <tr>
@@ -310,145 +456,7 @@ export default function ActivitiesTable({
         </tr>
       </thead>
       <tbody className="text-gray-500 dark:text-slate-400">
-        {tableActivities.length > 0 &&
-          tableActivities?.map((activity, i) => (
-            <tr
-              key={i}
-              className={clsx(
-                `border-b border-gray-200 dark:border-gray-300 transition-transform `,
-                {
-                  "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
-                    tableActivities[i].to != tableActivities[i + 1]?.from &&
-                    i + 1 !== tableActivities.length &&
-                    !activity.calendarId,
-                  "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
-                  "scale-105 ":
-                    (Number(firstKey) === i + 1 && !secondKey) ||
-                    (Number(firstKey + secondKey) === i + 1 && secondKey),
-                }
-              )}
-            >
-              <td
-                className={`relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
-                  activity.calendarId ? "opacity-50" : ""
-                }`}
-              >
-                {ctrlPressed && (
-                  <span className="absolute -left-4 text-blue-700">
-                    {i + 1}
-                  </span>
-                )}
-                <span
-                  className={clsx({
-                    "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
-                      !activity.isValid,
-                  })}
-                >
-                  {activity.from} - {activity.to}
-                </span>
-              </td>
-              <td
-                className={`px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
-                  activity.calendarId ? "opacity-50" : ""
-                }`}
-              >
-                <Tooltip>
-                  <p data-column="duration" onClick={copyToClipboardHandle}>
-                    {formatDuration(activity.duration)}
-                  </p>
-                </Tooltip>
-              </td>
-              <td
-                className={`relative px-3 py-4 ${
-                  activity.calendarId ? "opacity-50" : ""
-                }`}
-              >
-                <div className="flex">
-                  <Tooltip>
-                    <p
-                      className="text-sm font-medium text-gray-900 dark:text-dark-heading"
-                      onClick={copyToClipboardHandle}
-                    >
-                      {activity.project}
-                    </p>
-                  </Tooltip>
-                  {activity.isNewProject && (
-                    <p className="text-center ml-1 mb-1 w-fit text-xs  px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
-                      new
-                    </p>
-                  )}
-                </div>
-                {activity.activity && (
-                  <Tooltip>
-                    <p
-                      className="block text-xs font-semibold mt-1 old-break-word "
-                      onClick={copyToClipboardHandle}
-                    >
-                      {activity.activity}
-                    </p>
-                  </Tooltip>
-                )}
-              </td>
-              <td
-                className={`px-3 py-4 text-sm ${
-                  activity.calendarId ? "opacity-50" : ""
-                }`}
-              >
-                <Tooltip>
-                  <p
-                    onClick={copyToClipboardHandle}
-                    className={clsx("old-break-word", {
-                      "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20":
-                        activity.mistakes?.includes("startsWith!"),
-                    })}
-                  >
-                    {activity.description}
-                  </p>
-                  {activity.mistakes?.includes("startsWith!") && (
-                    <span className="block text-xs mt-1">
-                      Perhaps you wanted to report a break
-                    </span>
-                  )}
-                </Tooltip>
-              </td>
-              <td className="relative text-sm font-medium text-right whitespace-nowrap">
-                <div className={`${activity.calendarId ? "invisible" : ""}`}>
-                  <button
-                    className="group py-4 px-3"
-                    title="Copy"
-                    onClick={() => {
-                      onEditActivity({
-                        ...activity,
-                        id: null,
-                        from: activities[activities.length - 2].to,
-                        to: checkIsToday(selectedDate) ? getCeiledTime() : "",
-                        duration: null,
-                      });
-                    }}
-                  >
-                    <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                  </button>
-                </div>
-              </td>
-              <td className="relative text-sm font-medium text-right whitespace-nowrap">
-                <button
-                  className="group py-4 px-3"
-                  title={activity.calendarId ? "Add" : "Edit"}
-                  onClick={() => {
-                    editActivityHandler(activity);
-                  }}
-                >
-                  {!activity.calendarId && (
-                    <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                  )}
-
-                  {activity.calendarId && (
-                    <PlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                  )}
-                </button>
-              </td>
-            </tr>
-          ))}
+        {renderMainViewTable()}
         <tr>
           <td className="py-4 px-3 text-sm whitespace-nowrap">
             <p>Total</p>
@@ -474,6 +482,207 @@ export default function ActivitiesTable({
         </tr>
       </tbody>
     </table>
+  );
+
+  const renderCompactViewTable = () =>
+    tableActivities.length > 0 &&
+    tableActivities?.map((activity, i) => (
+      <Fragment key={i}>
+        <tr>
+          <td
+            className={`w-24 relative pt-4 pl-1 pr-1 text-sm whitespace-nowrap sm:pl-6 md:pl-0 ${
+              activity.calendarId ? "opacity-50" : ""
+            }`}
+          >
+            {ctrlPressed && (
+              <span className="absolute -left-4 text-blue-700">{i + 1}</span>
+            )}
+            <span
+              className={clsx("flex gap-1", {
+                "py-1 px-1 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
+                  !activity.isValid,
+              })}
+            >
+              {activity.from} - {activity.to}
+            </span>
+          </td>
+
+          <td
+            className={`relative px-1 pt-4 ${
+              activity.calendarId ? "opacity-50" : ""
+            }`}
+          >
+            <div className="flex flex-wrap gap-x-2 items-center">
+              <div className="flex gap-1">
+                {activity.isNewProject && (
+                  <p className="flex items-center shrink-0 w-fit h-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
+                    new
+                  </p>
+                )}
+                <Tooltip>
+                  <p
+                    className="text-sm font-medium text-gray-900 dark:text-dark-heading old-break-word"
+                    onClick={copyToClipboardHandle}
+                  >
+                    {activity.project}
+                  </p>
+                </Tooltip>
+              </div>
+
+              {activity.activity && (
+                <Tooltip>
+                  <p
+                    className="block text-xs font-semibold old-break-word text-gray-500 dark:text-slate-400"
+                    onClick={copyToClipboardHandle}
+                  >
+                    {activity.activity}
+                  </p>
+                </Tooltip>
+              )}
+            </div>
+          </td>
+
+          <td className="relative text-sm font-medium text-right whitespace-nowrap">
+            <div className={`${activity.calendarId ? "invisible" : ""}`}>
+              <button
+                className="group pt-4 px-1"
+                title="Copy"
+                onClick={() => {
+                  onEditActivity({
+                    ...activity,
+                    id: null,
+                    from: activities[activities.length - 2].to,
+                    to: checkIsToday(selectedDate) ? getCeiledTime() : "",
+                    duration: null,
+                  });
+                }}
+              >
+                <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr
+          className={clsx(
+            `border-b border-gray-200 dark:border-gray-300 transition-transform `,
+            {
+              "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
+                tableActivities[i].to != tableActivities[i + 1]?.from &&
+                i + 1 !== tableActivities.length &&
+                !activity.calendarId,
+              "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
+              "scale-105 ":
+                (Number(firstKey) === i + 1 && !secondKey) ||
+                (Number(firstKey + secondKey) === i + 1 && secondKey),
+            }
+          )}
+        >
+          <td
+            colSpan={2}
+            className={`relative pb-4 pl-1 pr-1 text-sm sm:pl-6 md:pl-0 ${
+              activity.calendarId ? "opacity-50" : ""
+            }`}
+          >
+            <div className="flex flex-nowrap gap-1 items-center">
+              <Tooltip>
+                <p
+                  data-column="duration"
+                  onClick={copyToClipboardHandle}
+                  className={`w-12 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
+                    activity.calendarId ? "opacity-50" : ""
+                  }`}
+                >
+                  {`${formatDuration(activity.duration)}`}
+                </p>
+              </Tooltip>
+              <Tooltip>
+                <p
+                  onClick={copyToClipboardHandle}
+                  className={clsx("old-break-word", {
+                    "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20":
+                      activity.mistakes?.includes("startsWith!"),
+                  })}
+                >
+                  {activity.description}
+                </p>
+                {activity.mistakes?.includes("startsWith!") && (
+                  <span className="block text-xs mt-1">
+                    Perhaps you wanted to report a break
+                  </span>
+                )}
+              </Tooltip>
+            </div>
+          </td>
+
+          <td className="relative text-sm font-medium text-right whitespace-nowrap">
+            <button
+              className="group pb-4 px-1"
+              title={activity.calendarId ? "Add" : "Edit"}
+              onClick={() => {
+                editActivityHandler(activity);
+              }}
+            >
+              {!activity.calendarId && (
+                <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+              )}
+
+              {activity.calendarId && (
+                <PlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+              )}
+            </button>
+          </td>
+        </tr>
+      </Fragment>
+    ));
+
+  const compactView = (
+    <>
+      <h2
+        id="manual-input-title"
+        className="text-lg font-medium text-gray-900 dark:text-dark-heading"
+      >
+        Registrations
+      </h2>
+      <table className="min-w-full divide-y divide-gray-300 table-fixed dark:divide-gray-600">
+        <tbody className="text-gray-500 dark:text-slate-400">
+          {renderCompactViewTable()}
+          <tr>
+            <td className="pt-4 px-3 text-sm whitespace-nowrap">
+              Total{" "}
+              <Tooltip>
+                <p
+                  data-column="total"
+                  className="px-1 py-1 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap"
+                >
+                  {formatDuration(totalDuration)}
+                </p>
+              </Tooltip>
+            </td>
+            <td className="px-1 pt-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap">
+              {tableActivities.length > 0 && (
+                <TimeBadge
+                  hours={totalDuration / MS_PER_HOUR}
+                  startTime={tableActivities[0].from}
+                  selectedDate={selectedDate}
+                />
+              )}
+            </td>
+            <td>{isLoading && <Loader />}</td>
+          </tr>
+        </tbody>
+      </table>
+    </>
+  );
+
+  if (showAsMain) {
+    return mainView;
+  }
+
+  return (
+    <>
+      <div className="lg:hidden">{mainView}</div>
+      <div className="hidden lg:block">{compactView}</div>
+    </>
   );
 }
 

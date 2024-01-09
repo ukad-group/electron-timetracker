@@ -2,7 +2,11 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useMainStore } from "../store/mainStore";
 import { shallow } from "zustand/shallow";
 import { MONTHS } from "../utils/datetime-ui";
-import { ReportActivity, formatDuration, parseReport } from "../utils/reports";
+import {
+  ReportActivity,
+  formatDurationAsDecimals,
+  parseReport,
+} from "../utils/reports";
 import { ParsedReport, TTUserInfo } from "./Calendar/Calendar";
 import Loader from "./ui/Loader";
 
@@ -39,14 +43,14 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
   const totalBookingTime: number = useMemo(() => {
     return bookedProjects.reduce(
-      (acc, project) => acc + project?.plans[0]?.hours,
+      (acc, project) => acc + (project?.plans[0]?.hours || 0),
       0
     );
   }, [bookedProjects]);
 
   const totalSpentTime: number = useMemo(() => {
     return bookedSpentStatistic.reduce(
-      (acc, project) => acc + project?.spent,
+      (acc, project) => acc + (project?.spent || 0),
       0
     );
   }, [bookedSpentStatistic]);
@@ -229,7 +233,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
                     {project.booked}h
                   </td>
                   <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                    {formatDuration(project.spent)}
+                    {formatDurationAsDecimals(project.spent)}
                   </td>
                 </tr>
               ))}
@@ -241,7 +245,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
                   {totalBookingTime}h
                 </td>
                 <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                  {formatDuration(totalSpentTime)}
+                  {formatDurationAsDecimals(totalSpentTime)}
                 </td>
               </tr>
             </tbody>
