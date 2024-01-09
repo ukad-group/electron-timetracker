@@ -5,6 +5,7 @@ import { parseReport, serializeReport } from "../utils/reports";
 import { getCurrentTimeRoundedUp } from "../utils/datetime-ui";
 import { useMainStore } from "../store/mainStore";
 import { shallow } from "zustand/shallow";
+import useUndoManager from "../hooks/useUndoManager";
 
 type ManualInputFormProps = {
   onSave: (
@@ -32,6 +33,7 @@ export default function ManualInputForm({
   const [showDeleteMessage, setShowDeleteMessage] = useState(false);
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   const [isFileExist, setIsFileExist] = useState(false);
+  const undoManager = useUndoManager(report);
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if (
@@ -44,6 +46,8 @@ export default function ManualInputForm({
   };
 
   useEffect(() => {
+    undoManager.setValue(report);
+    setReportHandler(report);
     document.addEventListener("keydown", saveOnPressHandler);
 
     return () => {
@@ -90,10 +94,28 @@ export default function ManualInputForm({
     setReport(report);
   };
 
-  const copyLineHandler = (event) => {
-    if ((event.ctrlKey || event.metaKey) && event.code === "KeyD") {
-      event.preventDefault();
+  const textAreaKeyHandler = (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.code === "KeyD") {
+      e.preventDefault();
       copyCurrentLine();
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
+      e.preventDefault();
+      const currentValue = undoManager.undo();
+
+      if (typeof currentValue === "string") {
+        setReport(currentValue);
+      }
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
+      e.preventDefault();
+      const currentValue = undoManager.redo();
+
+      if (typeof currentValue === "string") {
+        setReport(currentValue);
+      }
     }
   };
 
@@ -184,7 +206,7 @@ export default function ManualInputForm({
         className="block w-full px-3 py-2 mt-3 border border-gray-300 rounded-md shadow-sm focus-visible:outline-blue-500 sm:text-sm dark:bg-dark-back dark:border-dark-border dark:text-slate-400 focus-visible:dark:outline-slate-500"
         spellCheck={true}
         ref={textareaRef}
-        onKeyDown={copyLineHandler}
+        onKeyDown={textAreaKeyHandler}
       />
       <div className="relative flex flex-col gap-4 mt-6 justify-stretch">
         {showDeleteMessage && (
