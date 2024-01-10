@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { shallow } from "zustand/shallow";
 import { useUpdateStore } from "@/store/updateStore";
-import { DisclosureSection } from "../../shared/DisclosureSection";
+import { DisclosureSection } from "@/shared/DisclosureSection";
 import { GlobeAltIcon } from "@heroicons/react/24/solid";
 import SlackIcon from "@/shared/SlackIcon/SlackIcon";
 import { Release } from './types';
