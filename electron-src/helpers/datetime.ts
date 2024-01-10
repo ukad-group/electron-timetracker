@@ -1,13 +1,16 @@
 export function getISOWeek(date: Date): number {
-  const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-  const daysOffset =
-    firstDayOfYear.getDay() === 0 ? -6 : 1 - firstDayOfYear.getDay();
+  const timelessDate = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  );
+  timelessDate.setUTCDate(
+    timelessDate.getUTCDate() + 4 - (timelessDate.getUTCDay() || 7)
+  );
+  const yearStart = new Date(Date.UTC(timelessDate.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(
+    ((timelessDate.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
+  );
 
-  const yearStart = new Date(date.getFullYear(), 0, 1 + daysOffset);
-  const diff = date.getTime() - yearStart.getTime();
-  const weekNumber = Math.floor(diff / (7 * 24 * 60 * 60 * 1000));
-
-  return weekNumber;
+  return weekNo;
 }
 
 export function formatTimereportDate(date: Date): string {
