@@ -205,64 +205,63 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
     };
   }, [calendarDate]);
 
+  const renderProjectsHours = () =>
+    bookedSpentStatistic.map((project, i) => (
+      <tr key={i} className="border-b dark:border-gray-700">
+        <td className="pr-6 py-2 text-gray-700 dark:text-dark-main">
+          {project.project}
+        </td>
+        <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
+          {project.booked}h
+        </td>
+        <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
+          {formatDuration(project.spent)}
+        </td>
+      </tr>
+    ));
+
   return (
-    <>
-      {isTimetrackerLogged && (
-        <div className="relative px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-dark-heading mb-2">
-            Bookings in {currentReadableMonth}
-          </h2>
-          {loading && (
-            <div className="absolute top-5 right-4">
-              <Loader />
-            </div>
-          )}
-          <div className="relative overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="text-gray-900 dark:text-dark-heading border-b dark:border-gray-700">
-                <tr>
-                  <th scope="col" className="pr-6 py-3 font-semibold">
-                    Project
-                  </th>
-                  <th scope="col" className="px-6 py-3 font-semibold">
-                    Booked
-                  </th>
-                  <th scope="col" className="px-6 py-3 font-semibold">
-                    Spent
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookedSpentStatistic.map((project, i) => (
-                  <tr key={i} className="border-b dark:border-gray-700">
-                    <td className="pr-6 py-2 text-gray-700 dark:text-dark-main">
-                      {project.project}
-                    </td>
-                    <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                      {project.booked}h
-                    </td>
-                    <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                      {formatDuration(project.spent)}
-                    </td>
-                  </tr>
-                ))}
-                <tr>
-                  <td className="pr-6 py-2 text-gray-700 dark:text-dark-main ">
-                    Total:
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                    {totalBookingTime}h
-                  </td>
-                  <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                    {formatDuration(totalSpentTime)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+    <div className="relative px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
+      <h2 className="text-lg font-medium text-gray-900 dark:text-dark-heading mb-2">
+        Bookings in {currentReadableMonth}
+      </h2>
+      {loading && (
+        <div className="absolute top-5 right-4">
+          <Loader />
         </div>
       )}
-    </>
+      <div className="relative overflow-x-auto">
+        <table className="w-full text-sm text-left">
+          <thead className="text-gray-900 dark:text-dark-heading border-b dark:border-gray-700">
+            <tr>
+              <th scope="col" className="pr-6 py-3 font-semibold">
+                Project
+              </th>
+              <th scope="col" className="px-6 py-3 font-semibold">
+                Booked
+              </th>
+              <th scope="col" className="px-6 py-3 font-semibold">
+                Spent
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {renderProjectsHours()}
+            <tr>
+              <td className="pr-6 py-2 text-gray-700 dark:text-dark-main ">
+                Total:
+              </td>
+              <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
+                {totalBookingTime}h
+              </td>
+              <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
+                {formatDuration(totalSpentTime)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 
