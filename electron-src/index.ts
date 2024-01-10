@@ -119,12 +119,8 @@ ipcMain.on("dictionaty-update", (event, word: string) => {
   mainWindow?.webContents.session.addWordToSpellCheckerDictionary(word);
 });
 
-ipcMain.on("slack-redirect", (event, isDesktop: boolean) => {
-  shell.openExternal(
-    isDesktop
-      ? "slack://channel?team=T3PV37ANP&id=C069N5LUP3M"
-      : "https://ukad.slack.com/archives/C069N5LUP3M"
-  );
+ipcMain.on("redirect", (event, link: string) => {
+  shell.openExternal(link);
 });
 
 const userDataDirectory = app.getPath("userData");

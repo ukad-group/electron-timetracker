@@ -11,7 +11,8 @@ import { ButtonTransparent } from "../../shared/ButtonTransparent";
 import Popup from "../../shared/Popup/Popup";
 import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
-import { ActivitiesSectionProps, PlaceholderProps } from './types';
+import { ActivitiesSectionProps, PlaceholderProps } from "./types";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 
 export default function ActivitiesSection({
   onEditActivity,
@@ -29,6 +30,8 @@ export default function ActivitiesSection({
     errorTitle: "",
     errorMessage: "",
   });
+  const [errorType, setErrorType] = useState<null | "updater">(null);
+  const [isErrorShown, setIsErrorShown] = useState<boolean>(true);
   const isShowGoogleEvents = JSON.parse(
     localStorage.getItem("showGoogleEvents")
   );
@@ -82,7 +85,13 @@ export default function ActivitiesSection({
     global.ipcRenderer.on("background error", (event, errorMessage, data) => {
       setBackgroundError(errorMessage);
       console.log("Error data ", data);
+
+      const errorMessageArray = errorMessage.split(" ");
+      if (errorMessageArray.includes("Updater")) {
+        setErrorType("updater");
+      }
     });
+
     global.ipcRenderer.on(
       "render error",
       (event, errorTitle, errorMessage, data) => {
@@ -97,6 +106,17 @@ export default function ActivitiesSection({
       global.ipcRenderer.removeAllListeners("render or fetch error");
     };
   }, []);
+
+  const updateDownloadClickHandler = () => {
+    global.ipcRenderer.send(
+      "redirect",
+      "https://github.com/ukad-group/timetracker-desktop-client/releases"
+    );
+  };
+
+  const closeBtnHandler = () => {
+    setIsErrorShown(false);
+  };
 
   if (renderError.errorTitle && renderError.errorMessage) {
     return <ErrorPlaceholder {...renderError} />;
@@ -116,8 +136,8 @@ export default function ActivitiesSection({
   return (
     <div className="flex flex-col justify-between h-full">
       <div>
-        {backgroundError && (
-          <div className="border-t-4 border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left dark:text-slate-400">
+        {backgroundError && isErrorShown && (
+          <div className="relative border-t-4 border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left dark:text-slate-400">
             <div className="flex justify-start gap-2 w-full text-gray-900 font-bold dark:text-white">
               <ExclamationCircleIcon
                 className="w-7 h-7 text-red-700"
@@ -127,7 +147,19 @@ export default function ActivitiesSection({
             </div>
             <div className="pl-9 pr-8">
               {backgroundError} Refer to the console for specific error
-              information.
+              information.{" "}
+              {errorType === "updater" && (
+                <button
+                  className="text-dark-button-back hover:text-dark-button-hover"
+                  onClick={updateDownloadClickHandler}
+                >
+                  You can download the new version manually from the link
+                </button>
+              )}
+              <XMarkIcon
+                className="w-6 h-6 fill-gray-600 dark:fill-gray-400/70 absolute right-1 top-1 cursor-pointer"
+                onClick={closeBtnHandler}
+              />
             </div>
           </div>
         )}
