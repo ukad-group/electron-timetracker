@@ -12,6 +12,7 @@ import ButtonTransparent from "./ui/ButtonTransparent";
 import Popup from "./ui/Popup";
 import { useMainStore } from "../store/mainStore";
 import { shallow } from "zustand/shallow";
+import { Hint } from "./ui/Hint";
 
 type ActivitiesSectionProps = {
   activities: Array<ReportActivity>;
@@ -180,6 +181,17 @@ export default function ActivitiesSection({
             </span>
           </button>
         </div>
+        {!isLoading && (
+          <Hint
+            refetenceID="newActivityBtn"
+            shiftY={30}
+            shiftX={200}
+            position="bottom"
+          >
+            To log more time, click the 'Track More Time' button or press ctrl +
+            space to access the form for entering new registration today.
+          </Hint>
+        )}
       </div>
     </div>
   );
@@ -248,6 +260,7 @@ function Placeholder({
       </p>
       <div className="mt-6 mb-2">
         <button
+          id="placeholderBtn"
           onClick={() => onEditActivity("new")}
           type="button"
           className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500   dark:bg-dark-button-back  dark:hover:bg-dark-button-hover"
@@ -255,10 +268,22 @@ function Placeholder({
           <PlusIcon className="w-5 h-5 mr-2 -ml-1" aria-hidden="true" />
           New activity
         </button>
+        <Hint
+          refetenceID="placeholderBtn"
+          shiftY={120}
+          shiftX={60}
+          position="left"
+        >
+          This is a daily placeholder you'll encounter each day. Click the 'New
+          Activity' button or press ctrl + space to open the form for your
+          initial entry today. Alternatively, you can duplicate your last report
+          by clicking 'Copy Last Report.'
+        </Hint>
         <span className="block text-gray-500 text-xs">
           or press ctrl + space
         </span>
       </div>
+
       <ButtonTransparent callback={copyLastReport}>
         <Square2StackIcon className="w-5 h-5" />
         Copy last report
