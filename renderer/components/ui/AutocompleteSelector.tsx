@@ -54,45 +54,58 @@ export default function AutocompleteSelector({
   }, [availableItems, additionalItems]);
   const undoManager = useUndoManager(selectedItem);
 
-  const filteredList =
-    selectedItem === ""
-      ? availableItems?.filter((activity, i) => {
-          if (showedSuggestionsNumber) {
-            return activity !== "" && i < showedSuggestionsNumber;
-          }
-          return activity !== "";
-        })
-      : availableItems
-          .sort()
-          .concat(additionalItems ? additionalItems : [])
-          .reduce((accumulator, current) => {
-            let duplicate = false;
-            if (current.startsWith("TT:: ") || current.startsWith("JI:: ")) {
-              duplicate = availableItems.includes(current.slice(5));
-            }
-            if (
-              !duplicate &&
-              current.toLowerCase() === selectedItem.toLowerCase()
-            ) {
-              accumulator.unshift(current);
-            } else if (
-              !duplicate &&
-              current.toLowerCase().includes((selectedItem || "").toLowerCase())
-            ) {
-              accumulator.push(current);
-            }
-            return accumulator;
-          }, [])
-          .slice(0, 15);
+  const filteredList = useMemo(() => {
+    return selectedItem === ""
+      ? availableItems &&
+          [...availableItems]
+            .concat(additionalItems ? additionalItems : [])
+            .filter((activity, i) => {
+              if (showedSuggestionsNumber) {
+                return activity !== "" && i < showedSuggestionsNumber;
+              }
+              return activity !== "";
+            })
+      : availableItems &&
+          [...availableItems]
+            .sort()
+            .concat(additionalItems ? additionalItems : [])
+            .reduce((accumulator, current) => {
+              let duplicate = false;
+              if (current.startsWith("TT:: ") || current.startsWith("JI:: ")) {
+                duplicate = availableItems.includes(current.slice(5));
+              }
+              if (
+                !duplicate &&
+                current.toLowerCase() === selectedItem.toLowerCase()
+              ) {
+                accumulator.unshift(current);
+              } else if (
+                !duplicate &&
+                current
+                  .toLowerCase()
+                  .includes((selectedItem || "").toLowerCase())
+              ) {
+                accumulator.push(current);
+              }
+              return accumulator;
+            }, [])
+            .slice(0, 15);
+  }, [selectedItem, availableItems, additionalItems]);
+
+  const fullSuggestionsList = useMemo(() => {
+    return selectedItem.trim() === ""
+      ? filteredList
+      : [selectedItem, ...filteredList];
+  }, [selectedItem, filteredList]);
 
   const handleKey = (e) => {
-    if (e.key === "Home") {
+    if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.key === "Home") {
       e.preventDefault();
       inputRef.current.selectionStart = 0;
       inputRef.current.selectionEnd = 0;
     }
 
-    if (e.key === "End") {
+    if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.key === "End") {
       e.preventDefault();
       const input = inputRef.current;
       const length = input.value.length;
@@ -150,6 +163,43 @@ export default function AutocompleteSelector({
     }
   }, [selectedItem, allItems]);
 
+  const renderSuggestionsList = () =>
+    fullSuggestionsList.map((item, i) => (
+      <Combobox.Option
+        key={i}
+        value={item}
+        className={({ active }) =>
+          clsx(
+            "relative cursor-default select-none py-2 pl-3 pr-9",
+            active
+              ? "bg-blue-600 text-white dark:bg-indigo-800"
+              : "text-gray-900 dark:text-dark-main"
+          )
+        }
+      >
+        {({ active, selected }) => (
+          <>
+            <span
+              className={clsx("block truncate", selected && "font-semibold")}
+            >
+              {item}
+            </span>
+
+            {selected && (
+              <span
+                className={clsx(
+                  "absolute inset-y-0 right-0 flex items-center pr-4",
+                  active ? "text-white" : "text-blue-600"
+                )}
+              >
+                <CheckIcon className="w-5 h-5" aria-hidden="true" />
+              </span>
+            )}
+          </>
+        )}
+      </Combobox.Option>
+    ));
+
   return (
     <Combobox
       className={className}
@@ -196,92 +246,13 @@ export default function AutocompleteSelector({
           />
         </Combobox.Button>
 
-        {filteredList?.length > 0 ? (
+        {fullSuggestionsList?.length > 0 && (
           <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm dark:bg-dark-container dark:shadow-lg dark:shadow-slate-900">
             <div className="block text-xs text-gray-500 text-center">
               tab to choose
             </div>
-            {filteredList?.map((item, i) => (
-              <Combobox.Option
-                key={i}
-                value={item}
-                className={({ active }) =>
-                  clsx(
-                    "relative cursor-default select-none py-2 pl-3 pr-9",
-                    active
-                      ? "bg-blue-600 text-white dark:bg-indigo-800"
-                      : "text-gray-900 dark:text-dark-main"
-                  )
-                }
-              >
-                {({ active, selected }) => (
-                  <>
-                    <span
-                      className={clsx(
-                        "block truncate",
-                        selected && "font-semibold"
-                      )}
-                    >
-                      {item}
-                    </span>
-
-                    {selected && (
-                      <span
-                        className={clsx(
-                          "absolute inset-y-0 right-0 flex items-center pr-4",
-                          active ? "text-white" : "text-blue-600"
-                        )}
-                      >
-                        <CheckIcon className="w-5 h-5" aria-hidden="true" />
-                      </span>
-                    )}
-                  </>
-                )}
-              </Combobox.Option>
-            ))}
+            {renderSuggestionsList()}
           </Combobox.Options>
-        ) : (
-          filteredList &&
-          selectedItem && (
-            <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm dark:bg-dark-container dark:shadow-lg dark:shadow-slate-900">
-              <Combobox.Option
-                key={1}
-                value={selectedItem}
-                className={({ active }) =>
-                  clsx(
-                    "relative cursor-default select-none py-2 pl-3 pr-9",
-                    active
-                      ? "bg-blue-600 text-white dark:bg-indigo-800"
-                      : "text-gray-900 dark:text-dark-main"
-                  )
-                }
-              >
-                {({ active, selected }) => (
-                  <>
-                    <span
-                      className={clsx(
-                        "block truncate",
-                        selected && "font-semibold"
-                      )}
-                    >
-                      {selectedItem}
-                    </span>
-
-                    {selected && (
-                      <span
-                        className={clsx(
-                          "absolute inset-y-0 right-0 flex items-center pr-4",
-                          active ? "text-white" : "text-blue-600"
-                        )}
-                      >
-                        <CheckIcon className="w-5 h-5" aria-hidden="true" />
-                      </span>
-                    )}
-                  </>
-                )}
-              </Combobox.Option>
-            </Combobox.Options>
-          )
         )}
       </div>
     </Combobox>

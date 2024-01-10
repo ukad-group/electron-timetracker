@@ -6,7 +6,7 @@ import useTimeInput from "../../hooks/useTimeInput";
 import {
   ReportActivity,
   calcDurationBetweenTimes,
-  formatDuration,
+  formatDurationAsDecimals,
   addSuggestions,
   addDurationToTime,
 } from "../../utils/reports";
@@ -106,7 +106,9 @@ export default function TrackTimeModal({
     }
 
     setTo(editedActivity.to || "");
-    setFormattedDuration(formatDuration(editedActivity.duration) || "");
+    setFormattedDuration(
+      formatDurationAsDecimals(editedActivity.duration) || ""
+    );
     setProject(editedActivity.project || "");
     setActivity(editedActivity.activity || "");
     setDescription(editedActivity.description || "");
@@ -166,7 +168,7 @@ export default function TrackTimeModal({
   useEffect(() => {
     if (duration === null || isTypingFromDuration) return;
 
-    setFormattedDuration(formatDuration(duration));
+    setFormattedDuration(formatDurationAsDecimals(duration));
   }, [from, to]);
 
   useEffect(() => {
@@ -341,7 +343,7 @@ export default function TrackTimeModal({
 
   const onDurationBlur = () => {
     setIsTypingFromDuration(false);
-    setFormattedDuration(formatDuration(duration));
+    setFormattedDuration(formatDurationAsDecimals(duration));
   };
 
   const selectText = (e) => {
@@ -473,7 +475,7 @@ export default function TrackTimeModal({
       <Dialog
         as="div"
         className="fixed inset-0 z-10 overflow-y-auto"
-        onClose={close}
+        onClose={() => null}
       >
         <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
           <Transition.Child

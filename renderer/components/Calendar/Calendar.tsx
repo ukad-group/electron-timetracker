@@ -374,11 +374,11 @@ function renderEventContent(eventInfo) {
         <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[26px] -left-[1px] dark:fill-red-500/70" />
       )}
       {eventInfo.event.extendedProps.workDurationMs ? (
-        <p>
+        <p className="whitespace-normal">
           Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}
         </p>
       ) : (
-        <p>File is empty</p>
+        <p className="whitespace-normal">File is empty</p>
       )}
     </>
   );

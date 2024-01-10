@@ -6,7 +6,7 @@ import {
 import React, { useState, useEffect } from "react";
 import Tooltip from "./ui/Tooltip/Tooltip";
 import clsx from "clsx";
-import { ReportActivity, formatDuration, parseReport } from "../utils/reports";
+import { ReportActivity, formatDurationAsDecimals, parseReport } from "../utils/reports";
 import {
   convertMillisecondsToTime,
   getMonthDates,
@@ -148,7 +148,7 @@ const Totals = ({ selectedDate }) => {
           activities: [],
         });
       } else {
-        existingTotal.duration += curr.duration;
+        existingTotal.duration += curr.duration ? curr.duration : 0;
 
         const existingDescription = existingTotal.descriptions.find(
           (desc) => desc.name === name
@@ -292,7 +292,7 @@ const Totals = ({ selectedDate }) => {
   };
 
   return (
-    <div>
+    <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
       <h2 className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading">
         <div>
           <label htmlFor="select">Totals</label>
@@ -344,7 +344,7 @@ const Totals = ({ selectedDate }) => {
                       />
                     )}
                     <span>
-                      {name} - {formatDuration(duration)}
+                      {name} - {formatDurationAsDecimals(duration)}
                     </span>
                   </div>
                   {period === "day" && (
@@ -386,7 +386,7 @@ const Totals = ({ selectedDate }) => {
                           <span>
                             &#8226;{" "}
                             {activity.name ? activity.name : "(no activity)"} -{" "}
-                            {formatDuration(activity.duration)}
+                            {formatDurationAsDecimals(activity.duration)}
                           </span>
                         </div>
                         {period === "day" && (
@@ -436,7 +436,7 @@ const Totals = ({ selectedDate }) => {
           No tracked time this {period}
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

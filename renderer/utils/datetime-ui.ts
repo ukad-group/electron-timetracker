@@ -163,7 +163,15 @@ export function getCeiledTime() {
 }
 
 export const getTimeFromEventObj = (date: string) => {
-  return new Date(date).toLocaleTimeString([], {
+  let dateString = date;
+  const dateArray = dateString.split("");
+
+  if (dateArray[dateArray.length - 1] === "Z") {
+    dateArray.pop();
+    dateString = dateArray.join("");
+  }
+
+  return new Date(dateString).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
