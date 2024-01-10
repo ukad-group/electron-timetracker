@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
-import Button from "../../shared/Button";
+import { Button } from "../../shared/Button";
 import isOnline from "is-online";
 import { Office365User } from "../../helpers/utils/office365";
 

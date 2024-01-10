@@ -1,12 +1,6 @@
 import { shallow } from "zustand/shallow";
-import { useMainStore } from "../store/mainStore";
-
-type DeleteMessageProps = {
-  setShowDeleteButton: (value: boolean) => void;
-  setShowDeleteMessage: (value: boolean) => void;
-  selectedDate: Date;
-  setSelectedDateReport: (value: string) => void;
-};
+import { useMainStore } from "../../store/mainStore";
+import { DeleteMessageProps } from './types';
 
 export default function DeleteMessage({
   setShowDeleteButton,

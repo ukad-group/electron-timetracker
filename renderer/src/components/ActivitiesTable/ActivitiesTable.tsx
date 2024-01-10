@@ -12,7 +12,7 @@ import {
   getTimeFromEventObj,
   padStringToMinutes,
 } from "../../helpers/utils/datetime-ui";
-import TimeBadge from "../../shared/TimeBadge";
+import { TimeBadge } from "../../shared/TimeBadge";
 import {
   Square2StackIcon,
   PencilSquareIcon,
@@ -22,7 +22,7 @@ import { useScheduledEventsStore } from "../../store/googleEventsStore";
 import Tooltip from "../../shared/Tooltip/Tooltip";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { concatSortArrays, parseEventTitle } from "../../helpers/utils/utils";
-import Loader from "../../shared/Loader";
+import { Loader } from "../../shared/Loader";
 import { ActivitiesTableProps } from './types';
 
 const MS_PER_HOUR = 60 * 60 * 1000;

@@ -12,7 +12,7 @@ import TrackTimeModal from "../components/TrackTimeModal/TrackTimeModal";
 import { ManualInputForm } from "../components/ManualInputForm";
 import { ActivitiesSection } from "../components/ActivitiesSection";
 import { SelectFolderPlaceholder } from "../components/SelectFolderPlaceholder";
-import VersionMessage from "../shared/VersionMessages";
+import { VersionMessage } from "../shared/VersionMessage";
 import { UpdateDescription } from "../components/UpdateDescription";
 import { useMainStore } from "../store/mainStore";
 import { useThemeStore } from "../store/themeStore";

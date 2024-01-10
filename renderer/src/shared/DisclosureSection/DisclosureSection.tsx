@@ -1,14 +1,8 @@
 import clsx from "clsx";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { Disclosure } from "@headlessui/react";
-import React, { ReactNode } from "react";
-
-type DisclosureSectionProps = {
-  toggleFunction: () => void;
-  isOpen: boolean;
-  title: string;
-  children: ReactNode;
-};
+import React from "react";
+import { DisclosureSectionProps } from './types';
 
 export default function DisclosureSection(props: DisclosureSectionProps) {
   return (

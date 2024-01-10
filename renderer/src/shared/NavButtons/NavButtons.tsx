@@ -1,9 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-
-type NavButtonsProps = {
-  prevCallback: () => void;
-  nextCallback: () => void;
-};
+import { NavButtonsProps } from './types';
 
 export default function NavButtons({
   prevCallback,

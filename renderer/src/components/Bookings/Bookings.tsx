@@ -8,7 +8,7 @@ import {
   parseReport,
 } from "../../helpers/utils/reports";
 import { ParsedReport, TTUserInfo } from "../Calendar/Calendar";
-import Loader from "../../shared/Loader";
+import { Loader } from "../../shared/Loader";
 import { BookingsProps, BookingFromApi, BookedSpentStat } from './types';
 
 const Bookings = ({ calendarDate }: BookingsProps) => {

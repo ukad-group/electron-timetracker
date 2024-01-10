@@ -1,7 +1,5 @@
 import {
   FormEvent,
-  Dispatch,
-  SetStateAction,
   useState,
   useRef,
   ChangeEvent,
@@ -12,23 +10,8 @@ import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
-import useUndoManager from "../helpers/hooks/useUndoManager";
-
-type AutocompleteProps = {
-  isNewCheck: boolean;
-  onSave: (e: FormEvent | MouseEvent) => void;
-  title: string;
-  selectedItem: string;
-  availableItems: Array<string>;
-  additionalItems?: Array<string>;
-  setSelectedItem: Dispatch<SetStateAction<string>>;
-  required?: boolean;
-  tabIndex?: number;
-  isValidationEnabled?: boolean;
-  className?: string;
-  showedSuggestionsNumber: number;
-  spellCheck: boolean;
-};
+import useUndoManager from "../../helpers/hooks/useUndoManager";
+import { AutocompleteProps } from './types';
 
 export default function AutocompleteSelector({
   isNewCheck,

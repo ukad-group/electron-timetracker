@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Button from "../../shared/Button";
+import { Button } from "../../shared/Button";
 import { useRouter } from "next/router";
 import {
   getGoogleAuthUrl,

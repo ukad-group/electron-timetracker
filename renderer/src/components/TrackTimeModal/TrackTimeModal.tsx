@@ -11,8 +11,8 @@ import {
   addDurationToTime,
 } from "../../helpers/utils/reports";
 import { checkIsToday, padStringToMinutes } from "../../helpers/utils/datetime-ui";
-import AutocompleteSelector from "../../shared/AutocompleteSelector";
-import Button from "../../shared/Button";
+import { AutocompleteSelector } from "../../shared/AutocompleteSelector";
+import { Button } from "../../shared/Button";
 import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "../../store/googleEventsStore";
 import { getJiraCardsFromAPI } from "../../helpers/utils/jira";

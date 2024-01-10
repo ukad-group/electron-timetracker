@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import Button from "../../shared/Button";
-import DeleteMessage from "../../shared/DeleteMessage";
+import { Button } from "../../shared/Button";
+import { DeleteMessage } from "../../shared/DeleteMessage";
 import { parseReport, serializeReport } from "../../helpers/utils/reports";
 import { getCurrentTimeRoundedUp } from "../../helpers/utils/datetime-ui";
 import { useMainStore } from "../../store/mainStore";

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import NavButtons from "../../shared/NavButtons";
-import Button from "../../shared/Button";
-import ButtonTransparent from "../../shared/ButtonTransparent";
+import { NavButtons } from "../../shared/NavButtons";
+import { Button } from "../../shared/Button";
+import { ButtonTransparent } from "../../shared/ButtonTransparent";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
-import Popup from "../../shared/Popup";
+import Popup from "../../shared/Popup/Popup";
 import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
 import { DAY as day } from '../../helpers/dates';

@@ -1,11 +1,6 @@
 import React from "react";
-import { stringToMinutes } from "../helpers/utils/reports";
-
-export type TimeBadgeProps = {
-  hours: number;
-  startTime: string;
-  selectedDate: Date;
-};
+import { stringToMinutes } from "../../helpers/utils/reports";
+import { TimeBadgeProps } from './types';
 
 export default function TimeBadge({
   hours,

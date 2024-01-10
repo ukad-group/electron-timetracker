@@ -23,8 +23,8 @@ import {
   validation,
   ReportActivity,
 } from "../../helpers/utils/reports";
-import NavButtons from "../../shared/NavButtons";
-import Button from "../../shared/Button";
+import { NavButtons } from "../../shared/NavButtons";
+import { Button } from "../../shared/Button";
 import { ErrorPlaceholder, RenderError } from "../../shared/ErrorPlaceholder";
 import {
   getMonthWorkHours,

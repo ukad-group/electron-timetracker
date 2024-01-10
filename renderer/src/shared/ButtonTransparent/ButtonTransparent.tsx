@@ -1,9 +1,4 @@
-import { ReactNode } from "react";
-
-type ButtonTransparentProps = {
-  children: ReactNode;
-  callback?: () => void;
-};
+import { ButtonTransparentProps } from './types';
 
 export default function ButtonTransparent({
   children,

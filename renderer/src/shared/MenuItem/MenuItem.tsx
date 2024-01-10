@@ -1,10 +1,4 @@
-import { ReactNode } from "react";
-
-type MenuItemProps = {
-  children: ReactNode;
-  callback?: () => void;
-  isActive?: boolean;
-};
+import { MenuItemProps } from './types';
 
 export default function MenuItem({
   children,
