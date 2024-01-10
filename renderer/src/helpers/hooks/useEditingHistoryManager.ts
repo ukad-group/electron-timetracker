@@ -1,14 +1,10 @@
 import { useReducer, useCallback } from "react";
+import { EditingHistoryAction, actions } from "../../actions/editingActions";
 
 interface EditingHistoryState<T> {
   undoStack: T[];
   redoStack: T[];
 }
-
-type EditingHistoryAction<T> =
-  | { type: "SET_VALUE"; value: T }
-  | { type: "UNDO" }
-  | { type: "REDO" };
 
 const EditingHistoryReducer = <T>(
   state: EditingHistoryState<T>,
@@ -57,31 +53,34 @@ const EditingHistoryReducer = <T>(
 };
 
 const useEditingHistoryManager = <T>(initialValue: T) => {
-  const undoState: EditingHistoryState<T> = {
+  const editingHistoryState: EditingHistoryState<T> = {
     undoStack: [initialValue],
     redoStack: [],
   };
-  const [state, dispatch] = useReducer(EditingHistoryReducer<T>, undoState);
+  const [state, dispatch] = useReducer(
+    EditingHistoryReducer<T>,
+    editingHistoryState
+  );
 
-  const doSetValue = (value) => dispatch({ type: "SET_VALUE", value });
-  const doUndo = () => {
-    dispatch({ type: "UNDO" }); // same here
+  const setValue = useCallback(
+    (value: string) =>
+      dispatch(actions.setValue(value) as EditingHistoryAction<T>),
+    [dispatch]
+  );
+  const undo = useCallback(() => {
+    dispatch(actions.undo() as EditingHistoryAction<T>);
 
     if (state.undoStack.length > 2) {
       return state.undoStack[state.undoStack.length - 2];
     }
 
     return state.undoStack[0];
-  };
-  const doRedo = () => {
-    dispatch({ type: "REDO" }); // same here
+  }, [dispatch, state]);
+  const redo = useCallback(() => {
+    dispatch(actions.redo() as EditingHistoryAction<T>);
 
     return state.redoStack[state.redoStack.length - 1];
-  };
-
-  const setValue = useCallback(doSetValue, [dispatch]);
-  const undo = useCallback(doUndo, [dispatch, state]);
-  const redo = useCallback(doRedo, [dispatch, state]);
+  }, [dispatch, state]);
 
   return {
     setValue,

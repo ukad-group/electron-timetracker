@@ -29,7 +29,7 @@ export default function AutocompleteSelector({
       ? availableItems?.concat(additionalItems)
       : availableItems;
   }, [availableItems, additionalItems]);
-  const undoManager = useEditingHistoryManager(selectedItem);
+  const editingHistoryManager = useEditingHistoryManager(selectedItem);
 
   const filteredList = useMemo(() => {
     return selectedItem === ""
@@ -97,7 +97,7 @@ export default function AutocompleteSelector({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
-      const currentValue = undoManager.undo();
+      const currentValue = editingHistoryManager.undo();
 
       if (currentValue !== undefined) {
         setSelectedItem(currentValue as string);
@@ -106,7 +106,7 @@ export default function AutocompleteSelector({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
-      const currentValue = undoManager.redo();
+      const currentValue = editingHistoryManager.redo();
 
       if (currentValue !== undefined) {
         setSelectedItem(currentValue as string);
@@ -122,7 +122,7 @@ export default function AutocompleteSelector({
     }
 
     setSelectedItem(newValue);
-    undoManager.setValue(newValue);
+    editingHistoryManager.setValue(newValue);
   };
 
   const onBlurHandler = (e: ChangeEvent<HTMLInputElement>) => {

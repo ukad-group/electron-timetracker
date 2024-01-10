@@ -24,7 +24,7 @@ export default function ManualInputForm({
   const [showDeleteMessage, setShowDeleteMessage] = useState(false);
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   const [isFileExist, setIsFileExist] = useState(false);
-  const undoManager = useEditingHistoryManager(report);
+  const editingHistoryManager = useEditingHistoryManager(report);
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if (
@@ -64,7 +64,7 @@ export default function ManualInputForm({
   }, [selectedDateReport]);
 
   useEffect(() => {
-    undoManager.setValue(report);
+    editingHistoryManager.setValue(report);
     setReportHandler(report);
 
     if (isFileExist) {
@@ -94,7 +94,7 @@ export default function ManualInputForm({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
-      const currentValue = undoManager.undo();
+      const currentValue = editingHistoryManager.undo();
 
       if (typeof currentValue === "string") {
         setReport(currentValue);
@@ -103,7 +103,7 @@ export default function ManualInputForm({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
-      const currentValue = undoManager.redo();
+      const currentValue = editingHistoryManager.redo();
 
       if (typeof currentValue === "string") {
         setReport(currentValue);
