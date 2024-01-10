@@ -5,8 +5,8 @@ import { parseReport, serializeReport } from "../../helpers/utils/reports";
 import { getCurrentTimeRoundedUp } from "../../helpers/utils/datetime-ui";
 import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
-import useUndoManager from "../../helpers/hooks/useUndoManager";
-import { ManualInputFormProps } from './types';
+import useEditingHistoryManager from "../../helpers/hooks/useEditingHistoryManager";
+import { ManualInputFormProps } from "./types";
 
 export default function ManualInputForm({
   onSave,
@@ -24,7 +24,7 @@ export default function ManualInputForm({
   const [showDeleteMessage, setShowDeleteMessage] = useState(false);
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   const [isFileExist, setIsFileExist] = useState(false);
-  const undoManager = useUndoManager(report);
+  const undoManager = useEditingHistoryManager(report);
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if (

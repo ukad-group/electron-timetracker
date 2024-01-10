@@ -1,22 +1,19 @@
 import { useReducer, useCallback } from "react";
 
-interface UndoState<T> {
-  // в UndoState redoStack? назви це щось типу EditingHistoryState
+interface EditingHistoryState<T> {
   undoStack: T[];
   redoStack: T[];
 }
 
-type UndoAction<T> =
+type EditingHistoryAction<T> =
   | { type: "SET_VALUE"; value: T }
   | { type: "UNDO" }
   | { type: "REDO" };
 
-// чому у UndoAction може бути тип SET_VALUE або REDO. назва невдала.
-
-const undoReducer = <T>(
-  state: UndoState<T>,
-  action: UndoAction<T>
-): UndoState<T> => {
+const EditingHistoryReducer = <T>(
+  state: EditingHistoryState<T>,
+  action: EditingHistoryAction<T>
+): EditingHistoryState<T> => {
   switch (action.type) {
     case "SET_VALUE":
       if (state.undoStack[state.undoStack.length - 1] !== action.value) {
@@ -59,36 +56,32 @@ const undoReducer = <T>(
   }
 };
 
-const useUndoManager = <T>(initialValue: T) => {
-  const undoState: UndoState<T> = {
+const useEditingHistoryManager = <T>(initialValue: T) => {
+  const undoState: EditingHistoryState<T> = {
     undoStack: [initialValue],
     redoStack: [],
   };
-  const [state, dispatch] = useReducer(undoReducer<T>, undoState);
+  const [state, dispatch] = useReducer(EditingHistoryReducer<T>, undoState);
 
-  const setValue = useCallback(
-    (value) => {
-      dispatch({ type: "SET_VALUE", value }); // краще зробити action creator function
-    },
-    [dispatch]
-  );
-
-  const undo = useCallback(() => {
+  const doSetValue = (value) => dispatch({ type: "SET_VALUE", value });
+  const doUndo = () => {
     dispatch({ type: "UNDO" }); // same here
 
     if (state.undoStack.length > 2) {
       return state.undoStack[state.undoStack.length - 2];
-    } else {
-      // else не потрібно, просто return після умови
-      return state.undoStack[0];
     }
-  }, [dispatch, state]);
 
-  const redo = useCallback(() => {
+    return state.undoStack[0];
+  };
+  const doRedo = () => {
     dispatch({ type: "REDO" }); // same here
 
     return state.redoStack[state.redoStack.length - 1];
-  }, [dispatch, state]);
+  };
+
+  const setValue = useCallback(doSetValue, [dispatch]);
+  const undo = useCallback(doUndo, [dispatch, state]);
+  const redo = useCallback(doRedo, [dispatch, state]);
 
   return {
     setValue,
@@ -97,4 +90,4 @@ const useUndoManager = <T>(initialValue: T) => {
   };
 };
 
-export default useUndoManager;
+export default useEditingHistoryManager;
