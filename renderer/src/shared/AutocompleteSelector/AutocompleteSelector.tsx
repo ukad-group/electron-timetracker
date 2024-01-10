@@ -10,7 +10,7 @@ import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
-import useUndoManager from "../../helpers/hooks/useUndoManager";
+import useUndoManager from "@/helpers/hooks/useUndoManager";
 import { AutocompleteProps } from './types';
 
 export default function AutocompleteSelector({

@@ -22,9 +22,9 @@ import {
   parseReport,
   validation,
   ReportActivity,
-} from "../../helpers/utils/reports";
-import { NavButtons } from "../../shared/NavButtons";
-import { Button } from "../../shared/Button";
+} from "@/helpers/utils/reports";
+import { NavButtons } from "@/shared/NavButtons";
+import { Button } from "@/shared/Button";
 import { ErrorPlaceholder, RenderError } from "../../shared/ErrorPlaceholder";
 import {
   getMonthWorkHours,
@@ -32,7 +32,7 @@ import {
   getWeekNumber,
   isTheSameDates,
   MONTHS,
-} from "../../helpers/utils/datetime-ui";
+} from "@/helpers/utils/datetime-ui";
 import { loadHolidaysAndVacations } from "./utils";
 import { BookingFromApi } from "../Bookings/types";
 

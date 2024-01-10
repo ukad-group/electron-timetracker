@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
-import { Button } from "../../shared/Button";
+import { Button } from "@/shared/Button";
 import isOnline from "is-online";
-import { JiraUser } from "../../helpers/utils/jira";
+import { JiraUser } from "@/helpers/utils/jira";
 import { FlagIcon } from "@heroicons/react/24/outline";
 
 const JiraConnection = () => {

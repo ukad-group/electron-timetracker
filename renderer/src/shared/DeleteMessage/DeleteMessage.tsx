@@ -1,5 +1,5 @@
 import { shallow } from "zustand/shallow";
-import { useMainStore } from "../../store/mainStore";
+import { useMainStore } from "@/store/mainStore";
 import { DeleteMessageProps } from './types';
 
 export default function DeleteMessage({

@@ -4,15 +4,15 @@ import {
   DocumentPlusIcon,
 } from "@heroicons/react/24/outline";
 import React, { useState, useEffect } from "react";
-import Tooltip from "../../shared/Tooltip/Tooltip";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 import clsx from "clsx";
-import { ReportActivity, formatDurationAsDecimals, parseReport } from "../../helpers/utils/reports";
+import { ReportActivity, formatDurationAsDecimals, parseReport } from "@/helpers/utils/reports";
 import {
   convertMillisecondsToTime,
   getMonthDates,
   getWeekDates,
-} from "../../helpers/utils/datetime-ui";
-import { useMainStore } from "../../store/mainStore";
+} from "@/helpers/utils/datetime-ui";
+import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import { Description, Activity, Total, PeriodName } from './types';
 import { TOTAL_PERIODS } from './constants';
