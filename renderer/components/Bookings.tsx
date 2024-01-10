@@ -30,7 +30,6 @@ type BookedSpentStat = {
 };
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
-  const [isTimetrackerLogged, setIsTimetrackerLogged] = useState(false);
   const [bookedProjects, setBookedProjects] = useState<BookingFromApi[]>([]);
   const [bookedSpentStatistic, setBookedSpentStatistic] = useState<
     BookedSpentStat[]
@@ -140,8 +139,6 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
     if (!TTUserInfo) return;
 
-    setIsTimetrackerLogged(true);
-
     const timetrackerCookie = TTUserInfo?.TTCookie;
     const timetrackerUserName = TTUserInfo?.name;
 
@@ -219,7 +216,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
           {project.booked}h
         </td>
         <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-          {formatDuration(project.spent)}
+          {formatDurationAsDecimals(project.spent)}
         </td>
       </tr>
     ));
@@ -259,7 +256,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
                 {totalBookingTime}h
               </td>
               <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                {formatDuration(totalSpentTime)}
+                {formatDurationAsDecimals(totalSpentTime)}
               </td>
             </tr>
           </tbody>
