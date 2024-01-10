@@ -27,7 +27,7 @@ body {
 }
 
 *::-webkit-resizer {
-  @apply bg-gray-100 dark:bg-dark-back;
+  @apply bg-white dark:bg-dark-back;
   border: 2px solid #333;
   border-top: none;
   border-left: none;
