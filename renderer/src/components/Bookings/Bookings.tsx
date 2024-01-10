@@ -1,33 +1,15 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useMainStore } from "../store/mainStore";
+import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
-import { MONTHS } from "../helpers/utils/datetime-ui";
+import { MONTHS } from "../../helpers/utils/datetime-ui";
 import {
   ReportActivity,
   formatDurationAsDecimals,
   parseReport,
-} from "../helpers/utils/reports";
-import { ParsedReport, TTUserInfo } from "./Calendar/Calendar";
-import Loader from "../shared/Loader";
-
-type BookingsProps = {
-  calendarDate: Date;
-};
-
-export type BookingFromApi = {
-  name: string;
-  plans: Array<{
-    hours: number;
-    month: number;
-    year: number;
-  }>;
-};
-
-type BookedSpentStat = {
-  project: string;
-  booked: number;
-  spent: number;
-};
+} from "../../helpers/utils/reports";
+import { ParsedReport, TTUserInfo } from "../Calendar/Calendar";
+import Loader from "../../shared/Loader";
+import { BookingsProps, BookingFromApi, BookedSpentStat } from './types';
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
   const [bookedProjects, setBookedProjects] = useState<BookingFromApi[]>([]);

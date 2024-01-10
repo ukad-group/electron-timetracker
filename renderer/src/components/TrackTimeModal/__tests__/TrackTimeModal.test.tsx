@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import TrackTimeModal, { TrackTimeModalProps } from "./TrackTimeModal";
+import TrackTimeModal, { TrackTimeModalProps } from "../TrackTimeModal";
 import "@testing-library/jest-dom";
 
 const mockedActivities = [
@@ -32,7 +32,7 @@ const mockedActivities = [
   },
 ];
 
-jest.mock("../AddEventBtn", () => {
+jest.mock("../AddEventBtn/AddEventBtn", () => {
   return {
     __esModule: true,
     default: () => {

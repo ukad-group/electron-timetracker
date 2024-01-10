@@ -1,9 +1,5 @@
 import { PencilIcon } from "@heroicons/react/24/solid";
-
-type FolderSelectorProps = {
-  folderLocation?: string;
-  setFolderLocation: (location: string) => void;
-};
+import { FolderSelectorProps } from './types';
 
 export default function FolderSelector({
   folderLocation,

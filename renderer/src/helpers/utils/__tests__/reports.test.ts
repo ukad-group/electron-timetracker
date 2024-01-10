@@ -6,7 +6,7 @@ import {
   serializeReport,
   checkIntersection,
   validation,
-} from "./reports";
+} from "../reports";
 
 const parsedReport = (activity) => parseReport(activity)[0];
 const useFakeTime = () =>

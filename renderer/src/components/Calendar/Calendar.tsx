@@ -33,8 +33,8 @@ import {
   isTheSameDates,
   MONTHS,
 } from "../../helpers/utils/datetime-ui";
-import { loadHolidaysAndVacations } from "./calendar-utils";
-import { BookingFromApi } from "../Bookings";
+import { loadHolidaysAndVacations } from "./utils";
+import { BookingFromApi } from "../Bookings/types";
 
 type CalendarProps = {
   reportsFolder: string;

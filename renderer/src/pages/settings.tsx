@@ -67,7 +67,7 @@ const SettingsPage = () => {
                 Manage your settings and set preferences
               </span>
             </div>
-            <Link href="/renderer/public">
+            <Link href="/">
               <ButtonTransparent>
                 <ChevronLeftIcon className="w-4 h-4" /> Back
               </ButtonTransparent>

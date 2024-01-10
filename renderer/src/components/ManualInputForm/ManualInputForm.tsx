@@ -1,21 +1,12 @@
-import { SetStateAction, useEffect, useState, useRef } from "react";
-import Button from "../shared/Button";
-import DeleteMessage from "../shared/DeleteMessage";
-import { parseReport, serializeReport } from "../helpers/utils/reports";
-import { getCurrentTimeRoundedUp } from "../helpers/utils/datetime-ui";
-import { useMainStore } from "../store/mainStore";
+import { useEffect, useState, useRef } from "react";
+import Button from "../../shared/Button";
+import DeleteMessage from "../../shared/DeleteMessage";
+import { parseReport, serializeReport } from "../../helpers/utils/reports";
+import { getCurrentTimeRoundedUp } from "../../helpers/utils/datetime-ui";
+import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
-import useUndoManager from "../helpers/hooks/useUndoManager";
-
-type ManualInputFormProps = {
-  onSave: (
-    selectedDateReport: SetStateAction<string>,
-    shouldAutosave: SetStateAction<boolean>
-  ) => void;
-  selectedDateReport: string;
-  selectedDate: Date;
-  setSelectedDateReport: (value: string) => void;
-};
+import useUndoManager from "../../helpers/hooks/useUndoManager";
+import { ManualInputFormProps } from './types';
 
 export default function ManualInputForm({
   onSave,

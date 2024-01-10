@@ -1,6 +1,6 @@
 import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
-import FolderSelector from "../FolderSelector";
+import { FolderSelector } from "../FolderSelector";
 
 const ReportsFolderSection = () => {
   const [reportsFolder, setReportsFolder] = useMainStore(

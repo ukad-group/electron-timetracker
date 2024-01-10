@@ -4,38 +4,18 @@ import {
   DocumentPlusIcon,
 } from "@heroicons/react/24/outline";
 import React, { useState, useEffect } from "react";
-import Tooltip from "../shared/Tooltip/Tooltip";
+import Tooltip from "../../shared/Tooltip/Tooltip";
 import clsx from "clsx";
-import { ReportActivity, formatDurationAsDecimals, parseReport } from "../helpers/utils/reports";
+import { ReportActivity, formatDurationAsDecimals, parseReport } from "../../helpers/utils/reports";
 import {
   convertMillisecondsToTime,
   getMonthDates,
   getWeekDates,
-} from "../helpers/utils/datetime-ui";
-import { useMainStore } from "../store/mainStore";
+} from "../../helpers/utils/datetime-ui";
+import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
-
-interface Description {
-  id: string;
-  name: string;
-  duration: number;
-}
-
-interface Activity extends Description {
-  descriptions: Description[];
-}
-
-interface Total extends Activity {
-  activities: Activity[];
-}
-
-type PeriodName = "day" | "week" | "month";
-
-const TOTAL_PERIODS = [
-  { id: 0, name: "day" },
-  { id: 1, name: "week" },
-  { id: 2, name: "month" },
-];
+import { Description, Activity, Total, PeriodName } from './types';
+import { TOTAL_PERIODS } from './constants';
 
 const Totals = ({ selectedDate }) => {
   const [reportsFolder] = useMainStore(

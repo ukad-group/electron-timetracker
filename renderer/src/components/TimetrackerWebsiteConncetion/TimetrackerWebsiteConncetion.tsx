@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
-import Button from "../shared/Button";
+import Button from "../../shared/Button";
 import { useRouter } from "next/router";
-import Loader from "../shared/Loader";
+import Loader from "../../shared/Loader";
 import isOnline from "is-online";
-import { TTUserInfo } from "./Calendar/Calendar";
+import { TTUserInfo } from "../Calendar/Calendar";
 
 const TimetrackerWebsiteConnection = () => {
   const router = useRouter();

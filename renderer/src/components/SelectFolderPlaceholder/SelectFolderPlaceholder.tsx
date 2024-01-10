@@ -1,9 +1,6 @@
 import React from "react";
 import { PlusIcon } from "@heroicons/react/24/solid";
-
-type SelectFolderPlaceholderProps = {
-  setFolder: (path: string) => void;
-};
+import { SelectFolderPlaceholderProps } from './types';
 
 const SelectFolderPlaceholder = ({
   setFolder,

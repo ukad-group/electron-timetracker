@@ -1,27 +1,10 @@
 import { useState, useEffect } from "react";
 import { shallow } from "zustand/shallow";
-import { useUpdateStore } from "../store/updateStore";
-import { useBetaStore } from "../store/betaUpdatesStore";
-import DisclosureSection from "../shared/DisclosureSection";
+import { useUpdateStore } from "../../store/updateStore";
+import DisclosureSection from "../../shared/DisclosureSection";
 import { GlobeAltIcon } from "@heroicons/react/24/solid";
-import SlackIcon from "../shared/SlackIcon";
-
-type File = {
-  url: string;
-  sha512: string;
-  size: number;
-};
-
-type Release = {
-  files: File[];
-  path: string;
-  releaseDate: string;
-  releaseName: string;
-  releaseNotes: string;
-  sha512: string;
-  tag: string;
-  version: string;
-};
+import SlackIcon from "../../shared/SlackIcon";
+import { Release } from './types';
 
 export default function UpdateDescription() {
   const [release, setRelease] = useState<Release | null>();

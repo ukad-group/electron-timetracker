@@ -1,20 +1,13 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import NavButtons from "../shared/NavButtons";
-import Button from "../shared/Button";
-import ButtonTransparent from "../shared/ButtonTransparent";
+import { useEffect, useState } from "react";
+import NavButtons from "../../shared/NavButtons";
+import Button from "../../shared/Button";
+import ButtonTransparent from "../../shared/ButtonTransparent";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
-import Popup from "../shared/Popup";
-import { useMainStore } from "../store/mainStore";
+import Popup from "../../shared/Popup";
+import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
-
-type DateSelectorProps = {
-  isDropboxConnected: boolean;
-  selectedDate: Date;
-  setSelectedDate: Dispatch<SetStateAction<Date>>;
-  selectedDateReport: string;
-};
-
-const day = 60 * 60 * 24 * 1000;
+import { DAY as day } from '../../helpers/dates';
+import { DateSelectorProps } from './types';
 
 export default function DateSelector({
   isDropboxConnected,

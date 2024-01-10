@@ -1,7 +1,6 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ClockIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
-import ActivitiesTable from "../ActivitiesTable";
-import { ReportActivity } from "../../helpers/utils/reports";
+import { ActivitiesTable } from "../ActivitiesTable";
 import { ErrorPlaceholder, RenderError } from "../../shared/ErrorPlaceholder";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
@@ -12,23 +11,7 @@ import ButtonTransparent from "../../shared/ButtonTransparent";
 import Popup from "../../shared/Popup";
 import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
-
-type ActivitiesSectionProps = {
-  activities: Array<ReportActivity>;
-  onEditActivity: (activity: ReportActivity | "new") => void;
-  onDeleteActivity: (id: number) => void;
-  selectedDate: Date;
-  latestProjAndAct: Record<string, [string]>;
-  setSelectedDateReport: Dispatch<SetStateAction<String>>;
-  showAsMain: boolean;
-};
-
-type PlaceholderProps = {
-  onEditActivity: (activity: ReportActivity | "new") => void;
-  backgroundError: string;
-  selectedDate: Date;
-  setSelectedDateReport: Dispatch<SetStateAction<String>>;
-};
+import { ActivitiesSectionProps, PlaceholderProps } from './types';
 
 export default function ActivitiesSection({
   onEditActivity,
