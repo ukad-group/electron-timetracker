@@ -1,17 +1,25 @@
 import { useReducer, useCallback } from "react";
-import { EditingHistoryAction, actions } from "../../actions/editingActions";
+import {
+  SET_VALUE,
+  UNDO,
+  REDO,
+  setValue,
+  undoEditing,
+  redoEditing,
+  EditingHistoryAction,
+} from "../../actions/editingActions";
 
-interface EditingHistoryState<T> {
-  undoStack: T[];
-  redoStack: T[];
+interface EditingHistoryState {
+  undoStack: string[];
+  redoStack: string[];
 }
 
 const EditingHistoryReducer = <T>(
-  state: EditingHistoryState<T>,
-  action: EditingHistoryAction<T>
-): EditingHistoryState<T> => {
+  state: EditingHistoryState,
+  action: EditingHistoryAction
+): EditingHistoryState => {
   switch (action.type) {
-    case "SET_VALUE":
+    case SET_VALUE:
       if (state.undoStack[state.undoStack.length - 1] !== action.value) {
         return {
           undoStack: [...state.undoStack, action.value],
@@ -21,7 +29,7 @@ const EditingHistoryReducer = <T>(
 
       return state;
 
-    case "UNDO":
+    case UNDO:
       if (state.undoStack.length > 1) {
         return {
           undoStack: state.undoStack.slice(0, -1),
@@ -34,7 +42,7 @@ const EditingHistoryReducer = <T>(
 
       return state;
 
-    case "REDO":
+    case REDO:
       if (state.redoStack.length > 0) {
         return {
           undoStack: [
@@ -52,23 +60,22 @@ const EditingHistoryReducer = <T>(
   }
 };
 
-const useEditingHistoryManager = <T>(initialValue: T) => {
-  const editingHistoryState: EditingHistoryState<T> = {
+const useEditingHistoryManager = (initialValue: string) => {
+  const editingHistoryState: EditingHistoryState = {
     undoStack: [initialValue],
     redoStack: [],
   };
   const [state, dispatch] = useReducer(
-    EditingHistoryReducer<T>,
+    EditingHistoryReducer,
     editingHistoryState
   );
 
-  const setValue = useCallback(
-    (value: string) =>
-      dispatch(actions.setValue(value) as EditingHistoryAction<T>),
+  const handleSetValue = useCallback(
+    (value: string) => dispatch(setValue(value)),
     [dispatch]
   );
-  const undo = useCallback(() => {
-    dispatch(actions.undo() as EditingHistoryAction<T>);
+  const handleUndoEditing = useCallback(() => {
+    dispatch(undoEditing());
 
     if (state.undoStack.length > 2) {
       return state.undoStack[state.undoStack.length - 2];
@@ -76,16 +83,16 @@ const useEditingHistoryManager = <T>(initialValue: T) => {
 
     return state.undoStack[0];
   }, [dispatch, state]);
-  const redo = useCallback(() => {
-    dispatch(actions.redo() as EditingHistoryAction<T>);
+  const handleRedoEditing = useCallback(() => {
+    dispatch(redoEditing());
 
     return state.redoStack[state.redoStack.length - 1];
   }, [dispatch, state]);
 
   return {
-    setValue,
-    undo,
-    redo,
+    setValue: handleSetValue,
+    undoEditing: handleUndoEditing,
+    redoEditing: handleRedoEditing,
   };
 };
 

@@ -94,7 +94,7 @@ export default function ManualInputForm({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
-      const currentValue = editingHistoryManager.undo();
+      const currentValue = editingHistoryManager.undoEditing();
 
       if (typeof currentValue === "string") {
         setReport(currentValue);
@@ -103,7 +103,7 @@ export default function ManualInputForm({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
-      const currentValue = editingHistoryManager.redo();
+      const currentValue = editingHistoryManager.redoEditing();
 
       if (typeof currentValue === "string") {
         setReport(currentValue);

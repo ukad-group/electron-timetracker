@@ -97,7 +97,7 @@ export default function AutocompleteSelector({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
-      const currentValue = editingHistoryManager.undo();
+      const currentValue = editingHistoryManager.undoEditing();
 
       if (currentValue !== undefined) {
         setSelectedItem(currentValue as string);
@@ -106,7 +106,7 @@ export default function AutocompleteSelector({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
-      const currentValue = editingHistoryManager.redo();
+      const currentValue = editingHistoryManager.redoEditing();
 
       if (currentValue !== undefined) {
         setSelectedItem(currentValue as string);
