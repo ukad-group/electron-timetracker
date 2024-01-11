@@ -4,7 +4,6 @@ import {
   ReportActivity,
   calcDurationBetweenTimes,
   formatDuration,
-  validation,
 } from "@/helpers/utils/reports";
 import {
   checkIsToday,
@@ -23,7 +22,7 @@ import Tooltip from "@/shared/Tooltip/Tooltip";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { concatSortArrays, parseEventTitle } from "@/helpers/utils/utils";
 import { Loader } from "@/shared/Loader";
-import { ActivitiesTableProps } from './types';
+import { ActivitiesTableProps } from "./types";
 
 const MS_PER_HOUR = 60 * 60 * 1000;
 
@@ -35,6 +34,7 @@ export default function ActivitiesTable({
   events,
   isLoading,
   showAsMain,
+  nonBreakActivities,
 }: ActivitiesTableProps) {
   const [ctrlPressed, setCtrlPressed] = useState(false);
   const [firstKey, setFirstKey] = useState(null);
@@ -45,9 +45,6 @@ export default function ActivitiesTable({
     (state) => [state.event, state.setEvent],
     shallow
   );
-  const nonBreakActivities = useMemo(() => {
-    return validation(activities.filter((activity) => !activity.isBreak));
-  }, [activities]);
 
   const totalDuration = useMemo(() => {
     return nonBreakActivities.reduce((value, activity) => {
@@ -364,7 +361,7 @@ export default function ActivitiesTable({
           {activity.mistakes && (
             <p
               onClick={copyToClipboardHandle}
-              className="w-fit old-break-word py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20"
+              className="w-fit old-break-word py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20"
             >
               {activity.mistakes}
             </p>

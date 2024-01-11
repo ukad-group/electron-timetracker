@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ClockIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { ActivitiesTable } from "../ActivitiesTable";
 import { ErrorPlaceholder, RenderError } from "@/shared/ErrorPlaceholder";
@@ -11,7 +11,8 @@ import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import Popup from "@/shared/Popup/Popup";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import { ActivitiesSectionProps, PlaceholderProps } from './types';
+import { ActivitiesSectionProps, PlaceholderProps } from "./types";
+import { validation } from "../../helpers/utils/reports";
 
 export default function ActivitiesSection({
   onEditActivity,
@@ -35,6 +36,10 @@ export default function ActivitiesSection({
   const isShowOffice365Events = JSON.parse(
     localStorage.getItem("showOffice365Events")
   );
+  const nonBreakActivities = useMemo(() => {
+    return validation(activities.filter((activity) => !activity.isBreak));
+  }, [activities]);
+
   const ctrlSpaceHandler = (e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.code === "Space") {
       onEditActivity("new");
@@ -102,7 +107,7 @@ export default function ActivitiesSection({
     return <ErrorPlaceholder {...renderError} />;
   }
 
-  if (!activities?.length && !events?.length && !isLoading) {
+  if (!nonBreakActivities?.length && !events?.length && !isLoading) {
     return (
       <Placeholder
         onEditActivity={onEditActivity}
@@ -142,6 +147,7 @@ export default function ActivitiesSection({
             events={events}
             isLoading={isLoading}
             showAsMain={showAsMain}
+            nonBreakActivities={nonBreakActivities}
           />
         </div>
 
