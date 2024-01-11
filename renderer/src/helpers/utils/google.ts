@@ -1,7 +1,7 @@
 import {
   getGoogleEvents,
   updateGoogleCredentials,
-} from "../../API/googleCalendarAPI";
+} from "@/API/googleCalendarAPI";
 
 export const loadGoogleEvents = async (
   accessToken: string,

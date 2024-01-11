@@ -4,24 +4,24 @@ import {
   ReportActivity,
   calcDurationBetweenTimes,
   formatDuration,
-} from "../../helpers/utils/reports";
+} from "@/helpers/utils/reports";
 import {
   checkIsToday,
   getCeiledTime,
   getTimeFromEventObj,
   padStringToMinutes,
-} from "../../helpers/utils/datetime-ui";
-import { TimeBadge } from "../../shared/TimeBadge";
+} from "@/helpers/utils/datetime-ui";
+import { TimeBadge } from "@/shared/TimeBadge";
 import {
   Square2StackIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 import { shallow } from "zustand/shallow";
-import { useScheduledEventsStore } from "../../store/googleEventsStore";
-import Tooltip from "../../shared/Tooltip/Tooltip";
+import { useScheduledEventsStore } from "@/store/googleEventsStore";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { concatSortArrays, parseEventTitle } from "../../helpers/utils/utils";
-import { Loader } from "../../shared/Loader";
+import { concatSortArrays, parseEventTitle } from "@/helpers/utils/utils";
+import { Loader } from "@/shared/Loader";
 import { ActivitiesTableProps } from "./types";
 
 const MS_PER_HOUR = 60 * 60 * 1000;

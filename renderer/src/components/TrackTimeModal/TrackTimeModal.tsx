@@ -2,21 +2,21 @@ import clsx from "clsx";
 import { FormEvent, Fragment, useEffect, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
-import useTimeInput from "../../helpers/hooks/useTimeInput";
+import useTimeInput from "@/helpers/hooks/useTimeInput";
 import {
   ReportActivity,
   calcDurationBetweenTimes,
   formatDurationAsDecimals,
   addSuggestions,
   addDurationToTime,
-} from "../../helpers/utils/reports";
-import { checkIsToday, padStringToMinutes } from "../../helpers/utils/datetime-ui";
-import { AutocompleteSelector } from "../../shared/AutocompleteSelector";
-import { Button } from "../../shared/Button";
+} from "@/helpers/utils/reports";
+import { checkIsToday, padStringToMinutes } from "@/helpers/utils/datetime-ui";
+import { AutocompleteSelector } from "@/shared/AutocompleteSelector";
+import { Button } from "@/shared/Button";
 import { shallow } from "zustand/shallow";
-import { useScheduledEventsStore } from "../../store/googleEventsStore";
-import { getJiraCardsFromAPI } from "../../helpers/utils/jira";
-import { getAllTrelloCardsFromApi } from "../../helpers/utils/trello";
+import { useScheduledEventsStore } from "@/store/googleEventsStore";
+import { getJiraCardsFromAPI } from "@/helpers/utils/jira";
+import { getAllTrelloCardsFromApi } from "@/helpers/utils/trello";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;

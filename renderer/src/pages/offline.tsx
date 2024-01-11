@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { shallow } from "zustand/shallow";
 import { SignalSlashIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
-import { useThemeStore } from "../store/themeStore";
+import { useThemeStore } from "@/store/themeStore";
 
 const SettingsPage = () => {
   const [theme, setTheme] = useThemeStore(
