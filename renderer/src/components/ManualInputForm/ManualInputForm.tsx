@@ -5,7 +5,7 @@ import { parseReport, serializeReport } from "@/helpers/utils/reports";
 import { getCurrentTimeRoundedUp } from "@/helpers/utils/datetime-ui";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import useUndoManager from "@/helpers/hooks/useEditingHistoryManager";
+import useEditingHistoryManager from "@/helpers/hooks/useEditingHistoryManager";
 import { ManualInputFormProps } from "./types";
 
 export default function ManualInputForm({
