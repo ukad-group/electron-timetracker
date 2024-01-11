@@ -22,9 +22,9 @@ import {
   parseReport,
   validation,
   ReportActivity,
-} from "../../helpers/utils/reports";
-import { NavButtons } from "../../shared/NavButtons";
-import { Button } from "../../shared/Button";
+} from "@/helpers/utils/reports";
+import { NavButtons } from "@/shared/NavButtons";
+import { Button } from "@/shared/Button";
 import { ErrorPlaceholder, RenderError } from "../../shared/ErrorPlaceholder";
 import {
   getMonthWorkHours,
@@ -32,7 +32,7 @@ import {
   getWeekNumber,
   isTheSameDates,
   MONTHS,
-} from "../../helpers/utils/datetime-ui";
+} from "@/helpers/utils/datetime-ui";
 import { loadHolidaysAndVacations } from "./utils";
 import { BookingFromApi } from "../Bookings/types";
 
@@ -371,7 +371,7 @@ function renderEventContent(eventInfo) {
   return (
     <>
       {eventInfo.event.extendedProps.isValid === false && (
-        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[26px] -left-[1px] dark:fill-red-500/70" />
+        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-[25px] -left-[1px] dark:fill-red-500/70" />
       )}
       {eventInfo.event.extendedProps.workDurationMs ? (
         <p className="whitespace-normal">

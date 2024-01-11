@@ -1,4 +1,4 @@
-import { useThemeStore } from "../../store/themeStore";
+import { useThemeStore } from "@/store/themeStore";
 import { shallow } from "zustand/shallow";
 import clsx from "clsx";
 

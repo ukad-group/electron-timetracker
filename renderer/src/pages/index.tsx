@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
-import { DateSelector } from "../components/DateSelector";
+import { DateSelector } from "@/components/DateSelector";
 import {
   ReportActivity,
   parseReport,
   serializeReport,
   ReportAndNotes,
   stringToMinutes,
-} from "../helpers/utils/reports";
-import TrackTimeModal from "../components/TrackTimeModal/TrackTimeModal";
-import { ManualInputForm } from "../components/ManualInputForm";
-import { ActivitiesSection } from "../components/ActivitiesSection";
-import { SelectFolderPlaceholder } from "../components/SelectFolderPlaceholder";
-import { VersionMessage } from "../shared/VersionMessage";
-import { UpdateDescription } from "../components/UpdateDescription";
-import { useMainStore } from "../store/mainStore";
-import { useThemeStore } from "../store/themeStore";
-import { useBetaStore } from "../store/betaUpdatesStore";
-import { Calendar } from "../components/Calendar/Calendar";
+} from "@/helpers/utils/reports";
+import TrackTimeModal from "@/components/TrackTimeModal/TrackTimeModal";
+import { ManualInputForm } from "@/components/ManualInputForm";
+import { ActivitiesSection } from "@/components/ActivitiesSection";
+import { SelectFolderPlaceholder } from "@/components/SelectFolderPlaceholder";
+import { VersionMessage } from "@/shared/VersionMessage";
+import { UpdateDescription } from "@/components/UpdateDescription";
+import { useMainStore } from "@/store/mainStore";
+import { useThemeStore } from "@/store/themeStore";
+import { useBetaStore } from "@/store/betaUpdatesStore";
+import { Calendar } from "@/components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
-import { Totals } from "../components/Totals";
-import { Bookings } from "../components/Bookings";
+import { Totals } from "@/components/Totals";
+import { Bookings } from "@/components/Bookings";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(

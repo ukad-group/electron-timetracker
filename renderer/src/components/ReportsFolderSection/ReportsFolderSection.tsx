@@ -1,4 +1,4 @@
-import { useMainStore } from "../../store/mainStore";
+import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import { FolderSelector } from "../FolderSelector";
 

@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from "react";
-import { Button } from "../../shared/Button";
-import { DeleteMessage } from "../../shared/DeleteMessage";
-import { parseReport, serializeReport } from "../../helpers/utils/reports";
-import { getCurrentTimeRoundedUp } from "../../helpers/utils/datetime-ui";
-import { useMainStore } from "../../store/mainStore";
+import { Button } from "@/shared/Button";
+import { DeleteMessage } from "@/shared/DeleteMessage";
+import { parseReport, serializeReport } from "@/helpers/utils/reports";
+import { getCurrentTimeRoundedUp } from "@/helpers/utils/datetime-ui";
+import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import useEditingHistoryManager from "../../helpers/hooks/useEditingHistoryManager";
+import useUndoManager from "@/helpers/hooks/useEditingHistoryManager";
 import { ManualInputFormProps } from "./types";
 
 export default function ManualInputForm({
