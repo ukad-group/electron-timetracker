@@ -5,8 +5,8 @@ import { parseReport, serializeReport } from "@/helpers/utils/reports";
 import { getCurrentTimeRoundedUp } from "@/helpers/utils/datetime-ui";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import useUndoManager from "@/helpers/hooks/useUndoManager";
-import { ManualInputFormProps } from './types';
+import useUndoManager from "@/helpers/hooks/useEditingHistoryManager";
+import { ManualInputFormProps } from "./types";
 
 export default function ManualInputForm({
   onSave,
@@ -24,7 +24,7 @@ export default function ManualInputForm({
   const [showDeleteMessage, setShowDeleteMessage] = useState(false);
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   const [isFileExist, setIsFileExist] = useState(false);
-  const undoManager = useUndoManager(report);
+  const editingHistoryManager = useEditingHistoryManager(report);
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if (
@@ -64,7 +64,7 @@ export default function ManualInputForm({
   }, [selectedDateReport]);
 
   useEffect(() => {
-    undoManager.setValue(report);
+    editingHistoryManager.setValue(report);
     setReportHandler(report);
 
     if (isFileExist) {
@@ -94,7 +94,7 @@ export default function ManualInputForm({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
-      const currentValue = undoManager.undo();
+      const currentValue = editingHistoryManager.undoEditing();
 
       if (typeof currentValue === "string") {
         setReport(currentValue);
@@ -103,7 +103,7 @@ export default function ManualInputForm({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
-      const currentValue = undoManager.redo();
+      const currentValue = editingHistoryManager.redoEditing();
 
       if (typeof currentValue === "string") {
         setReport(currentValue);

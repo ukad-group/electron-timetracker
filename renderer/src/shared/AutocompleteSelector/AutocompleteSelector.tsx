@@ -1,17 +1,11 @@
-import {
-  FormEvent,
-  useState,
-  useRef,
-  ChangeEvent,
-  useEffect,
-} from "react";
+import { FormEvent, useState, useRef, ChangeEvent, useEffect } from "react";
 import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
-import useUndoManager from "@/helpers/hooks/useUndoManager";
-import { AutocompleteProps } from './types';
+import useUndoManager from "@/helpers/hooks/useEditingHistoryManager";
+import { AutocompleteProps } from "./types";
 
 export default function AutocompleteSelector({
   isNewCheck,
@@ -35,7 +29,7 @@ export default function AutocompleteSelector({
       ? availableItems?.concat(additionalItems)
       : availableItems;
   }, [availableItems, additionalItems]);
-  const undoManager = useUndoManager(selectedItem);
+  const editingHistoryManager = useEditingHistoryManager(selectedItem);
 
   const filteredList = useMemo(() => {
     return selectedItem === ""
@@ -103,7 +97,7 @@ export default function AutocompleteSelector({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
-      const currentValue = undoManager.undo();
+      const currentValue = editingHistoryManager.undoEditing();
 
       if (currentValue !== undefined) {
         setSelectedItem(currentValue as string);
@@ -112,7 +106,7 @@ export default function AutocompleteSelector({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
-      const currentValue = undoManager.redo();
+      const currentValue = editingHistoryManager.redoEditing();
 
       if (currentValue !== undefined) {
         setSelectedItem(currentValue as string);
@@ -128,7 +122,7 @@ export default function AutocompleteSelector({
     }
 
     setSelectedItem(newValue);
-    undoManager.setValue(newValue);
+    editingHistoryManager.setValue(newValue);
   };
 
   const onBlurHandler = (e: ChangeEvent<HTMLInputElement>) => {
