@@ -30,10 +30,6 @@ const Totals = ({ selectedDate }) => {
   };
 
   useEffect(() => {
-    setPeriod("day");
-  }, [selectedDate]);
-
-  useEffect(() => {
     getTotals();
 
     const fileChangeListener = (event) => {
