@@ -1,21 +1,25 @@
 import { useReducer, useCallback } from "react";
+import {
+  SET_VALUE,
+  UNDO,
+  REDO,
+  setValue,
+  undoEditing,
+  redoEditing,
+  EditingHistoryAction,
+} from "@/actions/editingActions";
 
-interface UndoState<T> {
-  undoStack: T[];
-  redoStack: T[];
+interface EditingHistoryState {
+  undoStack: string[];
+  redoStack: string[];
 }
 
-type UndoAction<T> =
-  | { type: "SET_VALUE"; value: T }
-  | { type: "UNDO" }
-  | { type: "REDO" };
-
-const undoReducer = <T>(
-  state: UndoState<T>,
-  action: UndoAction<T>
-): UndoState<T> => {
+const EditingHistoryReducer = <T>(
+  state: EditingHistoryState,
+  action: EditingHistoryAction
+): EditingHistoryState => {
   switch (action.type) {
-    case "SET_VALUE":
+    case SET_VALUE:
       if (state.undoStack[state.undoStack.length - 1] !== action.value) {
         return {
           undoStack: [...state.undoStack, action.value],
@@ -25,7 +29,7 @@ const undoReducer = <T>(
 
       return state;
 
-    case "UNDO":
+    case UNDO:
       if (state.undoStack.length > 1) {
         return {
           undoStack: state.undoStack.slice(0, -1),
@@ -38,7 +42,7 @@ const undoReducer = <T>(
 
       return state;
 
-    case "REDO":
+    case REDO:
       if (state.redoStack.length > 0) {
         return {
           undoStack: [
@@ -56,40 +60,40 @@ const undoReducer = <T>(
   }
 };
 
-const useUndoManager = (initialValue: string) => {
-  const [state, dispatch] = useReducer(undoReducer, {
+const useEditingHistoryManager = (initialValue: string) => {
+  const editingHistoryState: EditingHistoryState = {
     undoStack: [initialValue],
     redoStack: [],
-  });
-
-  const setValue = useCallback(
-    (value) => {
-      dispatch({ type: "SET_VALUE", value });
-    },
-    [dispatch]
+  };
+  const [state, dispatch] = useReducer(
+    EditingHistoryReducer,
+    editingHistoryState
   );
 
-  const undo = useCallback(() => {
-    dispatch({ type: "UNDO" });
+  const handleSetValue = useCallback(
+    (value: string) => dispatch(setValue(value)),
+    [dispatch]
+  );
+  const handleUndoEditing = useCallback(() => {
+    dispatch(undoEditing());
 
     if (state.undoStack.length > 2) {
       return state.undoStack[state.undoStack.length - 2];
-    } else {
-      return state.undoStack[0];
     }
-  }, [dispatch, state]);
 
-  const redo = useCallback(() => {
-    dispatch({ type: "REDO" });
+    return state.undoStack[0];
+  }, [dispatch, state]);
+  const handleRedoEditing = useCallback(() => {
+    dispatch(redoEditing());
 
     return state.redoStack[state.redoStack.length - 1];
   }, [dispatch, state]);
 
   return {
-    setValue,
-    undo,
-    redo,
+    setValue: handleSetValue,
+    undoEditing: handleUndoEditing,
+    redoEditing: handleRedoEditing,
   };
 };
 
-export default useUndoManager;
+export default useEditingHistoryManager;

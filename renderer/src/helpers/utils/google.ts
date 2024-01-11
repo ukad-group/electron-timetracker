@@ -1,7 +1,7 @@
 import {
   getGoogleEvents,
   updateGoogleCredentials,
-} from "../../API/googleCalendarAPI";
+} from "@/API/googleCalendarAPI";
 
 export const loadGoogleEvents = async (
   accessToken: string,
@@ -42,7 +42,5 @@ export const loadGoogleEventsFromAllUsers = async () => {
   );
   const userEvents = await Promise.all(userPromises);
 
-  const flattenedEvents = userEvents.flat();
-
-  return flattenedEvents;
+  return userEvents.flat();
 };

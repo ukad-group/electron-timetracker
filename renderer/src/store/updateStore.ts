@@ -1,29 +1,11 @@
 import { createWithEqualityFn } from "zustand/traditional";
 import {
-  StateStorage,
   createJSONStorage,
   devtools,
   persist,
 } from "zustand/middleware";
-
-type Update = { age: "old" | "new"; description: string | null };
-
-export type UpdateStore = {
-  update: Update | null;
-  setUpdate: (update: Update) => void;
-};
-
-const storage: StateStorage = {
-  getItem: async (name: string): Promise<string | null> => {
-    return (await global.ipcRenderer.invoke("storage:get", name)) || null;
-  },
-  setItem: async (name: string, value: string): Promise<void> => {
-    await global.ipcRenderer.invoke("storage:set", name, value);
-  },
-  removeItem: async (name: string): Promise<void> => {
-    await global.ipcRenderer.invoke("storage:delete", name);
-  },
-};
+import { getStorage } from "./utils";
+import { Update, UpdateStore } from "./types";
 
 export const useUpdateStore = createWithEqualityFn<UpdateStore>()(
   devtools(
@@ -35,7 +17,7 @@ export const useUpdateStore = createWithEqualityFn<UpdateStore>()(
       }),
       {
         name: "update-storage",
-        storage: createJSONStorage(() => storage),
+        storage: createJSONStorage(() => getStorage()),
       }
     )
   ),

@@ -4,25 +4,24 @@ import {
   ReportActivity,
   calcDurationBetweenTimes,
   formatDuration,
-  validation,
-} from "../../helpers/utils/reports";
+} from "@/helpers/utils/reports";
 import {
   checkIsToday,
   getCeiledTime,
   getTimeFromEventObj,
   padStringToMinutes,
-} from "../../helpers/utils/datetime-ui";
-import { TimeBadge } from "../../shared/TimeBadge";
+} from "@/helpers/utils/datetime-ui";
+import { TimeBadge } from "@/shared/TimeBadge";
 import {
   Square2StackIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 import { shallow } from "zustand/shallow";
-import { useScheduledEventsStore } from "../../store/googleEventsStore";
-import Tooltip from "../../shared/Tooltip/Tooltip";
+import { useScheduledEventsStore } from "@/store/googleEventsStore";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { concatSortArrays, parseEventTitle } from "../../helpers/utils/utils";
-import { Loader } from "../../shared/Loader";
+import { concatSortArrays, parseEventTitle } from "@/helpers/utils/utils";
+import { Loader } from "@/shared/Loader";
 import { ActivitiesTableProps } from "./types";
 import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
@@ -36,6 +35,7 @@ export default function ActivitiesTable({
   events,
   isLoading,
   showAsMain,
+  nonBreakActivities,
 }: ActivitiesTableProps) {
   const [ctrlPressed, setCtrlPressed] = useState(false);
   const [firstKey, setFirstKey] = useState(null);
@@ -46,9 +46,6 @@ export default function ActivitiesTable({
     (state) => [state.event, state.setEvent],
     shallow
   );
-  const nonBreakActivities = useMemo(() => {
-    return validation(activities.filter((activity) => !activity.isBreak));
-  }, [activities]);
 
   const totalDuration = useMemo(() => {
     return nonBreakActivities.reduce((value, activity) => {
@@ -57,9 +54,9 @@ export default function ActivitiesTable({
   }, [nonBreakActivities]);
 
   const formatEvents = (events) => {
-    if (events.length === 0) return [];
+    if (!events.length) return [];
 
-    const formattedEvents = events.map((event) => {
+    return events.map((event) => {
       const { start, end } = event;
 
       const startDateTime =
@@ -83,14 +80,12 @@ export default function ActivitiesTable({
         calendarId: event.id,
       };
     });
-
-    return formattedEvents;
   };
 
   const getActualEvents = (events) => {
     if (!events.length) return [];
 
-    const actualEvents = events.filter((event) => {
+    return events.filter((event) => {
       const { end } = event;
       const endDateTime =
         end?.timeZone === "UTC" ? `${end?.dateTime}Z` : end?.dateTime;
@@ -103,8 +98,6 @@ export default function ActivitiesTable({
         return event;
       }
     });
-
-    return actualEvents;
   };
 
   const tableActivities = useMemo(() => {
@@ -146,8 +139,7 @@ export default function ActivitiesTable({
         modifiedValue = originaValue.slice(0, -1);
       } else if (originaValue.includes("m")) {
         const minutes = originaValue.slice(0, -1);
-        const hours = Math.floor((minutes / 60) * 100) / 100;
-        modifiedValue = hours;
+        modifiedValue = Math.floor((minutes / 60) * 100) / 100;
       }
     }
 
@@ -379,7 +371,7 @@ export default function ActivitiesTable({
           {activity.mistakes && (
             <p
               onClick={copyToClipboardHandle}
-              className="w-fit old-break-word py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20"
+              className="w-fit old-break-word py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20"
             >
               {activity.mistakes}
             </p>
@@ -689,18 +681,4 @@ export default function ActivitiesTable({
       <div className="hidden lg:block">{compactView}</div>
     </>
   );
-}
-
-{
-  /* <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              <button
-                className="group py-4 px-3"
-                title="Delete"
-                onClick={() => {
-                  onDeleteActivity(activity.id);
-                }}
-              >
-                <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 dark:text-dark-heading" />
-              </button>
-            </td> */
 }

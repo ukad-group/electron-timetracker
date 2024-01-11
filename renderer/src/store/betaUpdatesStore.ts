@@ -1,27 +1,11 @@
 import { createWithEqualityFn } from "zustand/traditional";
 import {
-  StateStorage,
   createJSONStorage,
   devtools,
   persist,
 } from "zustand/middleware";
-
-export type BetaStore = {
-  isBeta: boolean;
-  setIsBeta: (isDownload: boolean) => void;
-};
-
-const storage: StateStorage = {
-  getItem: async (name: string): Promise<string | null> => {
-    return (await global.ipcRenderer.invoke("storage:get", name)) || null;
-  },
-  setItem: async (name: string, value: string): Promise<void> => {
-    await global.ipcRenderer.invoke("storage:set", name, value);
-  },
-  removeItem: async (name: string): Promise<void> => {
-    await global.ipcRenderer.invoke("storage:delete", name);
-  },
-};
+import { getStorage } from "./utils";
+import { BetaStore } from "./types";
 
 export const useBetaStore = createWithEqualityFn<BetaStore>()(
   devtools(
@@ -32,7 +16,7 @@ export const useBetaStore = createWithEqualityFn<BetaStore>()(
       }),
       {
         name: "beta-storage",
-        storage: createJSONStorage(() => storage),
+        storage: createJSONStorage(() => getStorage()),
       }
     )
   ),

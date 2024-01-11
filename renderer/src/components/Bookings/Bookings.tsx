@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useMainStore } from "../../store/mainStore";
+import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import { MONTHS } from "../../helpers/utils/datetime-ui";
+import { MONTHS } from "@/helpers/utils/datetime-ui";
 import {
   ReportActivity,
   formatDurationAsDecimals,
   parseReport,
-} from "../../helpers/utils/reports";
-import { ParsedReport, TTUserInfo } from "../Calendar/Calendar";
-import { Loader } from "../../shared/Loader";
+} from "@/helpers/utils/reports";
+import { ParsedReport, TTUserInfo } from "../Calendar/types";
+import { Loader } from "@/shared/Loader";
 import { BookingsProps, BookingFromApi, BookedSpentStat } from './types';
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
@@ -68,7 +68,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
       maxRecurse = 0;
 
-      const bookedProjects = allLoggedProjects.filter(
+      return allLoggedProjects.filter(
         (project: BookingFromApi) => {
           const projectBooking = project?.plans[0];
 
@@ -81,8 +81,6 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
           }
         }
       );
-
-      return bookedProjects;
     } catch (error) {
       console.log(error);
     } finally {
@@ -100,11 +98,9 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
       const monthParsedActivities = monthLocalReports.map(
         (report: ParsedReport) => {
-          const activities = (parseReport(report?.data)[0] || []).filter(
+          return  (parseReport(report?.data)[0] || []).filter(
             (activity: ReportActivity) => !activity.isBreak
           );
-
-          return activities;
         }
       );
 
@@ -177,7 +173,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   useEffect(() => {
     getBookedStatistic();
 
-    const fileChangeListener = (event) => {
+    const fileChangeListener = () => {
       getBookedStatistic();
     };
 

@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from "react";
-import { Button } from "../../shared/Button";
-import { DeleteMessage } from "../../shared/DeleteMessage";
-import { parseReport, serializeReport } from "../../helpers/utils/reports";
-import { getCurrentTimeRoundedUp } from "../../helpers/utils/datetime-ui";
-import { useMainStore } from "../../store/mainStore";
+import { Button } from "@/shared/Button";
+import { DeleteMessage } from "@/shared/DeleteMessage";
+import { parseReport, serializeReport } from "@/helpers/utils/reports";
+import { getCurrentTimeRoundedUp } from "@/helpers/utils/datetime-ui";
+import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import useUndoManager from "../../helpers/hooks/useUndoManager";
+import useEditingHistoryManager from "@/helpers/hooks/useEditingHistoryManager";
 import { ManualInputFormProps } from "./types";
 import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
@@ -25,7 +25,7 @@ export default function ManualInputForm({
   const [showDeleteMessage, setShowDeleteMessage] = useState(false);
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   const [isFileExist, setIsFileExist] = useState(false);
-  const undoManager = useUndoManager(report);
+  const editingHistoryManager = useEditingHistoryManager(report);
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if (
@@ -65,7 +65,7 @@ export default function ManualInputForm({
   }, [selectedDateReport]);
 
   useEffect(() => {
-    undoManager.setValue(report);
+    editingHistoryManager.setValue(report);
     setReportHandler(report);
 
     if (isFileExist) {
@@ -95,7 +95,7 @@ export default function ManualInputForm({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
-      const currentValue = undoManager.undo();
+      const currentValue = editingHistoryManager.undoEditing();
 
       if (typeof currentValue === "string") {
         setReport(currentValue);
@@ -104,7 +104,7 @@ export default function ManualInputForm({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
-      const currentValue = undoManager.redo();
+      const currentValue = editingHistoryManager.redoEditing();
 
       if (typeof currentValue === "string") {
         setReport(currentValue);
@@ -119,12 +119,11 @@ export default function ManualInputForm({
     const cursorPosition = textarea.selectionStart;
     const currentLineStart = report.lastIndexOf("\n", cursorPosition - 1) + 1;
     const currentLineEnd = report.indexOf("\n", cursorPosition);
-    const currentLine = report.slice(
+
+    return report.slice(
       currentLineStart,
       currentLineEnd !== -1 ? currentLineEnd : undefined
     );
-
-    return currentLine;
   };
 
   const copyCurrentLine = () => {

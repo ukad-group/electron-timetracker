@@ -9,4 +9,5 @@ export type ActivitiesTableProps = {
   events: ReportActivity[];
   isLoading: boolean;
   showAsMain: boolean;
+  nonBreakActivities: ReportActivity[];
 };

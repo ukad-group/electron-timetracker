@@ -2,24 +2,21 @@ import clsx from "clsx";
 import { FormEvent, Fragment, useEffect, useMemo, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/solid";
-import useTimeInput from "../../helpers/hooks/useTimeInput";
+import useTimeInput from "@/helpers/hooks/useTimeInput";
 import {
   ReportActivity,
   calcDurationBetweenTimes,
   formatDurationAsDecimals,
   addSuggestions,
   addDurationToTime,
-} from "../../helpers/utils/reports";
-import {
-  checkIsToday,
-  padStringToMinutes,
-} from "../../helpers/utils/datetime-ui";
-import { AutocompleteSelector } from "../../shared/AutocompleteSelector";
-import { Button } from "../../shared/Button";
+} from "@/helpers/utils/reports";
+import { checkIsToday, padStringToMinutes } from "@/helpers/utils/datetime-ui";
+import { AutocompleteSelector } from "@/shared/AutocompleteSelector";
+import { Button } from "@/shared/Button";
 import { shallow } from "zustand/shallow";
-import { useScheduledEventsStore } from "../../store/googleEventsStore";
-import { getJiraCardsFromAPI } from "../../helpers/utils/jira";
-import { getAllTrelloCardsFromApi } from "../../helpers/utils/trello";
+import { useScheduledEventsStore } from "@/store/googleEventsStore";
+import { getJiraCardsFromAPI } from "@/helpers/utils/jira";
+import { getAllTrelloCardsFromApi } from "@/helpers/utils/trello";
 import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 export type TrackTimeModalProps = {
@@ -295,28 +292,6 @@ export default function TrackTimeModal({
 
     setScheduledEvents(scheduledEvents);
 
-    // if (googleEvents.length > 0 && editedActivity !== "new") {
-    //   const arrayWithMarkedActivty = markActivityAsAdded(
-    //     googleEvents,
-    //     editedActivity
-    //   );
-
-    //   const arrayWithPrefilledValue = arrayWithMarkedActivty.map((gEvent) => {
-    //     if (gEvent.summary === editedActivity.description) {
-    //       if (project) gEvent.project = project;
-    //       if (activity) gEvent.activity = activity;
-    //     }
-
-    //     return gEvent;
-    //   });
-
-    //   localStorage.setItem(
-    //     "googleEvents",
-    //     JSON.stringify(arrayWithPrefilledValue)
-    //   );
-    //   setGoogleEvents(arrayWithPrefilledValue);
-    // }
-
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "registrations", {
       registration: "time_registrations",
     });
@@ -357,31 +332,6 @@ export default function TrackTimeModal({
     e.target.select();
   };
 
-  // const addEventToList = (event: Event) => {
-  //   const { from, to, project, activity, description } = event;
-  //   let dashedDescription = description;
-  //   if (description.includes(" - ")) {
-  //     setDescription(description.replace(" - ", " -- "));
-  //     dashedDescription = description.replace(" - ", " -- ");
-  //   }
-  //   if (scheduledEvents[dashedDescription]) {
-  //     setProject(scheduledEvents[dashedDescription].project);
-  //     setActivity(activity || scheduledEvents[dashedDescription].activity);
-  //   }
-  //   if (!scheduledEvents[dashedDescription]) {
-  //     setProject(project || "");
-  //     setActivity(activity || "");
-  //     scheduledEvents[dashedDescription] = { project: "", activity: "" };
-  //     scheduledEvents[dashedDescription].project = project || "";
-  //     scheduledEvents[dashedDescription].activity = activity || "";
-  //   }
-
-  //   setFrom(from.time || "");
-  //   setTo(to.time || "");
-  //   setDescription(dashedDescription || "");
-  //   setScheduledEvents(scheduledEvents);
-  // };
-
   const handleKey = (
     event: React.KeyboardEvent<HTMLInputElement>,
     callback: (value: string) => void | undefined = undefined
@@ -402,8 +352,7 @@ export default function TrackTimeModal({
       }
 
       const cursorPosition = input.selectionStart;
-      const currentTime = value;
-      let [hours, minutes] = currentTime.split(":").map(Number);
+      let [hours, minutes] = value.split(":").map(Number);
 
       const changeMinutesAndHours = (
         eventKey: string,
@@ -678,20 +627,6 @@ export default function TrackTimeModal({
               </div>
               <div className="mt-6 flex justify-end">
                 <div className="flex gap-3">
-                  {/* <div className="flex gap-3 justify-start">
-                    {checkIsToday(selectedDate) &&
-                      (loggedGoogleUsers?.length > 0 ||
-                        office365Users?.length > 0) && (
-                        <AddEventBtn
-                          addEvent={addEventToList}
-                          availableProjects={
-                            latestProjAndAct
-                              ? Object.keys(latestProjAndAct)
-                              : []
-                          }
-                        />
-                      )}
-                  </div> */}
                   <div className="flex gap-3">
                     <Button
                       text="Cancel"

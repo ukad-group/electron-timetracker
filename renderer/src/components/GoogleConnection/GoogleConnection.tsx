@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "../../shared/Button";
+import { Button } from "@/shared/Button";
 import { useRouter } from "next/router";
 import {
   getGoogleAuthUrl,
   getGoogleCredentials,
   getGoogleUserInfo,
-} from "../../API/googleCalendarAPI";
+} from "@/API/googleCalendarAPI";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import isOnline from "is-online";
 import { GoogleCredentails, GoogleUser } from "./types";
@@ -20,7 +20,7 @@ const GoogleConnection = () => {
     const online = await isOnline();
 
     if (online) {
-      router.push(getGoogleAuthUrl());
+      await router.push(getGoogleAuthUrl());
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -39,7 +39,6 @@ const GoogleConnection = () => {
 
     localStorage.setItem("googleUsers", JSON.stringify(filteredUsers));
     setLoggedUsers(filteredUsers);
-    // router.push("/settings");
   };
 
   const loadGoogleCredentials = async (authorizationCode: string) => {
@@ -81,8 +80,7 @@ const GoogleConnection = () => {
 
   const loadGoogleUserInfo = async (gCreds: GoogleCredentails) => {
     try {
-      const data = await getGoogleUserInfo(gCreds.access_token);
-      return data;
+      return await getGoogleUserInfo(gCreds.access_token);
     } catch (e) {
       console.error(e);
     }

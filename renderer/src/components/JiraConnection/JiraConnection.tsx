@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
-import { Button } from "../../shared/Button";
+import { Button } from "@/shared/Button";
 import isOnline from "is-online";
-import { JiraUser } from "../../helpers/utils/jira";
+import { JiraUser } from "@/helpers/utils/jira";
 import { FlagIcon } from "@heroicons/react/24/outline";
 import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
@@ -93,17 +93,6 @@ const JiraConnection = () => {
             type="button"
           />
         )}
-        {/* {users.length > 0 && (
-          <button
-            onClick={handleSignInButton}
-            type="button"
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border shadow-sm dark:border-dark-form-border"
-          >
-            <span className="hover:underline text-gray-500 dark:text-dark-main">
-              Add another account
-            </span>
-          </button>
-        )} */}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">
         {!users.length && (

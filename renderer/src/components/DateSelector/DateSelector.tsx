@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { NavButtons } from "../../shared/NavButtons";
-import { Button } from "../../shared/Button";
-import { ButtonTransparent } from "../../shared/ButtonTransparent";
+import { NavButtons } from "@/shared/NavButtons";
+import { Button } from "@/shared/Button";
+import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
-import Popup from "../../shared/Popup/Popup";
-import { useMainStore } from "../../store/mainStore";
+import Popup from "@/shared/Popup/Popup";
+import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import { DAY as day } from '../../helpers/dates';
-import { DateSelectorProps } from './types';
+import { DAY as day } from "@/helpers/utils/datetime-ui";
+import { DateSelectorProps } from "./types";
 
 export default function DateSelector({
   isDropboxConnected,
@@ -17,7 +17,7 @@ export default function DateSelector({
 }: DateSelectorProps) {
   const today = new Date();
   const [showModal, setShowModal] = useState(false);
-  const [reportsFolder, setReportsFolder] = useMainStore(
+  const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );

@@ -2,8 +2,6 @@ import {
   useState,
   useEffect,
   useRef,
-  Dispatch,
-  SetStateAction,
   useMemo,
   cloneElement,
   ReactElement,
@@ -22,9 +20,9 @@ import {
   parseReport,
   validation,
   ReportActivity,
-} from "../../helpers/utils/reports";
-import { NavButtons } from "../../shared/NavButtons";
-import { Button } from "../../shared/Button";
+} from "@/helpers/utils/reports";
+import { NavButtons } from "@/shared/NavButtons";
+import { Button } from "@/shared/Button";
 import { ErrorPlaceholder, RenderError } from "../../shared/ErrorPlaceholder";
 import {
   getMonthWorkHours,
@@ -32,58 +30,14 @@ import {
   getWeekNumber,
   isTheSameDates,
   MONTHS,
-} from "../../helpers/utils/datetime-ui";
+} from "@/helpers/utils/datetime-ui";
 import { loadHolidaysAndVacations } from "./utils";
-import { BookingFromApi } from "../Bookings/types";
-
-type CalendarProps = {
-  reportsFolder: string;
-  calendarDate: Date;
-  setCalendarDate: Dispatch<SetStateAction<Date>>;
-  selectedDate: Date;
-  setSelectedDate: Dispatch<SetStateAction<Date>>;
-};
-
-export type ParsedReport = {
-  data: string;
-  reportDate: string;
-};
-
-export type FormattedReport = {
-  date: string;
-  week: number;
-  workDurationMs: number;
-  isValid: boolean;
-};
-
-export type DayOff = {
-  date: Date;
-  duration: number;
-  description: string;
-  type: number;
-};
-
-export type ApiDayOff = {
-  dateFrom: string;
-  dateTo: string;
-  quantity: number;
-  description: string;
-  type: number;
-};
-
-export type TTUserInfo = {
-  userInfoIdToken: string;
-  userInfoRefreshToken: string;
-  name: string;
-  email: string;
-  TTCookie: string;
-  holidays: ApiDayOff[];
-  vacationsSickdays: ApiDayOff[];
-  yearProjects: string[];
-  plannerAccessToken: string;
-  plannerRefreshToken: string;
-  monthBookings: BookingFromApi[];
-};
+import {
+  CalendarProps,
+  ParsedReport,
+  FormattedReport,
+  TTUserInfo
+} from "./types";
 
 export function Calendar({
   reportsFolder,
@@ -132,7 +86,7 @@ export function Calendar({
         );
       })();
 
-      const fileChangeListener = (event, data) => {
+      const fileChangeListener = () => {
         (async () => {
           setParsedQuarterReports(
             await global.ipcRenderer.invoke(
@@ -371,7 +325,7 @@ function renderEventContent(eventInfo) {
   return (
     <>
       {eventInfo.event.extendedProps.isValid === false && (
-        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 bottom-[26px] -left-[1px] dark:fill-red-500/70" />
+        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-[25px] -left-[1px] dark:fill-red-500/70" />
       )}
       {eventInfo.event.extendedProps.workDurationMs ? (
         <p className="whitespace-normal">

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
-import { Button } from "../../shared/Button";
+import { Button } from "@/shared/Button";
 import { useRouter } from "next/router";
-import { Loader } from "../../shared/Loader";
+import { Loader } from "@/shared/Loader";
 import isOnline from "is-online";
-import { TTUserInfo } from "../Calendar/Calendar";
+import { TTUserInfo } from "../Calendar/types";
 import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 const TimetrackerWebsiteConnection = () => {
@@ -135,22 +135,17 @@ const TimetrackerWebsiteConnection = () => {
 
       const userFetchedData = await Promise.all(userPromises);
 
-      const userHolidays = userFetchedData[0];
-      userInfo.holidays = userHolidays;
-
-      const userVacations = userFetchedData[1].periods;
-      userInfo.vacationsSickdays = userVacations;
-
-      const timtrackerYearProjects = userFetchedData[2];
-      userInfo.yearProjects = timtrackerYearProjects;
-
-      const monthBookings = userFetchedData[3];
-      userInfo.monthBookings = monthBookings;
+      userInfo.holidays = userFetchedData[0];
+      userInfo.vacationsSickdays = userFetchedData[1].periods;
+      userInfo.yearProjects = userFetchedData[2];
+      userInfo.monthBookings = userFetchedData[3];
 
       localStorage.setItem("timetracker-user", JSON.stringify(userInfo));
+
       setLoggedUser(userInfo);
       setLoading(false);
-      router.push("/settings");
+
+      await router.push("/settings");
       document.body.removeAttribute("style"); // restore scrolling
     } catch (error) {
       console.log(error);

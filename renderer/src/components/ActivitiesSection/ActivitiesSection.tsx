@@ -1,18 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ClockIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
 import { ActivitiesTable } from "../ActivitiesTable";
-import { ErrorPlaceholder, RenderError } from "../../shared/ErrorPlaceholder";
+import { ErrorPlaceholder, RenderError } from "@/shared/ErrorPlaceholder";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { Square2StackIcon } from "@heroicons/react/24/outline";
-import { loadGoogleEventsFromAllUsers } from "../../helpers/utils/google";
-import { getOffice365Events } from "../../helpers/utils/office365";
-import { checkIsToday } from "../../helpers/utils/datetime-ui";
-import { ButtonTransparent } from "../../shared/ButtonTransparent";
-import Popup from "../../shared/Popup/Popup";
-import { useMainStore } from "../../store/mainStore";
+import { loadGoogleEventsFromAllUsers } from "@/helpers/utils/google";
+import { getOffice365Events } from "@/helpers/utils/office365";
+import { checkIsToday } from "@/helpers/utils/datetime-ui";
+import { ButtonTransparent } from "@/shared/ButtonTransparent";
+import Popup from "@/shared/Popup/Popup";
+import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import { ActivitiesSectionProps, PlaceholderProps } from "./types";
 import { XMarkIcon } from "@heroicons/react/24/solid";
+import { validation } from "@/helpers/utils/reports";
 import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 export default function ActivitiesSection({
@@ -41,6 +42,10 @@ export default function ActivitiesSection({
   const isShowOffice365Events = JSON.parse(
     localStorage.getItem("showOffice365Events")
   );
+  const nonBreakActivities = useMemo(() => {
+    return validation(activities.filter((activity) => !activity.isBreak));
+  }, [activities]);
+
   const ctrlSpaceHandler = (e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.code === "Space") {
       onEditActivity("new");
@@ -125,7 +130,7 @@ export default function ActivitiesSection({
     return <ErrorPlaceholder {...renderError} />;
   }
 
-  if (!activities?.length && !events?.length && !isLoading) {
+  if (!nonBreakActivities?.length && !events?.length && !isLoading) {
     return (
       <Placeholder
         onEditActivity={onEditActivity}
@@ -177,17 +182,9 @@ export default function ActivitiesSection({
             events={events}
             isLoading={isLoading}
             showAsMain={showAsMain}
+            nonBreakActivities={nonBreakActivities}
           />
         </div>
-
-        {/* <div className="flex gap-2 px-6 pb-4 items-center justify-end mr-auto">
-        {today && isShowGoogleEvents && (
-            setShowGoogleEvents={setShowGoogleEvents}
-          <GoogleCalendarEventsMessage
-            formattedGoogleEvents={formattedGoogleEvents}
-        )}
-          />
-      </div> */}
 
         <div>
           <button
@@ -213,7 +210,7 @@ function Placeholder({
   setSelectedDateReport,
 }: PlaceholderProps) {
   const [showModal, setShowModal] = useState(false);
-  const [reportsFolder, setReportsFolder] = useMainStore(
+  const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );

@@ -48,12 +48,11 @@ export const getOffice365Events = async () => {
     return getOffice365EventByUser(accessToken, refreshToken, userId);
   });
   const promisedOffice365Events = await Promise.all(usersPromises);
-  const allOffice365Events = promisedOffice365Events.reduce(
+    
+  return promisedOffice365Events.reduce(
     (acc, curr) => (!curr ? acc : [...acc, ...curr]),
     []
   );
-    
-  return allOffice365Events;
 };
 
 export const getOffice365EventByUser = async (

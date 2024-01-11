@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { shallow } from "zustand/shallow";
-import { useBetaStore } from "../../store/betaUpdatesStore";
+import { useBetaStore } from "@/store/betaUpdatesStore";
 import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 export default function BetaToggle() {

@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
-import { DateSelector } from "../components/DateSelector";
+import { DateSelector } from "@/components/DateSelector";
 import {
   ReportActivity,
   parseReport,
   serializeReport,
   ReportAndNotes,
   stringToMinutes,
-} from "../helpers/utils/reports";
-import TrackTimeModal from "../components/TrackTimeModal/TrackTimeModal";
-import { ManualInputForm } from "../components/ManualInputForm";
-import { ActivitiesSection } from "../components/ActivitiesSection";
-import { SelectFolderPlaceholder } from "../components/SelectFolderPlaceholder";
-import { VersionMessage } from "../shared/VersionMessage";
-import { UpdateDescription } from "../components/UpdateDescription";
-import { useMainStore } from "../store/mainStore";
-import { useThemeStore } from "../store/themeStore";
-import { useBetaStore } from "../store/betaUpdatesStore";
-import { Calendar } from "../components/Calendar/Calendar";
+} from "@/helpers/utils/reports";
+import TrackTimeModal from "@/components/TrackTimeModal/TrackTimeModal";
+import { ManualInputForm } from "@/components/ManualInputForm";
+import { ActivitiesSection } from "@/components/ActivitiesSection";
+import { SelectFolderPlaceholder } from "@/components/SelectFolderPlaceholder";
+import { VersionMessage } from "@/shared/VersionMessage";
+import { UpdateDescription } from "@/components/UpdateDescription";
+import { useMainStore } from "@/store/mainStore";
+import { useThemeStore } from "@/store/themeStore";
+import { useBetaStore } from "@/store/betaUpdatesStore";
+import { Calendar } from "@/components/Calendar/Calendar";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
-import { Totals } from "../components/Totals";
-import { Bookings } from "../components/Bookings";
+import { Totals } from "@/components/Totals";
+import { Bookings } from "@/components/Bookings";
 import { IPC_MAIN_CHANNELS } from "../../../electron-src/helpers/constants";
 
 export default function Home() {
@@ -111,12 +111,10 @@ export default function Home() {
     mediaQueryList.addListener(handleThemeChange);
     setIsOSDarkTheme(mediaQueryList.matches);
 
-    const mode =
+    document.body.className =
       (theme.os && isOSDarkTheme) || (!theme.os && theme.custom === "dark")
         ? "dark bg-dark-back"
         : "light bg-grey-100";
-
-    document.body.className = mode;
 
     return () => {
       mediaQueryList.removeListener(handleThemeChange);
@@ -232,49 +230,6 @@ export default function Home() {
       (act) => act.id === activity.id
     );
 
-    // if (activity.project === "delete") {
-    //   setSelectedDateActivities((activities) => {
-    //     if (activities.length === activityIndex + 2 && !activityIndex) {
-    //       return [];
-    //     }
-    //     if (
-    //       activities[activityIndex + 1].isBreak &&
-    //       activities.length !== activityIndex + 2
-    //     ) {
-    //       activities = activities.filter(
-    //         (act) => act.id !== activities[activityIndex + 1].id
-    //       );
-    //     }
-    //     if (activityIndex) {
-    //       activities[activityIndex - 1].to = activities[activityIndex + 1].from;
-    //     } else if (activities[activityIndex].isBreak) {
-    //       return activities.filter(
-    //         (act) => act.id !== activities[activityIndex].id
-    //       );
-    //     }
-
-    //     if (activities.length === activityIndex + 2) {
-    //       activities[activityIndex - 1].to = activities[activityIndex].from;
-    //       if (activities[activityIndex - 1].isBreak) {
-    //         return activities.filter(
-    //           (act) =>
-    //             act.id !== activities[activityIndex].id &&
-    //             act.id !== activities[activityIndex + 1].id &&
-    //             act.id !== activities[activityIndex - 1].id
-    //         );
-    //       }
-    //       return activities.filter(
-    //         (act) =>
-    //           act.id !== activities[activityIndex].id &&
-    //           act.id !== activities[activityIndex + 1].id
-    //       );
-    //     }
-    //     const filtered = activities.filter((act) => act.id !== activity.id);
-    //     return filtered;
-    //   });
-    //   setShouldAutosave(true);
-    //   return;
-    // }
     const tempActivities: Array<ReportActivity> = [];
     const newActFrom = stringToMinutes(activity.from);
     // const newActTo = stringToMinutes(activity.to);
@@ -322,13 +277,6 @@ export default function Home() {
               activities.splice(activityIndex + 1, 1);
             }
           }
-          // timeshifting for the next registration (if collision occurs). Commented after alex request
-          // else if (
-          //   activities[activityIndex + 1] &&
-          //   newActTo > stringToMinutes(activities[activityIndex + 1].from)
-          // ) {
-          //   activities[activityIndex + 1].from = activities[activityIndex].to;
-          // }
 
           return [...activities];
         } catch (err) {
@@ -363,13 +311,6 @@ export default function Home() {
           tempActivities.push(...selectedDateActivities);
           break;
         }
-        // // rewriting activity if start time the same. Commented after arthur request
-        // if (newActFrom === indexActFrom) {
-        //   tempActivities.push(activity);
-        //   isPastTime = true;
-        //   activity.isValid = true;
-        //   continue;
-        // }
       } catch (err) {
         global.ipcRenderer.send(
           IPC_MAIN_CHANNELS.FRONTEND_ERROR,
