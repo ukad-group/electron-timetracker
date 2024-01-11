@@ -23,6 +23,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { concatSortArrays, parseEventTitle } from "@/helpers/utils/utils";
 import { Loader } from "@/shared/Loader";
 import { ActivitiesTableProps } from "./types";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 const MS_PER_HOUR = 60 * 60 * 1000;
 
@@ -162,7 +163,10 @@ export default function ActivitiesTable({
   };
 
   const copyActivityHandler = (activity) => {
-    global.ipcRenderer.send("send-analytics-data", "copy_registration");
+    global.ipcRenderer.send(
+      IPC_MAIN_CHANNELS.ANALYTICS_DATA,
+      "copy_registration"
+    );
     onEditActivity({
       ...activity,
       id: null,
@@ -236,18 +240,29 @@ export default function ActivitiesTable({
   };
 
   const editActivityHandler = (activity) => {
-    global.ipcRenderer.send("send-analytics-data", "edit_registration");
+    global.ipcRenderer.send(
+      IPC_MAIN_CHANNELS.ANALYTICS_DATA,
+      "edit_registration"
+    );
     if (activity.calendarId) {
       onEditActivity({
         ...activity,
         id: null,
       });
-      global.ipcRenderer.send("send-analytics-data", "registrations", {
-        registration: "google-calendar-event_registration",
-      });
-      global.ipcRenderer.send("send-analytics-data", "registrations", {
-        registration: `all_calendar-events_registration`,
-      });
+      global.ipcRenderer.send(
+        IPC_MAIN_CHANNELS.ANALYTICS_DATA,
+        "registrations",
+        {
+          registration: "google-calendar-event_registration",
+        }
+      );
+      global.ipcRenderer.send(
+        IPC_MAIN_CHANNELS.ANALYTICS_DATA,
+        "registrations",
+        {
+          registration: `all_calendar-events_registration`,
+        }
+      );
     } else {
       onEditActivity(activity);
     }

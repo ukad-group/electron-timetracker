@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { Loader } from "@/shared/Loader";
 import isOnline from "is-online";
 import { TTUserInfo } from "../Calendar/types";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 const TimetrackerWebsiteConnection = () => {
   const router = useRouter();
@@ -17,9 +18,9 @@ const TimetrackerWebsiteConnection = () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send("azure:login-base");
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.AZURE_LOGIN_BASE);
     } else {
-      global.ipcRenderer.send("app:load-offline-page");
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
   };
 

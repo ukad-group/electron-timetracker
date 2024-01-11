@@ -17,6 +17,7 @@ import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "@/store/googleEventsStore";
 import { getJiraCardsFromAPI } from "@/helpers/utils/jira";
 import { getAllTrelloCardsFromApi } from "@/helpers/utils/trello";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -156,7 +157,10 @@ export default function TrackTimeModal({
       for (let i = 0; i < webTrackerProjects.length; i++) {
         if (!tempLatestProj.includes(webTrackerProjects[i])) {
           tempWebTrackerProjects.push(webTrackerProjects[i]);
-          global.ipcRenderer.send("dictionaty-update", webTrackerProjects[i]);
+          global.ipcRenderer.send(
+            IPC_MAIN_CHANNELS.DICTIONATY_UPDATE,
+            webTrackerProjects[i]
+          );
         }
       }
       setUniqueWebTrackerProjects(tempWebTrackerProjects);
@@ -288,7 +292,7 @@ export default function TrackTimeModal({
 
     setScheduledEvents(scheduledEvents);
 
-    global.ipcRenderer.send("send-analytics-data", "registrations", {
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "registrations", {
       registration: "time_registrations",
     });
     close();

@@ -8,7 +8,8 @@ import {
 } from "@/API/googleCalendarAPI";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import isOnline from "is-online";
-import { GoogleCredentails, GoogleUser } from './types';
+import { GoogleCredentails, GoogleUser } from "./types";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 const GoogleConnection = () => {
   const router = useRouter();
@@ -21,7 +22,7 @@ const GoogleConnection = () => {
     if (online) {
       await router.push(getGoogleAuthUrl());
     } else {
-      global.ipcRenderer.send("app:load-offline-page");
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
   };
 
@@ -62,7 +63,7 @@ const GoogleConnection = () => {
           accountId: googleProfileId,
         };
         global.ipcRenderer.send(
-          "send-analytics-data",
+          IPC_MAIN_CHANNELS.ANALYTICS_DATA,
           "calendars_connections",
           {
             calendar: "googleCalendar",

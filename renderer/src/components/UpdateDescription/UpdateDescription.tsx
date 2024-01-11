@@ -4,7 +4,8 @@ import { useUpdateStore } from "@/store/updateStore";
 import { DisclosureSection } from "@/shared/DisclosureSection";
 import { GlobeAltIcon } from "@heroicons/react/24/solid";
 import SlackIcon from "@/shared/SlackIcon/SlackIcon";
-import { Release } from './types';
+import { Release } from "./types";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 export default function UpdateDescription() {
   const [release, setRelease] = useState<Release | null>();
@@ -18,9 +19,11 @@ export default function UpdateDescription() {
   );
 
   const [isOpen, setIsOpen] = useState(update?.age === "new");
+  const SLACK_DESTOP_LINK = "slack://channel?team=T3PV37ANP&id=C069N5LUP3M";
+  const SLACK_WEB_LINK = "https://app.slack.com/client/T3PV37ANP/C069N5LUP3M";
 
   useEffect(() => {
-    global.ipcRenderer.send("get-current-version");
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.GET_CURRENT_VERSION);
 
     global.ipcRenderer.on("update-available", (event, data, info) => {
       setIsUpdate(data);
@@ -66,8 +69,8 @@ export default function UpdateDescription() {
     return tempDiv.innerHTML;
   };
 
-  const supportClickHandler = (isDesktop: boolean) => {
-    global.ipcRenderer.send("slack-redirect", isDesktop);
+  const supportClickHandler = (link: string) => {
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.REDIRECT, link);
   };
 
   return (
@@ -86,14 +89,14 @@ export default function UpdateDescription() {
         </p>
         <button
           className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
-          onClick={() => supportClickHandler(true)}
+          onClick={() => supportClickHandler(SLACK_DESTOP_LINK)}
         >
           <SlackIcon />
           Open in desktop Slack
         </button>
         <button
           className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
-          onClick={() => supportClickHandler(false)}
+          onClick={() => supportClickHandler(SLACK_WEB_LINK)}
         >
           <GlobeAltIcon className="w-6 h-6 fill-gray-600" />
           Open Slack in the browser
