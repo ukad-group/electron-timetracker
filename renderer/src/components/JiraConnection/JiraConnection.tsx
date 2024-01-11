@@ -4,7 +4,7 @@ import { Button } from "../../shared/Button";
 import isOnline from "is-online";
 import { JiraUser } from "../../helpers/utils/jira";
 import { FlagIcon } from "@heroicons/react/24/outline";
-import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 const JiraConnection = () => {
   const [users, setUsers] = useState(
@@ -15,9 +15,9 @@ const JiraConnection = () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send(ipcMainChannels.jiraLogin);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.JIRA_LOGIN);
     } else {
-      global.ipcRenderer.send(ipcMainChannels.loadOfflinePage);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
   };
 

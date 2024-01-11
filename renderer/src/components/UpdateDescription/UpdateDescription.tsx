@@ -5,7 +5,7 @@ import { DisclosureSection } from "../../shared/DisclosureSection";
 import { GlobeAltIcon } from "@heroicons/react/24/solid";
 import SlackIcon from "../../shared/SlackIcon/SlackIcon";
 import { Release } from "./types";
-import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 export default function UpdateDescription() {
   const [release, setRelease] = useState<Release | null>();
@@ -23,7 +23,7 @@ export default function UpdateDescription() {
   const SLACK_WEB_LINK = "https://app.slack.com/client/T3PV37ANP/C069N5LUP3M";
 
   useEffect(() => {
-    global.ipcRenderer.send(ipcMainChannels.getCurrentVersion);
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.GET_CURRENT_VERSION);
 
     global.ipcRenderer.on("update-available", (event, data, info) => {
       setIsUpdate(data);
@@ -70,7 +70,7 @@ export default function UpdateDescription() {
   };
 
   const supportClickHandler = (link: string) => {
-    global.ipcRenderer.send(ipcMainChannels.redirect, link);
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.REDIRECT, link);
   };
 
   return (

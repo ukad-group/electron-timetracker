@@ -20,7 +20,7 @@ import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "../../store/googleEventsStore";
 import { getJiraCardsFromAPI } from "../../helpers/utils/jira";
 import { getAllTrelloCardsFromApi } from "../../helpers/utils/trello";
-import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -161,7 +161,7 @@ export default function TrackTimeModal({
         if (!tempLatestProj.includes(webTrackerProjects[i])) {
           tempWebTrackerProjects.push(webTrackerProjects[i]);
           global.ipcRenderer.send(
-            ipcMainChannels.dictionatyUpdate,
+            IPC_MAIN_CHANNELS.DICTIONATY_UPDATE,
             webTrackerProjects[i]
           );
         }
@@ -317,7 +317,7 @@ export default function TrackTimeModal({
     //   setGoogleEvents(arrayWithPrefilledValue);
     // }
 
-    global.ipcRenderer.send(ipcMainChannels.analyticsData, "registrations", {
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "registrations", {
       registration: "time_registrations",
     });
     close();

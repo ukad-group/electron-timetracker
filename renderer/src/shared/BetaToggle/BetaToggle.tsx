@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { shallow } from "zustand/shallow";
 import { useBetaStore } from "../../store/betaUpdatesStore";
-import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 export default function BetaToggle() {
   const [isBeta, setIsBeta] = useBetaStore(
@@ -10,7 +10,7 @@ export default function BetaToggle() {
   );
 
   useEffect(() => {
-    global.ipcRenderer.send(ipcMainChannels.detaChannel, isBeta);
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
   }, [isBeta]);
 
   return (

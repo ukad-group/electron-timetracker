@@ -1,4 +1,4 @@
-import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 export type ReportActivity = {
   id: number;
@@ -135,7 +135,7 @@ export function parseReport(fileContent: string) {
     return reportAndNotes as ReportAndNotes;
   } catch (err) {
     global.ipcRenderer.send(
-      ipcMainChannels.frontendError,
+      IPC_MAIN_CHANNELS.FRONTEND_ERROR,
       "Parsing error",
       "An issue with the file has been identified. Please attempt to rectify the error within the report using the Manual Input field.",
       err
@@ -188,7 +188,7 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
     return report;
   } catch (err) {
     global.ipcRenderer.send(
-      ipcMainChannels.frontendError,
+      IPC_MAIN_CHANNELS.FRONTEND_ERROR,
       "Serializing error",
       "An issue with the file has been identified. Please attempt to rectify the error within the report using the Manual Input field. ",
       err

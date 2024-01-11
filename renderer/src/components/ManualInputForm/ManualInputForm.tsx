@@ -7,7 +7,7 @@ import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
 import useUndoManager from "../../helpers/hooks/useUndoManager";
 import { ManualInputFormProps } from "./types";
-import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 export default function ManualInputForm({
   onSave,
@@ -76,7 +76,7 @@ export default function ManualInputForm({
   }, [report]);
 
   const saveReportHandler = () => {
-    global.ipcRenderer.send(ipcMainChannels.analyticsData, "manuall_save");
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "manuall_save");
     onSave(report, true);
     setSaveBtnStatus("inprogress");
     setIsFileExist(true);

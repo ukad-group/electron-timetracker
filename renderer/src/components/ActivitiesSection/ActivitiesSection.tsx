@@ -13,7 +13,7 @@ import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
 import { ActivitiesSectionProps, PlaceholderProps } from "./types";
 import { XMarkIcon } from "@heroicons/react/24/solid";
-import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 export default function ActivitiesSection({
   onEditActivity,
@@ -86,7 +86,7 @@ export default function ActivitiesSection({
   useEffect(() => {
     document.addEventListener("keyup", ctrlSpaceHandler);
     global.ipcRenderer.on(
-      ipcMainChannels.backEndError,
+      IPC_MAIN_CHANNELS.BACKEND_ERROR,
       (event, errorMessage, data) => {
         setBackgroundError(errorMessage);
         console.log("Error data ", data);
@@ -108,13 +108,13 @@ export default function ActivitiesSection({
 
     return () => {
       document.removeEventListener("keyup", ctrlSpaceHandler);
-      global.ipcRenderer.removeAllListeners(ipcMainChannels.backEndError);
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.BACKEND_ERROR);
       global.ipcRenderer.removeAllListeners("render or fetch error");
     };
   }, []);
 
   const updateDownloadClickHandler = () => {
-    global.ipcRenderer.send(ipcMainChannels.redirect, RELEASES_LINK);
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.REDIRECT, RELEASES_LINK);
   };
 
   const closeBtnHandler = () => {

@@ -9,7 +9,7 @@ import {
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import isOnline from "is-online";
 import { GoogleCredentails, GoogleUser } from "./types";
-import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 const GoogleConnection = () => {
   const router = useRouter();
@@ -22,7 +22,7 @@ const GoogleConnection = () => {
     if (online) {
       router.push(getGoogleAuthUrl());
     } else {
-      global.ipcRenderer.send(ipcMainChannels.loadOfflinePage);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
   };
 
@@ -64,7 +64,7 @@ const GoogleConnection = () => {
           accountId: googleProfileId,
         };
         global.ipcRenderer.send(
-          ipcMainChannels.analyticsData,
+          IPC_MAIN_CHANNELS.ANALYTICS_DATA,
           "calendars_connections",
           {
             calendar: "googleCalendar",

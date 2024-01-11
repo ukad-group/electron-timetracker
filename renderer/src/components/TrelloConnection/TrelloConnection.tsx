@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { Button } from "../../shared/Button";
 import isOnline from "is-online";
-import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
 
 function extractTokenFromString(inputString: string) {
   const parts = inputString.split("#");
@@ -28,9 +28,9 @@ const TrelloConnection = () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send(ipcMainChannels.trelloLogin);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.TRELLO_LOGIN);
     } else {
-      global.ipcRenderer.send(ipcMainChannels.loadOfflinePage);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
   };
 

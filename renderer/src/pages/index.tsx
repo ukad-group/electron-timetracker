@@ -22,7 +22,7 @@ import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 import { Totals } from "../components/Totals";
 import { Bookings } from "../components/Bookings";
-import { ipcMainChannels } from "../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "../../../electron-src/helpers/constants";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -71,17 +71,23 @@ export default function Home() {
   }
 
   useEffect(() => {
-    global.ipcRenderer.send(ipcMainChannels.startFolderWatcher, reportsFolder);
+    global.ipcRenderer.send(
+      IPC_MAIN_CHANNELS.START_FOLDER_WATCHER,
+      reportsFolder
+    );
 
-    global.ipcRenderer.send(ipcMainChannels.checkDropboxConnection);
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
       setIsDropboxConnected(!reportsFolder.includes("Dropbox") || data);
     });
-    global.ipcRenderer.send(ipcMainChannels.detaChannel, isBeta);
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
 
     return () => {
       global.ipcRenderer.removeAllListeners("dropbox-connection");
-      global.ipcRenderer.send(ipcMainChannels.stopPathWatcher, reportsFolder);
+      global.ipcRenderer.send(
+        IPC_MAIN_CHANNELS.STOP_PATH_WATCHER,
+        reportsFolder
+      );
     };
   }, []);
 
@@ -139,14 +145,14 @@ export default function Home() {
       })();
     } catch (err) {
       global.ipcRenderer.send(
-        ipcMainChannels.frontendError,
+        IPC_MAIN_CHANNELS.FRONTEND_ERROR,
         "Reports reading error",
         "An error occurred while reading reports. ",
         err
       );
     }
     global.ipcRenderer.send(
-      ipcMainChannels.startFileWatcher,
+      IPC_MAIN_CHANNELS.START_FILE_WATCHER,
       reportsFolder,
       selectedDate
     );
@@ -164,7 +170,7 @@ export default function Home() {
       global.ipcRenderer.removeAllListeners("file-changed");
       global.ipcRenderer.removeAllListeners("errorMes");
       global.ipcRenderer.send(
-        ipcMainChannels.stopPathWatcher,
+        IPC_MAIN_CHANNELS.STOP_PATH_WATCHER,
         reportsFolder,
         selectedDate
       );
@@ -200,7 +206,7 @@ export default function Home() {
       }
     } catch (err) {
       global.ipcRenderer.send(
-        ipcMainChannels.frontendError,
+        IPC_MAIN_CHANNELS.FRONTEND_ERROR,
         "Reports saving error",
         "An error occurred while saving reports. ",
         err
@@ -209,7 +215,7 @@ export default function Home() {
   }, [selectedDateActivities]);
 
   const saveSerializedReport = (serializedReport: string) => {
-    global.ipcRenderer.send(ipcMainChannels.checkDropboxConnection);
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
     global.ipcRenderer.invoke(
       "app:write-day-report",
       reportsFolder,
@@ -327,7 +333,7 @@ export default function Home() {
           return [...activities];
         } catch (err) {
           global.ipcRenderer.send(
-            ipcMainChannels.frontendError,
+            IPC_MAIN_CHANNELS.FRONTEND_ERROR,
             "Activity editing error",
             "An error occurred while editing reports. ",
             err
@@ -366,7 +372,7 @@ export default function Home() {
         // }
       } catch (err) {
         global.ipcRenderer.send(
-          ipcMainChannels.frontendError,
+          IPC_MAIN_CHANNELS.FRONTEND_ERROR,
           "Adding activity error",
           "An error occurred when adding a new activity to the report. ",
           err
@@ -393,7 +399,7 @@ export default function Home() {
       }
     } catch (err) {
       global.ipcRenderer.send(
-        ipcMainChannels.frontendError,
+        IPC_MAIN_CHANNELS.FRONTEND_ERROR,
         "Adding activity error",
         "An error occurred when adding a new activity to the report. ",
         err

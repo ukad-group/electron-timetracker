@@ -45,11 +45,11 @@ import {
   getJiraResources,
   getJiraTokens,
 } from "./helpers/API/jiraApi";
-import { ipcMainChannels } from "./helpers/constants";
+import { IPC_MAIN_CHANNELS } from "./helpers/constants";
 
 initialize("A-EU-9361517871");
 ipcMain.on(
-  ipcMainChannels.analyticsData,
+  IPC_MAIN_CHANNELS.ANALYTICS_DATA,
   (_, analyticsEvent: string, data?: Record<string, string>) => {
     trackEvent(analyticsEvent, data);
   }
@@ -63,7 +63,7 @@ let updateVersion = "";
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
-ipcMain.on(ipcMainChannels.detaChannel, (event: any, isBeta: boolean) => {
+ipcMain.on(IPC_MAIN_CHANNELS.BETA_CHANNEL, (event: any, isBeta: boolean) => {
   autoUpdater.allowPrerelease = isBeta;
 });
 
@@ -75,13 +75,13 @@ function setUpdateStatus(status: "available" | "downloaded", version: string) {
 autoUpdater.allowDowngrade = true;
 autoUpdater.on("error", (e: Error, message?: string) => {
   mainWindow?.webContents.send(
-    ipcMainChannels.backEndError,
+    IPC_MAIN_CHANNELS.BACKEND_ERROR,
     "Updater error. An error was encountered during the download of the latest version. ",
     message
   );
 });
 
-ipcMain.on(ipcMainChannels.getCurrentVersion, () => {
+ipcMain.on(IPC_MAIN_CHANNELS.GET_CURRENT_VERSION, () => {
   mainWindow &&
     mainWindow.webContents.send("current-version", app.getVersion());
 });
@@ -101,12 +101,12 @@ autoUpdater.on("update-downloaded", (info: UpdateInfo) => {
   }
 });
 
-ipcMain.on(ipcMainChannels.installVersion, () => {
+ipcMain.on(IPC_MAIN_CHANNELS.INSTALL_VERSION, () => {
   autoUpdater.quitAndInstall(true, true);
 });
 
 ipcMain.on(
-  ipcMainChannels.frontendError,
+  IPC_MAIN_CHANNELS.FRONTEND_ERROR,
   (_, errorTitle: string, errorMessage: string, data) => {
     mainWindow?.webContents.send(
       "render error",
@@ -116,11 +116,11 @@ ipcMain.on(
     );
   }
 );
-ipcMain.on(ipcMainChannels.dictionatyUpdate, (_, word: string) => {
+ipcMain.on(IPC_MAIN_CHANNELS.DICTIONATY_UPDATE, (_, word: string) => {
   mainWindow?.webContents.session.addWordToSpellCheckerDictionary(word);
 });
 
-ipcMain.on(ipcMainChannels.redirect, (_, link: string) => {
+ipcMain.on(IPC_MAIN_CHANNELS.REDIRECT, (_, link: string) => {
   shell.openExternal(link);
 });
 
@@ -283,7 +283,7 @@ app.on("ready", async () => {
       } catch (err) {
         console.log(err);
         mainWindow?.webContents.send(
-          ipcMainChannels.backEndError,
+          IPC_MAIN_CHANNELS.BACKEND_ERROR,
           "Tray error. Encountered errors while integrating the application into the system tray.",
           err
         );
@@ -296,7 +296,7 @@ app.on("ready", async () => {
     } = {};
 
     ipcMain.on(
-      ipcMainChannels.startFileWatcher,
+      IPC_MAIN_CHANNELS.START_FILE_WATCHER,
       (_, reportsFolder: string, selectedDate: Date) => {
         const timereportPath = getPathFromDate(selectedDate, reportsFolder);
 
@@ -321,7 +321,7 @@ app.on("ready", async () => {
         } catch (err) {
           console.log(err);
           mainWindow?.webContents.send(
-            ipcMainChannels.backEndError,
+            IPC_MAIN_CHANNELS.BACKEND_ERROR,
             "Watcher error. Updates to files might not be accurately displayed within the application. ",
             err
           );
@@ -330,7 +330,7 @@ app.on("ready", async () => {
     );
 
     ipcMain.on(
-      ipcMainChannels.startFolderWatcher,
+      IPC_MAIN_CHANNELS.START_FOLDER_WATCHER,
       (_, reportsFolder: string) => {
         try {
           if (fs.existsSync(reportsFolder)) {
@@ -353,7 +353,7 @@ app.on("ready", async () => {
         } catch (err) {
           console.log(err);
           mainWindow?.webContents.send(
-            ipcMainChannels.backEndError,
+            IPC_MAIN_CHANNELS.BACKEND_ERROR,
             "Watcher error. Updates to files might not be accurately displayed within the application. ",
             err
           );
@@ -361,7 +361,7 @@ app.on("ready", async () => {
       }
     );
 
-    ipcMain.on(ipcMainChannels.checkDropboxConnection, () => {
+    ipcMain.on(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION, () => {
       const command = process.platform === "win32" ? "tasklist" : "ps aux";
       exec(command, (err, stdout, stderr) => {
         if (err) {
@@ -380,7 +380,7 @@ app.on("ready", async () => {
     });
 
     ipcMain.on(
-      ipcMainChannels.stopPathWatcher,
+      IPC_MAIN_CHANNELS.STOP_PATH_WATCHER,
       (_, reportsFolder: string, selectedDate: Date) => {
         try {
           if (selectedDate) {
@@ -396,7 +396,7 @@ app.on("ready", async () => {
         } catch (err) {
           console.log(err);
           mainWindow?.webContents.send(
-            ipcMainChannels.backEndError,
+            IPC_MAIN_CHANNELS.BACKEND_ERROR,
             "Watcher error. Updates to files might not be accurately displayed within the application. ",
             err
           );
@@ -481,7 +481,7 @@ const readDataFromFile = (timereportPath: string, callback: Callback) => {
   } catch (err) {
     console.error(err);
     mainWindow?.webContents.send(
-      ipcMainChannels.backEndError,
+      IPC_MAIN_CHANNELS.BACKEND_ERROR,
       "File reading error. The file content display may be inaccurate or absent. ",
       err
     );
@@ -555,7 +555,7 @@ ipcMain.handle(
         } catch (err) {
           console.error(err);
           mainWindow?.webContents.send(
-            ipcMainChannels.backEndError,
+            IPC_MAIN_CHANNELS.BACKEND_ERROR,
             "Error when finding last report",
             err
           );
@@ -583,7 +583,7 @@ ipcMain.handle(
       console.log(err);
 
       mainWindow?.webContents.send(
-        ipcMainChannels.backEndError,
+        IPC_MAIN_CHANNELS.BACKEND_ERROR,
         "Error in writing to file. The file writing process may be incorrect. ",
         err
       );
@@ -605,7 +605,7 @@ ipcMain.handle(
     } catch (err) {
       console.log(err);
       mainWindow?.webContents.send(
-        ipcMainChannels.backEndError,
+        IPC_MAIN_CHANNELS.BACKEND_ERROR,
         "Error when checking existing project.",
         err
       );
@@ -663,7 +663,7 @@ ipcMain.handle(
       console.log(err);
 
       mainWindow?.webContents.send(
-        ipcMainChannels.backEndError,
+        IPC_MAIN_CHANNELS.BACKEND_ERROR,
         "Error reading past reports. Autocomplete suggestions will not appear in the form display. ",
         err
       );
@@ -714,7 +714,7 @@ ipcMain.handle(
   }
 );
 
-ipcMain.on(ipcMainChannels.loadOfflinePage, async () => {
+ipcMain.on(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE, async () => {
   mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
 });
 
@@ -727,7 +727,7 @@ const getTrelloOptions = () => {
   };
 };
 
-ipcMain.on(ipcMainChannels.trelloLogin, async () => {
+ipcMain.on(IPC_MAIN_CHANNELS.TRELLO_LOGIN, async () => {
   const options = getTrelloOptions();
   const trelloAuthUrl = getTrelloAuthUrl(options);
 
@@ -762,7 +762,7 @@ const getJiraOptions = () => {
   };
 };
 
-ipcMain.on(ipcMainChannels.jiraLogin, async () => {
+ipcMain.on(IPC_MAIN_CHANNELS.JIRA_LOGIN, async () => {
   const options = getJiraOptions();
   const jiraAuthUrl = getJiraAuthUrl(options);
 
@@ -809,7 +809,7 @@ const getOffice365Options = () => {
   };
 };
 
-ipcMain.on(ipcMainChannels.office365Login, async () => {
+ipcMain.on(IPC_MAIN_CHANNELS.OFFICE365_LOGIN, async () => {
   const options = getOffice365Options();
   const office365AuthUrl = getAuthUrl(options);
 
@@ -843,7 +843,7 @@ ipcMain.handle("office365:get-today-events", async (_, accessToken: string) => {
 
 //#region TIMETRACKER WEBSITE
 
-ipcMain.on(ipcMainChannels.azureLoginBase, async () => {
+ipcMain.on(IPC_MAIN_CHANNELS.AZURE_LOGIN_BASE, async () => {
   const options = getOffice365Options();
 
   const optionsWithAllScope = {
