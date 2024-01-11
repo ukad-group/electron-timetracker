@@ -6,7 +6,8 @@ import { getCurrentTimeRoundedUp } from "../../helpers/utils/datetime-ui";
 import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
 import useUndoManager from "../../helpers/hooks/useUndoManager";
-import { ManualInputFormProps } from './types';
+import { ManualInputFormProps } from "./types";
+import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
 
 export default function ManualInputForm({
   onSave,
@@ -75,7 +76,7 @@ export default function ManualInputForm({
   }, [report]);
 
   const saveReportHandler = () => {
-    global.ipcRenderer.send("send-analytics-data", "manuall_save");
+    global.ipcRenderer.send(ipcMainChannels.analyticsData, "manuall_save");
     onSave(report, true);
     setSaveBtnStatus("inprogress");
     setIsFileExist(true);

@@ -3,6 +3,7 @@ import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { Button } from "../../shared/Button";
 import isOnline from "is-online";
 import { Office365User } from "../../helpers/utils/office365";
+import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
 
 const Office365Connection = () => {
   const [users, setUsers] = useState(
@@ -14,9 +15,9 @@ const Office365Connection = () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send("office365:login");
+      global.ipcRenderer.send(ipcMainChannels.office365Login);
     } else {
-      global.ipcRenderer.send("app:load-offline-page");
+      global.ipcRenderer.send(ipcMainChannels.loadOfflinePage);
     }
   };
 
@@ -68,9 +69,13 @@ const Office365Connection = () => {
       refreshToken: refresh_token,
       username: username,
     };
-    global.ipcRenderer.send("send-analytics-data", "calendars_connections", {
-      calendar: "office365",
-    });
+    global.ipcRenderer.send(
+      ipcMainChannels.analyticsData,
+      "calendars_connections",
+      {
+        calendar: "office365",
+      }
+    );
     const newUsers = [...users, user];
 
     localStorage.setItem("office365-users", JSON.stringify(newUsers));

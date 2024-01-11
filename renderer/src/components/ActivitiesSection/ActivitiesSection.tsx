@@ -13,6 +13,7 @@ import { useMainStore } from "../../store/mainStore";
 import { shallow } from "zustand/shallow";
 import { ActivitiesSectionProps, PlaceholderProps } from "./types";
 import { XMarkIcon } from "@heroicons/react/24/solid";
+import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
 
 export default function ActivitiesSection({
   onEditActivity,
@@ -32,6 +33,8 @@ export default function ActivitiesSection({
   });
   const [errorType, setErrorType] = useState<null | "updater">(null);
   const [isErrorShown, setIsErrorShown] = useState<boolean>(true);
+  const RELEASES_LINK =
+    "https://github.com/ukad-group/timetracker-desktop-client/releases";
   const isShowGoogleEvents = JSON.parse(
     localStorage.getItem("showGoogleEvents")
   );
@@ -82,15 +85,18 @@ export default function ActivitiesSection({
 
   useEffect(() => {
     document.addEventListener("keyup", ctrlSpaceHandler);
-    global.ipcRenderer.on("background error", (event, errorMessage, data) => {
-      setBackgroundError(errorMessage);
-      console.log("Error data ", data);
+    global.ipcRenderer.on(
+      ipcMainChannels.backEndError,
+      (event, errorMessage, data) => {
+        setBackgroundError(errorMessage);
+        console.log("Error data ", data);
 
-      const errorMessageArray = errorMessage.split(" ");
-      if (errorMessageArray.includes("Updater")) {
-        setErrorType("updater");
+        const errorMessageArray = errorMessage.split(" ");
+        if (errorMessageArray.includes("Updater")) {
+          setErrorType("updater");
+        }
       }
-    });
+    );
 
     global.ipcRenderer.on(
       "render error",
@@ -102,16 +108,13 @@ export default function ActivitiesSection({
 
     return () => {
       document.removeEventListener("keyup", ctrlSpaceHandler);
-      global.ipcRenderer.removeAllListeners("background error");
+      global.ipcRenderer.removeAllListeners(ipcMainChannels.backEndError);
       global.ipcRenderer.removeAllListeners("render or fetch error");
     };
   }, []);
 
   const updateDownloadClickHandler = () => {
-    global.ipcRenderer.send(
-      "redirect",
-      "https://github.com/ukad-group/timetracker-desktop-client/releases"
-    );
+    global.ipcRenderer.send(ipcMainChannels.redirect, RELEASES_LINK);
   };
 
   const closeBtnHandler = () => {

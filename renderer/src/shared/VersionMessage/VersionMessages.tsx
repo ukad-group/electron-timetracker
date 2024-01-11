@@ -5,6 +5,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { UpdateInfo } from "electron-updater";
+import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
 
 export default function VersionMessage() {
   const [isUpdate, setIsUpdate] = useState(false);
@@ -66,7 +67,7 @@ export default function VersionMessage() {
   }, [version]);
 
   const install = () => {
-    global.ipcRenderer.send("install");
+    global.ipcRenderer.send(ipcMainChannels.installVersion);
   };
 
   const closeBtnHandler = () => {

@@ -10,13 +10,17 @@ import {
   addSuggestions,
   addDurationToTime,
 } from "../../helpers/utils/reports";
-import { checkIsToday, padStringToMinutes } from "../../helpers/utils/datetime-ui";
+import {
+  checkIsToday,
+  padStringToMinutes,
+} from "../../helpers/utils/datetime-ui";
 import { AutocompleteSelector } from "../../shared/AutocompleteSelector";
 import { Button } from "../../shared/Button";
 import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "../../store/googleEventsStore";
 import { getJiraCardsFromAPI } from "../../helpers/utils/jira";
 import { getAllTrelloCardsFromApi } from "../../helpers/utils/trello";
+import { ipcMainChannels } from "../../../../electron-src/helpers/constants";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -156,7 +160,10 @@ export default function TrackTimeModal({
       for (let i = 0; i < webTrackerProjects.length; i++) {
         if (!tempLatestProj.includes(webTrackerProjects[i])) {
           tempWebTrackerProjects.push(webTrackerProjects[i]);
-          global.ipcRenderer.send("dictionaty-update", webTrackerProjects[i]);
+          global.ipcRenderer.send(
+            ipcMainChannels.dictionatyUpdate,
+            webTrackerProjects[i]
+          );
         }
       }
       setUniqueWebTrackerProjects(tempWebTrackerProjects);
@@ -310,7 +317,7 @@ export default function TrackTimeModal({
     //   setGoogleEvents(arrayWithPrefilledValue);
     // }
 
-    global.ipcRenderer.send("send-analytics-data", "registrations", {
+    global.ipcRenderer.send(ipcMainChannels.analyticsData, "registrations", {
       registration: "time_registrations",
     });
     close();
