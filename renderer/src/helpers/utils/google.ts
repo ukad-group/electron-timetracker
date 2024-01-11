@@ -42,7 +42,5 @@ export const loadGoogleEventsFromAllUsers = async () => {
   );
   const userEvents = await Promise.all(userPromises);
 
-  const flattenedEvents = userEvents.flat();
-
-  return flattenedEvents;
+  return userEvents.flat();
 };

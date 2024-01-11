@@ -7,7 +7,6 @@ import dynamic from "next/dynamic";
 import Head from "next/head";
 
 function App({ Component, pageProps }: AppProps) {
-  // return <Component {...pageProps} />;
   const AnyComponent = Component as any; // need review this
 
   return (

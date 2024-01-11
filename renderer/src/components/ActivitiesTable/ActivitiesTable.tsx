@@ -53,9 +53,9 @@ export default function ActivitiesTable({
   }, [nonBreakActivities]);
 
   const formatEvents = (events) => {
-    if (events.length === 0) return [];
+    if (!events.length) return [];
 
-    const formattedEvents = events.map((event) => {
+    return events.map((event) => {
       const { start, end } = event;
 
       const startDateTime =
@@ -79,14 +79,12 @@ export default function ActivitiesTable({
         calendarId: event.id,
       };
     });
-
-    return formattedEvents;
   };
 
   const getActualEvents = (events) => {
     if (!events.length) return [];
 
-    const actualEvents = events.filter((event) => {
+    return events.filter((event) => {
       const { end } = event;
       const endDateTime =
         end?.timeZone === "UTC" ? `${end?.dateTime}Z` : end?.dateTime;
@@ -99,8 +97,6 @@ export default function ActivitiesTable({
         return event;
       }
     });
-
-    return actualEvents;
   };
 
   const tableActivities = useMemo(() => {
@@ -142,8 +138,7 @@ export default function ActivitiesTable({
         modifiedValue = originaValue.slice(0, -1);
       } else if (originaValue.includes("m")) {
         const minutes = originaValue.slice(0, -1);
-        const hours = Math.floor((minutes / 60) * 100) / 100;
-        modifiedValue = hours;
+        modifiedValue = Math.floor((minutes / 60) * 100) / 100;
       }
     }
 
@@ -671,18 +666,4 @@ export default function ActivitiesTable({
       <div className="hidden lg:block">{compactView}</div>
     </>
   );
-}
-
-{
-  /* <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              <button
-                className="group py-4 px-3"
-                title="Delete"
-                onClick={() => {
-                  onDeleteActivity(activity.id);
-                }}
-              >
-                <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 dark:text-dark-heading" />
-              </button>
-            </td> */
 }

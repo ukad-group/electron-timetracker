@@ -12,7 +12,7 @@ import Popup from "@/shared/Popup/Popup";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import { ActivitiesSectionProps, PlaceholderProps } from "./types";
-import { validation } from "../../helpers/utils/reports";
+import { validation } from "@/helpers/utils/reports";
 
 export default function ActivitiesSection({
   onEditActivity,
@@ -151,15 +151,6 @@ export default function ActivitiesSection({
           />
         </div>
 
-        {/* <div className="flex gap-2 px-6 pb-4 items-center justify-end mr-auto">
-        {today && isShowGoogleEvents && (
-            setShowGoogleEvents={setShowGoogleEvents}
-          <GoogleCalendarEventsMessage
-            formattedGoogleEvents={formattedGoogleEvents}
-        )}
-          />
-      </div> */}
-
         <div>
           <button
             id="newActivityBtn"
@@ -184,7 +175,7 @@ function Placeholder({
   setSelectedDateReport,
 }: PlaceholderProps) {
   const [showModal, setShowModal] = useState(false);
-  const [reportsFolder, setReportsFolder] = useMainStore(
+  const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );

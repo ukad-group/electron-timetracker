@@ -214,9 +214,7 @@ export function calcDurationBetweenTimes(from: string, to: string): number {
 
     const totalMinutes = endTotalMinutes - startTotalMinutes;
 
-    const milliseconds = totalMinutes * 60 * 1000;
-
-    return milliseconds;
+    return totalMinutes * 60 * 1000;
   } catch (err) {
     console.log(err);
     return 0;

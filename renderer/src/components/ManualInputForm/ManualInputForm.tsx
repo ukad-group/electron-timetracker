@@ -118,12 +118,11 @@ export default function ManualInputForm({
     const cursorPosition = textarea.selectionStart;
     const currentLineStart = report.lastIndexOf("\n", cursorPosition - 1) + 1;
     const currentLineEnd = report.indexOf("\n", cursorPosition);
-    const currentLine = report.slice(
+
+    return report.slice(
       currentLineStart,
       currentLineEnd !== -1 ? currentLineEnd : undefined
     );
-
-    return currentLine;
   };
 
   const copyCurrentLine = () => {
