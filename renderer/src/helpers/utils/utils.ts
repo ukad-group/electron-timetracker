@@ -1,5 +1,5 @@
 import { ReportActivity } from "./reports";
-import { GoogleEvent } from "../../store/googleCalendarStore";
+import { GoogleEvent } from "@/store/googleCalendarStore";
 
 export const replaceHyphensWithSpaces = (inputString: string): string => {
   const resultString = inputString.replace(/ - /g, " ");

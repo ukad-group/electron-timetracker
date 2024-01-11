@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { shallow } from "zustand/shallow";
-import { useBetaStore } from "../../store/betaUpdatesStore";
+import { useBetaStore } from "@/store/betaUpdatesStore";
 
 export default function BetaToggle() {
   const [isBeta, setIsBeta] = useBetaStore(

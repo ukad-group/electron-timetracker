@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "../../shared/Button";
+import { Button } from "@/shared/Button";
 import { useRouter } from "next/router";
 import {
   getGoogleAuthUrl,
   getGoogleCredentials,
   getGoogleUserInfo,
-} from "../../API/googleCalendarAPI";
+} from "@/API/googleCalendarAPI";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import isOnline from "is-online";
 import { GoogleCredentails, GoogleUser } from './types';

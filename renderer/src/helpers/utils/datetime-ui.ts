@@ -2,7 +2,7 @@ import {
   FormattedReport,
   DayOff,
   ApiDayOff,
-} from "../../components/Calendar/Calendar";
+} from "@/components/Calendar/Calendar";
 
 export const MONTHS = [
   "January",

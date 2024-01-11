@@ -1,4 +1,4 @@
-import { BetaToggle } from "../../shared/BetaToggle";
+import { BetaToggle } from "@/shared/BetaToggle";
 
 const VersionSection = () => (
   <section className="h-full">

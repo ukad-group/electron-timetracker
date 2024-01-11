@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { shallow } from "zustand/shallow";
-import { useThemeStore } from "../store/themeStore";
-import { MenuItem } from "../shared/MenuItem";
-import { ButtonTransparent } from "../shared/ButtonTransparent";
+import { useThemeStore } from "@/store/themeStore";
+import { MenuItem } from "@/shared/MenuItem";
+import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
-import { SidebarNavItem, SETTING_SECTIONS } from "../helpers/contstants";
+import { SidebarNavItem, SETTING_SECTIONS } from "@/helpers/contstants";
 
 const SettingsPage = () => {
   const [theme] = useThemeStore(
