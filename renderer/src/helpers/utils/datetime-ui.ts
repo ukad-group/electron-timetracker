@@ -2,7 +2,9 @@ import {
   FormattedReport,
   DayOff,
   ApiDayOff,
-} from "@/components/Calendar/Calendar";
+} from "@/components/Calendar/types";
+
+export const DAY = 60 * 60 * 24 * 1000;
 
 export const MONTHS = [
   "January",
@@ -23,22 +25,14 @@ export function checkIsToday(date: Date): boolean {
   const now = new Date();
   const chosenDate = new Date(date);
 
-  if (now.setHours(0, 0, 0, 0) === chosenDate.setHours(0, 0, 0, 0)) {
-    return true;
-  } else {
-    return false;
-  }
+  return now.setHours(0, 0, 0, 0) === chosenDate.setHours(0, 0, 0, 0);
 }
 
 export function isTheSameDates(date1: Date, date2: Date): boolean {
   const firstDate = new Date(date1);
   const socondDate = new Date(date2);
 
-  if (firstDate.setHours(0, 0, 0, 0) === socondDate.setHours(0, 0, 0, 0)) {
-    return true;
-  } else {
-    return false;
-  }
+  return firstDate.setHours(0, 0, 0, 0) === socondDate.setHours(0, 0, 0, 0);
 }
 
 export function getWeekNumber(dateString: string) {
@@ -114,7 +108,7 @@ export function extractDatesFromPeriod(period: ApiDayOff, holidays: DayOff[]) {
   const dateEnd = new Date(new Date(period?.dateTo).toISOString().slice(0, -1));
   const vacationRange = generateDateRange(dateStart, dateEnd);
 
-  const datesWithoutWeekendsHolidays = vacationRange
+  return vacationRange
     .filter((date) => {
       return (
         date.getDay() >= 1 &&
@@ -130,8 +124,6 @@ export function extractDatesFromPeriod(period: ApiDayOff, holidays: DayOff[]) {
         type: period?.type,
       };
     });
-
-  return datesWithoutWeekendsHolidays;
 }
 
 function generateDateRange(startDate: Date, endDate: Date) {
@@ -184,14 +176,6 @@ export const padStringToMinutes = (timeString: string) => {
   const [hours, minutes] = timeString.split(":").map(Number);
   return hours * 60 + minutes;
 };
-
-// export const getStringDate = (date: Date): string => {
-//   const year = date.getFullYear();
-//   const month = (date.getMonth() + 1).toString().padStart(2, "0");
-//   const day = date.getDate().toString().padStart(2, "0");
-
-//   return `${year}-${month}-${day}`;
-// };
 
 export const convertMillisecondsToTime = (milliseconds) => {
   const totalSeconds = Math.floor(milliseconds / 1000);

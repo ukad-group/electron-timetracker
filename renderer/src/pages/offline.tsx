@@ -5,7 +5,7 @@ import { SignalSlashIcon, ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { useThemeStore } from "@/store/themeStore";
 
 const SettingsPage = () => {
-  const [theme, setTheme] = useThemeStore(
+  const [theme] = useThemeStore(
     (state) => [state.theme, state.setTheme],
     shallow
   );
@@ -23,10 +23,7 @@ const SettingsPage = () => {
       .matchMedia("(prefers-color-scheme: dark)")
       .addListener(handleThemeChange);
 
-    const mode =
-      (theme.os && isOSDarkTheme) || theme.custom === "dark" ? "dark" : "light";
-
-    document.body.className = mode;
+    document.body.className = (theme.os && isOSDarkTheme) || theme.custom === "dark" ? "dark" : "light";
   }, [theme, isOSDarkTheme]);
 
   return (

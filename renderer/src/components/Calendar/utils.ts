@@ -1,8 +1,8 @@
 import {
   extractDatesFromPeriod,
   isTheSameDates,
-} from "../../helpers/utils/datetime-ui";
-import { DayOff, ApiDayOff, TTUserInfo } from "./Calendar";
+} from "@/helpers/utils/datetime-ui";
+import { DayOff, ApiDayOff, TTUserInfo } from "./types";
 
 type VacationSickDaysData = {
   periods: ApiDayOff[];

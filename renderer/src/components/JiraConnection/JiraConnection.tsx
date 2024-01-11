@@ -92,17 +92,6 @@ const JiraConnection = () => {
             type="button"
           />
         )}
-        {/* {users.length > 0 && (
-          <button
-            onClick={handleSignInButton}
-            type="button"
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border shadow-sm dark:border-dark-form-border"
-          >
-            <span className="hover:underline text-gray-500 dark:text-dark-main">
-              Add another account
-            </span>
-          </button>
-        )} */}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">
         {!users.length && (

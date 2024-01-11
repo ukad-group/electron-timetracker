@@ -32,7 +32,7 @@ const Totals = ({ selectedDate }) => {
   useEffect(() => {
     getTotals();
 
-    const fileChangeListener = (event) => {
+    const fileChangeListener = () => {
       getTotals();
     };
 
@@ -95,57 +95,52 @@ const Totals = ({ selectedDate }) => {
     );
 
     const parsedReportsAndNotes = parseReport(dayReport);
-    const parsedActivities = parsedReportsAndNotes[0];
 
-    return parsedActivities;
+    return parsedReportsAndNotes[0];
   };
 
-  const getProjectTotals = (activities: ReportActivity[]) => {
-    const totals = activities.reduce((acc: Total[], curr: ReportActivity) => {
-      if (!curr?.project || curr?.project.startsWith("!")) return acc;
+  const getProjectTotals = (activities: ReportActivity[]) => activities.reduce((acc: Total[], curr: ReportActivity) => {
+    if (!curr?.project || curr?.project.startsWith("!")) return acc;
 
-      const existingTotal = acc.find((item) => item.name === curr.project);
-      const name = curr.activity
-        ? `${curr.activity} - ${curr.description}`
-        : curr.description;
+    const existingTotal = acc.find((item) => item.name === curr.project);
+    const name = curr.activity
+      ? `${curr.activity} - ${curr.description}`
+      : curr.description;
 
-      if (!existingTotal) {
-        acc.push({
-          id: curr.project,
-          name: curr.project,
-          duration: curr.duration,
-          descriptions: [
-            {
-              id: name,
-              name: name,
-              duration: curr.duration,
-            },
-          ],
-          activities: [],
-        });
-      } else {
-        existingTotal.duration += curr.duration ? curr.duration : 0;
-
-        const existingDescription = existingTotal.descriptions.find(
-          (desc) => desc.name === name
-        );
-
-        if (existingDescription) {
-          existingDescription.duration += curr.duration;
-        } else {
-          existingTotal.descriptions.push({
+    if (!existingTotal) {
+      acc.push({
+        id: curr.project,
+        name: curr.project,
+        duration: curr.duration,
+        descriptions: [
+          {
             id: name,
             name: name,
             duration: curr.duration,
-          });
-        }
+          },
+        ],
+        activities: [],
+      });
+    } else {
+      existingTotal.duration += curr.duration ? curr.duration : 0;
+
+      const existingDescription = existingTotal.descriptions.find(
+        (desc) => desc.name === name
+      );
+
+      if (existingDescription) {
+        existingDescription.duration += curr.duration;
+      } else {
+        existingTotal.descriptions.push({
+          id: name,
+          name: name,
+          duration: curr.duration,
+        });
       }
+    }
 
-      return acc;
-    }, []);
-
-    return totals;
-  };
+    return acc;
+  }, []);
 
   const getActivityTotals = (
     projectName: string,
@@ -155,7 +150,7 @@ const Totals = ({ selectedDate }) => {
       (activity: ReportActivity) => activity.project === projectName
     );
 
-    const totals = filteredActivities.reduce(
+    return filteredActivities.reduce(
       (acc: Activity[], curr: ReportActivity) => {
         const existingTotal = acc.find((item) => item.name === curr.activity);
 
@@ -194,8 +189,6 @@ const Totals = ({ selectedDate }) => {
       },
       []
     );
-
-    return totals;
   };
 
   const sortTotals = (totals) => {

@@ -7,7 +7,7 @@ import {
   undoEditing,
   redoEditing,
   EditingHistoryAction,
-} from "../../actions/editingActions";
+} from "@/actions/editingActions";
 
 interface EditingHistoryState {
   undoStack: string[];
