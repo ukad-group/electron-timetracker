@@ -32,20 +32,6 @@ const mockedActivities = [
   },
 ];
 
-jest.mock("../AddEventBtn/AddEventBtn", () => {
-  return {
-    __esModule: true,
-    default: () => {
-      // if you exporting component as default
-      return <div />;
-    },
-    GoogleCalendarAddEventBtn: () => {
-      // if you exporting component as not default
-      return <div />;
-    },
-  };
-});
-
 const day = 60 * 60 * 24 * 1000;
 const today = new Date();
 const yesterday = new Date(today.getTime() - day);
