@@ -16,4 +16,6 @@ export const IPC_MAIN_CHANNELS = {
   JIRA_LOGIN: "jira:login",
   OFFICE365_LOGIN: "office365:login",
   AZURE_LOGIN_BASE: "azure:login-base",
+  WINDOW_FOCUSED: "window-focused",
+  RENDER_ERROR: "render error"
 };

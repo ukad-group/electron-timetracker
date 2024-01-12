@@ -1,9 +1,12 @@
-import { ReportActivity } from "../../helpers/utils/reports";
+import { ReportActivity } from "@/helpers/utils/reports";
 import { Dispatch, SetStateAction } from "react";
 
-export type ActivitiesSectionProps = {
-  activities: Array<ReportActivity>;
+export type TrackTimeButtonProps = {
   onEditActivity: (activity: ReportActivity | "new") => void;
+}
+
+export type ActivitiesSectionProps = TrackTimeButtonProps & {
+  activities: Array<ReportActivity>;
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
   latestProjAndAct: Record<string, [string]>;
@@ -11,8 +14,7 @@ export type ActivitiesSectionProps = {
   showAsMain: boolean;
 };
 
-export type PlaceholderProps = {
-  onEditActivity: (activity: ReportActivity | "new") => void;
+export type PlaceholderProps = TrackTimeButtonProps & {
   backgroundError: string;
   selectedDate: Date;
   setSelectedDateReport: Dispatch<SetStateAction<String>>;
