@@ -186,7 +186,7 @@ export default function ActivitiesSection({
             refetenceID="newActivityBtn"
             shiftY={30}
             shiftX={200}
-            position="bottom"
+            position={{ basePosition: "bottom", diagonalPosition: "right" }}
           >
             To log more time, click the 'Track More Time' button or press ctrl +
             space to access the form for entering new registration today.
@@ -272,7 +272,7 @@ function Placeholder({
           refetenceID="placeholderBtn"
           shiftY={120}
           shiftX={60}
-          position="left"
+          position={{ basePosition: "right", diagonalPosition: "bottom" }}
         >
           This is a daily placeholder you'll encounter each day. Click the 'New
           Activity' button or press ctrl + space to open the form for your

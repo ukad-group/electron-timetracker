@@ -1,14 +1,32 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { computePosition } from "@floating-ui/dom";
 import ButtonTransparent from "./ButtonTransparent";
+
+export type Position =
+  | {
+      basePosition: "bottom";
+      diagonalPosition: "left" | "right";
+    }
+  | {
+      basePosition: "top";
+      diagonalPosition: "left" | "right";
+    }
+  | {
+      basePosition: "left";
+      diagonalPosition: "bottom" | "top";
+    }
+  | {
+      basePosition: "right";
+      diagonalPosition: "bottom" | "top";
+    };
 
 export type Hint = {
   children: ReactNode;
   refetenceID: string;
   shiftY: number;
   shiftX: number;
-  position: "bottom" | "top" | "left" | "right";
+  position: Position;
 };
 
 export function Hint({
@@ -28,38 +46,28 @@ export function Hint({
   const VerticalLine = document.getElementById(VerticalLineID);
   const reference = document.getElementById(refetenceID);
   const floating = document.getElementById(floatingID);
+  const [showHint, setShowHint] = useState(false);
 
-  if (reference && SVG) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowHint(true);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
+
+  if (reference && SVG && showHint) {
     computePosition(reference, floating, {
-      placement: position,
+      placement: position.basePosition,
     })
       .then(({ x, y }) => {
         Object.assign(reference.style, {
           "z-index": "40",
           position: "relative",
         });
-        switch (position) {
-          case "bottom":
-            Object.assign(floating.style, {
-              top: `${y + shiftY}px`,
-              left: `${x + shiftX}px`,
-            });
-            Object.assign(SVG.style, {
-              top: `${y}px`,
-              left: `${x}px`,
-            });
-
-            HorizontalLine.setAttribute("x1", "1");
-            HorizontalLine.setAttribute("y1", `${shiftY + 30}`);
-            HorizontalLine.setAttribute("x2", `${shiftX}`);
-            HorizontalLine.setAttribute("y2", `${shiftY + 30}`);
-
-            VerticalLine.setAttribute("x1", "1");
-            VerticalLine.setAttribute("y1", "0");
-            VerticalLine.setAttribute("x2", "1");
-            VerticalLine.setAttribute("y2", `${shiftY + 30}`);
-            break;
-
+        switch (position.basePosition) {
           case "top":
             Object.assign(floating.style, {
               top: `${y - shiftY}px`,
@@ -70,48 +78,158 @@ export function Hint({
               left: `${x}px`,
             });
 
-            HorizontalLine.setAttribute("x1", "1");
             HorizontalLine.setAttribute("y1", `${shiftY}`);
-            HorizontalLine.setAttribute("x2", `${shiftX}`);
             HorizontalLine.setAttribute("y2", `${shiftY}`);
-
-            VerticalLine.setAttribute("x1", "1");
             VerticalLine.setAttribute("y1", `${shiftY}`);
-            VerticalLine.setAttribute("x2", "1");
             VerticalLine.setAttribute("y2", `${floating.offsetHeight}`);
+
+            if (position.diagonalPosition === "right") {
+              HorizontalLine.setAttribute("x1", "1");
+              HorizontalLine.setAttribute("x2", `${shiftX}`);
+              VerticalLine.setAttribute("x1", "1");
+              VerticalLine.setAttribute("x2", "1");
+
+              Object.assign(floating.style, {
+                left: `${x + shiftX}px`,
+              });
+              Object.assign(SVG.style, {
+                left: `${x}px`,
+              });
+            }
+            if (position.diagonalPosition === "left") {
+              HorizontalLine.setAttribute("x1", `${shiftX * 2}`);
+              HorizontalLine.setAttribute("x2", `${floating.offsetWidth}`);
+              VerticalLine.setAttribute("x1", `${shiftX * 2}`);
+              VerticalLine.setAttribute("x2", `${shiftX * 2}`);
+
+              Object.assign(floating.style, {
+                left: `${x - shiftX}px`,
+              });
+              Object.assign(SVG.style, {
+                left: `${x - shiftX}px`,
+              });
+            }
+            break;
+
+          case "right":
+            Object.assign(floating.style, {
+              left: `${x + shiftX}px`,
+            });
+            Object.assign(SVG.style, {
+              top: `${y}px`,
+              left: `${x}px`,
+            });
+
+            HorizontalLine.setAttribute("x1", `${0}`);
+            HorizontalLine.setAttribute(
+              "x2",
+              `${floating.offsetWidth / 2 + shiftX}`
+            );
+            HorizontalLine.setAttribute("y1", `${floating.offsetHeight / 2}`);
+            HorizontalLine.setAttribute("y2", `${floating.offsetHeight / 2}`);
+
+            VerticalLine.setAttribute(
+              "x1",
+              `${floating.offsetWidth / 2 + shiftX}`
+            );
+            VerticalLine.setAttribute(
+              "x2",
+              `${floating.offsetWidth / 2 + shiftX}`
+            );
+
+            if (position.diagonalPosition === "top") {
+              VerticalLine.setAttribute("y1", `${y - shiftY}`);
+              VerticalLine.setAttribute("y2", `${floating.offsetHeight / 2}`);
+              Object.assign(floating.style, {
+                top: `${y - shiftY}px`,
+              });
+            } else if (position.diagonalPosition === "bottom") {
+              VerticalLine.setAttribute("y1", `${floating.offsetHeight / 2}`);
+              VerticalLine.setAttribute(
+                "y2",
+                `${y - floating.offsetHeight + shiftY}`
+              );
+              Object.assign(floating.style, {
+                top: `${y + shiftY}px`,
+              });
+            }
+            break;
+
+          case "bottom":
+            Object.assign(floating.style, {
+              top: `${y + shiftY}px`,
+            });
+            Object.assign(SVG.style, {
+              top: `${y}px`,
+            });
+
+            VerticalLine.setAttribute("y1", "0");
+            VerticalLine.setAttribute("y2", `${shiftY + 30}`);
+            HorizontalLine.setAttribute("y1", `${shiftY + 30}`);
+            HorizontalLine.setAttribute("y2", `${shiftY + 30}`);
+
+            if (position.diagonalPosition === "right") {
+              HorizontalLine.setAttribute("x1", "1");
+              HorizontalLine.setAttribute("x2", `${shiftX}`);
+              VerticalLine.setAttribute("x1", "1");
+              VerticalLine.setAttribute("x2", "1");
+
+              Object.assign(floating.style, {
+                left: `${x + shiftX}px`,
+              });
+              Object.assign(SVG.style, {
+                left: `${x}px`,
+              });
+            } else if (position.diagonalPosition === "left") {
+              HorizontalLine.setAttribute("x1", `${shiftX * 2}`);
+              HorizontalLine.setAttribute("x2", `${floating.offsetWidth}`);
+              VerticalLine.setAttribute("x1", `${shiftX * 2}`);
+              VerticalLine.setAttribute("x2", `${shiftX * 2}`);
+
+              Object.assign(floating.style, {
+                left: `${x - shiftX}px`,
+              });
+              Object.assign(SVG.style, {
+                left: `${x - shiftX}px`,
+              });
+            }
             break;
 
           case "left":
             Object.assign(floating.style, {
-              top: `${y - shiftY}px`,
               left: `${x - shiftX}px`,
             });
             Object.assign(SVG.style, {
-              top: `${y - shiftY}px`,
+              top: `${y}px`,
               left: `${x - shiftX}px`,
             });
 
             HorizontalLine.setAttribute("x1", `${floating.offsetWidth / 2}`);
             HorizontalLine.setAttribute(
-              "y1",
-              `${floating.offsetHeight / 2 + shiftY}`
-            );
-            HorizontalLine.setAttribute(
               "x2",
               `${floating.offsetWidth + shiftX}`
             );
-            HorizontalLine.setAttribute(
-              "y2",
-              `${floating.offsetHeight / 2 + shiftY}`
-            );
-
+            HorizontalLine.setAttribute("y1", `${floating.offsetHeight / 2}`);
+            HorizontalLine.setAttribute("y2", `${floating.offsetHeight / 2}`);
             VerticalLine.setAttribute("x1", `${floating.offsetWidth / 2}`);
-            VerticalLine.setAttribute("y1", `${floating.offsetHeight}`);
             VerticalLine.setAttribute("x2", `${floating.offsetWidth / 2}`);
-            VerticalLine.setAttribute(
-              "y2",
-              `${floating.offsetHeight / 2 + shiftY}`
-            );
+
+            if (position.diagonalPosition === "top") {
+              VerticalLine.setAttribute("y1", `${y - shiftY}`);
+              VerticalLine.setAttribute("y2", `${floating.offsetHeight / 2}`);
+              Object.assign(floating.style, {
+                top: `${y - shiftY}px`,
+              });
+            } else if (position.diagonalPosition === "bottom") {
+              VerticalLine.setAttribute("y1", `${floating.offsetHeight / 2}`);
+              VerticalLine.setAttribute(
+                "y2",
+                `${y - floating.offsetHeight + shiftY}`
+              );
+              Object.assign(floating.style, {
+                top: `${y + shiftY}px`,
+              });
+            }
             break;
         }
       })
