@@ -42,6 +42,10 @@ export function searchReadFiles(
   return filledReportsArr;
 }
 
+function isTimereportNameValid(filename: string) {
+  return /^timereport - \d{8}$/.test(filename);
+}
+
 function searchFilesWithSubfolders(
   currentYearFolder: string,
   queries: string[],
@@ -56,7 +60,10 @@ function searchFilesWithSubfolders(
 
       if (stats.isDirectory()) {
         searchFilesWithSubfolders(filePath, queries, initialReportsArr);
-      } else if (queries.some((query) => file.includes(query))) {
+      } else if (
+        isTimereportNameValid(file) &&
+        queries.some((query) => file.includes(query))
+      ) {
         initialReportsArr.push({
           data: fs.readFileSync(filePath, "utf8"),
           reportDate: filePath.split(" - ")[1],
