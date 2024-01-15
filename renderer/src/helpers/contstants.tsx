@@ -27,6 +27,9 @@ export const LOCAL_STORAGE_VARIABLES = {
 }
 
 export const KEY_CODES = {
-  SPACE: 'Space'
+  SPACE: 'Space',
+  ARROW_UP: 'ArrowUp',
+  META: 'Meta',
+  CONTROL: 'Control'
   // ...Add more key codes as needed
 }
