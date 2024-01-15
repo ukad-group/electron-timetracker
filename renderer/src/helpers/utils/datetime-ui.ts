@@ -5,6 +5,7 @@ import {
 } from "@/components/Calendar/types";
 
 export const DAY = 60 * 60 * 24 * 1000;
+export const MS_PER_HOUR = 60 * 60 * 1000;
 
 export const MONTHS = [
   "January",
