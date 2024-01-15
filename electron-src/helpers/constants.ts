@@ -17,5 +17,8 @@ export const IPC_MAIN_CHANNELS = {
   OFFICE365_LOGIN: "office365:login",
   AZURE_LOGIN_BASE: "azure:login-base",
   WINDOW_FOCUSED: "window-focused",
-  RENDER_ERROR: "render error"
+  RENDER_ERROR: "render error",
+  TIMETRACKER_GET_BOOKINGS: "timetracker:get-bookings",
+  APP_FIND_MONTH_PROJECTS: "app:find-month-projects",
+  ANY_FILE_CHANGED: "any-file-changed"
 };

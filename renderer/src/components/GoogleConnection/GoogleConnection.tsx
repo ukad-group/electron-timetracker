@@ -9,7 +9,7 @@ import {
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import isOnline from "is-online";
 import { GoogleCredentails, GoogleUser } from "./types";
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const GoogleConnection = () => {
   const router = useRouter();

@@ -7,7 +7,7 @@ import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import useEditingHistoryManager from "@/helpers/hooks/useEditingHistoryManager";
 import { ManualInputFormProps } from "./types";
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export default function ManualInputForm({
   onSave,

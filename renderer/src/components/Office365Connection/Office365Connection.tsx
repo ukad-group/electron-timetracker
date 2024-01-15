@@ -3,7 +3,7 @@ import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { Button } from "@/shared/Button";
 import isOnline from "is-online";
 import { Office365User } from "@/helpers/utils/office365";
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const Office365Connection = () => {
   const [users, setUsers] = useState(

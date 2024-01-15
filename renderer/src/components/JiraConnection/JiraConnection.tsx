@@ -4,7 +4,7 @@ import { Button } from "@/shared/Button";
 import isOnline from "is-online";
 import { JiraUser } from "@/helpers/utils/jira";
 import { FlagIcon } from "@heroicons/react/24/outline";
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const JiraConnection = () => {
   const [users, setUsers] = useState(
