@@ -181,7 +181,10 @@ const ActivitiesSection = ({
           />
         </div>
         <div>
-          <TrackTimeButton onEditActivity={onEditActivity} />
+          <TrackTimeButton
+            isLoading={isLoading}
+            onEditActivity={onEditActivity}
+          />
         </div>
       </div>
     </div>

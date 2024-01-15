@@ -18,6 +18,7 @@ import { useScheduledEventsStore } from "@/store/googleEventsStore";
 import { getJiraCardsFromAPI } from "@/helpers/utils/jira";
 import { getAllTrelloCardsFromApi } from "@/helpers/utils/trello";
 import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { Hint } from "@/shared/Hint";
 
 export type TrackTimeModalProps = {
   activities: Array<ReportActivity> | null;
@@ -492,6 +493,33 @@ export default function TrackTimeModal({
                     >
                       From
                     </label>
+                    <Hint
+                      refetenceID="from"
+                      // shiftY={20}
+                      // shiftX={100}
+                      // fullWidth={"2/5"}
+                      // mobileWidth={"3/5"}
+                      // position={{
+                      //   basePosition: "top",
+                      //   diagonalPosition: "right",
+                      // }}
+                      shiftY={25}
+                      shiftX={260}
+                      fullWidth={"2/5"}
+                      mobileWidth={"2/5"}
+                      position={{
+                        basePosition: "top",
+                        diagonalPosition: "right",
+                      }}
+                    >
+                      Upon form opening, the "from" time defaults to the prior
+                      entry's end time (if exists) or the current time, rounded
+                      to the nearest 15 minutes.. The "to" time is set to the
+                      current time, rounded to the nearest 15 minutes. You can
+                      manually modify the time by 15-minute increments using the
+                      arrow keys. Alternatively, entering the desired duration
+                      will automatically adjust the "to" field accordingly.
+                    </Hint>
                     <input
                       onKeyDown={(event) => handleKey(event, setFrom)}
                       required
@@ -503,7 +531,7 @@ export default function TrackTimeModal({
                       id="from"
                       tabIndex={1}
                       className={clsx(
-                        "block w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:border-dark-form-border dark:text-dark-heading dark:bg-dark-form-back focus:dark:border-focus-border focus:dark:ring-focus-border",
+                        "block w-full px-3 w- py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:border-dark-form-border dark:text-dark-heading dark:bg-dark-form-back focus:dark:border-focus-border focus:dark:ring-focus-border",
                         {
                           "border-red-300 text-red-900 placeholder-red-300 dark:border-red-700/40 dark:text-red-500 dark:placeholder-red-300":
                             isValidationEnabled && (!from || from.length < 5),

@@ -1,7 +1,8 @@
+import clsx from "clsx";
 import { ReactNode, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { computePosition } from "@floating-ui/dom";
-import ButtonTransparent from "./ButtonTransparent";
+import { ButtonTransparent } from "@/shared/ButtonTransparent";
 
 export type Position =
   | {
@@ -26,14 +27,18 @@ export type Hint = {
   refetenceID: string;
   shiftY: number;
   shiftX: number;
+  fullWidth: string;
+  mobileWidth: string;
   position: Position;
 };
 
-export function Hint({
+export default function Hint({
   children,
   refetenceID,
   shiftY,
   shiftX,
+  fullWidth,
+  mobileWidth,
   position,
 }: Hint) {
   const svgID = refetenceID + "SVG";
@@ -48,6 +53,8 @@ export function Hint({
   const floating = document.getElementById(floatingID);
   const [showHint, setShowHint] = useState(false);
 
+  const className = `p-4 flex gap-2 flex-col text-sm rounded-lg w-${mobileWidth} lg:w-${fullWidth} z-50 border border-gray-500 bg-black absolute text-gray-900 dark:text-dark-heading`;
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowHint(true);
@@ -59,6 +66,9 @@ export function Hint({
   }, []);
 
   if (reference && SVG && showHint) {
+    const hintHeight = floating.offsetHeight;
+    const hintWidth = floating.offsetWidth;
+
     computePosition(reference, floating, {
       placement: position.basePosition,
     })
@@ -71,21 +81,19 @@ export function Hint({
           case "top":
             Object.assign(floating.style, {
               top: `${y - shiftY}px`,
-              left: `${x + shiftX}px`,
             });
             Object.assign(SVG.style, {
               top: `${y}px`,
-              left: `${x}px`,
             });
 
-            HorizontalLine.setAttribute("y1", `${shiftY}`);
-            HorizontalLine.setAttribute("y2", `${shiftY}`);
-            VerticalLine.setAttribute("y1", `${shiftY}`);
-            VerticalLine.setAttribute("y2", `${floating.offsetHeight}`);
+            HorizontalLine.setAttribute("y1", `${hintHeight / 2 - shiftY}`);
+            HorizontalLine.setAttribute("y2", `${hintHeight / 2 - shiftY}`);
+            VerticalLine.setAttribute("y1", `${hintHeight / 2 - shiftY}`);
+            VerticalLine.setAttribute("y2", `${hintHeight}`);
 
             if (position.diagonalPosition === "right") {
               HorizontalLine.setAttribute("x1", "1");
-              HorizontalLine.setAttribute("x2", `${shiftX}`);
+              HorizontalLine.setAttribute("x2", `${shiftX - hintWidth / 2}`);
               VerticalLine.setAttribute("x1", "1");
               VerticalLine.setAttribute("x2", "1");
 
@@ -93,14 +101,14 @@ export function Hint({
                 left: `${x + shiftX}px`,
               });
               Object.assign(SVG.style, {
-                left: `${x}px`,
+                left: `${x + hintWidth / 2}px`,
               });
             }
             if (position.diagonalPosition === "left") {
-              HorizontalLine.setAttribute("x1", `${shiftX * 2}`);
-              HorizontalLine.setAttribute("x2", `${floating.offsetWidth}`);
-              VerticalLine.setAttribute("x1", `${shiftX * 2}`);
-              VerticalLine.setAttribute("x2", `${shiftX * 2}`);
+              HorizontalLine.setAttribute("x1", `${shiftX + hintWidth / 2}`);
+              HorizontalLine.setAttribute("x2", `${hintWidth}`);
+              VerticalLine.setAttribute("x1", `${shiftX + hintWidth / 2}`);
+              VerticalLine.setAttribute("x2", `${shiftX + hintWidth / 2}`);
 
               Object.assign(floating.style, {
                 left: `${x - shiftX}px`,
@@ -118,37 +126,26 @@ export function Hint({
             Object.assign(SVG.style, {
               top: `${y}px`,
               left: `${x}px`,
+              width: `${hintWidth / 2 + shiftX + 1}`,
             });
 
             HorizontalLine.setAttribute("x1", `${0}`);
-            HorizontalLine.setAttribute(
-              "x2",
-              `${floating.offsetWidth / 2 + shiftX}`
-            );
-            HorizontalLine.setAttribute("y1", `${floating.offsetHeight / 2}`);
-            HorizontalLine.setAttribute("y2", `${floating.offsetHeight / 2}`);
+            HorizontalLine.setAttribute("x2", `${hintWidth / 2 + shiftX}`);
+            HorizontalLine.setAttribute("y1", `${hintHeight / 2}`);
+            HorizontalLine.setAttribute("y2", `${hintHeight / 2}`);
 
-            VerticalLine.setAttribute(
-              "x1",
-              `${floating.offsetWidth / 2 + shiftX}`
-            );
-            VerticalLine.setAttribute(
-              "x2",
-              `${floating.offsetWidth / 2 + shiftX}`
-            );
+            VerticalLine.setAttribute("x1", `${hintWidth / 2 + shiftX}`);
+            VerticalLine.setAttribute("x2", `${hintWidth / 2 + shiftX}`);
 
             if (position.diagonalPosition === "top") {
               VerticalLine.setAttribute("y1", `${y - shiftY}`);
-              VerticalLine.setAttribute("y2", `${floating.offsetHeight / 2}`);
+              VerticalLine.setAttribute("y2", `${hintHeight / 2}`);
               Object.assign(floating.style, {
                 top: `${y - shiftY}px`,
               });
             } else if (position.diagonalPosition === "bottom") {
-              VerticalLine.setAttribute("y1", `${floating.offsetHeight / 2}`);
-              VerticalLine.setAttribute(
-                "y2",
-                `${y - floating.offsetHeight + shiftY}`
-              );
+              VerticalLine.setAttribute("y1", `${hintHeight / 2}`);
+              VerticalLine.setAttribute("y2", `${y - hintHeight + shiftY}`);
               Object.assign(floating.style, {
                 top: `${y + shiftY}px`,
               });
@@ -164,9 +161,9 @@ export function Hint({
             });
 
             VerticalLine.setAttribute("y1", "0");
-            VerticalLine.setAttribute("y2", `${shiftY + 30}`);
-            HorizontalLine.setAttribute("y1", `${shiftY + 30}`);
-            HorizontalLine.setAttribute("y2", `${shiftY + 30}`);
+            VerticalLine.setAttribute("y2", `${shiftY + hintHeight / 2}`);
+            HorizontalLine.setAttribute("y1", `${shiftY + hintHeight / 2}`);
+            HorizontalLine.setAttribute("y2", `${shiftY + hintHeight / 2}`);
 
             if (position.diagonalPosition === "right") {
               HorizontalLine.setAttribute("x1", "1");
@@ -178,14 +175,13 @@ export function Hint({
                 left: `${x + shiftX}px`,
               });
               Object.assign(SVG.style, {
-                left: `${x}px`,
+                left: `${x + hintWidth / 2}px`,
               });
             } else if (position.diagonalPosition === "left") {
-              HorizontalLine.setAttribute("x1", `${shiftX * 2}`);
-              HorizontalLine.setAttribute("x2", `${floating.offsetWidth}`);
-              VerticalLine.setAttribute("x1", `${shiftX * 2}`);
-              VerticalLine.setAttribute("x2", `${shiftX * 2}`);
-
+              HorizontalLine.setAttribute("x1", `${hintWidth}`);
+              HorizontalLine.setAttribute("x2", `${hintWidth / 2 + shiftX}`);
+              VerticalLine.setAttribute("x1", `${hintWidth / 2 + shiftX}`);
+              VerticalLine.setAttribute("x2", `${hintWidth / 2 + shiftX}`);
               Object.assign(floating.style, {
                 left: `${x - shiftX}px`,
               });
@@ -204,28 +200,22 @@ export function Hint({
               left: `${x - shiftX}px`,
             });
 
-            HorizontalLine.setAttribute("x1", `${floating.offsetWidth / 2}`);
-            HorizontalLine.setAttribute(
-              "x2",
-              `${floating.offsetWidth + shiftX}`
-            );
-            HorizontalLine.setAttribute("y1", `${floating.offsetHeight / 2}`);
-            HorizontalLine.setAttribute("y2", `${floating.offsetHeight / 2}`);
-            VerticalLine.setAttribute("x1", `${floating.offsetWidth / 2}`);
-            VerticalLine.setAttribute("x2", `${floating.offsetWidth / 2}`);
+            HorizontalLine.setAttribute("x1", `${hintWidth / 2}`);
+            HorizontalLine.setAttribute("x2", `${hintWidth + shiftX}`);
+            HorizontalLine.setAttribute("y1", `${hintHeight / 2}`);
+            HorizontalLine.setAttribute("y2", `${hintHeight / 2}`);
+            VerticalLine.setAttribute("x1", `${hintWidth / 2}`);
+            VerticalLine.setAttribute("x2", `${hintWidth / 2}`);
 
             if (position.diagonalPosition === "top") {
               VerticalLine.setAttribute("y1", `${y - shiftY}`);
-              VerticalLine.setAttribute("y2", `${floating.offsetHeight / 2}`);
+              VerticalLine.setAttribute("y2", `${hintHeight / 2}`);
               Object.assign(floating.style, {
                 top: `${y - shiftY}px`,
               });
             } else if (position.diagonalPosition === "bottom") {
-              VerticalLine.setAttribute("y1", `${floating.offsetHeight / 2}`);
-              VerticalLine.setAttribute(
-                "y2",
-                `${y - floating.offsetHeight + shiftY}`
-              );
+              VerticalLine.setAttribute("y1", `${hintHeight / 2}`);
+              VerticalLine.setAttribute("y2", `${y - hintHeight + shiftY}`);
               Object.assign(floating.style, {
                 top: `${y + shiftY}px`,
               });
@@ -241,12 +231,12 @@ export function Hint({
   return (
     <>
       {createPortal(
-        <div className="h-screen w-full fixed justify-center top-0 z-20 items-center bg-gray-900/40  pointer-events-none" />,
+        <div className="h-screen w-full fixed justify-center top-0 z-20 items-center bg-gray-900/40 pointer-events-none" />,
         document.body
       )}
       {createPortal(
         <svg
-          className="absolute w-1/2 h-screen z-50 pointer-events-none"
+          className="absolute  h-screen z-40 pointer-events-none"
           xmlns="http://www.w3.org/2000/svg"
           id={svgID}
         >
@@ -257,10 +247,7 @@ export function Hint({
         document.body
       )}
       {createPortal(
-        <div
-          className="p-4 flex gap-2 flex-col text-sm rounded-lg z-40 border border-gray-500 bg-black absolute text-gray-900 dark:text-dark-heading w-1/5"
-          id={floatingID}
-        >
+        <div className={className} id={floatingID}>
           <p>{children}</p>
           <div className="flex gap-4 justify-end">
             <ButtonTransparent callback={() => {}}>Skip all</ButtonTransparent>

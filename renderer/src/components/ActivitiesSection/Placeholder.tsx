@@ -2,10 +2,15 @@ import { PlaceholderProps } from "@/components/ActivitiesSection/types";
 import { useState } from "react";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import { ClockIcon, ExclamationCircleIcon, Square2StackIcon } from "@heroicons/react/24/outline";
+import {
+  ClockIcon,
+  ExclamationCircleIcon,
+  Square2StackIcon,
+} from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { ButtonTransparent } from "@/shared/ButtonTransparent";
-import Popup from "@/shared/Popup/Popup";
+import { Popup } from "@/shared/Popup";
+import { Hint } from "@/shared/Hint";
 
 const Placeholder = ({
   onEditActivity,
@@ -70,6 +75,7 @@ const Placeholder = ({
       </p>
       <div className="mt-6 mb-2">
         <button
+          id="placeholderBtn"
           onClick={() => onEditActivity("new")}
           type="button"
           className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500   dark:bg-dark-button-back  dark:hover:bg-dark-button-hover"
@@ -77,6 +83,19 @@ const Placeholder = ({
           <PlusIcon className="w-5 h-5 mr-2 -ml-1" aria-hidden="true" />
           New activity
         </button>
+        {/* <Hint
+          refetenceID="placeholderBtn"
+          shiftY={150}
+          shiftX={60}
+          fullWidth={"1/5"}
+          mobileWidth={"2/5"}
+          position={{ basePosition: "left", diagonalPosition: "top" }}
+        >
+          This is a daily placeholder you'll encounter each day. Click the 'New
+          Activity' button or press ctrl + space to open the form for your
+          initial entry today. Alternatively, you can duplicate your last report
+          by clicking 'Copy Last Report.'
+        </Hint> */}
         <span className="block text-gray-500 text-xs">
           or press ctrl + space
         </span>
@@ -102,6 +121,6 @@ const Placeholder = ({
       )}
     </div>
   );
-}
+};
 
 export default Placeholder;
