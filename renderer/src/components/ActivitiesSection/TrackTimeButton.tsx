@@ -16,19 +16,18 @@ const TrackTimeButton = ({
         click or press ctrl + space
       </span>
     </button>
-    {!isLoading && (
+    {/* {!isLoading && (
       <Hint
         refetenceID="newActivityBtn"
         shiftY={30}
         shiftX={200}
-        fullWidth={"1/5"}
-        mobileWidth={"2/6"}
+        width={"medium"}
         position={{ basePosition: "bottom", diagonalPosition: "right" }}
       >
         To log more time, click the 'Track More Time' button or press ctrl +
         space to access the form for entering new registration today.
       </Hint>
-    )}
+    )} */}
   </>
 );
 

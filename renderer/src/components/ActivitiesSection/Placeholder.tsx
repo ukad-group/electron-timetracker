@@ -83,19 +83,21 @@ const Placeholder = ({
           <PlusIcon className="w-5 h-5 mr-2 -ml-1" aria-hidden="true" />
           New activity
         </button>
-        {/* <Hint
+        <Hint
+          learningMethod="buttonClick"
+          order={1}
+          groupName="placeholder"
           refetenceID="placeholderBtn"
           shiftY={150}
           shiftX={60}
-          fullWidth={"1/5"}
-          mobileWidth={"2/5"}
+          width={"small"}
           position={{ basePosition: "left", diagonalPosition: "top" }}
         >
           This is a daily placeholder you'll encounter each day. Click the 'New
           Activity' button or press ctrl + space to open the form for your
           initial entry today. Alternatively, you can duplicate your last report
           by clicking 'Copy Last Report.'
-        </Hint> */}
+        </Hint>
         <span className="block text-gray-500 text-xs">
           or press ctrl + space
         </span>

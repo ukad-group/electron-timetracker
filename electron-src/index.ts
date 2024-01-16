@@ -139,6 +139,7 @@ const generateWindow = () => {
     icon: path.join(__dirname, "../renderer/out/images/logo.png"),
   });
 
+  mainWindow.maximize();
   mainWindow.loadURL(`http://localhost:${PORT}/`);
 
   if (isDev) {

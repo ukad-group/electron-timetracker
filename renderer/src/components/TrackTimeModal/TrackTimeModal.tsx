@@ -494,19 +494,13 @@ export default function TrackTimeModal({
                       From
                     </label>
                     <Hint
+                      learningMethod="nextClick"
+                      order={1}
+                      groupName="trackTimeModal"
                       refetenceID="from"
-                      // shiftY={20}
-                      // shiftX={100}
-                      // fullWidth={"2/5"}
-                      // mobileWidth={"3/5"}
-                      // position={{
-                      //   basePosition: "top",
-                      //   diagonalPosition: "right",
-                      // }}
                       shiftY={25}
-                      shiftX={260}
-                      fullWidth={"2/5"}
-                      mobileWidth={"2/5"}
+                      shiftX={300}
+                      width={"large"}
                       position={{
                         basePosition: "top",
                         diagonalPosition: "right",
@@ -616,7 +610,28 @@ export default function TrackTimeModal({
                       spellCheck={false}
                     />
                   </div>
-                  <div className="col-span-6">
+                  <Hint
+                    learningMethod="nextClick"
+                    order={2}
+                    groupName="trackTimeModal"
+                    refetenceID="textFields"
+                    shiftY={175}
+                    shiftX={30}
+                    width={"medium"}
+                    position={{
+                      basePosition: "left",
+                      diagonalPosition: "top",
+                    }}
+                  >
+                    In the text fields, you'll find suggestions for projects,
+                    activities, and descriptions based on your usage in the past
+                    month. Upon linking the timetracker website, all company
+                    projects become available for selection. After connecting
+                    Trello and Jira, you'll be prompted to choose tasks from
+                    your boards in the description field, prioritizing those
+                    assigned to you.
+                  </Hint>
+                  <div id="textFields" className="col-span-6">
                     <AutocompleteSelector
                       isNewCheck={true}
                       onSave={onSave}
