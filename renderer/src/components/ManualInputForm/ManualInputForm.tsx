@@ -38,14 +38,6 @@ export default function ManualInputForm({
   };
 
   useEffect(() => {
-    document.addEventListener("keydown", saveOnPressHandler);
-
-    return () => {
-      document.removeEventListener("keydown", saveOnPressHandler);
-    };
-  }, []);
-
-  useEffect(() => {
     setShowDeleteMessage(false);
 
     (async () => {
@@ -73,6 +65,12 @@ export default function ManualInputForm({
     } else {
       setShowDeleteButton(false);
     }
+
+    document.addEventListener("keydown", saveOnPressHandler);
+
+    return () => {
+      document.removeEventListener("keydown", saveOnPressHandler);
+    };
   }, [report]);
 
   const saveReportHandler = () => {
