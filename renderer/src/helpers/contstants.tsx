@@ -23,7 +23,8 @@ export const SETTING_SECTIONS = {
 export const LOCAL_STORAGE_VARIABLES = {
   SHOW_GOOGLE_EVENTS: 'showGoogleEvents',
   SHOW_OFFICE_365_EVENTS: 'showOffice365Events',
-  TIMETRACKER_USER: 'timetracker-user'
+  TIMETRACKER_USER: 'timetracker-user',
+  GOOGLE_USERS: 'googleUsers'
   // ...Add more local storage variables as needed
 }
 

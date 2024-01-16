@@ -242,3 +242,11 @@ export const getCurrentTimeRoundedUp = () => {
 
   return `${formattedTime}`;
 };
+
+
+export const formatDate = (date: Date, type: "short" | "long" = "long") =>
+  date.toLocaleDateString("en-US", {
+    month: type,
+    day: "numeric",
+    year: "numeric",
+  });
