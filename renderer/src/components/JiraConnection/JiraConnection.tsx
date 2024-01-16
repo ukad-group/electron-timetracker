@@ -5,10 +5,11 @@ import isOnline from "is-online";
 import { JiraUser } from "@/helpers/utils/jira";
 import { FlagIcon } from "@heroicons/react/24/outline";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 
 const JiraConnection = () => {
   const [users, setUsers] = useState(
-    JSON.parse(localStorage.getItem("jira-users")) || []
+    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || []
   );
 
   const handleSignInButton = async () => {
@@ -25,9 +26,9 @@ const JiraConnection = () => {
     const filteredUsers = users.filter((user: JiraUser) => user.userId !== id);
 
     if (filteredUsers.length > 0) {
-      localStorage.setItem("jira-users", JSON.stringify(filteredUsers));
+      localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(filteredUsers));
     } else {
-      localStorage.removeItem("jira-users");
+      localStorage.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS);
     }
 
     setUsers(filteredUsers);
@@ -68,7 +69,7 @@ const JiraConnection = () => {
 
     const newUsers = [...users, user];
 
-    localStorage.setItem("jira-users", JSON.stringify(newUsers));
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(newUsers));
     setUsers(newUsers);
   };
 

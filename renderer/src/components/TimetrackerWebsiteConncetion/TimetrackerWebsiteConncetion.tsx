@@ -193,7 +193,6 @@ const TimetrackerWebsiteConnection = () => {
         <span className="font-medium dark:text-dark-heading">
           Timetracker website
         </span>
-
         {!loggedUser && (
           <Button
             text="Add account"

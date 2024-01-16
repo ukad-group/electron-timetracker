@@ -279,7 +279,6 @@ const Totals = ({ selectedDate }) => {
           </select>
         </div>
       </h2>
-
       {totals.length > 0 && (
         <div className="flex flex-col gap-2 pt-2">
           {totals.map(({ id, name, duration, activities, descriptions }) => {
@@ -399,7 +398,6 @@ const Totals = ({ selectedDate }) => {
           })}
         </div>
       )}
-
       {!totals.length && (
         <div className="text-sm text-gray-700 font-semibold pt-2 dark:text-dark-main ml-5">
           No tracked time this {period}
