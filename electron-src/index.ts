@@ -8,7 +8,11 @@ import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
 import { createWindow } from "./helpers/create-window";
 import { parseReportsInfo, Activity } from "./helpers/parseReportsInfo";
-import { getPathFromDate } from "./helpers/datetime";
+import {
+  getPathFromDate,
+  getWeeksAroundDate,
+  getWeeksInMonth,
+} from "./helpers/datetime";
 import { createDirByPath, searchReadFiles } from "./helpers/fs";
 import chokidar from "chokidar";
 import { initialize, trackEvent } from "@aptabase/electron/main";
@@ -687,15 +691,7 @@ ipcMain.handle(
   (_, reportsFolder: string, calendarDate: Date) => {
     if (!reportsFolder || !calendarDate) return [];
 
-    const year = calendarDate.getFullYear().toString();
-    const prevMonth = calendarDate.getMonth().toString().padStart(2, "0");
-    const currentMonth = (calendarDate.getMonth() + 1)
-      .toString()
-      .padStart(2, "0");
-    const nextMonth = (calendarDate.getMonth() + 2).toString().padStart(2, "0");
-    const queries = [year + currentMonth, year + prevMonth, year + nextMonth];
-
-    return searchReadFiles(reportsFolder, queries, year);
+    return searchReadFiles(reportsFolder, getWeeksAroundDate(calendarDate));
   }
 );
 
@@ -704,13 +700,7 @@ ipcMain.handle(
   (_, reportsFolder: string, selectedDate: Date) => {
     if (!reportsFolder || !selectedDate) return [];
 
-    const year = selectedDate.getFullYear().toString();
-    const currentMonth = (selectedDate.getMonth() + 1)
-      .toString()
-      .padStart(2, "0");
-    const queries = [year + currentMonth];
-
-    return searchReadFiles(reportsFolder, queries, year);
+    return searchReadFiles(reportsFolder, getWeeksInMonth(selectedDate));
   }
 );
 
