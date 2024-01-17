@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { getDateFromFilename, getISOWeek } from "./datetime";
 
 export function createDirByPath(path: string) {
   const parts = path.split("/");
@@ -20,52 +21,46 @@ type Report = {
 
 export function searchReadFiles(
   directory: string,
-  queries: string[],
-  year: string
+  queries: { year: string; week: string }[]
 ) {
-  const initialReportsArr: Report[] = [];
+  const reports: Report[] = [];
   const yearFolders = fs.readdirSync(directory);
-  const currentYearFolder = yearFolders.find(
-    (folderName) => folderName === year
-  );
 
-  if (!currentYearFolder) return [];
+  queries.forEach(({ year, week }) => {
+    const yearFolderName = year;
+    const weekFolderName = `week ${week}`;
 
-  const currentYearPath = `${directory}/${currentYearFolder}`;
+    if (!yearFolders.includes(yearFolderName)) return;
 
-  const filledReportsArr = searchFilesWithSubfolders(
-    currentYearPath,
-    queries,
-    initialReportsArr
-  );
+    const weekFolders = fs.readdirSync(`${directory}/${yearFolderName}`);
 
-  return filledReportsArr;
-}
+    if (!weekFolders.includes(weekFolderName)) return;
 
-function searchFilesWithSubfolders(
-  currentYearFolder: string,
-  queries: string[],
-  initialReportsArr: Report[]
-) {
-  try {
-    const files = fs.readdirSync(currentYearFolder);
+    const currentWeekFolder = `${directory}/${yearFolderName}/${weekFolderName}`;
+    const files = fs.readdirSync(currentWeekFolder);
 
     files.forEach((file) => {
-      const filePath = path.join(currentYearFolder, file);
-      const stats = fs.statSync(filePath);
+      const filePath = path.join(currentWeekFolder, file);
+      const dateFromFilename = getDateFromFilename(file);
 
-      if (stats.isDirectory()) {
-        searchFilesWithSubfolders(filePath, queries, initialReportsArr);
-      } else if (queries.some((query) => file.includes(query))) {
-        initialReportsArr.push({
+      if (!dateFromFilename) return;
+
+      const weekFromFilename = getISOWeek(dateFromFilename)
+        .toString()
+        .padStart(2, "0");
+
+      if (isTimereportNameValid(file) && weekFromFilename === week) {
+        reports.push({
           data: fs.readFileSync(filePath, "utf8"),
           reportDate: filePath.split(" - ")[1],
         });
       }
     });
-  } catch (err) {
-    console.error("Error:", err);
-  }
+  });
 
-  return initialReportsArr;
+  return reports;
+}
+
+function isTimereportNameValid(filename: string) {
+  return /^timereport - \d{8}$/.test(filename);
 }
