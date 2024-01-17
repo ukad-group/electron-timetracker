@@ -157,9 +157,9 @@ export function getCeiledTime() {
 
 export const getTimeFromEventObj = (date: string) => {
   let dateString = date;
-  const dateArray = dateString.split("");
+  const dateArray = dateString ? dateString.split("") : [];
 
-  if (dateArray[dateArray.length - 1] === "Z") {
+  if (dateArray.length && dateArray[dateArray.length - 1] === "Z") {
     dateArray.pop();
     dateString = dateArray.join("");
   }

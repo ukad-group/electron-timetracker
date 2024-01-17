@@ -10,9 +10,9 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 import { validation } from "@/helpers/utils/reports";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import Placeholder from "./Placeholder";
-import TrackTimeButton from './TrackTimeButton';
-import { RELEASES_LINK } from './constants';
-import { LOCAL_STORAGE_VARIABLES, KEY_CODES } from '@/helpers/contstants';
+import TrackTimeButton from "./TrackTimeButton";
+import { RELEASES_LINK } from "./constants";
+import { LOCAL_STORAGE_VARIABLES, KEY_CODES } from "@/helpers/contstants";
 
 const ActivitiesSection = ({
   onEditActivity,
@@ -92,7 +92,7 @@ const ActivitiesSection = ({
         setBackgroundError(errorMessage);
         console.log("Error data ", data);
 
-        const errorMessageArray = errorMessage.split(" ");
+        const errorMessageArray = errorMessage ? errorMessage.split(" ") : [];
         if (errorMessageArray.includes("Updater")) {
           setErrorType("updater");
         }
@@ -186,6 +186,6 @@ const ActivitiesSection = ({
       </div>
     </div>
   );
-}
+};
 
 export default ActivitiesSection;
