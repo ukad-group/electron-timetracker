@@ -9,7 +9,9 @@ import {
 } from "@/helpers/utils/reports";
 import { ParsedReport, TTUserInfo } from "../Calendar/types";
 import { Loader } from "@/shared/Loader";
-import { BookingsProps, BookingFromApi, BookedSpentStat } from './types';
+import { BookingsProps, BookingFromApi, BookedSpentStat } from "./types";
+import { LOCAL_STORAGE_VARIABLES } from '@/helpers/contstants';
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
   const [bookedProjects, setBookedProjects] = useState<BookingFromApi[]>([]);
@@ -46,7 +48,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
       setLoading(true);
 
       const allLoggedProjects = await global.ipcRenderer.invoke(
-        "timetracker:get-bookings",
+        IPC_MAIN_CHANNELS.TIMETRACKER_GET_BOOKINGS,
         cookie,
         userName,
         calendarDate
@@ -56,7 +58,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         maxRecurse += 1; // we are already refreshing the token in calendar compenent, so i just want to re execute function maximum 3 times to prevent loop
 
         const updatedTTUserInfo: TTUserInfo = JSON.parse(
-          localStorage.getItem("timetracker-user")
+          localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)
         );
         const updatedCookie = updatedTTUserInfo?.TTCookie;
 
@@ -91,7 +93,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   const getMonthLocalActivities = async (): Promise<ReportActivity[]> => {
     try {
       const monthLocalReports = await global.ipcRenderer.invoke(
-        "app:find-month-projects",
+        IPC_MAIN_CHANNELS.APP_FIND_MONTH_PROJECTS,
         reportsFolder,
         calendarDate
       );
@@ -112,7 +114,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
   const getBookedStatistic = async () => {
     const TTUserInfo: TTUserInfo = JSON.parse(
-      localStorage.getItem("timetracker-user")
+      localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)
     );
 
     if (!TTUserInfo) return;
@@ -177,10 +179,14 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
       getBookedStatistic();
     };
 
-    global.ipcRenderer.on("any-file-changed", fileChangeListener);
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener
+    );
 
     return () => {
-      global.ipcRenderer.removeListener("any-file-changed", fileChangeListener);
+      global.ipcRenderer.removeListener(
+        IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener
+      );
     };
   }, [calendarDate]);
 

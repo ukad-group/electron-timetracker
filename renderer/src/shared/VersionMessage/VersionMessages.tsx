@@ -5,7 +5,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { UpdateInfo } from "electron-updater";
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export default function VersionMessage() {
   const [isUpdate, setIsUpdate] = useState(false);

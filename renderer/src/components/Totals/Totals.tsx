@@ -1,21 +1,14 @@
-import {
-  ChevronRightIcon,
-  DocumentIcon,
-  DocumentPlusIcon,
-} from "@heroicons/react/24/outline";
 import React, { useState, useEffect } from "react";
-import Tooltip from "@/shared/Tooltip/Tooltip";
-import clsx from "clsx";
-import { ReportActivity, formatDurationAsDecimals, parseReport } from "@/helpers/utils/reports";
 import {
   convertMillisecondsToTime,
-  getMonthDates,
-  getWeekDates,
 } from "@/helpers/utils/datetime-ui";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import { Description, Activity, Total, PeriodName } from './types';
-import { TOTAL_PERIODS } from './constants';
+import { Description, Total, PeriodName } from "./types";
+import { TOTAL_PERIODS } from "./constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { getTotals } from "./utils";
+import TotalsList from "./TotalsList";
 
 const Totals = ({ selectedDate }) => {
   const [reportsFolder] = useMainStore(
@@ -30,172 +23,28 @@ const Totals = ({ selectedDate }) => {
   };
 
   useEffect(() => {
-    getTotals();
-
-    const fileChangeListener = () => {
-      getTotals();
-    };
-
-    global.ipcRenderer.on("any-file-changed", fileChangeListener);
-
-    return () => {
-      global.ipcRenderer.removeListener("any-file-changed", fileChangeListener);
-    };
-  }, [selectedDate, period]);
-
-  const getTotals = async () => {
-    const dates = getDates();
-
-    const parsedActivities = await Promise.all(
-      dates.map((date) => getParsedActivities(date))
-    );
-
-    const combinedActivities = parsedActivities.reduce((acc, act) => {
-      if (act) {
-        return [...acc, ...act];
-      }
-
-      return acc;
-    }, []);
-
-    const initialProjectTotals = getProjectTotals(combinedActivities);
-    const sortedProjectTotals = sortTotals(initialProjectTotals);
-    const fullProjectTotals = sortedProjectTotals.map((total: Total) => {
-      const projectActivities = getActivityTotals(
-        total.name,
-        combinedActivities
-      );
-      const sortedProjectActivities = sortTotals(projectActivities);
-
-      return { ...total, activities: sortedProjectActivities };
+    getTotals({
+      period,
+      selectedDate,
+      reportsFolder,
+      setTotals
     });
 
-    setTotals(fullProjectTotals);
-  };
-
-  const getDates = () => {
-    switch (period) {
-      case "week":
-        return getWeekDates(selectedDate);
-
-      case "month":
-        return getMonthDates(selectedDate);
-
-      case "day":
-      default:
-        return [selectedDate];
-    }
-  };
-
-  const getParsedActivities = async (day: Date) => {
-    const dayReport = await global.ipcRenderer.invoke(
-      "app:read-day-report",
-      reportsFolder,
-      day
-    );
-
-    const parsedReportsAndNotes = parseReport(dayReport);
-
-    return parsedReportsAndNotes[0];
-  };
-
-  const getProjectTotals = (activities: ReportActivity[]) => activities.reduce((acc: Total[], curr: ReportActivity) => {
-    if (!curr?.project || curr?.project.startsWith("!")) return acc;
-
-    const existingTotal = acc.find((item) => item.name === curr.project);
-    const name = curr.activity
-      ? `${curr.activity} - ${curr.description}`
-      : curr.description;
-
-    if (!existingTotal) {
-      acc.push({
-        id: curr.project,
-        name: curr.project,
-        duration: curr.duration,
-        descriptions: [
-          {
-            id: name,
-            name: name,
-            duration: curr.duration,
-          },
-        ],
-        activities: [],
+    const fileChangeListener = () => {
+      getTotals({
+        period,
+        selectedDate,
+        reportsFolder,
+        setTotals
       });
-    } else {
-      existingTotal.duration += curr.duration ? curr.duration : 0;
+    };
 
-      const existingDescription = existingTotal.descriptions.find(
-        (desc) => desc.name === name
-      );
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
 
-      if (existingDescription) {
-        existingDescription.duration += curr.duration;
-      } else {
-        existingTotal.descriptions.push({
-          id: name,
-          name: name,
-          duration: curr.duration,
-        });
-      }
-    }
-
-    return acc;
-  }, []);
-
-  const getActivityTotals = (
-    projectName: string,
-    activities: ReportActivity[]
-  ) => {
-    const filteredActivities = activities.filter(
-      (activity: ReportActivity) => activity.project === projectName
-    );
-
-    return filteredActivities.reduce(
-      (acc: Activity[], curr: ReportActivity) => {
-        const existingTotal = acc.find((item) => item.name === curr.activity);
-
-        if (!existingTotal) {
-          acc.push({
-            id: curr.activity,
-            name: curr.activity,
-            duration: curr.duration,
-            descriptions: [
-              {
-                id: curr.description,
-                name: curr.description,
-                duration: curr.duration,
-              },
-            ],
-          });
-        } else {
-          existingTotal.duration += curr.duration;
-
-          const existingDescription = existingTotal.descriptions.find(
-            (desc) => desc.name === curr.description
-          );
-
-          if (existingDescription) {
-            existingDescription.duration += curr.duration;
-          } else {
-            existingTotal.descriptions.push({
-              id: curr.description,
-              name: curr.description,
-              duration: curr.duration,
-            });
-          }
-        }
-
-        return acc;
-      },
-      []
-    );
-  };
-
-  const sortTotals = (totals) => {
-    return totals.sort((totalA, totalB) =>
-      totalA.name.localeCompare(totalB.name)
-    );
-  };
+    return () => {
+      global.ipcRenderer.removeListener(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
+    };
+  }, [selectedDate, period]);
 
   const toggleActivitiesList = (projectName: string) => {
     if (isShowedActivitiesList(projectName)) {
@@ -260,6 +109,13 @@ const Totals = ({ selectedDate }) => {
     setPeriod(rangeName);
   };
 
+  const renderTotalPeriods = (totalPeriods) =>
+    totalPeriods.map((range) => (
+      <option key={range.id} value={range.name}>
+        {range.name}
+      </option>
+    ))
+
   return (
     <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
       <h2 className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading">
@@ -271,135 +127,21 @@ const Totals = ({ selectedDate }) => {
             value={period}
             onChange={(e) => onChangeRange(e.target.value as PeriodName)}
           >
-            {TOTAL_PERIODS.map((range) => (
-              <option key={range.id} value={range.name}>
-                {range.name}
-              </option>
-            ))}
+            {renderTotalPeriods(TOTAL_PERIODS)}
           </select>
         </div>
       </h2>
-
       {totals.length > 0 && (
         <div className="flex flex-col gap-2 pt-2">
-          {totals.map(({ id, name, duration, activities, descriptions }) => {
-            const showActivity =
-              activities.length > 1 ||
-              (activities.length === 1 && activities[0].name.length > 0);
-
-            return (
-              <div key={id} className="flex flex-col gap-1">
-                <div className="flex items-center gap-2 text-sm text-gray-700 font-semibold dark:text-dark-main">
-                  <div
-                    className={clsx(
-                      "flex items-center gap-1",
-                      {
-                        "ml-5": !showActivity,
-                      },
-                      {
-                        "hover:text-gray-400 dark:hover:text-white ml-0 cursor-pointer":
-                          showActivity,
-                      }
-                    )}
-                    onClick={() => {
-                      toggleActivitiesList(name);
-                    }}
-                  >
-                    {showActivity && (
-                      <ChevronRightIcon
-                        className={clsx("w-4 h-4", {
-                          "rotate-90": isShowedActivitiesList(name),
-                        })}
-                      />
-                    )}
-                    <span>
-                      {name} - {formatDurationAsDecimals(duration)}
-                    </span>
-                  </div>
-                  {period === "day" && (
-                    <>
-                      <Tooltip>
-                        <button
-                          className="group"
-                          title="Copy project descriptions without time"
-                          onClick={() =>
-                            copyDescriptionsHandler(descriptions, false)
-                          }
-                        >
-                          <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                        </button>
-                      </Tooltip>
-                      <Tooltip>
-                        <button
-                          className="group"
-                          title="Copy project descriptions with time"
-                          onClick={() =>
-                            copyDescriptionsHandler(descriptions, true)
-                          }
-                        >
-                          <DocumentPlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                        </button>
-                      </Tooltip>
-                    </>
-                  )}
-                </div>
-
-                {isShowedActivitiesList(name) && showActivity && (
-                  <div className="flex flex-col gap-1">
-                    {activities.map((activity) => (
-                      <div
-                        key={activity.id}
-                        className="flex items-center gap-2 text-sm text-gray-700 font-semibold dark:text-dark-main"
-                      >
-                        <div className="flex items-center gap-1 ml-6">
-                          <span>
-                            &#8226;{" "}
-                            {activity.name ? activity.name : "(no activity)"} -{" "}
-                            {formatDurationAsDecimals(activity.duration)}
-                          </span>
-                        </div>
-                        {period === "day" && (
-                          <>
-                            <Tooltip>
-                              <button
-                                className="group"
-                                title="Copy activity descriptions without time"
-                                onClick={() => {
-                                  copyDescriptionsHandler(
-                                    activity.descriptions,
-                                    false
-                                  );
-                                }}
-                              >
-                                <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                              </button>
-                            </Tooltip>
-                            <Tooltip>
-                              <button
-                                className="group"
-                                title="Copy activity descriptions with time"
-                                onClick={() => {
-                                  copyDescriptionsHandler(
-                                    activity.descriptions,
-                                    true
-                                  );
-                                }}
-                              >
-                                <DocumentPlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
-                              </button>
-                            </Tooltip>
-                          </>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          <TotalsList
+            totals={totals}
+            toggleActivitiesList={toggleActivitiesList}
+            isShowedActivitiesList={isShowedActivitiesList}
+            period={period}
+            onCopyDescriptions={copyDescriptionsHandler}
+          />
         </div>
       )}
-
       {!totals.length && (
         <div className="text-sm text-gray-700 font-semibold pt-2 dark:text-dark-main ml-5">
           No tracked time this {period}

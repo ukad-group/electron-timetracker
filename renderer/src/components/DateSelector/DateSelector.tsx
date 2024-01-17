@@ -6,7 +6,7 @@ import { Square2StackIcon } from "@heroicons/react/24/outline";
 import Popup from "@/shared/Popup/Popup";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import { DAY as day } from "@/helpers/utils/datetime-ui";
+import { DAY as day, formatDate } from "@/helpers/utils/datetime-ui";
 import { DateSelectorProps } from "./types";
 
 export default function DateSelector({
@@ -158,12 +158,4 @@ export default function DateSelector({
       )}
     </div>
   );
-}
-
-function formatDate(date: Date, type: "short" | "long" = "long") {
-  return date.toLocaleDateString("en-US", {
-    month: type,
-    day: "numeric",
-    year: "numeric",
-  });
 }

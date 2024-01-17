@@ -5,7 +5,7 @@ import { DisclosureSection } from "@/shared/DisclosureSection";
 import { GlobeAltIcon } from "@heroicons/react/24/solid";
 import SlackIcon from "@/shared/SlackIcon/SlackIcon";
 import { Release } from "./types";
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export default function UpdateDescription() {
   const [release, setRelease] = useState<Release | null>();

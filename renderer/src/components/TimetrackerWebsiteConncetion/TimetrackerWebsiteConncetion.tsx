@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { Loader } from "@/shared/Loader";
 import isOnline from "is-online";
 import { TTUserInfo } from "../Calendar/types";
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const TimetrackerWebsiteConnection = () => {
   const router = useRouter();
@@ -193,7 +193,6 @@ const TimetrackerWebsiteConnection = () => {
         <span className="font-medium dark:text-dark-heading">
           Timetracker website
         </span>
-
         {!loggedUser && (
           <Button
             text="Add account"

@@ -8,7 +8,7 @@ import { checkIsToday } from "@/helpers/utils/datetime-ui";
 import { ActivitiesSectionProps } from "./types";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { validation } from "@/helpers/utils/reports";
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import Placeholder from "./Placeholder";
 import TrackTimeButton from './TrackTimeButton';
 import { RELEASES_LINK } from './constants';
