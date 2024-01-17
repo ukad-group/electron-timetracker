@@ -156,7 +156,7 @@ export function getCeiledTime() {
 
 export const getTimeFromEventObj = (date: string) => {
   let dateString = date;
-  const dateArray = dateString.split("");
+  const dateArray = dateString?.split("");
 
   if (dateArray[dateArray.length - 1] === "Z") {
     dateArray.pop();
