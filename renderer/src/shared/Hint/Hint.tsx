@@ -54,10 +54,12 @@ export default function Hint({
   const HorizontalLineID = refetenceID + "Horizontal";
   const VerticalLineID = refetenceID + "Vertical";
   const floatingID = refetenceID + "Float";
+  const TriangleID = refetenceID + "Triangle";
 
   const SVG = document.getElementById(svgID);
   const HorizontalLine = document.getElementById(HorizontalLineID);
   const VerticalLine = document.getElementById(VerticalLineID);
+  const Triangle = document.getElementById(TriangleID);
   const reference = document.getElementById(refetenceID);
   const floating = document.getElementById(floatingID);
   const [hintPositioning, setHintPositioning] = useState(false);
@@ -183,11 +185,18 @@ export default function Hint({
             VerticalLine.setAttribute("y1", `${hintHeight / 2 - shiftY}`);
             VerticalLine.setAttribute("y2", `${hintHeight}`);
 
+            Triangle.setAttribute(
+              "points",
+              `${0}, ${hintHeight - 10} 
+              ${5}, ${hintHeight} 
+              ${10},  ${hintHeight - 10} `
+            );
+
             if (position.diagonalPosition === "right") {
-              HorizontalLine.setAttribute("x1", "1");
+              HorizontalLine.setAttribute("x1", "5");
               HorizontalLine.setAttribute("x2", `${shiftX - hintWidth / 2}`);
-              VerticalLine.setAttribute("x1", "1");
-              VerticalLine.setAttribute("x2", "1");
+              VerticalLine.setAttribute("x1", "5");
+              VerticalLine.setAttribute("x2", "5");
 
               Object.assign(floating.style, {
                 left: `${x + shiftX}px`,
@@ -229,6 +238,13 @@ export default function Hint({
             VerticalLine.setAttribute("x1", `${hintWidth / 2 + shiftX}`);
             VerticalLine.setAttribute("x2", `${hintWidth / 2 + shiftX}`);
 
+            Triangle.setAttribute(
+              "points",
+              `${10}, ${hintHeight / 2 - 5} 
+              ${0}, ${hintHeight / 2} 
+              ${10},  ${hintHeight / 2 + 5} `
+            );
+
             if (position.diagonalPosition === "top") {
               VerticalLine.setAttribute("y1", `${y - shiftY - hintHeight / 2}`);
               VerticalLine.setAttribute("y2", `${hintHeight / 2}`);
@@ -257,11 +273,17 @@ export default function Hint({
             HorizontalLine.setAttribute("y1", `${shiftY + hintHeight / 2}`);
             HorizontalLine.setAttribute("y2", `${shiftY + hintHeight / 2}`);
 
+            Triangle.setAttribute(
+              "points",
+              `${0}, ${10} 
+              ${5}, ${0} 
+              ${10},  ${10} `
+            );
             if (position.diagonalPosition === "right") {
-              HorizontalLine.setAttribute("x1", "1");
+              HorizontalLine.setAttribute("x1", "5");
               HorizontalLine.setAttribute("x2", `${shiftX}`);
-              VerticalLine.setAttribute("x1", "1");
-              VerticalLine.setAttribute("x2", "1");
+              VerticalLine.setAttribute("x1", "5");
+              VerticalLine.setAttribute("x2", "5");
 
               Object.assign(floating.style, {
                 left: `${x + shiftX}px`,
@@ -298,6 +320,13 @@ export default function Hint({
             HorizontalLine.setAttribute("y2", `${hintHeight / 2}`);
             VerticalLine.setAttribute("x1", `${hintWidth / 2}`);
             VerticalLine.setAttribute("x2", `${hintWidth / 2}`);
+
+            Triangle.setAttribute(
+              "points",
+              `${hintWidth + shiftX - 10}, ${hintHeight / 2 - 5} 
+              ${hintWidth + shiftX}, ${hintHeight / 2} 
+              ${hintWidth + shiftX - 10},  ${hintHeight / 2 + 5} `
+            );
 
             if (position.diagonalPosition === "top") {
               VerticalLine.setAttribute("y1", `${y - shiftY - hintHeight / 2}`);
@@ -348,6 +377,8 @@ export default function Hint({
               <line id={HorizontalLineID} stroke="white" strokeWidth="1" />
 
               <line id={VerticalLineID} stroke="white" strokeWidth="1" />
+
+              <polygon className="z-50" id={TriangleID} fill="white" />
             </svg>,
             document.body
           )}
