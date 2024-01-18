@@ -38,6 +38,8 @@ import {
   FormattedReport,
   TTUserInfo
 } from "./types";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export function Calendar({
   reportsFolder,
@@ -61,7 +63,7 @@ export function Calendar({
     errorMessage: "",
   });
   const timetrackerUserInfo: TTUserInfo = JSON.parse(
-    localStorage.getItem("timetracker-user")
+    localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)
   );
 
   const monthWorkedHours = useMemo(() => {
@@ -79,7 +81,7 @@ export function Calendar({
       (async () => {
         setParsedQuarterReports(
           await global.ipcRenderer.invoke(
-            "app:find-quarter-projects",
+            IPC_MAIN_CHANNELS.APP_FIND_QUARTER_PROJECTS,
             reportsFolder,
             calendarDate
           )
@@ -90,7 +92,7 @@ export function Calendar({
         (async () => {
           setParsedQuarterReports(
             await global.ipcRenderer.invoke(
-              "app:find-quarter-projects",
+              IPC_MAIN_CHANNELS.APP_FIND_QUARTER_PROJECTS,
               reportsFolder,
               calendarDate
             )
@@ -98,11 +100,11 @@ export function Calendar({
         })();
       };
 
-      global.ipcRenderer.on("any-file-changed", fileChangeListener);
+      global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
 
       return () => {
         global.ipcRenderer.removeListener(
-          "any-file-changed",
+          IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
           fileChangeListener
         );
       };
@@ -201,7 +203,7 @@ export function Calendar({
     return "";
   };
 
-  const weekNumberContent = (options) => {
+  const renderWeekNumberContent = (options) => {
     const weekTotalHours = formatDuration(
       formattedQuarterReports.reduce((acc, report) => {
         if (report.week === options.num) {
@@ -219,7 +221,7 @@ export function Calendar({
     );
   };
 
-  const handleDayCellContent = (info) => {
+  const getDayCellContent = (info) => {
     if (!daysOff || daysOff?.length === 0) {
       return info.dayNumberText;
     }
@@ -313,9 +315,9 @@ export function Calendar({
         dateClick={dateClickHandle}
         dayCellClassNames={addCellClassNameHandle}
         weekNumbers={true}
-        weekNumberContent={weekNumberContent}
+        weekNumberContent={renderWeekNumberContent}
         height="auto"
-        dayCellContent={handleDayCellContent}
+        dayCellContent={getDayCellContent}
       />
     </div>
   );

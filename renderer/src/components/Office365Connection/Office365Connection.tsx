@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { Button } from "@/shared/Button";
 import isOnline from "is-online";
 import { Office365User } from "@/helpers/utils/office365";
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import Users from "./Users";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 
 const Office365Connection = () => {
   const [users, setUsers] = useState(
-    JSON.parse(localStorage.getItem("office365-users")) || []
+    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || []
   );
   const [showEventsInTable, setShowEventsInTable] = useState(false);
 
@@ -27,7 +28,7 @@ const Office365Connection = () => {
     );
 
     if (filteredUsers.length > 0) {
-      localStorage.setItem("office365-users", JSON.stringify(filteredUsers));
+      localStorage.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS, JSON.stringify(filteredUsers));
     } else {
       localStorage.removeItem("office365-users");
       localStorage.removeItem("showOffice365Events");
@@ -78,13 +79,13 @@ const Office365Connection = () => {
     );
     const newUsers = [...users, user];
 
-    localStorage.setItem("office365-users", JSON.stringify(newUsers));
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS, JSON.stringify(newUsers));
     setUsers(newUsers);
   };
 
   const handleCheckboxChange = () => {
     localStorage.setItem(
-      "showOffice365Events",
+      LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS,
       (!showEventsInTable).toString()
     );
     setShowEventsInTable(!showEventsInTable);
@@ -99,7 +100,7 @@ const Office365Connection = () => {
       (async () => addUser())();
     }
 
-    if (localStorage.getItem("showOffice365Events") === "true") {
+    if (localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS) === "true") {
       setShowEventsInTable(true);
     }
   }, []);
@@ -135,25 +136,7 @@ const Office365Connection = () => {
             No one user authorized
           </div>
         )}
-
-        {users.length > 0 && (
-          <div className="flex flex-col gap-2 w-full">
-            {users.map((user) => (
-              <div key={user.userId} className="flex gap-4 items-center">
-                <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-blue-900 dark:text-blue-400 dark:bg-blue-400/20">
-                  {user.username}
-                </div>
-                <div
-                  onClick={() => handleSignOutButton(user.userId)}
-                  className="cursor-pointer bg-gray-400 hover:bg-gray-500 transition duration-300 inline-flex gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium text-white dark:text-dark-heading dark:bg-dark-button-back-gray dark:hover:bg-dark-button-gray-hover"
-                >
-                  <ArrowRightOnRectangleIcon className="w-4 h-4 fill-white dark:fill-dark-heading" />
-                  Sign Out
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        {users.length > 0 && <Users users={users} onSignOutButton={handleSignOutButton}/>}
       </div>
       <p className="text-sm text-gray-500  dark:text-dark-main">
         After connection, you will be able to fill in the Report with the

@@ -11,5 +11,6 @@ module.exports = {
   testEnvironment: "jsdom",
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/renderer/src/$1',
+    '^@electron/(.*)$': '<rootDir>/electron-src/$1',
   },
 };

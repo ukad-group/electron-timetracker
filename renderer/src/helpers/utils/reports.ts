@@ -1,4 +1,4 @@
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export type ReportActivity = {
   id: number;
@@ -341,7 +341,6 @@ export function validation(activities: Array<ReportActivity>) {
         !activities[i].activity &&
         !activities[i].description
       ) {
-        activities[i].isValid = false;
         activities[i].mistakes += "No activity or description";
       }
     }

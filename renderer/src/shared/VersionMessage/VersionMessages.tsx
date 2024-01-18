@@ -5,7 +5,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { UpdateInfo } from "electron-updater";
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export default function VersionMessage() {
   const [isUpdate, setIsUpdate] = useState(false);
@@ -19,14 +19,14 @@ export default function VersionMessage() {
   useEffect(() => {
     global.ipcRenderer.on(
       "update-available",
-      (event, data: boolean, info: UpdateInfo) => {
+      (_, data: boolean, info: UpdateInfo) => {
         setIsUpdate(data);
         setVersion(info.version);
       }
     );
     global.ipcRenderer.on(
       "downloaded",
-      (event, data: boolean, info: UpdateInfo) => {
+      (_, data: boolean, info: UpdateInfo) => {
         setIsDownload(data);
         setVersion(info.version);
       }

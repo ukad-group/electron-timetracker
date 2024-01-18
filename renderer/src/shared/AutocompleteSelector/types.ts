@@ -1,7 +1,7 @@
 import { Dispatch, FormEvent, SetStateAction } from "react";
 
 export type AutocompleteProps = {
-  isNewCheck: boolean;
+  isNewCheck?: boolean;
   onSave: (e: FormEvent | MouseEvent) => void;
   title: string;
   selectedItem: string;
@@ -13,5 +13,5 @@ export type AutocompleteProps = {
   isValidationEnabled?: boolean;
   className?: string;
   showedSuggestionsNumber: number;
-  spellCheck: boolean;
+  spellCheck?: boolean;
 };

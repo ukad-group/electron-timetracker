@@ -22,8 +22,7 @@ import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 import { Totals } from "@/components/Totals";
 import { Bookings } from "@/components/Bookings";
-import { IPC_MAIN_CHANNELS } from "../../../electron-src/helpers/constants";
-import { Hint } from "@/shared/Hint";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
