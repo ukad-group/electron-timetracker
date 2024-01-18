@@ -2,7 +2,10 @@ import { Fragment, useContext } from "react";
 import clsx from "clsx";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { checkIsToday, getCeiledTime } from "@/helpers/utils/datetime-ui";
-import { PencilSquareIcon, Square2StackIcon } from "@heroicons/react/24/outline";
+import {
+  PencilSquareIcon,
+  Square2StackIcon,
+} from "@heroicons/react/24/outline";
 import { formatDuration } from "@/helpers/utils/reports";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { ActivitiesTableContext } from "../context";
@@ -17,10 +20,11 @@ const CompactViewTable = () => {
     selectedDate,
     firstKey,
     secondKey,
-    editActivityHandler
-  } = useContext(ActivitiesTableContext)
+    editActivityHandler,
+  } = useContext(ActivitiesTableContext);
 
-  return tableActivities.length > 0 &&
+  return (
+    tableActivities.length > 0 &&
     tableActivities?.map((activity, i) => (
       <Fragment key={i}>
         <tr>
@@ -50,8 +54,7 @@ const CompactViewTable = () => {
             <div className="flex flex-wrap gap-x-2 items-center">
               <div className="flex gap-1">
                 {activity.isNewProject && (
-                  <p
-                    className="flex items-center shrink-0 w-fit h-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
+                  <p className="flex items-center shrink-0 w-fit h-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
                     new
                   </p>
                 )}
@@ -93,8 +96,7 @@ const CompactViewTable = () => {
                   });
                 }}
               >
-                <Square2StackIcon
-                  className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
               </button>
             </div>
           </td>
@@ -111,7 +113,7 @@ const CompactViewTable = () => {
               "scale-105 ":
                 (Number(firstKey) === i + 1 && !secondKey) ||
                 (Number(firstKey + secondKey) === i + 1 && secondKey),
-            },
+            }
           )}
         >
           <td
@@ -129,7 +131,7 @@ const CompactViewTable = () => {
                     activity.calendarId ? "opacity-50" : ""
                   }`}
                 >
-                  {`${formatDuration(activity.duration)}`}
+                  {formatDuration(activity.duration)}
                 </p>
               </Tooltip>
               <Tooltip>
@@ -160,19 +162,18 @@ const CompactViewTable = () => {
               }}
             >
               {!activity.calendarId && (
-                <PencilSquareIcon
-                  className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
               )}
 
               {activity.calendarId && (
-                <PlusIcon
-                  className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                <PlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
               )}
             </button>
           </td>
         </tr>
       </Fragment>
-    ));
+    ))
+  );
 };
 
 export default CompactViewTable;

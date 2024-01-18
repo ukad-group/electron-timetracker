@@ -10,7 +10,7 @@ import {
 import { ParsedReport, TTUserInfo } from "../Calendar/types";
 import { Loader } from "@/shared/Loader";
 import { BookingsProps, BookingFromApi, BookedSpentStat } from "./types";
-import { LOCAL_STORAGE_VARIABLES } from '@/helpers/contstants';
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
@@ -70,19 +70,17 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
       maxRecurse = 0;
 
-      return allLoggedProjects.filter(
-        (project: BookingFromApi) => {
-          const projectBooking = project?.plans[0];
+      return allLoggedProjects.filter((project: BookingFromApi) => {
+        const projectBooking = project?.plans[0];
 
-          if (
-            projectBooking?.hours !== 0 &&
-            projectBooking?.month === calendarDate?.getMonth() + 1 &&
-            projectBooking?.year === calendarDate?.getFullYear()
-          ) {
-            return project;
-          }
+        if (
+          projectBooking?.hours !== 0 &&
+          projectBooking?.month === calendarDate?.getMonth() + 1 &&
+          projectBooking?.year === calendarDate?.getFullYear()
+        ) {
+          return project;
         }
-      );
+      });
     } catch (error) {
       console.log(error);
     } finally {
@@ -100,7 +98,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
       const monthParsedActivities = monthLocalReports.map(
         (report: ParsedReport) => {
-          return  (parseReport(report?.data)[0] || []).filter(
+          return (parseReport(report?.data)[0] || []).filter(
             (activity: ReportActivity) => !activity.isBreak
           );
         }
@@ -141,7 +139,11 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
       .map((booking) => {
         const spentProjectTime = monthLocalActivities.reduce(
           (acc, activity) => {
-            if (activity?.project === booking?.name) {
+            if (
+              activity?.project === booking?.name &&
+              activity?.duration &&
+              activity?.duration > 0
+            ) {
               return acc + activity?.duration;
             } else {
               return acc;
@@ -180,12 +182,14 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
     };
 
     global.ipcRenderer.on(
-      IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener
+      IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
+      fileChangeListener
     );
 
     return () => {
       global.ipcRenderer.removeListener(
-        IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener
+        IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
+        fileChangeListener
       );
     };
   }, [calendarDate]);

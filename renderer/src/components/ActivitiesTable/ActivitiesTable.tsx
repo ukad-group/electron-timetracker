@@ -1,11 +1,6 @@
 import { useMemo, useEffect, useState } from "react";
-import {
-  ReportActivity
-} from "@/helpers/utils/reports";
-import {
-  checkIsToday,
-  getCeiledTime,
-} from "@/helpers/utils/datetime-ui";
+import { ReportActivity } from "@/helpers/utils/reports";
+import { checkIsToday, getCeiledTime } from "@/helpers/utils/datetime-ui";
 import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "@/store/googleEventsStore";
 import { concatSortArrays } from "@/helpers/utils/utils";
@@ -36,8 +31,10 @@ export default function ActivitiesTable({
     shallow
   );
 
-  const totalDuration = useMemo(() =>
-    getTotalDuration(nonBreakActivities), [nonBreakActivities]);
+  const totalDuration = useMemo(
+    () => getTotalDuration(nonBreakActivities),
+    [nonBreakActivities]
+  );
 
   const tableActivities = useMemo(() => {
     const badgedActivities = nonBreakActivities.map((activity) => {
@@ -48,8 +45,10 @@ export default function ActivitiesTable({
       return activity;
     });
     const actualEvents = getActualEvents(events, activities);
-    const formattedEvents: ReportActivity[] =
-      formatEvents(actualEvents, latestProjAndAct);
+    const formattedEvents: ReportActivity[] = formatEvents(
+      actualEvents,
+      latestProjAndAct
+    );
 
     for (let i = 0; i < formattedEvents.length; i++) {
       if (
@@ -131,7 +130,9 @@ export default function ActivitiesTable({
     }
 
     if (
-      (event.ctrlKey || event.key === KEY_CODES.CONTROL || event.key === KEY_CODES.META) &&
+      (event.ctrlKey ||
+        event.key === KEY_CODES.CONTROL ||
+        event.key === KEY_CODES.META) &&
       /^[0-9]$/.test(event.key)
     ) {
       const number = parseInt(event.key, 10);
@@ -218,33 +219,36 @@ export default function ActivitiesTable({
     };
   }, [firstKey, tableActivities]);
 
-  const value = useMemo(() => ({
-    totalDuration,
-    tableActivities,
-    selectedDate,
-    isLoading,
-    ctrlPressed,
-    copyToClipboardHandle,
-    onEditActivity,
-    activities,
-    firstKey,
-    secondKey,
-    editActivityHandler,
-    copyActivityHandler
-  }), [
-    totalDuration,
-    tableActivities,
-    selectedDate,
-    isLoading,
-    ctrlPressed,
-    copyToClipboardHandle,
-    onEditActivity,
-    activities,
-    firstKey,
-    secondKey,
-    editActivityHandler,
-    copyActivityHandler
-  ]);
+  const value = useMemo(
+    () => ({
+      totalDuration,
+      tableActivities,
+      selectedDate,
+      isLoading,
+      ctrlPressed,
+      copyToClipboardHandle,
+      onEditActivity,
+      activities,
+      firstKey,
+      secondKey,
+      editActivityHandler,
+      copyActivityHandler,
+    }),
+    [
+      totalDuration,
+      tableActivities,
+      selectedDate,
+      isLoading,
+      ctrlPressed,
+      copyToClipboardHandle,
+      onEditActivity,
+      activities,
+      firstKey,
+      secondKey,
+      editActivityHandler,
+      copyActivityHandler,
+    ]
+  );
 
   return (
     <ActivitiesTableContext.Provider value={value}>
