@@ -48,7 +48,7 @@ export type MainStore = {
   setReportsFolder: (folder: string) => void;
 };
 
-export type Theme = { custom: "light"|"dark"; os: boolean };
+export type Theme = { custom: "light" | "dark"; os: boolean };
 
 export type ThemeStore = {
   theme: Theme;
@@ -60,4 +60,12 @@ export type Update = { age: "old" | "new"; description: string | null };
 export type UpdateStore = {
   update: Update | null;
   setUpdate: (update: Update) => void;
+};
+
+export type TutorialProgress = {
+  [key: string]: boolean[];
+};
+export type TutorialProgressStore = {
+  progress: TutorialProgress;
+  setProgress: (event: TutorialProgress) => void;
 };

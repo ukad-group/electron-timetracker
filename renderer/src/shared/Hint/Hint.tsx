@@ -4,6 +4,8 @@ import { createPortal } from "react-dom";
 import { computePosition } from "@floating-ui/dom";
 import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { XMarkIcon } from "@heroicons/react/24/solid";
+import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
+import { shallow } from "zustand/shallow";
 
 export type Position =
   | {
@@ -24,6 +26,7 @@ export type Position =
     };
 
 export type Hint = {
+  displayCondition?: boolean;
   learningMethod: "buttonClick" | "nextClick" | "ctrlArrowNumberPress";
   order: number;
   groupName: string;
@@ -36,6 +39,7 @@ export type Hint = {
 };
 
 export default function Hint({
+  displayCondition,
   learningMethod,
   order,
   groupName,
@@ -58,19 +62,51 @@ export default function Hint({
   const floating = document.getElementById(floatingID);
   const [hintPositioning, setHintPositioning] = useState(false);
   const [showHint, setShowHint] = useState(true);
-  const group = document.querySelectorAll(`.${groupName}`);
+  const [groupSize, setGroupSize] = useState(0);
+
+  const [progress, setProgress] = useTutorialProgressStore(
+    (state) => [state.progress, state.setProgress],
+    shallow
+  );
 
   useEffect(() => {
     const positioningTimer = setTimeout(() => {
       setHintPositioning(true);
     }, 0);
 
+    if (order > 1 && progress[groupName] === undefined) {
+      const tempArr = [];
+      tempArr[order - 1] = true;
+      progress[groupName] = tempArr;
+      setProgress(progress);
+      hintLearned();
+    }
+
+    const unsubscribe = useTutorialProgressStore.subscribe((newProgress) => {
+      setGroupSize(newProgress[groupName]?.length);
+      if (
+        newProgress.progress.hasOwnProperty(groupName) &&
+        !newProgress.progress[groupName][order - 1]
+      ) {
+        setShowHint(true);
+      }
+    });
+
     return () => {
       clearTimeout(positioningTimer);
+      unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    setGroupSize(progress[groupName]?.length);
+    if (progress.hasOwnProperty(groupName) && progress[groupName][order - 1]) {
+      setShowHint(false);
+    }
+  }, [progress[groupName]]);
+
   const closeBtnHandler = () => {
-    setShowHint(false);
+    hintLearned();
   };
 
   const handleKeyDown = (e) => {
@@ -80,7 +116,26 @@ export default function Hint({
       ((e.ctrlKey || e.key === "Control" || e.key === "Meta") &&
         /^[0-9]$/.test(e.key))
     ) {
+      hintLearned();
     }
+  };
+
+  const hintLearned = () => {
+    setShowHint(false);
+    if (progress[groupName] === undefined) {
+      progress[groupName] = [true];
+    } else {
+      progress[groupName][order - 1] = true;
+    }
+    setProgress(progress);
+  };
+
+  const nextClickHandler = () => {
+    if (progress[groupName][order] !== undefined) {
+      progress[groupName][order] = false;
+    }
+    setProgress(progress);
+    hintLearned();
   };
 
   if (reference && SVG && hintPositioning) {
@@ -90,9 +145,10 @@ export default function Hint({
     switch (learningMethod) {
       case "buttonClick":
         reference.addEventListener("click", () => {
-          setShowHint(false);
+          hintLearned();
         });
         break;
+
       case "ctrlArrowNumberPress":
         window.addEventListener("keydown", handleKeyDown);
         break;
@@ -310,20 +366,22 @@ export default function Hint({
                 <ButtonTransparent callback={() => {}}>
                   Skip all
                 </ButtonTransparent>
-                {order < group.length && (
+                {order - 1 < groupSize && (
                   <button
                     type="button"
                     className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500   dark:bg-dark-button-back  dark:hover:bg-dark-button-hover"
+                    onClick={nextClickHandler}
                   >
                     Next
                   </button>
                 )}
-                {order === group.length && (
+                {!groupSize && (
                   <button
                     type="button"
                     className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500   dark:bg-dark-button-back  dark:hover:bg-dark-button-hover"
+                    onClick={closeBtnHandler}
                   >
-                    Cancel
+                    Close
                   </button>
                 )}
               </div>
