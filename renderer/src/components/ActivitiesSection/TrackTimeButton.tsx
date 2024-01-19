@@ -16,8 +16,11 @@ const TrackTimeButton = ({
         click or press ctrl + space
       </span>
     </button>
-    {/* {!isLoading && (
+    {!isLoading && (
       <Hint
+        learningMethod="buttonClick"
+        order={1}
+        groupName="trackTimeButton"
         refetenceID="newActivityBtn"
         shiftY={30}
         shiftX={200}
@@ -27,7 +30,7 @@ const TrackTimeButton = ({
         To log more time, click the 'Track More Time' button or press ctrl +
         space to access the form for entering new registration today.
       </Hint>
-    )} */}
+    )}
   </>
 );
 

@@ -63,7 +63,7 @@ export default function Hint({
   const reference = document.getElementById(refetenceID);
   const floating = document.getElementById(floatingID);
   const [hintPositioning, setHintPositioning] = useState(false);
-  const [showHint, setShowHint] = useState(true);
+  const [showHint, setShowHint] = useState(false);
   const [groupSize, setGroupSize] = useState(0);
 
   const [progress, setProgress] = useTutorialProgressStore(
@@ -86,11 +86,30 @@ export default function Hint({
 
     const unsubscribe = useTutorialProgressStore.subscribe((newProgress) => {
       setGroupSize(newProgress[groupName]?.length);
+
       if (
         newProgress.progress.hasOwnProperty(groupName) &&
         !newProgress.progress[groupName][order - 1]
       ) {
         setShowHint(true);
+      } else {
+        setShowHint(false);
+      }
+
+      if (
+        !newProgress.progress.hasOwnProperty(groupName) &&
+        displayCondition &&
+        newProgress.progress.hasOwnProperty(`${groupName}Conditions`) &&
+        !newProgress.progress[`${groupName}Conditions`].includes(false)
+      ) {
+        setHintPositioning(true);
+        setShowHint(true);
+      } else if (
+        displayCondition &&
+        newProgress.progress.hasOwnProperty(groupName) &&
+        !newProgress.progress[groupName][order - 1]
+      ) {
+        setShowHint(false);
       }
     });
 
@@ -104,8 +123,10 @@ export default function Hint({
     setGroupSize(progress[groupName]?.length);
     if (progress.hasOwnProperty(groupName) && progress[groupName][order - 1]) {
       setShowHint(false);
+    } else if (!displayCondition) {
+      setShowHint(true);
     }
-  }, [progress[groupName]]);
+  }, [progress[groupName], progress[`${groupName}Conditions`]]);
 
   const closeBtnHandler = () => {
     hintLearned();
@@ -358,7 +379,7 @@ export default function Hint({
         <>
           {createPortal(
             <div
-              onClick={() => console.log("sdfghjk")}
+              // onClick={() => console.log("sdfghjk")}
               className="h-screen w-full fixed justify-center top-0 z-20 items-center bg-gray-900/40 pointer-events-auto"
             />,
             document.body

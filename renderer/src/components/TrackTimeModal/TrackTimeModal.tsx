@@ -14,6 +14,7 @@ import {
 import { AutocompleteSelector } from "@/shared/AutocompleteSelector";
 import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "@/store/googleEventsStore";
+import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { getJiraCardsFromAPI } from "@/helpers/utils/jira";
 import { getAllTrelloCardsFromApi } from "@/helpers/utils/trello";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
@@ -25,6 +26,7 @@ import {
   changeHours,
   getTimetrackerYearProjects,
 } from "./utils";
+import { Hint } from "@/shared/Hint";
 
 export default function TrackTimeModal({
   activities,
@@ -50,6 +52,10 @@ export default function TrackTimeModal({
   const [otherJiraTasks, setOtherJiraTasks] = useState([]);
   const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
     (state) => [state.event, state.setEvent],
+    shallow
+  );
+  const [progress, setProgress] = useTutorialProgressStore(
+    (state) => [state.progress, state.setProgress],
     shallow
   );
   const [latestProjects, setLatestProjects] = useState([]);
@@ -177,6 +183,13 @@ export default function TrackTimeModal({
       return;
     }
 
+    if (
+      progress["shortcutsEditingConditions"] &&
+      progress["shortcutsEditingConditions"][0]
+    ) {
+      progress["shortcutsEditingConditions"][1] = true;
+      setProgress(progress);
+    }
     let dashedDescription = description;
 
     if (description.includes(" - ")) {
@@ -332,7 +345,26 @@ export default function TrackTimeModal({
             )}
             onDragStart={disableTextDrag}
           />
-          {/* >>>>>>> alpha */}
+          <Hint
+            learningMethod="nextClick"
+            order={1}
+            groupName="trackTimeModal"
+            refetenceID="from"
+            shiftY={25}
+            shiftX={300}
+            width={"large"}
+            position={{
+              basePosition: "top",
+              diagonalPosition: "right",
+            }}
+          >
+            Upon form opening, the "from" time defaults to the prior entry's end
+            time (if exists) or the current time, rounded to the nearest 15
+            minutes.. The "to" time is set to the current time, rounded to the
+            nearest 15 minutes. You can manually modify the time by 15-minute
+            increments using the arrow keys. Alternatively, entering the desired
+            duration will automatically adjust the "to" field accordingly.
+          </Hint>
         </div>
         <div className="col-span-6 sm:col-span-2">
           <TextField
@@ -393,7 +425,7 @@ export default function TrackTimeModal({
             tabIndex={4}
           />
         </div>
-        <div className="col-span-6">
+        <div id="textFields" className="col-span-6">
           <AutocompleteSelector
             isNewCheck
             onSave={onSave}
@@ -407,6 +439,26 @@ export default function TrackTimeModal({
             tabIndex={5}
           />
         </div>
+        <Hint
+          learningMethod="nextClick"
+          order={2}
+          groupName="trackTimeModal"
+          refetenceID="textFields"
+          shiftY={175}
+          shiftX={30}
+          width={"medium"}
+          position={{
+            basePosition: "left",
+            diagonalPosition: "top",
+          }}
+        >
+          In the text fields, you'll find suggestions for projects, activities,
+          and descriptions based on your usage in the past month. Upon linking
+          the timetracker website, all company projects become available for
+          selection. After connecting Trello and Jira, you'll be prompted to
+          choose tasks from your boards in the description field, prioritizing
+          those assigned to you.
+        </Hint>
         <div className="col-span-6">
           <AutocompleteSelector
             onSave={onSave}
