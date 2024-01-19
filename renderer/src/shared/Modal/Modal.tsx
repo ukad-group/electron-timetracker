@@ -68,7 +68,7 @@ const Modal = ({ isOpen, children, onSubmit, title, onClose }: ModalProps) => (
                   <Button
                     text="Cancel"
                     type={"button"}
-                    callback={close}
+                    callback={onClose}
                     status={"cancel"}
                     tabIndex={8}
                   />

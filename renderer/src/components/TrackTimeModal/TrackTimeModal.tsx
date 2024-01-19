@@ -7,7 +7,10 @@ import {
   addSuggestions,
   addDurationToTime,
 } from "@/helpers/utils/reports";
-import { padStringToMinutes, getDateTimeData } from "@/helpers/utils/datetime-ui";
+import {
+  padStringToMinutes,
+  getDateTimeData,
+} from "@/helpers/utils/datetime-ui";
 import { AutocompleteSelector } from "@/shared/AutocompleteSelector";
 import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "@/store/googleEventsStore";
@@ -17,7 +20,11 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { TrackTimeModalProps } from "./types";
 import { Modal } from "@/shared/Modal";
 import { TextField } from "@/shared/TextField";
-import { changeMinutesAndHours, changeHours, getTimetrackerYearProjects } from "./utils";
+import {
+  changeMinutesAndHours,
+  changeHours,
+  getTimetrackerYearProjects,
+} from "./utils";
 
 export default function TrackTimeModal({
   activities,
@@ -107,7 +114,8 @@ export default function TrackTimeModal({
       return;
     }
 
-    const { hours, floorMinutes, isToday, ceilHours, ceilMinutes } = getDateTimeData(selectedDate)
+    const { hours, floorMinutes, isToday, ceilHours, ceilMinutes } =
+      getDateTimeData(selectedDate);
 
     if (activities?.length && activities[activities?.length - 1].to) {
       setFrom(activities[activities?.length - 1].to);
@@ -159,8 +167,13 @@ export default function TrackTimeModal({
     })();
 
     getTimetrackerYearProjects(setWebTrackerProjects);
-  }, []);
 
+    document.addEventListener("keyup", handleCloseModal);
+
+    return () => {
+      document.removeEventListener("keyup", handleCloseModal);
+    };
+  }, []);
 
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
@@ -252,15 +265,15 @@ export default function TrackTimeModal({
   };
 
   const handleKey = (
-    event: React.KeyboardEvent<HTMLInputElement>,
+    e: React.KeyboardEvent<HTMLInputElement>,
     callback: (value: string) => void | undefined = undefined
   ) => {
-    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-      event.preventDefault();
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
 
       if (!callback) return;
 
-      const input = event.target as HTMLInputElement;
+      const input = e.target as HTMLInputElement;
       const value = input.value;
 
       if (value.length < 5) return;
@@ -275,14 +288,14 @@ export default function TrackTimeModal({
 
       if (cursorPosition > 2) {
         const [newMinutes, newHours] = changeMinutesAndHours(
-          event.key,
+          e.key,
           minutes,
           hours
         );
         minutes = newMinutes;
         hours = newHours;
       } else {
-        hours = changeHours(event.key, hours);
+        hours = changeHours(e.key, hours);
       }
 
       const adjustedTime =
@@ -295,20 +308,21 @@ export default function TrackTimeModal({
       input.selectionEnd = cursorPosition;
       callback(adjustedTime);
     }
+  };
 
-    if (event.ctrlKey && event.key === "Enter") {
-      event.preventDefault();
-      onSave(event);
+  const handleCloseModal = (e) => {
+    if (e.ctrlKey && e.key === "Enter") {
+      e.preventDefault();
+      onSave(e);
+    }
+
+    if (e.key === "Escape" || e.key === "Esc") {
+      close();
     }
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onSubmit={onSave}
-      onClose={close}
-      title="Track time"
-    >
+    <Modal isOpen={isOpen} onSubmit={onSave} onClose={close} title="Track time">
       <div className="grid grid-cols-6 gap-6">
         <div className="col-span-6 sm:col-span-2">
           <TextField
@@ -326,7 +340,7 @@ export default function TrackTimeModal({
               {
                 "border-red-300 text-red-900 placeholder-red-300 dark:border-red-700/40 dark:text-red-500 dark:placeholder-red-300":
                   isValidationEnabled && (!from || from.length < 5),
-              },
+              }
             )}
             onDragStart={disableTextDrag}
           />
@@ -347,7 +361,7 @@ export default function TrackTimeModal({
               {
                 "border-red-300 text-red-900 placeholder-red-300 dark:border-red-700/40 dark:text-red-500 dark:placeholder-red-300":
                   isValidationEnabled && (!to || to.length < 5),
-              },
+              }
             )}
             onDragStart={disableTextDrag}
           />
@@ -368,7 +382,7 @@ export default function TrackTimeModal({
               {
                 "border-red-300 text-red-900 placeholder-red-300 dark:border-red-700/40 dark:text-red-500 dark:placeholder-red-300":
                   isValidationEnabled && (!duration || duration < 0),
-              },
+              }
             )}
             onDragStart={disableTextDrag}
           />
@@ -386,9 +400,7 @@ export default function TrackTimeModal({
             selectedItem={project}
             setSelectedItem={setProject}
             isValidationEnabled={isValidationEnabled}
-            showedSuggestionsNumber={
-              Object.keys(latestProjAndAct).length
-            }
+            showedSuggestionsNumber={Object.keys(latestProjAndAct).length}
             tabIndex={4}
           />
         </div>
@@ -398,9 +410,7 @@ export default function TrackTimeModal({
             onSave={onSave}
             title="Activity"
             availableItems={
-              latestProjAndAct[project]
-                ? latestProjAndAct[project]
-                : []
+              latestProjAndAct[project] ? latestProjAndAct[project] : []
             }
             selectedItem={activity}
             setSelectedItem={setActivity}
@@ -413,9 +423,7 @@ export default function TrackTimeModal({
             onSave={onSave}
             title="Description"
             availableItems={
-              latestProjAndDesc[project]
-                ? latestProjAndDesc[project]
-                : []
+              latestProjAndDesc[project] ? latestProjAndDesc[project] : []
             }
             additionalItems={thirdPartyItems}
             selectedItem={description}
@@ -427,5 +435,5 @@ export default function TrackTimeModal({
         </div>
       </div>
     </Modal>
-  )
+  );
 }
