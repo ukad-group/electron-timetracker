@@ -27,6 +27,16 @@ const MainViewTable = () => {
     (state) => [state.progress, state.setProgress],
     shallow
   );
+  useEffect(() => {
+    if (!progress["shortcutsEditingConditions"]) {
+      progress["shortcutsEditingConditions"] = [false, false];
+    } else {
+      progress["shortcutsEditingConditions"][0] = false;
+      progress["shortcutsEditingConditions"][1] = false;
+    }
+
+    setProgress(progress);
+  }, []);
 
   const editClickHandler = (activity) => {
     if (!progress["shortcutsEditingConditions"]) {
@@ -61,6 +71,22 @@ const MainViewTable = () => {
           registration. Then select the registration to edit by pressing its
           corresponding number. Alternatively, use ArrowUp to edit the last
           entry.
+        </Hint>
+        <Hint
+          learningMethod="buttonClick"
+          order={1}
+          groupName="editButton"
+          refetenceID="editButton0"
+          shiftY={30}
+          shiftX={200}
+          width={"small"}
+          position={{
+            basePosition: "bottom",
+            diagonalPosition: "left",
+          }}
+        >
+          If you need to modify a registration, click this button to open the
+          corresponding form
         </Hint>
         {tableActivities?.map((activity, i) => (
           <tr
@@ -182,7 +208,10 @@ const MainViewTable = () => {
                 }}
               >
                 {!activity.calendarId && (
-                  <PencilSquareIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                  <PencilSquareIcon
+                    id={`editButton${i}`}
+                    className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
+                  />
                 )}
 
                 {activity.calendarId && (

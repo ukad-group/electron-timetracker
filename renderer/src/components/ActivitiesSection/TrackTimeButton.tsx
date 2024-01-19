@@ -7,7 +7,6 @@ const TrackTimeButton = ({
 }: TrackTimeButtonProps) => (
   <>
     <button
-      id="newActivityBtn"
       className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300 sm:rounded-b-lg dark:bg-dark-button-back-gray hover:dark:bg-dark-button-gray-hover dark:text-dark-heading"
       onClick={() => onEditActivity("new")}
     >
@@ -16,21 +15,6 @@ const TrackTimeButton = ({
         click or press ctrl + space
       </span>
     </button>
-    {!isLoading && (
-      <Hint
-        learningMethod="buttonClick"
-        order={1}
-        groupName="trackTimeButton"
-        refetenceID="newActivityBtn"
-        shiftY={30}
-        shiftX={200}
-        width={"medium"}
-        position={{ basePosition: "bottom", diagonalPosition: "right" }}
-      >
-        To log more time, click the 'Track More Time' button or press ctrl +
-        space to access the form for entering new registration today.
-      </Hint>
-    )}
   </>
 );
 
