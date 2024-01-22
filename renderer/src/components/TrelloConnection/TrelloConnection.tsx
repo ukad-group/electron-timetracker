@@ -30,6 +30,9 @@ const TrelloConnection = () => {
     const token = localStorage.getItem(
       LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN
     );
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN);
+
+    if (!token) return;
 
     const { id, username, fullName } = await global.ipcRenderer.invoke(
       "trello:get-profile-info",
@@ -49,17 +52,15 @@ const TrelloConnection = () => {
     setUser(newUser);
   };
 
-  const rerenderListener = (_, shouldRerender) => {
-    if (shouldRerender) {
-      (async () => addUser())();
-    }
+  const rerenderListener = () => {
+    (async () => addUser())();
   };
 
   useEffect(() => {
-    global.ipcRenderer.on("should-rerender", rerenderListener);
+    global.ipcRenderer.on("should-rerender-trello", rerenderListener);
 
     return () => {
-      global.ipcRenderer.removeAllListeners("should-rerender");
+      global.ipcRenderer.removeAllListeners("should-rerender-trello");
     };
   }, [user]);
 

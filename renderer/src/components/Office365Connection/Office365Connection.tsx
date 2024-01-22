@@ -46,6 +46,9 @@ const Office365Connection = () => {
     const authorizationCode = localStorage.getItem(
       LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE
     );
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE);
+
+    if (!authorizationCode) return;
 
     const { access_token, refresh_token } = await global.ipcRenderer.invoke(
       "office365:get-tokens",
@@ -100,10 +103,8 @@ const Office365Connection = () => {
     setShowEventsInTable(!showEventsInTable);
   };
 
-  const rerenderListener = (_, shouldRerender) => {
-    if (shouldRerender) {
-      (async () => addUser())();
-    }
+  const rerenderListener = () => {
+    (async () => addUser())();
   };
 
   useEffect(() => {
@@ -114,10 +115,10 @@ const Office365Connection = () => {
       setShowEventsInTable(true);
     }
 
-    global.ipcRenderer.on("should-rerender", rerenderListener);
+    global.ipcRenderer.on("should-rerender-office365", rerenderListener);
 
     return () => {
-      global.ipcRenderer.removeAllListeners("should-rerender");
+      global.ipcRenderer.removeAllListeners("should-rerender-office365");
     };
   }, [users]);
 

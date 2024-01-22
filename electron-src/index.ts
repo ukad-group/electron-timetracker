@@ -59,6 +59,7 @@ import {
   getJiraTokens,
 } from "./helpers/API/jiraApi";
 import { IPC_MAIN_CHANNELS } from "./helpers/constants";
+import { getGoogleAuthUrl } from "./helpers/API/googleApi";
 
 initialize("A-EU-9361517871");
 ipcMain.on(
@@ -322,7 +323,6 @@ app.on("ready", async () => {
       });
       childWindow.on("closed", () => {
         childWindow = null;
-        mainWindow?.webContents.send("should-rerender", false);
       });
     }
 
@@ -338,7 +338,7 @@ app.on("ready", async () => {
           return getTrelloAuthUrl(getTrelloOptions());
 
         case "google":
-          return getTrelloAuthUrl(getTrelloOptions());
+          return getGoogleAuthUrl(getGoogleOptions());
 
         default:
           return "";
@@ -349,8 +349,28 @@ app.on("ready", async () => {
       createChildWindow(getConnectionUrl(connectionName));
     });
 
-    ipcMain.on("child-window-closed", (_, rerender) => {
-      mainWindow?.webContents.send("should-rerender", rerender);
+    ipcMain.on("child-window-closed", (_, componentName) => {
+      switch (componentName) {
+        case "google":
+          mainWindow?.webContents.send("should-rerender-google");
+          break;
+
+        case "jira":
+          mainWindow?.webContents.send("should-rerender-jira");
+          break;
+
+        case "office365":
+          mainWindow?.webContents.send("should-rerender-office365");
+          break;
+
+        case "trello":
+          mainWindow?.webContents.send("should-rerender-trello");
+          break;
+
+        default:
+          break;
+      }
+      // mainWindow?.webContents.send("should-rerender", rerender, section);
     });
 
     // common scope watchers for the start/stop-folder-watcher functions
@@ -766,6 +786,20 @@ ipcMain.handle(
 ipcMain.on(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE, async () => {
   mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
 });
+
+//#region GOOGLE FUNCTIONS
+
+const getGoogleOptions = () => {
+  return {
+    clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
+    clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET || "",
+    redirectUri: `http://localhost:${PORT}/settings`,
+    scope:
+      "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile",
+  };
+};
+
+//#endregion
 
 //#region TRELLO FUNCTIONS
 

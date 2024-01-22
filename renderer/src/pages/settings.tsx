@@ -40,6 +40,7 @@ const SettingsPage = () => {
           LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE,
           urlParams.get("code")
         );
+        global.ipcRenderer.send("child-window-closed", "office365");
       }
 
       if (
@@ -51,6 +52,19 @@ const SettingsPage = () => {
           LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE,
           urlParams.get("code")
         );
+        global.ipcRenderer.send("child-window-closed", "jira");
+      }
+
+      if (
+        window.location.search.includes("code") &&
+        window.location.search.includes("state=googlecalendarcode") &&
+        !window.location.search.includes("error")
+      ) {
+        localStorage.setItem(
+          LOCAL_STORAGE_VARIABLES.GOOGLE_AUTH_CODE,
+          urlParams.get("code")
+        );
+        global.ipcRenderer.send("child-window-closed", "google");
       }
 
       if (
@@ -63,9 +77,9 @@ const SettingsPage = () => {
           LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN,
           tokenFromUrl
         );
+        global.ipcRenderer.send("child-window-closed", "trello");
       }
 
-      global.ipcRenderer.send("child-window-closed", true);
       window.close();
     }
   };

@@ -41,6 +41,9 @@ const JiraConnection = () => {
     const authorizationCode = localStorage.getItem(
       LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE
     );
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE);
+
+    if (!authorizationCode) return;
 
     const { access_token, refresh_token } = await global.ipcRenderer.invoke(
       "jira:get-tokens",
@@ -80,17 +83,15 @@ const JiraConnection = () => {
     setUsers(newUsers);
   };
 
-  const rerenderListener = (_, shouldRerender) => {
-    if (shouldRerender) {
-      (async () => addUser())();
-    }
+  const rerenderListener = () => {
+    (async () => addUser())();
   };
 
   useEffect(() => {
-    global.ipcRenderer.on("should-rerender", rerenderListener);
+    global.ipcRenderer.on("should-rerender-jira", rerenderListener);
 
     return () => {
-      global.ipcRenderer.removeAllListeners("should-rerender");
+      global.ipcRenderer.removeAllListeners("should-rerender-jira");
     };
   }, [users]);
 
