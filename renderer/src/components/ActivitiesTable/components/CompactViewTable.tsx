@@ -38,7 +38,7 @@ const CompactViewTable = () => {
             )}
             <span
               className={clsx("flex gap-1", {
-                "py-1 px-1 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
+                "py-1 px-1 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20 w-fit":
                   !activity.isValid,
               })}
             >
