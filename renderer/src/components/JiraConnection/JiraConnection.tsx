@@ -16,7 +16,7 @@ const JiraConnection = () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.JIRA_LOGIN);
+      global.ipcRenderer.send("open-child-window", "jira");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -26,7 +26,10 @@ const JiraConnection = () => {
     const filteredUsers = users.filter((user: JiraUser) => user.userId !== id);
 
     if (filteredUsers.length > 0) {
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(filteredUsers));
+      localStorage.setItem(
+        LOCAL_STORAGE_VARIABLES.JIRA_USERS,
+        JSON.stringify(filteredUsers)
+      );
     } else {
       localStorage.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS);
     }
@@ -35,8 +38,9 @@ const JiraConnection = () => {
   };
 
   const addUser = async () => {
-    const params = new URLSearchParams(window.location.search);
-    const authorizationCode = params.get("code");
+    const authorizationCode = localStorage.getItem(
+      LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE
+    );
 
     const { access_token, refresh_token } = await global.ipcRenderer.invoke(
       "jira:get-tokens",
@@ -69,19 +73,26 @@ const JiraConnection = () => {
 
     const newUsers = [...users, user];
 
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(newUsers));
+    localStorage.setItem(
+      LOCAL_STORAGE_VARIABLES.JIRA_USERS,
+      JSON.stringify(newUsers)
+    );
     setUsers(newUsers);
   };
 
-  useEffect(() => {
-    if (
-      window.location.search.includes("code") &&
-      window.location.search.includes("state=jiracode") &&
-      !window.location.search.includes("error")
-    ) {
+  const rerenderListener = (_, shouldRerender) => {
+    if (shouldRerender) {
       (async () => addUser())();
     }
-  }, []);
+  };
+
+  useEffect(() => {
+    global.ipcRenderer.on("should-rerender", rerenderListener);
+
+    return () => {
+      global.ipcRenderer.removeAllListeners("should-rerender");
+    };
+  }, [users]);
 
   return (
     <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">

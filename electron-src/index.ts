@@ -3,7 +3,16 @@ import path from "path";
 import next from "next";
 import { parse } from "url";
 import { createServer } from "http";
-import { app, dialog, ipcMain, Menu, MenuItem, shell, Tray } from "electron";
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  Menu,
+  MenuItem,
+  shell,
+  Tray,
+} from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
 import { createWindow } from "./helpers/create-window";
@@ -60,6 +69,7 @@ ipcMain.on(
 );
 
 const PORT = 51432;
+let childWindow: any;
 
 let updateStatus: null | "available" | "downloaded" = null;
 let updateVersion = "";
@@ -293,6 +303,54 @@ app.on("ready", async () => {
           err
         );
       }
+    });
+
+    function createChildWindow(url: string) {
+      childWindow = createWindow({
+        width: 1000,
+        height: 700,
+        modal: true,
+        show: false,
+        autoHideMenuBar: true,
+        parent: mainWindow as BrowserWindow | undefined,
+        webPreferences: {},
+      });
+
+      childWindow.loadURL(url);
+      childWindow.once("ready-to-show", () => {
+        childWindow.show();
+      });
+      childWindow.on("closed", () => {
+        childWindow = null;
+        mainWindow?.webContents.send("should-rerender", false);
+      });
+    }
+
+    const getConnectionUrl = (connectionName: string) => {
+      switch (connectionName) {
+        case "office365":
+          return getAuthUrl(getOffice365Options());
+
+        case "jira":
+          return getJiraAuthUrl(getJiraOptions());
+
+        case "trello":
+          return getTrelloAuthUrl(getTrelloOptions());
+
+        case "google":
+          return getTrelloAuthUrl(getTrelloOptions());
+
+        default:
+          return "";
+      }
+    };
+
+    ipcMain.on("open-child-window", (_, connectionName) => {
+      createChildWindow(getConnectionUrl(connectionName));
+    });
+
+    ipcMain.on("child-window-closed", (_, rerender) => {
+      mainWindow?.webContents.send("should-rerender", rerender);
     });
 
     // common scope watchers for the start/stop-folder-watcher functions

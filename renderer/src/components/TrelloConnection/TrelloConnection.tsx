@@ -3,68 +3,65 @@ import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { Button } from "@/shared/Button";
 import isOnline from "is-online";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-
-function extractTokenFromString(inputString: string) {
-  const parts = inputString.split("#");
-
-  if (parts.length >= 2) {
-    const afterHash = parts[1];
-    const tokenPart = afterHash.split("=");
-
-    if (tokenPart.length === 2 && tokenPart[0] === "token") {
-      return tokenPart[1];
-    }
-  }
-
-  return "";
-}
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 
 const TrelloConnection = () => {
   const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("trello-user")) || null
+    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER)) ||
+      null
   );
 
   const handleSignInButton = async () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.TRELLO_LOGIN);
+      global.ipcRenderer.send("open-child-window", "trello");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
   };
 
   const handleSignOutButton = () => {
-    localStorage.removeItem("trello-user");
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER);
     setUser(null);
   };
 
   const addUser = async () => {
-    const tokenFromUrl = extractTokenFromString(window.location.hash);
+    const token = localStorage.getItem(
+      LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN
+    );
 
     const { id, username, fullName } = await global.ipcRenderer.invoke(
       "trello:get-profile-info",
-      tokenFromUrl
+      token
     );
 
     const newUser = {
       userId: id,
-      accessToken: tokenFromUrl,
+      accessToken: token,
       username: username || fullName || "",
     };
 
-    localStorage.setItem("trello-user", JSON.stringify(newUser));
+    localStorage.setItem(
+      LOCAL_STORAGE_VARIABLES.TRELLO_USER,
+      JSON.stringify(newUser)
+    );
     setUser(newUser);
   };
 
-  useEffect(() => {
-    if (
-      window.location.hash.includes("token") &&
-      !window.location.hash.includes("error")
-    ) {
+  const rerenderListener = (_, shouldRerender) => {
+    if (shouldRerender) {
       (async () => addUser())();
     }
-  }, []);
+  };
+
+  useEffect(() => {
+    global.ipcRenderer.on("should-rerender", rerenderListener);
+
+    return () => {
+      global.ipcRenderer.removeAllListeners("should-rerender");
+    };
+  }, [user]);
 
   return (
     <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">

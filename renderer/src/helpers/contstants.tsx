@@ -21,19 +21,23 @@ export const SETTING_SECTIONS = {
 };
 
 export const LOCAL_STORAGE_VARIABLES = {
-  SHOW_GOOGLE_EVENTS: 'showGoogleEvents',
-  SHOW_OFFICE_365_EVENTS: 'showOffice365Events',
-  TIMETRACKER_USER: 'timetracker-user',
-  GOOGLE_USERS: 'googleUsers',
-  JIRA_USERS: 'jira-users',
-  OFFICE_365_USERS: 'office365-users'
+  SHOW_GOOGLE_EVENTS: "showGoogleEvents",
+  SHOW_OFFICE_365_EVENTS: "showOffice365Events",
+  TIMETRACKER_USER: "timetracker-user",
+  GOOGLE_USERS: "googleUsers",
+  JIRA_USERS: "jira-users",
+  JIRA_AUTH_CODE: "jira-auth-code",
+  OFFICE_365_USERS: "office365-users",
+  OFFICE_365_AUTH_CODE: "office365-auth-code",
+  TRELLO_USER: "trello-user",
+  TRELLO_AUTH_TOKEN: "trello-auth-token",
   // ...Add more local storage variables as needed
-}
+};
 
 export const KEY_CODES = {
-  SPACE: 'Space',
-  ARROW_UP: 'ArrowUp',
-  META: 'Meta',
-  CONTROL: 'Control'
+  SPACE: "Space",
+  ARROW_UP: "ArrowUp",
+  META: "Meta",
+  CONTROL: "Control",
   // ...Add more key codes as needed
-}
+};

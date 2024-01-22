@@ -5,16 +5,21 @@ import { useThemeStore } from "@/store/themeStore";
 import { MenuItem } from "@/shared/MenuItem";
 import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
-import { SidebarNavItem, SETTING_SECTIONS } from "@/helpers/contstants";
+import {
+  SidebarNavItem,
+  SETTING_SECTIONS,
+  LOCAL_STORAGE_VARIABLES,
+} from "@/helpers/contstants";
+import { extractTokenFromString } from "@/helpers/utils/utils";
 
 const SettingsPage = () => {
   const [theme] = useThemeStore(
     (state) => [state.theme, state.setTheme],
-    shallow,
+    shallow
   );
   const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const [currentMenuItem, setCurrentMenuItem] = useState<SidebarNavItem>(
-    SidebarNavItem.Connections,
+    SidebarNavItem.Connections
   );
 
   const settingSection = SETTING_SECTIONS[currentMenuItem];
@@ -22,15 +27,63 @@ const SettingsPage = () => {
   const handleThemeChange = (e) =>
     e.matches ? setIsOSDarkTheme(true) : setIsOSDarkTheme(false);
 
+  const closeWindowIfNeeded = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (window.location.hash || window.location.search) {
+      if (
+        window.location.search.includes("code") &&
+        window.location.search.includes("state=office365code") &&
+        !window.location.search.includes("error")
+      ) {
+        localStorage.setItem(
+          LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE,
+          urlParams.get("code")
+        );
+      }
+
+      if (
+        window.location.search.includes("code") &&
+        window.location.search.includes("state=jiracode") &&
+        !window.location.search.includes("error")
+      ) {
+        localStorage.setItem(
+          LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE,
+          urlParams.get("code")
+        );
+      }
+
+      if (
+        window.location.hash.includes("token") &&
+        !window.location.hash.includes("error")
+      ) {
+        const tokenFromUrl = extractTokenFromString(window.location.hash);
+
+        localStorage.setItem(
+          LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN,
+          tokenFromUrl
+        );
+      }
+
+      global.ipcRenderer.send("child-window-closed", true);
+      window.close();
+    }
+  };
+
+  useEffect(() => {
+    closeWindowIfNeeded();
+  }, []);
+
   useEffect(() => {
     const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
 
     mediaQueryList.addListener(handleThemeChange);
     setIsOSDarkTheme(mediaQueryList.matches);
 
-    document.body.className = (theme.os && isOSDarkTheme) || (!theme.os && theme.custom === "dark")
-      ? "dark bg-dark-back"
-      : "light bg-grey-100";
+    document.body.className =
+      (theme.os && isOSDarkTheme) || (!theme.os && theme.custom === "dark")
+        ? "dark bg-dark-back"
+        : "light bg-grey-100";
 
     return () => {
       mediaQueryList.removeListener(handleThemeChange);
@@ -54,10 +107,8 @@ const SettingsPage = () => {
 
   return (
     <div className="w-full overflow-hidden h-screen bg-gray-100 dark:bg-dark-back">
-      <div
-        className="h-full overflow-hidden mx-auto sm:px-6 max-w-3xl lg:max-w-[1400px] flex flex-col gap-6 px-6 py-10 dark:bg-dark-back">
-        <div
-          className="h-full overflow-hidden flex flex-col gap-6 bg-white shadow sm:rounded-lg p-6 dark:bg-dark-container dark:border-dark-border">
+      <div className="h-full overflow-hidden mx-auto sm:px-6 max-w-3xl lg:max-w-[1400px] flex flex-col gap-6 px-6 py-10 dark:bg-dark-back">
+        <div className="h-full overflow-hidden flex flex-col gap-6 bg-white shadow sm:rounded-lg p-6 dark:bg-dark-container dark:border-dark-border">
           <div className="flex items-center justify-between gap-6">
             <div className="flex flex-col">
               <span className="text-lg font-medium text-gray-900 dark:text-dark-heading">

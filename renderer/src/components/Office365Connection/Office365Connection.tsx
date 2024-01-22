@@ -8,7 +8,9 @@ import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 
 const Office365Connection = () => {
   const [users, setUsers] = useState(
-    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || []
+    JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)
+    ) || []
   );
   const [showEventsInTable, setShowEventsInTable] = useState(false);
 
@@ -16,7 +18,7 @@ const Office365Connection = () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.OFFICE365_LOGIN);
+      global.ipcRenderer.send("open-child-window", "office365");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -28,18 +30,22 @@ const Office365Connection = () => {
     );
 
     if (filteredUsers.length > 0) {
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS, JSON.stringify(filteredUsers));
+      localStorage.setItem(
+        LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS,
+        JSON.stringify(filteredUsers)
+      );
     } else {
-      localStorage.removeItem("office365-users");
-      localStorage.removeItem("showOffice365Events");
+      localStorage.removeItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS);
+      localStorage.removeItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS);
     }
 
     setUsers(filteredUsers);
   };
 
   const addUser = async () => {
-    const params = new URLSearchParams(window.location.search);
-    const authorizationCode = params.get("code");
+    const authorizationCode = localStorage.getItem(
+      LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE
+    );
 
     const { access_token, refresh_token } = await global.ipcRenderer.invoke(
       "office365:get-tokens",
@@ -79,7 +85,10 @@ const Office365Connection = () => {
     );
     const newUsers = [...users, user];
 
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS, JSON.stringify(newUsers));
+    localStorage.setItem(
+      LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS,
+      JSON.stringify(newUsers)
+    );
     setUsers(newUsers);
   };
 
@@ -91,19 +100,26 @@ const Office365Connection = () => {
     setShowEventsInTable(!showEventsInTable);
   };
 
-  useEffect(() => {
-    if (
-      window.location.search.includes("code") &&
-      window.location.search.includes("state=office365code") &&
-      !window.location.search.includes("error")
-    ) {
+  const rerenderListener = (_, shouldRerender) => {
+    if (shouldRerender) {
       (async () => addUser())();
     }
+  };
 
-    if (localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS) === "true") {
+  useEffect(() => {
+    if (
+      localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS) ===
+      "true"
+    ) {
       setShowEventsInTable(true);
     }
-  }, []);
+
+    global.ipcRenderer.on("should-rerender", rerenderListener);
+
+    return () => {
+      global.ipcRenderer.removeAllListeners("should-rerender");
+    };
+  }, [users]);
 
   return (
     <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">
@@ -136,7 +152,9 @@ const Office365Connection = () => {
             No one user authorized
           </div>
         )}
-        {users.length > 0 && <Users users={users} onSignOutButton={handleSignOutButton}/>}
+        {users.length > 0 && (
+          <Users users={users} onSignOutButton={handleSignOutButton} />
+        )}
       </div>
       <p className="text-sm text-gray-500  dark:text-dark-main">
         After connection, you will be able to fill in the Report with the
