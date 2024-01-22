@@ -1,5 +1,5 @@
 import { PlaceholderProps } from "@/components/ActivitiesSection/types";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import {
@@ -19,6 +19,7 @@ const Placeholder = ({
   setSelectedDateReport,
 }: PlaceholderProps) => {
   const [showModal, setShowModal] = useState(false);
+  const placeholderButtonRef = useRef(null);
   const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
@@ -75,7 +76,7 @@ const Placeholder = ({
       </p>
       <div className="mt-6 mb-2">
         <button
-          id="placeholderBtn"
+          ref={placeholderButtonRef}
           onClick={() => onEditActivity("new")}
           type="button"
           className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500   dark:bg-dark-button-back  dark:hover:bg-dark-button-hover"
@@ -87,7 +88,7 @@ const Placeholder = ({
           learningMethod="buttonClick"
           order={1}
           groupName="placeholder"
-          refetenceID="placeholderBtn"
+          referenceRef={placeholderButtonRef}
           shiftY={150}
           shiftX={60}
           width={"small"}

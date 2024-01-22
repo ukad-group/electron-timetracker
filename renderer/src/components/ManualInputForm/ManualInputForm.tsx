@@ -4,10 +4,12 @@ import { DeleteMessage } from "@/shared/DeleteMessage";
 import { parseReport, serializeReport } from "@/helpers/utils/reports";
 import { getCurrentTimeRoundedUp } from "@/helpers/utils/datetime-ui";
 import { useMainStore } from "@/store/mainStore";
+import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import useEditingHistoryManager from "@/helpers/hooks/useEditingHistoryManager";
 import { ManualInputFormProps } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { Hint } from "@/shared/Hint";
 
 export default function ManualInputForm({
   onSave,
@@ -26,6 +28,11 @@ export default function ManualInputForm({
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   const [isFileExist, setIsFileExist] = useState(false);
   const editingHistoryManager = useEditingHistoryManager(report);
+
+  const [progress, setProgress] = useTutorialProgressStore(
+    (state) => [state.progress, state.setProgress],
+    shallow
+  );
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if (
@@ -179,9 +186,50 @@ export default function ManualInputForm({
 
     setReportHandler(serializedReport);
   };
+  useEffect(() => {
+    if (progress["manualInputConditions"]) {
+      progress["manualInputConditions"][0] = false;
+    } else {
+      progress["manualInputConditions"] = [false];
+    }
+
+    setProgress(progress);
+  }, []);
+
+  const onFocusHandler = () => {
+    if (progress["manualInputConditions"]) {
+      progress["manualInputConditions"][0] = true;
+    } else {
+      progress["manualInputConditions"] = [true];
+    }
+    setProgress(progress);
+  };
 
   return (
     <div>
+      <Hint
+        displayCondition={true}
+        learningMethod="nextClick"
+        order={1}
+        groupName="manualInput"
+        referenceRef={textareaRef}
+        shiftY={30}
+        shiftX={200}
+        width={"medium"}
+        position={{
+          basePosition: "bottom",
+          diagonalPosition: "left",
+        }}
+      >
+        In the Manual Input section, view a serialized representation of your
+        report, mirroring its appearance in your file. Edit your report directly
+        in this field, and save changes with the 'Save' button or by pressing
+        ctrl + space.
+        <br />
+        You can increase the height of this box by dragging it from the bottom
+        right corner
+      </Hint>
+
       <h2
         id="manual-input-title"
         className="text-lg font-medium text-gray-900 dark:text-dark-heading"
@@ -191,6 +239,7 @@ export default function ManualInputForm({
 
       <textarea
         value={report}
+        onFocus={onFocusHandler}
         onChange={(e) => setReportHandler(e.target.value)}
         rows={15}
         className="block w-full px-3 py-2 mt-3 border border-gray-300 rounded-md shadow-sm focus-visible:outline-blue-500 sm:text-sm dark:bg-dark-back dark:border-dark-border dark:text-slate-400 focus-visible:dark:outline-slate-500"

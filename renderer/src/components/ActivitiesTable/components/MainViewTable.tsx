@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import clsx from "clsx";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { formatDuration } from "@/helpers/utils/reports";
@@ -22,6 +22,9 @@ const MainViewTable = () => {
     copyActivityHandler,
     editActivityHandler,
   } = useContext(ActivitiesTableContext);
+
+  const firstRowRef = useRef(null);
+  const firstEditButtonRef = useRef(null);
 
   const [progress, setProgress] = useTutorialProgressStore(
     (state) => [state.progress, state.setProgress],
@@ -58,7 +61,7 @@ const MainViewTable = () => {
           learningMethod="ctrlArrowNumberPress"
           order={1}
           groupName="shortcutsEditing"
-          refetenceID="activityRow0"
+          referenceRef={firstRowRef}
           shiftY={25}
           shiftX={150}
           width={"small"}
@@ -76,7 +79,7 @@ const MainViewTable = () => {
           learningMethod="buttonClick"
           order={1}
           groupName="editButton"
-          refetenceID="editButton0"
+          referenceRef={firstEditButtonRef}
           shiftY={30}
           shiftX={200}
           width={"small"}
@@ -90,7 +93,7 @@ const MainViewTable = () => {
         </Hint>
         {tableActivities?.map((activity, i) => (
           <tr
-            id={`activityRow${i}`}
+            ref={i === 0 ? firstRowRef : undefined}
             key={i}
             className={clsx(
               `border-b border-gray-200 dark:border-gray-300 transition-transform `,
@@ -209,7 +212,7 @@ const MainViewTable = () => {
               >
                 {!activity.calendarId && (
                   <PencilSquareIcon
-                    id={`editButton${i}`}
+                    ref={i === 0 ? firstEditButtonRef : undefined}
                     className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
                   />
                 )}

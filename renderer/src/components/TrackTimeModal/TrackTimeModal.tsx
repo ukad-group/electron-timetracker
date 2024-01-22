@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState, useRef } from "react";
 import useTimeInput from "@/helpers/hooks/useTimeInput";
 import {
   calcDurationBetweenTimes,
@@ -61,6 +61,8 @@ export default function TrackTimeModal({
   const [latestProjects, setLatestProjects] = useState([]);
   const [webTrackerProjects, setWebTrackerProjects] = useState([]);
   const [uniqueWebTrackerProjects, setUniqueWebTrackerProjects] = useState([]);
+  const timeInputRef = useRef(null);
+  const textInputRef = useRef(null);
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -328,6 +330,7 @@ export default function TrackTimeModal({
         <div className="col-span-6 sm:col-span-2">
           <TextField
             id="from"
+            ref={timeInputRef}
             label="From"
             onKeyDown={(event) => handleKey(event, setFrom)}
             required
@@ -349,7 +352,7 @@ export default function TrackTimeModal({
             learningMethod="nextClick"
             order={1}
             groupName="trackTimeModal"
-            refetenceID="from"
+            referenceRef={timeInputRef}
             shiftY={25}
             shiftX={300}
             width={"large"}
@@ -425,7 +428,7 @@ export default function TrackTimeModal({
             tabIndex={4}
           />
         </div>
-        <div id="textFields" className="col-span-6">
+        <div ref={textInputRef} className="col-span-6">
           <AutocompleteSelector
             isNewCheck
             onSave={onSave}
@@ -443,7 +446,7 @@ export default function TrackTimeModal({
           learningMethod="nextClick"
           order={2}
           groupName="trackTimeModal"
-          refetenceID="textFields"
+          referenceRef={textInputRef}
           shiftY={175}
           shiftX={30}
           width={"medium"}
