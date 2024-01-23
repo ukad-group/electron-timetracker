@@ -45,7 +45,6 @@ const MainViewTable = () => {
     if (!progress["copyButtonConditions"]) {
       progress["copyButtonConditions"] = [true, false];
     } else {
-      progress["copyButtonConditions"][0] = true;
       progress["copyButtonConditions"][1] = false;
     }
 

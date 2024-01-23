@@ -239,7 +239,7 @@ export default function Hint({
                     type="button"
                     className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500   dark:bg-dark-button-back  dark:hover:bg-dark-button-hover"
                     onClick={(e) => {
-                      e.stopPropagation();
+                      e.stopPropagation(); //For some reason, the "track more time" button was also pressed on the activity copy hint when the close button was pressed. I added this to fix the bug, but why the bubbling is happening here I don't understand.
                       closeBtnHandler();
                     }}
                   >
@@ -250,7 +250,7 @@ export default function Hint({
               <XMarkIcon
                 className="w-6 h-6 fill-gray-600 dark:fill-gray-400/70 absolute right-1 top-1 cursor-pointer"
                 onClick={(e) => {
-                  e.stopPropagation();
+                  e.stopPropagation(); //For some reason, the "track more time" button was also pressed on the activity copy hint when the close button was pressed. I added this to fix the bug, but why the bubbling is happening here I don't understand.
                   closeBtnHandler();
                 }}
               />
