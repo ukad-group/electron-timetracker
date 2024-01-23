@@ -9,7 +9,8 @@ import {
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import isOnline from "is-online";
 import { GoogleCredentails, GoogleUser } from "./types";
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 
 const GoogleConnection = () => {
   const router = useRouter();
@@ -27,17 +28,17 @@ const GoogleConnection = () => {
   };
 
   const signOutHandler = (id: string) => {
-    const loggedUsersFromLs = JSON.parse(localStorage.getItem("googleUsers"));
+    const loggedUsersFromLs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
     const filteredUsers = loggedUsersFromLs.filter(
       (user: GoogleUser) => user.accountId !== id
     );
 
     if (filteredUsers.length === 0) {
       setShowGoogleEvents(false);
-      localStorage.setItem("showGoogleEvents", "false");
+      localStorage.setItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS, "false");
     }
 
-    localStorage.setItem("googleUsers", JSON.stringify(filteredUsers));
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify(filteredUsers));
     setLoggedUsers(filteredUsers);
   };
 
@@ -47,7 +48,7 @@ const GoogleConnection = () => {
       const googleProfileInfo = await loadGoogleUserInfo(credentials);
       const googleProfileUsername = googleProfileInfo?.names[0]?.displayName;
       const googleProfileId = googleProfileInfo?.resourceName;
-      const googleUsersFromLs = JSON.parse(localStorage.getItem("googleUsers"));
+      const googleUsersFromLs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
 
       if (
         googleUsersFromLs.some((user) => {
@@ -70,7 +71,7 @@ const GoogleConnection = () => {
           }
         );
         googleUsersFromLs.push(userObject);
-        localStorage.setItem("googleUsers", JSON.stringify(googleUsersFromLs));
+        localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify(googleUsersFromLs));
         setLoggedUsers(googleUsersFromLs);
       }
     } catch (e) {
@@ -89,27 +90,27 @@ const GoogleConnection = () => {
   const handleCheckboxChange = () => {
     setShowGoogleEvents((prev) => !prev);
     const reversShowGoogleEvents = !showGoogleEvents;
-    localStorage.setItem("showGoogleEvents", reversShowGoogleEvents.toString());
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS, reversShowGoogleEvents.toString());
   };
 
   useEffect(() => {
-    const googleUsers = JSON.parse(localStorage.getItem("googleUsers"));
+    const googleUsers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
     const params = new URLSearchParams(window.location.search);
     const authorizationCode = params.get("code");
     const googleUrlState = params.get("state") === "googlecalendarcode";
 
     if (authorizationCode && googleUrlState && !googleUsers) {
-      localStorage.setItem("googleUsers", JSON.stringify([]));
+      localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify([]));
       loadGoogleCredentials(authorizationCode);
     } else if (authorizationCode && googleUrlState) {
       loadGoogleCredentials(authorizationCode);
     }
 
-    if (localStorage.getItem("showGoogleEvents") === "true") {
+    if (localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS) === "true") {
       setShowGoogleEvents(true);
     }
 
-    const loggedUsersFromLs = JSON.parse(localStorage.getItem("googleUsers"));
+    const loggedUsersFromLs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
     if (loggedUsersFromLs) {
       setLoggedUsers(loggedUsersFromLs);
     }
@@ -140,7 +141,6 @@ const GoogleConnection = () => {
             No one user authorized
           </div>
         )}
-
         {loggedUsers.length > 0 && (
           <div className="flex flex-col gap-2 w-full">
             {loggedUsers.map((user) => (

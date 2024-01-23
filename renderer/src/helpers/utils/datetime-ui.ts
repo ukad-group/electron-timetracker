@@ -5,6 +5,7 @@ import {
 } from "@/components/Calendar/types";
 
 export const DAY = 60 * 60 * 24 * 1000;
+export const MS_PER_HOUR = 60 * 60 * 1000;
 
 export const MONTHS = [
   "January",
@@ -241,3 +242,41 @@ export const getCurrentTimeRoundedUp = () => {
 
   return `${formattedTime}`;
 };
+
+
+export const formatDate = (date: Date, type: "short" | "long" = "long") =>
+  date.toLocaleDateString("en-US", {
+    month: type,
+    day: "numeric",
+    year: "numeric",
+  });
+
+export const getDateTimeData = (selectedDate: Date) => {
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, "0");
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+  const floorMinutes = (Math.floor(Number(minutes) / 15) * 15)
+    .toString()
+    .padStart(2, "0");
+  const ceilHours = Math.ceil(
+    Number(minutes) / 15 > 3 ? Number(hours) + 1 : Number(hours)
+  )
+    .toString()
+    .padStart(2, "0");
+  const ceilMinutes = (
+    Math.ceil(Number(minutes) / 15 > 3 ? 0 : Number(minutes) / 15) * 15
+  )
+    .toString()
+    .padStart(2, "0");
+  const isToday = checkIsToday(selectedDate);
+
+  return {
+    now,
+    hours,
+    minutes,
+    floorMinutes,
+    ceilHours,
+    ceilMinutes,
+    isToday
+  }
+}

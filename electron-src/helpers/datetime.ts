@@ -74,3 +74,46 @@ export function getDateFromFilename(filename: string) {
 
   return new Date(year, month, day);
 }
+
+export function getWeeksAroundDate(
+  date: Date
+): { year: string; week: string }[] {
+  const result: { year: string; week: string }[] = [];
+
+  for (let i = -5; i <= 5; i++) {
+    const currentDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+    currentDate.setDate(currentDate.getDate() + i * 7);
+
+    const isoWeek = getISOWeek(currentDate);
+    result.push({
+      year: currentDate.getFullYear().toString(),
+      week: isoWeek.toString().padStart(2, "0"),
+    });
+  }
+
+  return result;
+}
+
+export function getWeeksInMonth(date: Date): { year: string; week: string }[] {
+  const weeksArray: { year: string; week: string }[] = [];
+
+  const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+  const lastDayOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+  for (
+    let currentDay = firstDayOfMonth;
+    currentDay <= lastDayOfMonth;
+    currentDay.setDate(currentDay.getDate() + 7)
+  ) {
+    const year = currentDay.getFullYear();
+    const week = getISOWeek(currentDay).toString().padStart(2, "0");
+
+    weeksArray.push({ year: year.toString(), week });
+  }
+
+  return weeksArray;
+}

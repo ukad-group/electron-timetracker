@@ -1,4 +1,4 @@
-import { IPC_MAIN_CHANNELS } from "../../../../electron-src/helpers/constants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export type ReportActivity = {
   id: number;
@@ -224,7 +224,7 @@ export function calcDurationBetweenTimes(from: string, to: string): number {
 }
 
 export function formatDuration(ms: number): string {
-  if (ms == undefined) return;
+  if (ms === undefined) return "";
 
   const msPerMinute = 60 * 1000;
   const msPerHour = 60 * msPerMinute;
@@ -244,7 +244,7 @@ export function formatDuration(ms: number): string {
 }
 
 export function formatDurationAsDecimals(ms: number): string {
-  if (ms == undefined) return;
+  if (ms === undefined) return "";
 
   const minutes = ms / 1000 / 60;
   const hours = minutes / 60;
@@ -341,7 +341,6 @@ export function validation(activities: Array<ReportActivity>) {
         !activities[i].activity &&
         !activities[i].description
       ) {
-        activities[i].isValid = false;
         activities[i].mistakes += "No activity or description";
       }
     }

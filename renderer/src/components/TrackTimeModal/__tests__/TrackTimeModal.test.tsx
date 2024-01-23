@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import TrackTimeModal, { TrackTimeModalProps } from "../TrackTimeModal";
+import TrackTimeModal from "../TrackTimeModal";
+import { TrackTimeModalProps } from "../types";
 import "@testing-library/jest-dom";
 
 const mockedActivities = [

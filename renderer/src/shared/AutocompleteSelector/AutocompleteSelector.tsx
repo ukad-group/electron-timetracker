@@ -1,14 +1,16 @@
 import { FormEvent, useState, useRef, ChangeEvent, useEffect } from "react";
-import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/24/solid";
+import { ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
 import useEditingHistoryManager from "@/helpers/hooks/useEditingHistoryManager";
 import { AutocompleteProps } from "./types";
+import SuggestionsList from "./SuggestionsList";
+import { filterList } from "./utils";
 
 export default function AutocompleteSelector({
-  isNewCheck,
+  isNewCheck = false,
   onSave,
   title,
   className = "",
@@ -20,7 +22,7 @@ export default function AutocompleteSelector({
   tabIndex,
   isValidationEnabled,
   showedSuggestionsNumber,
-  spellCheck,
+  spellCheck = false,
 }: AutocompleteProps) {
   const [isNew, setIsNew] = useState(false);
   const inputRef = useRef(null);
@@ -31,43 +33,9 @@ export default function AutocompleteSelector({
   }, [availableItems, additionalItems]);
   const editingHistoryManager = useEditingHistoryManager(selectedItem);
 
-  const filteredList = useMemo(() => {
-    return selectedItem === ""
-      ? availableItems &&
-          [...availableItems]
-            .concat(additionalItems ? additionalItems : [])
-            .filter((activity, i) => {
-              if (showedSuggestionsNumber) {
-                return activity !== "" && i < showedSuggestionsNumber;
-              }
-              return activity !== "";
-            })
-      : availableItems &&
-          [...availableItems]
-            .sort()
-            .concat(additionalItems ? additionalItems : [])
-            .reduce((accumulator, current) => {
-              let duplicate = false;
-              if (current.startsWith("TT:: ") || current.startsWith("JI:: ")) {
-                duplicate = availableItems.includes(current.slice(5));
-              }
-              if (
-                !duplicate &&
-                current.toLowerCase() === selectedItem.toLowerCase()
-              ) {
-                accumulator.unshift(current);
-              } else if (
-                !duplicate &&
-                current
-                  .toLowerCase()
-                  .includes((selectedItem || "").toLowerCase())
-              ) {
-                accumulator.push(current);
-              }
-              return accumulator;
-            }, [])
-            .slice(0, 15);
-  }, [selectedItem, availableItems, additionalItems]);
+  const filteredList = useMemo(() =>
+    filterList({ selectedItem, availableItems, additionalItems, showedSuggestionsNumber }),
+    [selectedItem, availableItems, additionalItems]);
 
   const fullSuggestionsList = useMemo(() => {
     return selectedItem.trim() === ""
@@ -140,43 +108,6 @@ export default function AutocompleteSelector({
     }
   }, [selectedItem, allItems]);
 
-  const renderSuggestionsList = () =>
-    fullSuggestionsList.map((item, i) => (
-      <Combobox.Option
-        key={i}
-        value={item}
-        className={({ active }) =>
-          clsx(
-            "relative cursor-default select-none py-2 pl-3 pr-9",
-            active
-              ? "bg-blue-600 text-white dark:bg-indigo-800"
-              : "text-gray-900 dark:text-dark-main"
-          )
-        }
-      >
-        {({ active, selected }) => (
-          <>
-            <span
-              className={clsx("block truncate", selected && "font-semibold")}
-            >
-              {item}
-            </span>
-
-            {selected && (
-              <span
-                className={clsx(
-                  "absolute inset-y-0 right-0 flex items-center pr-4",
-                  active ? "text-white" : "text-blue-600"
-                )}
-              >
-                <CheckIcon className="w-5 h-5" aria-hidden="true" />
-              </span>
-            )}
-          </>
-        )}
-      </Combobox.Option>
-    ));
-
   return (
     <Combobox
       className={className}
@@ -228,7 +159,7 @@ export default function AutocompleteSelector({
             <div className="block text-xs text-gray-500 text-center">
               tab to choose
             </div>
-            {renderSuggestionsList()}
+            <SuggestionsList list={fullSuggestionsList} />
           </Combobox.Options>
         )}
       </div>
