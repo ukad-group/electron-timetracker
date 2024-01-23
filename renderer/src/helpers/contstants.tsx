@@ -24,6 +24,7 @@ export const LOCAL_STORAGE_VARIABLES = {
   SHOW_GOOGLE_EVENTS: "showGoogleEvents",
   SHOW_OFFICE_365_EVENTS: "showOffice365Events",
   TIMETRACKER_USER: "timetracker-user",
+  TIMETRACKER_WEBSITE_CODE: "timetracker-website-code",
   GOOGLE_USERS: "googleUsers",
   GOOGLE_AUTH_CODE: "google-auth-code",
   JIRA_USERS: "jira-users",

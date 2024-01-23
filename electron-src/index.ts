@@ -340,6 +340,17 @@ app.on("ready", async () => {
         case "google":
           return getGoogleAuthUrl(getGoogleOptions());
 
+        case "timetracker-website":
+          const options = getOffice365Options();
+
+          const optionsWithAllScope = {
+            ...options,
+            scope:
+              "api://d7d02680-bd82-47ed-95f9-e977ab5f0487/access_as_user offline_access profile email offline_access openid User.Read Calendars.Read",
+          };
+
+          return getAzureAuthUrl(optionsWithAllScope);
+
         default:
           return "";
       }
@@ -363,6 +374,10 @@ app.on("ready", async () => {
           mainWindow?.webContents.send("should-rerender-office365");
           break;
 
+        case "timetracker-website":
+          mainWindow?.webContents.send("should-rerender-timetracker-website");
+          break;
+
         case "trello":
           mainWindow?.webContents.send("should-rerender-trello");
           break;
@@ -370,7 +385,6 @@ app.on("ready", async () => {
         default:
           break;
       }
-      // mainWindow?.webContents.send("should-rerender", rerender, section);
     });
 
     // common scope watchers for the start/stop-folder-watcher functions

@@ -80,6 +80,24 @@ const SettingsPage = () => {
         global.ipcRenderer.send("child-window-closed", "trello");
       }
 
+      if (
+        window.location.search.includes("code") &&
+        window.location.search.includes("state=azure-base")
+      ) {
+        localStorage.setItem(
+          LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE,
+          urlParams.get("code")
+        );
+        global.ipcRenderer.send("child-window-closed", "timetracker-website");
+      }
+
+      if (
+        window.location.search.includes("code") &&
+        window.location.search.includes("state=azure-additional")
+      ) {
+        return;
+      }
+
       window.close();
     }
   };
