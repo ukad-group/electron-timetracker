@@ -63,7 +63,7 @@ export default function Hint({
       setProgress(progress);
       hintLearned();
     } else if (order > 1 && progress[groupName] !== undefined) {
-      progress[groupName][order + 1] = true;
+      progress[groupName][order - 1] = true;
       setProgress(progress);
       hintLearned();
     }

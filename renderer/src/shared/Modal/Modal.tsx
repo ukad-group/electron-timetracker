@@ -27,8 +27,8 @@ const Modal = ({ isOpen, children, onSubmit, title, onClose }: ModalProps) => (
           className="hidden sm:inline-block sm:align-middle sm:h-screen"
           aria-hidden="true"
         >
-            &#8203;
-          </span>
+          &#8203;
+        </span>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -68,7 +68,7 @@ const Modal = ({ isOpen, children, onSubmit, title, onClose }: ModalProps) => (
                   <Button
                     text="Cancel"
                     type={"button"}
-                    callback={close}
+                    callback={onClose}
                     status={"cancel"}
                     tabIndex={8}
                   />
