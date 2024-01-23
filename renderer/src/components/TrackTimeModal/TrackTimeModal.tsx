@@ -330,7 +330,7 @@ export default function TrackTimeModal({
         <div className="col-span-6 sm:col-span-2">
           <TextField
             id="from"
-            ref={timeInputRef}
+            reference={timeInputRef}
             label="From"
             onKeyDown={(event) => handleKey(event, setFrom)}
             required

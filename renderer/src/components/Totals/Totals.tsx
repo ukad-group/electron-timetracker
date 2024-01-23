@@ -1,23 +1,29 @@
-import React, { useState, useEffect } from "react";
-import {
-  convertMillisecondsToTime,
-} from "@/helpers/utils/datetime-ui";
+import React, { useState, useEffect, useRef } from "react";
+import { convertMillisecondsToTime } from "@/helpers/utils/datetime-ui";
 import { useMainStore } from "@/store/mainStore";
+import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { Description, Total, PeriodName } from "./types";
 import { TOTAL_PERIODS } from "./constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { getTotals } from "./utils";
 import TotalsList from "./TotalsList";
+import { Hint } from "@/shared/Hint";
 
 const Totals = ({ selectedDate }) => {
   const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );
+  const [progress, setProgress] = useTutorialProgressStore(
+    (state) => [state.progress, state.setProgress],
+    shallow
+  );
   const [totals, setTotals] = useState<Total[]>([]);
   const [period, setPeriod] = useState<PeriodName>("day");
   const [showedProjects, setShowedProjects] = useState<string[]>([]);
+  const totalsRef = useRef(null);
+  const totalsSelectRef = useRef(null);
   const isShowedActivitiesList = (projectName: string) => {
     return showedProjects.includes(projectName);
   };
@@ -27,7 +33,7 @@ const Totals = ({ selectedDate }) => {
       period,
       selectedDate,
       reportsFolder,
-      setTotals
+      setTotals,
     });
 
     const fileChangeListener = () => {
@@ -35,14 +41,20 @@ const Totals = ({ selectedDate }) => {
         period,
         selectedDate,
         reportsFolder,
-        setTotals
+        setTotals,
       });
     };
 
-    global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
+      fileChangeListener
+    );
 
     return () => {
-      global.ipcRenderer.removeListener(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
+      global.ipcRenderer.removeListener(
+        IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
+        fileChangeListener
+      );
     };
   }, [selectedDate, period]);
 
@@ -114,14 +126,78 @@ const Totals = ({ selectedDate }) => {
       <option key={range.id} value={range.name}>
         {range.name}
       </option>
-    ))
+    ));
 
+  useEffect(() => {
+    if (progress["totalsConditions"]) {
+      progress["totalsConditions"][0] = false;
+    } else {
+      progress["totalsConditions"] = [false];
+    }
+
+    setProgress(progress);
+  }, []);
+
+  const onFocusHandler = () => {
+    if (progress["totalsConditions"]) {
+      progress["totalsConditions"][0] = true;
+    } else {
+      progress["totalsConditions"] = [true];
+    }
+    setProgress(progress);
+  };
   return (
-    <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-      <h2 className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading">
+    <section
+      onFocus={onFocusHandler}
+      className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border"
+    >
+      <Hint
+        displayCondition={true}
+        learningMethod="nextClick"
+        order={1}
+        groupName="totals"
+        referenceRef={totalsRef}
+        shiftY={150}
+        shiftX={50}
+        width={"medium"}
+        position={{
+          basePosition: "left",
+          diagonalPosition: "top",
+        }}
+      >
+        This widget facilitates the seamless transfer of your reports to the
+        customer's tracker. You can easily copy all your actions for the day
+        onto the project collectively or individually in the "activity -
+        description" format (if there is activity) or simply the "description"
+        format (if there is no activity). Just click on the file icon to
+        initiate this process. If you require the time spent on each activity,
+        click on the plus file icon, and the log will be copied in the format
+        "description (hh:mm)."
+      </Hint>
+      <Hint
+        learningMethod="buttonClick"
+        order={2}
+        groupName="totals"
+        referenceRef={totalsSelectRef}
+        shiftY={50}
+        shiftX={150}
+        width={"medium"}
+        position={{
+          basePosition: "top",
+          diagonalPosition: "left",
+        }}
+      >
+        You can get data for the day, week and month by selecting the
+        appropriate item in the selector
+      </Hint>
+      <h2
+        ref={totalsRef}
+        className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading"
+      >
         <div>
           <label htmlFor="select">Totals</label>
           <select
+            ref={totalsSelectRef}
             className="cursor-pointer rounded-lg dark:text-dark-heading px-1 capitalize bg-white dark:bg-dark-container focus:outline-none"
             id="select"
             value={period}

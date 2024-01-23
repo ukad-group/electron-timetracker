@@ -6,4 +6,5 @@ export type TextFieldProps = React.DetailedHTMLProps<
 > & {
   id: string;
   label: string;
+  reference?: MutableRefObject<any>;
 };

@@ -178,7 +178,7 @@ export default function Hint({
                 left: `${x + shiftX}px`,
               });
               Object.assign(SVGRef.current.style, {
-                top: `${y}px`,
+                top: `${y - shiftY}px`,
                 left: `${x}px`,
                 width: `${hintWidth / 2 + shiftX + 1}`,
               });
@@ -188,8 +188,14 @@ export default function Hint({
                 "x2",
                 `${hintWidth / 2 + shiftX}`
               );
-              HorizontalLineRef.current.setAttribute("y1", `${hintHeight / 2}`);
-              HorizontalLineRef.current.setAttribute("y2", `${hintHeight / 2}`);
+              HorizontalLineRef.current.setAttribute(
+                "y1",
+                `${hintHeight / 2 + shiftY}`
+              );
+              HorizontalLineRef.current.setAttribute(
+                "y2",
+                `${hintHeight / 2 + shiftY}`
+              );
 
               VerticalLineRef.current.setAttribute(
                 "x1",
@@ -199,29 +205,31 @@ export default function Hint({
                 "x2",
                 `${hintWidth / 2 + shiftX}`
               );
+              VerticalLineRef.current.setAttribute(
+                "y1",
+                `${hintHeight / 2 + shiftY}`
+              );
 
               TriangleRef.current.setAttribute(
                 "points",
-                `${10}, ${hintHeight / 2 - 5} 
-              ${0}, ${hintHeight / 2} 
-              ${10},  ${hintHeight / 2 + 5} `
+                `${10}, ${hintHeight / 2 + shiftY - 5} 
+              ${0}, ${hintHeight / 2 + shiftY} 
+              ${10},  ${hintHeight / 2 + shiftY + 5} `
               );
 
               if (position.diagonalPosition === "top") {
-                VerticalLineRef.current.setAttribute(
-                  "y1",
-                  `${y - shiftY - hintHeight / 2}`
-                );
-                VerticalLineRef.current.setAttribute("y2", `${hintHeight / 2}`);
+                VerticalLineRef.current.setAttribute("y2", `${hintHeight}`);
                 Object.assign(floatingRef.current.style, {
                   top: `${y - shiftY}px`,
                 });
               } else if (position.diagonalPosition === "bottom") {
-                VerticalLineRef.current.setAttribute("y1", `${hintHeight / 2}`);
                 VerticalLineRef.current.setAttribute(
                   "y2",
-                  `${y - hintHeight + shiftY}`
+                  `${hintHeight / 2 + shiftY * 2}`
                 );
+                Object.assign(SVGRef.current.style, {
+                  height: `${hintHeight + shiftY * 2}`,
+                });
                 Object.assign(floatingRef.current.style, {
                   top: `${y + shiftY}px`,
                 });
@@ -306,8 +314,10 @@ export default function Hint({
                 left: `${x - shiftX}px`,
               });
               Object.assign(SVGRef.current.style, {
-                top: `${y}px`,
+                top: `${y - shiftY}px`,
                 left: `${x - shiftX}px`,
+                width: `${hintWidth + shiftX}`,
+                height: `${hintHeight + shiftY}`,
               });
 
               HorizontalLineRef.current.setAttribute("x1", `${hintWidth / 2}`);
@@ -315,33 +325,41 @@ export default function Hint({
                 "x2",
                 `${hintWidth + shiftX}`
               );
-              HorizontalLineRef.current.setAttribute("y1", `${hintHeight / 2}`);
-              HorizontalLineRef.current.setAttribute("y2", `${hintHeight / 2}`);
+              HorizontalLineRef.current.setAttribute(
+                "y1",
+                `${hintHeight / 2 + shiftY}`
+              );
+              HorizontalLineRef.current.setAttribute(
+                "y2",
+                `${hintHeight / 2 + shiftY}`
+              );
               VerticalLineRef.current.setAttribute("x1", `${hintWidth / 2}`);
               VerticalLineRef.current.setAttribute("x2", `${hintWidth / 2}`);
+              VerticalLineRef.current.setAttribute(
+                "y1",
+                `${hintHeight / 2 + shiftY}`
+              );
 
               TriangleRef.current.setAttribute(
                 "points",
-                `${hintWidth + shiftX - 10}, ${hintHeight / 2 - 5} 
-              ${hintWidth + shiftX}, ${hintHeight / 2} 
-              ${hintWidth + shiftX - 10},  ${hintHeight / 2 + 5} `
+                `${hintWidth + shiftX - 10}, ${hintHeight / 2 + shiftY - 5} 
+              ${hintWidth + shiftX}, ${hintHeight / 2 + shiftY} 
+              ${hintWidth + shiftX - 10},  ${hintHeight / 2 + shiftY + 5} `
               );
 
               if (position.diagonalPosition === "top") {
-                VerticalLineRef.current.setAttribute(
-                  "y1",
-                  `${y - shiftY - hintHeight / 2}`
-                );
-                VerticalLineRef.current.setAttribute("y2", `${hintHeight / 2}`);
+                VerticalLineRef.current.setAttribute("y2", `${hintHeight}`);
                 Object.assign(floatingRef.current.style, {
                   top: `${y - shiftY}px`,
                 });
               } else if (position.diagonalPosition === "bottom") {
-                VerticalLineRef.current.setAttribute("y1", `${hintHeight / 2}`);
                 VerticalLineRef.current.setAttribute(
                   "y2",
-                  `${y - hintHeight + shiftY}`
+                  `${hintHeight / 2 + shiftY * 2}`
                 );
+                Object.assign(SVGRef.current.style, {
+                  height: `${hintHeight + shiftY * 2}`,
+                });
                 Object.assign(floatingRef.current.style, {
                   top: `${y + shiftY}px`,
                 });
@@ -359,16 +377,29 @@ export default function Hint({
   };
 
   useEffect(() => {
+    const handleResize = () => {
+      positioning();
+    };
+    window.addEventListener("resize", handleResize);
+
     if (order > 1 && progress[groupName] === undefined) {
-      const tempArr = [];
-      tempArr[order - 1] = true;
+      const tempArr = [null];
+      for (let i = 1; i < order; i++) {
+        tempArr[i] = true;
+      }
       progress[groupName] = tempArr;
+      setProgress(progress);
+      hintLearned();
+    } else if (order > 1 && progress[groupName] !== undefined) {
+      progress[groupName][order + 1] = true;
       setProgress(progress);
       hintLearned();
     }
 
     const unsubscribe = useTutorialProgressStore.subscribe((newProgress) => {
-      setGroupSize(newProgress[groupName]?.length);
+      newProgress[groupName]?.length
+        ? setGroupSize(newProgress[groupName]?.length)
+        : null;
 
       if (
         newProgress.progress.hasOwnProperty(groupName) &&
@@ -385,8 +416,15 @@ export default function Hint({
         newProgress.progress.hasOwnProperty(`${groupName}Conditions`) &&
         !newProgress.progress[`${groupName}Conditions`].includes(false)
       ) {
-        // setHintPositioning(true);
         setShowHint(true);
+      } else if (
+        newProgress.progress.hasOwnProperty(groupName) &&
+        newProgress.progress[groupName][order - 1] !== false &&
+        displayCondition &&
+        newProgress.progress.hasOwnProperty(`${groupName}Conditions`) &&
+        !newProgress.progress[`${groupName}Conditions`].includes(false)
+      ) {
+        // Without this empty condition, no hints with displayCondition property are displayed. If you know why, tell me.
       } else if (
         displayCondition &&
         newProgress.progress.hasOwnProperty(groupName) &&
@@ -397,13 +435,16 @@ export default function Hint({
     });
 
     return () => {
-      // clearTimeout(positioningTimer);
       unsubscribe();
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   useEffect(() => {
-    setGroupSize(progress[groupName]?.length);
+    progress[groupName]?.length
+      ? setGroupSize(progress[groupName]?.length)
+      : null;
+
     if (progress.hasOwnProperty(groupName) && progress[groupName][order - 1]) {
       setShowHint(false);
     } else if (!displayCondition) {
@@ -448,6 +489,12 @@ export default function Hint({
     if (!progress.skipAll[0]) {
       positioning();
     }
+    if (referenceRef.current && !showHint) {
+      Object.assign(referenceRef.current.style, {
+        "z-index": "0",
+        position: "relative",
+      });
+    }
   }, [showHint]);
 
   const skipAllClockHandler = () => {
@@ -489,8 +536,9 @@ export default function Hint({
           )}
           {createPortal(
             <div
+              id="hint"
               className={clsx(
-                "p-4 flex gap-2 flex-col text-sm rounded-lg  z-50 border border-gray-500 bg-black absolute text-gray-900 dark:text-dark-heading",
+                "p-4 pt-5 flex gap-2 flex-col text-sm rounded-lg  z-50 border border-gray-500 bg-black absolute text-gray-900 dark:text-dark-heading",
                 { "w-1/3 lg:w-1/5": width === "small" },
                 { "w-2/5 lg:w-1/4": width === "medium" },
                 { "w-3/5 lg:w-2/5": width === "large" }
@@ -502,7 +550,7 @@ export default function Hint({
                 <ButtonTransparent callback={skipAllClockHandler}>
                   Skip all
                 </ButtonTransparent>
-                {order - 1 < groupSize && (
+                {order < groupSize && (
                   <button
                     type="button"
                     className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500   dark:bg-dark-button-back  dark:hover:bg-dark-button-hover"
@@ -511,11 +559,14 @@ export default function Hint({
                     Next
                   </button>
                 )}
-                {!groupSize && (
+                {(!groupSize || order === groupSize) && (
                   <button
                     type="button"
                     className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500   dark:bg-dark-button-back  dark:hover:bg-dark-button-hover"
-                    onClick={closeBtnHandler}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      closeBtnHandler();
+                    }}
                   >
                     Close
                   </button>
@@ -523,7 +574,10 @@ export default function Hint({
               </div>
               <XMarkIcon
                 className="w-6 h-6 fill-gray-600 dark:fill-gray-400/70 absolute right-1 top-1 cursor-pointer"
-                onClick={closeBtnHandler}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeBtnHandler();
+                }}
               />
             </div>,
             document.body

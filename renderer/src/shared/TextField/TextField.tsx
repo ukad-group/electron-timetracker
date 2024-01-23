@@ -5,6 +5,7 @@ const TextField = ({
   type = "text",
   label,
   required = false,
+  reference,
   ...props
 }: TextFieldProps) => (
   <>
@@ -16,7 +17,7 @@ const TextField = ({
         {label}
       </label>
     )}
-    <input {...props} required={required} type={type} id={id} />
+    <input ref={reference} {...props} required={required} type={type} id={id} />
   </>
 );
 

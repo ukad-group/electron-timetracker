@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import clsx from "clsx";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { formatDuration } from "@/helpers/utils/reports";
@@ -25,6 +25,10 @@ const MainViewTable = () => {
 
   const firstRowRef = useRef(null);
   const firstEditButtonRef = useRef(null);
+  const lastCopyButtonRef = useRef(null);
+  const invalidTimeRef = useRef(null);
+  const calendarEventRef = useRef(null);
+  const [dublicateIndex, setDublicateIndex] = useState(-1);
 
   const [progress, setProgress] = useTutorialProgressStore(
     (state) => [state.progress, state.setProgress],
@@ -38,8 +42,44 @@ const MainViewTable = () => {
       progress["shortcutsEditingConditions"][1] = false;
     }
 
+    if (!progress["copyButtonConditions"]) {
+      progress["copyButtonConditions"] = [true, false];
+    } else {
+      progress["copyButtonConditions"][0] = true;
+      progress["copyButtonConditions"][1] = false;
+    }
+
+    if (!progress["calendarEventConditions"]) {
+      progress["copcalendarEventditions"] = [false];
+    } else {
+      progress["calendarEventConditions"][0] = false;
+    }
+
     setProgress(progress);
   }, []);
+
+  useEffect(() => {
+    if (
+      progress["copyButtonConditions"] &&
+      progress["copyButtonConditions"].includes(false)
+    ) {
+      for (let i = 0; i < tableActivities.length; i++) {
+        const description = tableActivities[i].description;
+        tableActivities.forEach((item, index) => {
+          if (index !== i && item.description === description) {
+            setDublicateIndex(index);
+            if (!progress["copyButtonConditions"]) {
+              progress["copyButtonConditions"] = [true, true];
+            } else {
+              progress["copyButtonConditions"][1] = true;
+            }
+            setProgress(progress);
+            return;
+          }
+        });
+      }
+    }
+  }, [tableActivities]);
 
   const editClickHandler = (activity) => {
     if (!progress["shortcutsEditingConditions"]) {
@@ -51,6 +91,18 @@ const MainViewTable = () => {
 
     setProgress(progress);
     editActivityHandler(activity);
+  };
+
+  const copyClickHandler = (activity) => {
+    if (!progress["copyButtonConditions"]) {
+      progress["copyButtonConditions"] = [false, false];
+    } else {
+      progress["copyButtonConditions"][0] = false;
+      progress["copyButtonConditions"][1] = false;
+    }
+
+    setProgress(progress);
+    copyActivityHandler(activity);
   };
 
   return (
@@ -91,6 +143,24 @@ const MainViewTable = () => {
           If you need to modify a registration, click this button to open the
           corresponding form
         </Hint>
+        <Hint
+          displayCondition={true}
+          learningMethod="buttonClick"
+          order={1}
+          groupName="copyButton"
+          referenceRef={lastCopyButtonRef}
+          shiftY={150}
+          shiftX={50}
+          width={"medium"}
+          position={{
+            basePosition: "right",
+            diagonalPosition: "bottom",
+          }}
+        >
+          It looks like you added the same registration as an existing one. You
+          can do it in a few clicks by clicking on this button, try it
+        </Hint>
+
         {tableActivities?.map((activity, i) => (
           <tr
             ref={i === 0 ? firstRowRef : undefined}
@@ -117,7 +187,26 @@ const MainViewTable = () => {
               {ctrlPressed && (
                 <span className="absolute -left-4 text-blue-700">{i + 1}</span>
               )}
+              {!activity.isValid && (
+                <Hint
+                  learningMethod="buttonClick"
+                  order={1}
+                  groupName="validation"
+                  referenceRef={invalidTimeRef}
+                  shiftY={150}
+                  shiftX={50}
+                  width={"medium"}
+                  position={{
+                    basePosition: "right",
+                    diagonalPosition: "top",
+                  }}
+                >
+                  If you make a mistake in creating a registration, it will be
+                  displayed in red in the table
+                </Hint>
+              )}
               <span
+                ref={!activity.isValid ? invalidTimeRef : undefined}
                 className={clsx({
                   "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
                     !activity.isValid,
@@ -192,10 +281,15 @@ const MainViewTable = () => {
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
               <div className={`${activity.calendarId ? "invisible" : ""}`}>
                 <button
+                  ref={
+                    !activity.calendarId && dublicateIndex === i
+                      ? lastCopyButtonRef
+                      : undefined
+                  }
                   className="group py-4 px-3"
                   title="Copy"
                   onClick={() => {
-                    copyActivityHandler(activity);
+                    copyClickHandler(activity);
                   }}
                 >
                   <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
@@ -216,9 +310,38 @@ const MainViewTable = () => {
                     className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
                   />
                 )}
-
+                {activity.calendarId &&
+                  progress["editButton"] &&
+                  !progress["editButton"].includes(false) && (
+                    <Hint
+                      learningMethod="buttonClick"
+                      order={1}
+                      groupName="calendarEvent"
+                      referenceRef={calendarEventRef}
+                      shiftY={200}
+                      shiftX={50}
+                      width={"medium"}
+                      position={{
+                        basePosition: "right",
+                        diagonalPosition: "bottom",
+                      }}
+                    >
+                      The table also displays the events specified in your
+                      calendar (Google Calendar and Office 365 Calendar). If you
+                      write the title of the event in the calendar in the form
+                      of project - activity - description or activity -
+                      description, it will be parsed automatically. If the title
+                      is not separated by dashes, the entire title will be
+                      written in the description. And if there is a known
+                      project in the title, it will be written in the project
+                      field.
+                    </Hint>
+                  )}
                 {activity.calendarId && (
-                  <PlusIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                  <PlusIcon
+                    ref={activity.calendarId ? calendarEventRef : undefined}
+                    className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
+                  />
                 )}
               </button>
             </td>

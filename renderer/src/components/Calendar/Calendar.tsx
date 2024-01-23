@@ -36,10 +36,14 @@ import {
   CalendarProps,
   ParsedReport,
   FormattedReport,
-  TTUserInfo
+  TTUserInfo,
 } from "./types";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
+import { shallow } from "zustand/shallow";
+import { Hint } from "@/shared/Hint";
+import { SCREENS } from "@/constants";
 
 export function Calendar({
   reportsFolder,
@@ -55,6 +59,9 @@ export function Calendar({
     FormattedReport[]
   >([]);
   const calendarRef = useRef(null);
+  const allCalendarRef = useRef(null);
+  const totalTimeRef = useRef(null);
+  const weekNumberRef = useRef(null);
   const currentReadableMonth = MONTHS[calendarDate.getMonth()];
   const currentYear = calendarDate.getFullYear();
   const [daysOff, setDaysOff] = useState([]);
@@ -62,6 +69,7 @@ export function Calendar({
     errorTitle: "",
     errorMessage: "",
   });
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const timetrackerUserInfo: TTUserInfo = JSON.parse(
     localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)
   );
@@ -100,7 +108,10 @@ export function Calendar({
         })();
       };
 
-      global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
+      global.ipcRenderer.on(
+        IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
+        fileChangeListener
+      );
 
       return () => {
         global.ipcRenderer.removeListener(
@@ -214,7 +225,7 @@ export function Calendar({
     );
 
     return (
-      <div className="flex flex-col text-xs text-zinc-400">
+      <div ref={weekNumberRef} className="flex flex-col text-xs text-zinc-400">
         <span>week {options.num}</span>
         <span className="self-start">{weekTotalHours}</span>
       </div>
@@ -272,14 +283,56 @@ export function Calendar({
     }
   };
 
+  const [progress, setProgress] = useTutorialProgressStore(
+    (state) => [state.progress, state.setProgress],
+    shallow
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } =
+        document.documentElement;
+
+      if (scrollTop + clientHeight >= scrollHeight) {
+        if (progress["calendarConditions"]) {
+          progress["calendarConditions"][0] = true;
+        } else {
+          progress["calendarConditions"] = [true];
+        }
+        setProgress(progress);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
+    if (progress["calendarConditions"]) {
+      progress["calendarConditions"][0] = false;
+    } else {
+      progress["calendarConditions"] = [false];
+    }
+
+    setProgress(progress);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
   if (renderError.errorMessage && renderError.errorTitle) {
     return <ErrorPlaceholder {...renderError} />;
   }
 
   return (
-    <div className="wrapper bg-white p-4 rounded-lg shadow dark:bg-dark-container dark:border dark:border-dark-border">
+    <div
+      ref={allCalendarRef}
+      className="wrapper bg-white p-4 rounded-lg shadow dark:bg-dark-container dark:border dark:border-dark-border"
+    >
       <div className="calendar-header h-10 flex items-center justify-between mb-4">
-        <div>
+        <div ref={totalTimeRef}>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-heading">{`${currentReadableMonth} ${currentYear}`}</h3>
           <p className="text-xs text-gray-500 dark:text-dark-main">
             Total: {monthWorkedHours}
@@ -303,6 +356,85 @@ export function Calendar({
             nextCallback={nextButtonHandle}
           />
         </div>
+        {screenWidth >= SCREENS.LG && (
+          <Hint
+            displayCondition={true}
+            learningMethod="nextClick"
+            order={1}
+            groupName="calendar"
+            referenceRef={allCalendarRef}
+            shiftY={150}
+            shiftX={50}
+            width={"medium"}
+            position={{
+              basePosition: "right",
+              diagonalPosition: "top",
+            }}
+          >
+            Within the calendar, you can easily track the time you've reported
+            for each day. It provides visibility into your vacation days, sick
+            leave, and holidays, along with identifying reports containing
+            errors. The current day is highlighted in yellow, while the day
+            you've selected for viewing is marked in blue.
+          </Hint>
+        )}
+        {screenWidth < SCREENS.LG && (
+          <Hint
+            displayCondition={true}
+            learningMethod="nextClick"
+            order={1}
+            groupName="calendar"
+            referenceRef={allCalendarRef}
+            shiftY={50}
+            shiftX={0}
+            width={"medium"}
+            position={{
+              basePosition: "top",
+              diagonalPosition: "right",
+            }}
+          >
+            Within the calendar, you can easily track the time you've reported
+            for each day. It provides visibility into your vacation days, sick
+            leave, and holidays, along with identifying reports containing
+            errors. The current day is highlighted in yellow, while the day
+            you've selected for viewing is marked in blue.
+          </Hint>
+        )}
+        <Hint
+          learningMethod="nextClick"
+          order={2}
+          groupName="calendar"
+          referenceRef={totalTimeRef}
+          shiftY={200}
+          shiftX={50}
+          width={"medium"}
+          position={{
+            basePosition: "right",
+            diagonalPosition: "bottom",
+          }}
+        >
+          In the totals field, you can view the cumulative hours you've reported
+          for this month. The Required field displays the necessary number of
+          hours to be reported for the month, factoring in weekends, holidays,
+          vacations, and sick days (If you have connected the timetracker
+          website in the settings).
+        </Hint>
+        <Hint
+          learningMethod="nextClick"
+          order={3}
+          groupName="calendar"
+          referenceRef={weekNumberRef}
+          shiftY={200}
+          shiftX={50}
+          width={"medium"}
+          position={{
+            basePosition: "right",
+            diagonalPosition: "top",
+          }}
+        >
+          This indicates the week number along with the total hours you've
+          reported for that week.
+        </Hint>
       </div>
       <FullCalendar
         ref={calendarRef}
