@@ -157,7 +157,7 @@ const Totals = ({ selectedDate }) => {
         order={1}
         groupName="totals"
         referenceRef={totalsRef}
-        shiftY={150}
+        shiftY={200}
         shiftX={50}
         width={"medium"}
         position={{
@@ -181,7 +181,7 @@ const Totals = ({ selectedDate }) => {
         referenceRef={totalsSelectRef}
         shiftY={50}
         shiftX={150}
-        width={"medium"}
+        width={"small"}
         position={{
           basePosition: "top",
           diagonalPosition: "left",

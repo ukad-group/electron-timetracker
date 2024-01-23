@@ -3,7 +3,7 @@ import { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { Position } from "./types";
 
 export const positioning = (
-  hintLearned: () => void,
+  learnHint: () => void,
   referenceRef: MutableRefObject<any>,
   floatingRef: MutableRefObject<any>,
   SVGRef: MutableRefObject<any>,
@@ -24,7 +24,7 @@ export const positioning = (
       ((e.ctrlKey || e.key === "Control" || e.key === "Meta") &&
         /^[0-9]$/.test(e.key))
     ) {
-      hintLearned();
+      learnHint();
     }
   };
   if (referenceRef && floatingRef.current && SVGRef.current) {
@@ -36,7 +36,7 @@ export const positioning = (
     switch (learningMethod) {
       case "buttonClick":
         referenceRef.current.addEventListener("click", () => {
-          hintLearned();
+          learnHint();
         });
         break;
 
@@ -51,13 +51,12 @@ export const positioning = (
       .then(({ x, y }) => {
         if (showHint) {
           Object.assign(referenceRef.current.style, {
-            "z-index": "40",
+            "z-index": "50",
             position: "relative",
           });
         } else {
           Object.assign(referenceRef.current.style, {
-            "z-index": "0",
-            position: "relative",
+            "z-index": null,
           });
         }
 
@@ -68,7 +67,7 @@ export const positioning = (
             });
             Object.assign(SVGRef.current.style, {
               top: `${y}px`,
-              width: `${hintWidth + shiftX}`,
+              width: `${hintWidth / 2 + shiftX + 5}`,
             });
 
             HorizontalLine.setAttribute("y1", `${hintHeight / 2 - shiftY}`);
@@ -77,19 +76,19 @@ export const positioning = (
             VerticalLine.setAttribute("y1", `${hintHeight / 2 - shiftY}`);
             VerticalLine.setAttribute("y2", `${hintHeight}`);
 
-            TriangleRef.current.setAttribute(
-              "points",
-              `${0}, ${hintHeight - 10} 
-              ${5}, ${hintHeight} 
-              ${10},  ${hintHeight - 10} `
-            );
-
             if (position.diagonalPosition === "right") {
               HorizontalLine.setAttribute("x1", "5");
               HorizontalLine.setAttribute("x2", `${shiftX - hintWidth / 2}`);
 
               VerticalLine.setAttribute("x1", "5");
               VerticalLine.setAttribute("x2", "5");
+
+              TriangleRef.current.setAttribute(
+                "points",
+                `${0}, ${hintHeight - 10} 
+                ${5}, ${hintHeight} 
+                ${10},  ${hintHeight - 10} `
+              );
 
               Object.assign(floatingRef.current.style, {
                 left: `${x + shiftX}px`,
@@ -104,6 +103,13 @@ export const positioning = (
 
               VerticalLine.setAttribute("x1", `${shiftX + hintWidth / 2}`);
               VerticalLine.setAttribute("x2", `${shiftX + hintWidth / 2}`);
+
+              TriangleRef.current.setAttribute(
+                "points",
+                `${shiftX + hintWidth / 2 - 5}, ${hintHeight - 10} 
+                ${shiftX + hintWidth / 2}, ${hintHeight} 
+                ${shiftX + hintWidth / 2 + 5},  ${hintHeight - 10} `
+              );
 
               Object.assign(floatingRef.current.style, {
                 left: `${x - shiftX}px`,
