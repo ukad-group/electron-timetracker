@@ -1,48 +1,13 @@
 import clsx from "clsx";
-import {
-  ReactNode,
-  useState,
-  useEffect,
-  useRef,
-  MutableRefObject,
-} from "react";
+import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { computePosition } from "@floating-ui/dom";
+
 import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
-
-export type Position =
-  | {
-      basePosition: "bottom";
-      diagonalPosition: "left" | "right";
-    }
-  | {
-      basePosition: "top";
-      diagonalPosition: "left" | "right";
-    }
-  | {
-      basePosition: "left";
-      diagonalPosition: "bottom" | "top";
-    }
-  | {
-      basePosition: "right";
-      diagonalPosition: "bottom" | "top";
-    };
-
-export type Hint = {
-  displayCondition?: boolean;
-  learningMethod: "buttonClick" | "nextClick" | "ctrlArrowNumberPress";
-  order: number;
-  groupName: string;
-  children: ReactNode;
-  referenceRef: MutableRefObject<any>;
-  shiftY: number;
-  shiftX: number;
-  width: "small" | "medium" | "large";
-  position: Position;
-};
+import { positioning } from "./positioning";
+import { Hint } from "./types";
 
 export default function Hint({
   displayCondition,
@@ -69,316 +34,23 @@ export default function Hint({
     shallow
   );
 
-  const positioning = () => {
-    if (referenceRef && floatingRef.current && SVGRef.current) {
-      const hintHeight = floatingRef.current.offsetHeight;
-      const hintWidth = floatingRef.current.offsetWidth;
-
-      switch (learningMethod) {
-        case "buttonClick":
-          referenceRef.current.addEventListener("click", () => {
-            hintLearned();
-          });
-          break;
-
-        case "ctrlArrowNumberPress":
-          window.addEventListener("keydown", handleKeyDown);
-          break;
-      }
-
-      computePosition(referenceRef.current, floatingRef.current, {
-        placement: position.basePosition,
-      })
-        .then(({ x, y }) => {
-          if (showHint) {
-            Object.assign(referenceRef.current.style, {
-              "z-index": "40",
-              position: "relative",
-            });
-          } else {
-            Object.assign(referenceRef.current.style, {
-              "z-index": "0",
-              position: "relative",
-            });
-          }
-
-          switch (position.basePosition) {
-            case "top":
-              Object.assign(floatingRef.current.style, {
-                top: `${y - shiftY}px`,
-              });
-              Object.assign(SVGRef.current.style, {
-                top: `${y}px`,
-                width: `${hintWidth + shiftX}`,
-              });
-
-              HorizontalLineRef.current.setAttribute(
-                "y1",
-                `${hintHeight / 2 - shiftY}`
-              );
-              HorizontalLineRef.current.setAttribute(
-                "y2",
-                `${hintHeight / 2 - shiftY}`
-              );
-              VerticalLineRef.current.setAttribute(
-                "y1",
-                `${hintHeight / 2 - shiftY}`
-              );
-              VerticalLineRef.current.setAttribute("y2", `${hintHeight}`);
-
-              TriangleRef.current.setAttribute(
-                "points",
-                `${0}, ${hintHeight - 10} 
-              ${5}, ${hintHeight} 
-              ${10},  ${hintHeight - 10} `
-              );
-
-              if (position.diagonalPosition === "right") {
-                HorizontalLineRef.current.setAttribute("x1", "5");
-                HorizontalLineRef.current.setAttribute(
-                  "x2",
-                  `${shiftX - hintWidth / 2}`
-                );
-                VerticalLineRef.current.setAttribute("x1", "5");
-                VerticalLineRef.current.setAttribute("x2", "5");
-
-                Object.assign(floatingRef.current.style, {
-                  left: `${x + shiftX}px`,
-                });
-                Object.assign(SVGRef.current.style, {
-                  left: `${x + hintWidth / 2}px`,
-                });
-              }
-              if (position.diagonalPosition === "left") {
-                HorizontalLineRef.current.setAttribute(
-                  "x1",
-                  `${shiftX + hintWidth / 2}`
-                );
-                HorizontalLineRef.current.setAttribute("x2", `${hintWidth}`);
-                VerticalLineRef.current.setAttribute(
-                  "x1",
-                  `${shiftX + hintWidth / 2}`
-                );
-                VerticalLineRef.current.setAttribute(
-                  "x2",
-                  `${shiftX + hintWidth / 2}`
-                );
-
-                Object.assign(floatingRef.current.style, {
-                  left: `${x - shiftX}px`,
-                });
-                Object.assign(SVGRef.current.style, {
-                  left: `${x - shiftX}px`,
-                });
-              }
-              break;
-
-            case "right":
-              Object.assign(floatingRef.current.style, {
-                left: `${x + shiftX}px`,
-              });
-              Object.assign(SVGRef.current.style, {
-                top: `${y - shiftY}px`,
-                left: `${x}px`,
-                width: `${hintWidth / 2 + shiftX + 1}`,
-              });
-
-              HorizontalLineRef.current.setAttribute("x1", `${0}`);
-              HorizontalLineRef.current.setAttribute(
-                "x2",
-                `${hintWidth / 2 + shiftX}`
-              );
-              HorizontalLineRef.current.setAttribute(
-                "y1",
-                `${hintHeight / 2 + shiftY}`
-              );
-              HorizontalLineRef.current.setAttribute(
-                "y2",
-                `${hintHeight / 2 + shiftY}`
-              );
-
-              VerticalLineRef.current.setAttribute(
-                "x1",
-                `${hintWidth / 2 + shiftX}`
-              );
-              VerticalLineRef.current.setAttribute(
-                "x2",
-                `${hintWidth / 2 + shiftX}`
-              );
-              VerticalLineRef.current.setAttribute(
-                "y1",
-                `${hintHeight / 2 + shiftY}`
-              );
-
-              TriangleRef.current.setAttribute(
-                "points",
-                `${10}, ${hintHeight / 2 + shiftY - 5} 
-              ${0}, ${hintHeight / 2 + shiftY} 
-              ${10},  ${hintHeight / 2 + shiftY + 5} `
-              );
-
-              if (position.diagonalPosition === "top") {
-                VerticalLineRef.current.setAttribute("y2", `${hintHeight}`);
-                Object.assign(floatingRef.current.style, {
-                  top: `${y - shiftY}px`,
-                });
-              } else if (position.diagonalPosition === "bottom") {
-                VerticalLineRef.current.setAttribute(
-                  "y2",
-                  `${hintHeight / 2 + shiftY * 2}`
-                );
-                Object.assign(SVGRef.current.style, {
-                  height: `${hintHeight + shiftY * 2}`,
-                });
-                Object.assign(floatingRef.current.style, {
-                  top: `${y + shiftY}px`,
-                });
-              }
-              break;
-
-            case "bottom":
-              Object.assign(floatingRef.current.style, {
-                top: `${y + shiftY}px`,
-              });
-              Object.assign(SVGRef.current.style, {
-                top: `${y}px`,
-                width: `${hintWidth + shiftX}`,
-              });
-
-              VerticalLineRef.current.setAttribute("y1", "0");
-              VerticalLineRef.current.setAttribute(
-                "y2",
-                `${shiftY + hintHeight / 2}`
-              );
-              HorizontalLineRef.current.setAttribute(
-                "y1",
-                `${shiftY + hintHeight / 2}`
-              );
-              HorizontalLineRef.current.setAttribute(
-                "y2",
-                `${shiftY + hintHeight / 2}`
-              );
-
-              if (position.diagonalPosition === "right") {
-                HorizontalLineRef.current.setAttribute("x1", "5");
-                HorizontalLineRef.current.setAttribute("x2", `${shiftX}`);
-                VerticalLineRef.current.setAttribute("x1", "5");
-                VerticalLineRef.current.setAttribute("x2", "5");
-
-                TriangleRef.current.setAttribute(
-                  "points",
-                  `${0}, ${10} 
-                  ${5}, ${0} 
-                  ${10},  ${10} `
-                );
-
-                Object.assign(floatingRef.current.style, {
-                  left: `${x + shiftX}px`,
-                });
-                Object.assign(SVGRef.current.style, {
-                  left: `${x + hintWidth / 2}px`,
-                });
-              } else if (position.diagonalPosition === "left") {
-                HorizontalLineRef.current.setAttribute("x1", `${hintWidth}`);
-                HorizontalLineRef.current.setAttribute(
-                  "x2",
-                  `${hintWidth / 2 + shiftX}`
-                );
-                VerticalLineRef.current.setAttribute(
-                  "x1",
-                  `${hintWidth / 2 + shiftX}`
-                );
-                VerticalLineRef.current.setAttribute(
-                  "x2",
-                  `${hintWidth / 2 + shiftX}`
-                );
-
-                TriangleRef.current.setAttribute(
-                  "points",
-                  `${hintWidth / 2 + shiftX - 5}, ${10} 
-                  ${hintWidth / 2 + shiftX}, ${0} 
-                  ${hintWidth / 2 + shiftX + 5},  ${10} `
-                );
-
-                Object.assign(floatingRef.current.style, {
-                  left: `${x - shiftX}px`,
-                });
-                Object.assign(SVGRef.current.style, {
-                  left: `${x - shiftX}px`,
-                });
-              }
-              break;
-
-            case "left":
-              Object.assign(floatingRef.current.style, {
-                left: `${x - shiftX}px`,
-              });
-              Object.assign(SVGRef.current.style, {
-                top: `${y - shiftY}px`,
-                left: `${x - shiftX}px`,
-                width: `${hintWidth + shiftX}`,
-                height: `${hintHeight + shiftY}`,
-              });
-
-              HorizontalLineRef.current.setAttribute("x1", `${hintWidth / 2}`);
-              HorizontalLineRef.current.setAttribute(
-                "x2",
-                `${hintWidth + shiftX}`
-              );
-              HorizontalLineRef.current.setAttribute(
-                "y1",
-                `${hintHeight / 2 + shiftY}`
-              );
-              HorizontalLineRef.current.setAttribute(
-                "y2",
-                `${hintHeight / 2 + shiftY}`
-              );
-              VerticalLineRef.current.setAttribute("x1", `${hintWidth / 2}`);
-              VerticalLineRef.current.setAttribute("x2", `${hintWidth / 2}`);
-              VerticalLineRef.current.setAttribute(
-                "y1",
-                `${hintHeight / 2 + shiftY}`
-              );
-
-              TriangleRef.current.setAttribute(
-                "points",
-                `${hintWidth + shiftX - 10}, ${hintHeight / 2 + shiftY - 5} 
-              ${hintWidth + shiftX}, ${hintHeight / 2 + shiftY} 
-              ${hintWidth + shiftX - 10},  ${hintHeight / 2 + shiftY + 5} `
-              );
-
-              if (position.diagonalPosition === "top") {
-                VerticalLineRef.current.setAttribute("y2", `${hintHeight}`);
-                Object.assign(floatingRef.current.style, {
-                  top: `${y - shiftY}px`,
-                });
-              } else if (position.diagonalPosition === "bottom") {
-                VerticalLineRef.current.setAttribute(
-                  "y2",
-                  `${hintHeight / 2 + shiftY * 2}`
-                );
-                Object.assign(SVGRef.current.style, {
-                  height: `${hintHeight + shiftY * 2}`,
-                });
-                Object.assign(floatingRef.current.style, {
-                  top: `${y + shiftY}px`,
-                });
-              }
-              break;
-
-            default:
-              setShowHint(false);
-          }
-        })
-        .catch((error) => {
-          console.error("Error in computing position:", error);
-        });
-    }
-  };
-
   useEffect(() => {
     const handleResize = () => {
-      positioning();
+      positioning(
+        hintLearned,
+        referenceRef,
+        floatingRef,
+        SVGRef,
+        learningMethod,
+        position,
+        showHint,
+        shiftY,
+        shiftX,
+        HorizontalLineRef,
+        VerticalLineRef,
+        TriangleRef,
+        setShowHint
+      );
     };
     window.addEventListener("resize", handleResize);
 
@@ -466,17 +138,6 @@ export default function Hint({
     hintLearned();
   };
 
-  const handleKeyDown = (e) => {
-    if (
-      (e.ctrlKey && e.key === "ArrowUp") ||
-      (e.key === "Meta" && e.key === "ArrowUp") ||
-      ((e.ctrlKey || e.key === "Control" || e.key === "Meta") &&
-        /^[0-9]$/.test(e.key))
-    ) {
-      hintLearned();
-    }
-  };
-
   const nextClickHandler = () => {
     if (progress[groupName][order] !== undefined) {
       progress[groupName][order] = false;
@@ -487,7 +148,21 @@ export default function Hint({
 
   useEffect(() => {
     if (!progress.skipAll[0]) {
-      positioning();
+      positioning(
+        hintLearned,
+        referenceRef,
+        floatingRef,
+        SVGRef,
+        learningMethod,
+        position,
+        showHint,
+        shiftY,
+        shiftX,
+        HorizontalLineRef,
+        VerticalLineRef,
+        TriangleRef,
+        setShowHint
+      );
     }
     if (referenceRef.current && !showHint) {
       Object.assign(referenceRef.current.style, {
