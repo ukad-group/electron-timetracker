@@ -224,7 +224,7 @@ export function calcDurationBetweenTimes(from: string, to: string): number {
 }
 
 export function formatDuration(ms: number): string {
-  if (ms === undefined) return "";
+  if (ms === undefined) return undefined;
 
   const msPerMinute = 60 * 1000;
   const msPerHour = 60 * msPerMinute;
