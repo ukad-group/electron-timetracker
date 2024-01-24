@@ -16,7 +16,7 @@ const JiraConnection = () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send("open-child-window", "jira");
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "jira");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -88,10 +88,15 @@ const JiraConnection = () => {
   };
 
   useEffect(() => {
-    global.ipcRenderer.on("should-rerender-jira", rerenderListener);
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.JIRA_SHOULD_RERENDER,
+      rerenderListener
+    );
 
     return () => {
-      global.ipcRenderer.removeAllListeners("should-rerender-jira");
+      global.ipcRenderer.removeAllListeners(
+        IPC_MAIN_CHANNELS.JIRA_SHOULD_RERENDER
+      );
     };
   }, [users]);
 

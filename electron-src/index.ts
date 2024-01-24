@@ -356,30 +356,38 @@ app.on("ready", async () => {
       }
     };
 
-    ipcMain.on("open-child-window", (_, connectionName) => {
+    ipcMain.on(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, (_, connectionName) => {
       createChildWindow(getConnectionUrl(connectionName));
     });
 
     ipcMain.on("child-window-closed", (_, componentName) => {
       switch (componentName) {
         case "google":
-          mainWindow?.webContents.send("should-rerender-google");
+          mainWindow?.webContents.send(
+            IPC_MAIN_CHANNELS.GOOGLE_SHOULD_RERENDER
+          );
           break;
 
         case "jira":
-          mainWindow?.webContents.send("should-rerender-jira");
+          mainWindow?.webContents.send(IPC_MAIN_CHANNELS.JIRA_SHOULD_RERENDER);
           break;
 
         case "office365":
-          mainWindow?.webContents.send("should-rerender-office365");
+          mainWindow?.webContents.send(
+            IPC_MAIN_CHANNELS.OFFICE365_SHOULD_RERENDER
+          );
           break;
 
         case "timetracker-website":
-          mainWindow?.webContents.send("should-rerender-timetracker-website");
+          mainWindow?.webContents.send(
+            IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER
+          );
           break;
 
         case "trello":
-          mainWindow?.webContents.send("should-rerender-trello");
+          mainWindow?.webContents.send(
+            IPC_MAIN_CHANNELS.TRELLO_SHOULD_RERENDER
+          );
           break;
 
         default:

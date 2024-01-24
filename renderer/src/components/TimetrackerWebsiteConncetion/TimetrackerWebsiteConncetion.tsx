@@ -19,7 +19,10 @@ const TimetrackerWebsiteConnection = () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send("open-child-window", "timetracker-website");
+      global.ipcRenderer.send(
+        IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW,
+        "timetracker-website"
+      );
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -182,13 +185,13 @@ const TimetrackerWebsiteConnection = () => {
     }
 
     global.ipcRenderer.on(
-      "should-rerender-timetracker-website",
+      IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER,
       rerenderListener
     );
 
     return () => {
       global.ipcRenderer.removeAllListeners(
-        "should-rerender-timetracker-website"
+        IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER
       );
     };
   }, []);

@@ -15,7 +15,7 @@ const TrelloConnection = () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send("open-child-window", "trello");
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "trello");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -57,10 +57,15 @@ const TrelloConnection = () => {
   };
 
   useEffect(() => {
-    global.ipcRenderer.on("should-rerender-trello", rerenderListener);
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.TRELLO_SHOULD_RERENDER,
+      rerenderListener
+    );
 
     return () => {
-      global.ipcRenderer.removeAllListeners("should-rerender-trello");
+      global.ipcRenderer.removeAllListeners(
+        IPC_MAIN_CHANNELS.TRELLO_SHOULD_RERENDER
+      );
     };
   }, [user]);
 

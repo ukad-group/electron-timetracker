@@ -18,7 +18,7 @@ const GoogleConnection = () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send("open-child-window", "google");
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "google");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -140,10 +140,15 @@ const GoogleConnection = () => {
       setLoggedUsers(loggedUsersFromLs);
     }
 
-    global.ipcRenderer.on("should-rerender-google", rerenderListener);
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.GOOGLE_SHOULD_RERENDER,
+      rerenderListener
+    );
 
     return () => {
-      global.ipcRenderer.removeAllListeners("should-rerender-google");
+      global.ipcRenderer.removeAllListeners(
+        IPC_MAIN_CHANNELS.GOOGLE_SHOULD_RERENDER
+      );
     };
   }, []);
 

@@ -18,7 +18,7 @@ const Office365Connection = () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send("open-child-window", "office365");
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "office365");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -115,10 +115,15 @@ const Office365Connection = () => {
       setShowEventsInTable(true);
     }
 
-    global.ipcRenderer.on("should-rerender-office365", rerenderListener);
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.OFFICE365_SHOULD_RERENDER,
+      rerenderListener
+    );
 
     return () => {
-      global.ipcRenderer.removeAllListeners("should-rerender-office365");
+      global.ipcRenderer.removeAllListeners(
+        IPC_MAIN_CHANNELS.OFFICE365_SHOULD_RERENDER
+      );
     };
   }, [users]);
 
