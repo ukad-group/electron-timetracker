@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { UseOnlineType } from './types';
+import { UseOnlineStatusTypes } from './types';
 
-const useOnlineStatus = (trigger: boolean): UseOnlineType => {
+const useOnlineStatus = (trigger: boolean): UseOnlineStatusTypes => {
   const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
 
   const updateOnlineStatus = () => {

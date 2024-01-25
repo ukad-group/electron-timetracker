@@ -1,4 +1,4 @@
-export type UseOnlineType = {
+export type UseOnlineStatusTypes = {
   isOnline: boolean;
   updateOnlineStatus: () => void;
 };
