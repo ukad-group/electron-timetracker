@@ -54,12 +54,11 @@ const mockedProps: TrackTimeModalProps = {
   selectedDate: new Date(),
 };
 
-// mocking the method that requires TrackTimeModal
-class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-}
+global.ResizeObserver = jest.fn(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
 
 describe("toInput prefilled value depends on the date", () => {
   window.ResizeObserver = ResizeObserver;
