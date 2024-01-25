@@ -6,7 +6,8 @@
   "author": "mmmykhailo <mmmykhailo@proton.me>",
   "main": "main/index.js",
   "scripts": {
-    "test": "jest --coverage",
+    "coverage": "jest --coverage",
+    "test": "jest",
     "clean": "rimraf dist main renderer/out renderer/.next",
     "postinstall": "electron-builder install-app-deps",
     "dev": "npm run build-electron && electron .",
