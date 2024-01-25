@@ -3,9 +3,9 @@ import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { Button } from "@/shared/Button";
 import { useRouter } from "next/router";
 import { Loader } from "@/shared/Loader";
-import isOnline from "is-online";
 import { TTUserInfo } from "../Calendar/types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { useOnlineStatus } from "@/helpers/hooks";
 
 const TimetrackerWebsiteConnection = () => {
   const router = useRouter();
@@ -13,11 +13,13 @@ const TimetrackerWebsiteConnection = () => {
     JSON.parse(localStorage.getItem("timetracker-user"))
   );
   const [loading, setLoading] = useState(false);
+  const [trigger, setTrigger] = useState(false);
+  const { isOnline } = useOnlineStatus(trigger)
 
   const handleSignInButton = async () => {
-    const online = await isOnline();
+    setTrigger(!trigger);
 
-    if (online) {
+    if (isOnline) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.AZURE_LOGIN_BASE);
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);

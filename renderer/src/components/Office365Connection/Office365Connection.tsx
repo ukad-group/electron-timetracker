@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/shared/Button";
-import isOnline from "is-online";
 import { Office365User } from "@/helpers/utils/office365";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import Users from "./Users";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { useOnlineStatus } from "@/helpers/hooks";
 
 const Office365Connection = () => {
   const [users, setUsers] = useState(
     JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || []
   );
   const [showEventsInTable, setShowEventsInTable] = useState(false);
+  const [trigger, setTrigger] = useState(false);
+  const { isOnline } = useOnlineStatus(trigger)
+
 
   const handleSignInButton = async () => {
-    const online = await isOnline();
+    setTrigger(!trigger);
 
-    if (online) {
+    if (isOnline) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.OFFICE365_LOGIN);
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);

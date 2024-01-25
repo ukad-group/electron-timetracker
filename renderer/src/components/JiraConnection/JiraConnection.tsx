@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { Button } from "@/shared/Button";
-import isOnline from "is-online";
 import { JiraUser } from "@/helpers/utils/jira";
 import { FlagIcon } from "@heroicons/react/24/outline";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { useOnlineStatus } from '@/helpers/hooks';
 
 const JiraConnection = () => {
   const [users, setUsers] = useState(
     JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || []
   );
+  const [trigger, setTrigger] = useState(false);
+  const { isOnline } = useOnlineStatus(trigger)
 
   const handleSignInButton = async () => {
-    const online = await isOnline();
+    setTrigger(!trigger);
 
-    if (online) {
+    if (isOnline) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.JIRA_LOGIN);
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
