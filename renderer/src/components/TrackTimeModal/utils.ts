@@ -1,12 +1,13 @@
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { KEY_CODES } from "@/helpers/contstants";
 
 export const changeHours = (eventKey: string, hours: number) => {
   let newHours = hours;
 
-  if (eventKey === "ArrowUp") {
+  if (eventKey === KEY_CODES.ARROW_UP) {
     newHours += 1;
-  } else if (eventKey === "ArrowDown") {
+  } else if (eventKey === KEY_CODES.ARROW_DOWN) {
     newHours -= 1;
   }
 
@@ -27,9 +28,9 @@ export const changeMinutesAndHours = (
   let newMinutes = minutes;
   let newHours = hours;
 
-  if (eventKey === "ArrowUp") {
+  if (eventKey === KEY_CODES.ARROW_UP) {
     newMinutes += 15;
-  } else if (eventKey === "ArrowDown") {
+  } else if (eventKey === KEY_CODES.ARROW_DOWN) {
     newMinutes -= 15;
   }
 
