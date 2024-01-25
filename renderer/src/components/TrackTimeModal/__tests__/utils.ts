@@ -4,12 +4,6 @@ import {
 } from '../utils';
 import { KEY_CODES } from '@/helpers/contstants';
 
-jest.mock('electron', () => ({
-  ipcRenderer: {
-    invoke: jest.fn(),
-  },
-}));
-
 describe('GIVEN changeHours', () => {
   it('should increment hours when ArrowUp key is pressed', () => {
     expect(changeHours(KEY_CODES.ARROW_UP, 5)).toBe(6);
@@ -47,3 +41,6 @@ describe('GIVEN changeMinutesAndHours', () => {
     expect(changeMinutesAndHours(KEY_CODES.ARROW_UP, 60, 1)).toEqual([15, 2]);
   });
 });
+
+// Need to figure out how to cover the getTimetrackerYearProjects util function.
+// ...

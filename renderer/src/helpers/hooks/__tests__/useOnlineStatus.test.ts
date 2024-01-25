@@ -55,6 +55,3 @@ describe('GIVEN useOnlineStatus', () => {
     window.addEventListener = originalAddEventListener;
   });
 });
-
-// Need to figure out how to cover the getTimetrackerYearProjects util function.
-// ...
