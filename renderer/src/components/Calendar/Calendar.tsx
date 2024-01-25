@@ -43,7 +43,8 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { Hint } from "@/shared/Hint";
-import { SCREENS } from "@/constants";
+import { SCREENS, HINTS_GROUP_NAMES } from "@/constants";
+import { changeHintConditions } from "@/helpers/utils/utils";
 
 export function Calendar({
   reportsFolder,
@@ -293,29 +294,33 @@ export function Calendar({
       setScreenWidth(window.innerWidth);
     };
 
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.CALENDAR,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+    ]);
+
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } =
         document.documentElement;
 
       if (scrollTop + clientHeight >= scrollHeight) {
-        if (progress["calendarConditions"]) {
-          progress["calendarConditions"][0] = true;
-        } else {
-          progress["calendarConditions"] = [true];
-        }
-        setProgress(progress);
+        console.log("scroll");
+        changeHintConditions(progress, setProgress, [
+          {
+            groupName: HINTS_GROUP_NAMES.CALENDAR,
+            newConditions: [true],
+            existingConditions: [true],
+          },
+        ]);
       }
     };
 
     window.addEventListener("scroll", handleScroll);
     window.addEventListener("resize", handleResize);
-    if (progress["calendarConditions"]) {
-      progress["calendarConditions"][0] = false;
-    } else {
-      progress["calendarConditions"] = [false];
-    }
 
-    setProgress(progress);
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
@@ -361,7 +366,7 @@ export function Calendar({
             displayCondition={true}
             learningMethod="nextClick"
             order={1}
-            groupName="calendar"
+            groupName={`${HINTS_GROUP_NAMES.CALENDAR}`}
             referenceRef={allCalendarRef}
             shiftY={150}
             shiftX={50}
@@ -383,7 +388,7 @@ export function Calendar({
             displayCondition={true}
             learningMethod="nextClick"
             order={1}
-            groupName="calendar"
+            groupName={`${HINTS_GROUP_NAMES.CALENDAR}`}
             referenceRef={allCalendarRef}
             shiftY={50}
             shiftX={0}
@@ -403,7 +408,7 @@ export function Calendar({
         <Hint
           learningMethod="nextClick"
           order={2}
-          groupName="calendar"
+          groupName={`${HINTS_GROUP_NAMES.CALENDAR}`}
           referenceRef={totalTimeRef}
           shiftY={200}
           shiftX={50}
@@ -422,7 +427,7 @@ export function Calendar({
         <Hint
           learningMethod="nextClick"
           order={3}
-          groupName="calendar"
+          groupName={`${HINTS_GROUP_NAMES.CALENDAR}`}
           referenceRef={weekNumberRef}
           shiftY={200}
           shiftX={50}

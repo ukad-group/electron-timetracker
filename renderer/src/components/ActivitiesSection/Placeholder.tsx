@@ -11,6 +11,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { Popup } from "@/shared/Popup";
 import { Hint } from "@/shared/Hint";
+import { HINTS_GROUP_NAMES } from "@/constants";
 
 const Placeholder = ({
   onEditActivity,
@@ -87,7 +88,7 @@ const Placeholder = ({
         <Hint
           learningMethod="buttonClick"
           order={1}
-          groupName="placeholder"
+          groupName={`${HINTS_GROUP_NAMES.PLACEHOLDER}`}
           referenceRef={placeholderButtonRef}
           shiftY={150}
           shiftX={60}

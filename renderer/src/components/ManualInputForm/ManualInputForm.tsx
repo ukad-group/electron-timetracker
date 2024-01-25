@@ -10,6 +10,8 @@ import useEditingHistoryManager from "@/helpers/hooks/useEditingHistoryManager";
 import { ManualInputFormProps } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { Hint } from "@/shared/Hint";
+import { HINTS_GROUP_NAMES } from "@/constants";
+import { changeHintConditions } from "@/helpers/utils/utils";
 
 export default function ManualInputForm({
   onSave,
@@ -187,22 +189,23 @@ export default function ManualInputForm({
     setReportHandler(serializedReport);
   };
   useEffect(() => {
-    if (progress["manualInputConditions"]) {
-      progress["manualInputConditions"][0] = false;
-    } else {
-      progress["manualInputConditions"] = [false];
-    }
-
-    setProgress(progress);
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.MANUAL_INPUT,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+    ]);
   }, []);
 
   const onFocusHandler = () => {
-    if (progress["manualInputConditions"]) {
-      progress["manualInputConditions"][0] = true;
-    } else {
-      progress["manualInputConditions"] = [true];
-    }
-    setProgress(progress);
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.MANUAL_INPUT,
+        newConditions: [true],
+        existingConditions: [true],
+      },
+    ]);
   };
 
   return (
@@ -211,7 +214,7 @@ export default function ManualInputForm({
         displayCondition={true}
         learningMethod="nextClick"
         order={1}
-        groupName="manualInput"
+        groupName={`${HINTS_GROUP_NAMES.MANUAL_INPUT}`}
         referenceRef={textareaRef}
         shiftY={30}
         shiftX={200}

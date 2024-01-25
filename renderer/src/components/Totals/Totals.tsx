@@ -9,6 +9,8 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { getTotals } from "./utils";
 import TotalsList from "./TotalsList";
 import { Hint } from "@/shared/Hint";
+import { HINTS_GROUP_NAMES } from "@/constants";
+import { changeHintConditions } from "@/helpers/utils/utils";
 
 const Totals = ({ selectedDate }) => {
   const [reportsFolder] = useMainStore(
@@ -129,22 +131,23 @@ const Totals = ({ selectedDate }) => {
     ));
 
   useEffect(() => {
-    if (progress["totalsConditions"]) {
-      progress["totalsConditions"][0] = false;
-    } else {
-      progress["totalsConditions"] = [false];
-    }
-
-    setProgress(progress);
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.TOTALS,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+    ]);
   }, []);
 
   const onFocusHandler = () => {
-    if (progress["totalsConditions"]) {
-      progress["totalsConditions"][0] = true;
-    } else {
-      progress["totalsConditions"] = [true];
-    }
-    setProgress(progress);
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.TOTALS,
+        newConditions: [true],
+        existingConditions: [true],
+      },
+    ]);
   };
   return (
     <section
@@ -155,7 +158,7 @@ const Totals = ({ selectedDate }) => {
         displayCondition={true}
         learningMethod="nextClick"
         order={1}
-        groupName="totals"
+        groupName={`${HINTS_GROUP_NAMES.TOTALS}`}
         referenceRef={totalsRef}
         shiftY={200}
         shiftX={50}
@@ -177,7 +180,7 @@ const Totals = ({ selectedDate }) => {
       <Hint
         learningMethod="buttonClick"
         order={2}
-        groupName="totals"
+        groupName={`${HINTS_GROUP_NAMES.TOTALS}`}
         referenceRef={totalsSelectRef}
         shiftY={50}
         shiftX={150}

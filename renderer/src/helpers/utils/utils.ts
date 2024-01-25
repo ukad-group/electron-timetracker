@@ -1,4 +1,5 @@
 import { ReportActivity } from "./reports";
+import { TutorialProgress, TutorialProgressStore } from "@/store/types";
 
 export const replaceHyphensWithSpaces = (inputString: string): string =>
   inputString.replace(/ - /g, " ");
@@ -100,3 +101,27 @@ export function parseEventTitle(
 
   return event;
 }
+type HintConitions = {
+  groupName: string;
+  newConditions: Array<boolean>;
+  existingConditions: Array<boolean | "same">;
+};
+export const changeHintConditions = (
+  progress: TutorialProgress,
+  setProgress: (event: TutorialProgress) => void,
+  hints: Array<HintConitions>
+) => {
+  hints.forEach((hint) => {
+    if (!progress[`${hint.groupName}Conditions`]) {
+      progress[`${hint.groupName}Conditions`] = hint.newConditions;
+    } else {
+      hint.existingConditions.forEach((condition, i) => {
+        if (condition !== "same") {
+          progress[`${hint.groupName}Conditions`][i] = condition;
+        }
+      });
+    }
+  });
+
+  setProgress(progress);
+};

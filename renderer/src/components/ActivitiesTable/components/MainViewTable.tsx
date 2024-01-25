@@ -11,6 +11,8 @@ import { ActivitiesTableContext } from "../context";
 import { Hint } from "@/shared/Hint";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
+import { HINTS_GROUP_NAMES } from "@/constants";
+import { changeHintConditions } from "@/helpers/utils/utils";
 
 const MainViewTable = () => {
   const {
@@ -35,44 +37,42 @@ const MainViewTable = () => {
     shallow
   );
   useEffect(() => {
-    if (!progress["shortcutsEditingConditions"]) {
-      progress["shortcutsEditingConditions"] = [false, false];
-    } else {
-      progress["shortcutsEditingConditions"][0] = false;
-      progress["shortcutsEditingConditions"][1] = false;
-    }
-
-    if (!progress["copyButtonConditions"]) {
-      progress["copyButtonConditions"] = [true, false];
-    } else {
-      progress["copyButtonConditions"][1] = false;
-    }
-
-    if (!progress["calendarEventConditions"]) {
-      progress["copcalendarEventditions"] = [false];
-    } else {
-      progress["calendarEventConditions"][0] = false;
-    }
-
-    setProgress(progress);
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.SHORTCUTS_EDITING,
+        newConditions: [false, false],
+        existingConditions: [false, false],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.COPY_BUTTON,
+        newConditions: [true, false],
+        existingConditions: ["same", false],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.CALENDAR_EVENT,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+    ]);
   }, []);
 
   useEffect(() => {
     if (
-      progress["copyButtonConditions"] &&
-      progress["copyButtonConditions"].includes(false)
+      progress[`${HINTS_GROUP_NAMES.COPY_BUTTON}Conditions`] &&
+      progress[`${HINTS_GROUP_NAMES.COPY_BUTTON}Conditions`].includes(false)
     ) {
       for (let i = 0; i < tableActivities.length; i++) {
         const description = tableActivities[i].description;
         tableActivities.forEach((item, index) => {
           if (index !== i && item.description === description) {
             setDublicateIndex(index);
-            if (!progress["copyButtonConditions"]) {
-              progress["copyButtonConditions"] = [true, true];
-            } else {
-              progress["copyButtonConditions"][1] = true;
-            }
-            setProgress(progress);
+            changeHintConditions(progress, setProgress, [
+              {
+                groupName: HINTS_GROUP_NAMES.COPY_BUTTON,
+                newConditions: [true, true],
+                existingConditions: ["same", true],
+              },
+            ]);
             return;
           }
         });
@@ -81,26 +81,24 @@ const MainViewTable = () => {
   }, [tableActivities]);
 
   const editClickHandler = (activity) => {
-    if (!progress["shortcutsEditingConditions"]) {
-      progress["shortcutsEditingConditions"] = [true, false];
-    } else {
-      progress["shortcutsEditingConditions"][0] = true;
-      progress["shortcutsEditingConditions"][1] = false;
-    }
-
-    setProgress(progress);
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.SHORTCUTS_EDITING,
+        newConditions: [true, false],
+        existingConditions: [true, false],
+      },
+    ]);
     editActivityHandler(activity);
   };
 
   const copyClickHandler = (activity) => {
-    if (!progress["copyButtonConditions"]) {
-      progress["copyButtonConditions"] = [false, false];
-    } else {
-      progress["copyButtonConditions"][0] = false;
-      progress["copyButtonConditions"][1] = false;
-    }
-
-    setProgress(progress);
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.COPY_BUTTON,
+        newConditions: [false, false],
+        existingConditions: [false, false],
+      },
+    ]);
     copyActivityHandler(activity);
   };
 
@@ -111,7 +109,7 @@ const MainViewTable = () => {
           displayCondition={true}
           learningMethod="ctrlArrowNumberPress"
           order={1}
-          groupName="shortcutsEditing"
+          groupName={`${HINTS_GROUP_NAMES.SHORTCUTS_EDITING}`}
           referenceRef={firstRowRef}
           shiftY={25}
           shiftX={150}
@@ -129,7 +127,7 @@ const MainViewTable = () => {
         <Hint
           learningMethod="buttonClick"
           order={1}
-          groupName="editButton"
+          groupName={`${HINTS_GROUP_NAMES.EDITING_BUTTON}`}
           referenceRef={firstEditButtonRef}
           shiftY={30}
           shiftX={200}
@@ -146,7 +144,7 @@ const MainViewTable = () => {
           displayCondition={true}
           learningMethod="buttonClick"
           order={1}
-          groupName="copyButton"
+          groupName={`${HINTS_GROUP_NAMES.COPY_BUTTON}`}
           referenceRef={lastCopyButtonRef}
           shiftY={150}
           shiftX={50}
@@ -190,7 +188,7 @@ const MainViewTable = () => {
                 <Hint
                   learningMethod="buttonClick"
                   order={1}
-                  groupName="validation"
+                  groupName={`${HINTS_GROUP_NAMES.VALIDATION}`}
                   referenceRef={invalidTimeRef}
                   shiftY={150}
                   shiftX={50}
@@ -205,10 +203,14 @@ const MainViewTable = () => {
                 </Hint>
               )}
               <span
-                ref={!activity.isValid ? invalidTimeRef : undefined}
+                ref={
+                  activity.isValid !== undefined && !activity.isValid
+                    ? invalidTimeRef
+                    : undefined
+                }
                 className={clsx({
                   "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
-                    !activity.isValid,
+                    activity.isValid !== undefined && !activity.isValid,
                 })}
               >
                 {activity.from} - {activity.to}

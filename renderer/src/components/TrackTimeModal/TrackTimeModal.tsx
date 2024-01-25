@@ -27,6 +27,7 @@ import {
   getTimetrackerYearProjects,
 } from "./utils";
 import { Hint } from "@/shared/Hint";
+import { HINTS_GROUP_NAMES } from "@/constants";
 
 export default function TrackTimeModal({
   activities,
@@ -351,7 +352,7 @@ export default function TrackTimeModal({
           <Hint
             learningMethod="nextClick"
             order={1}
-            groupName="trackTimeModal"
+            groupName={`${HINTS_GROUP_NAMES.TRACK_TIME_MODAL}`}
             referenceRef={timeInputRef}
             shiftY={25}
             shiftX={300}
@@ -445,7 +446,7 @@ export default function TrackTimeModal({
         <Hint
           learningMethod="nextClick"
           order={2}
-          groupName="trackTimeModal"
+          groupName={`${HINTS_GROUP_NAMES.TRACK_TIME_MODAL}`}
           referenceRef={textInputRef}
           shiftY={175}
           shiftX={30}
