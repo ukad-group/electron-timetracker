@@ -8,7 +8,7 @@ import SlackIcon from "@/shared/SlackIcon/SlackIcon";
 import { Release } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { Hint } from "@/shared/Hint";
-import { HINTS_GROUP_NAMES } from "@/constants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 
 export default function UpdateDescription() {
@@ -106,7 +106,7 @@ export default function UpdateDescription() {
         displayCondition={true}
         learningMethod="buttonClick"
         order={1}
-        groupName={`${HINTS_GROUP_NAMES.WHATS_NEW}`}
+        groupName={HINTS_GROUP_NAMES.WHATS_NEW}
         referenceRef={whatsNewRef}
         shiftY={150}
         shiftX={50}
@@ -116,8 +116,7 @@ export default function UpdateDescription() {
           diagonalPosition: "bottom",
         }}
       >
-        Here you can see your application version. Links to contact us. And the
-        list of changes that were added in this version.
+        {HINTS_ALERTS.WHATS_NEW}
       </Hint>
       <p className="text-xs text-gray-700 font-semibold dark:text-dark-main mb-4">
         Current version {currentVersion} {!isUpdate && "(latest)"}

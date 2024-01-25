@@ -11,7 +11,7 @@ import { PlusIcon } from "@heroicons/react/24/solid";
 import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { Popup } from "@/shared/Popup";
 import { Hint } from "@/shared/Hint";
-import { HINTS_GROUP_NAMES } from "@/constants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 
 const Placeholder = ({
   onEditActivity,
@@ -88,17 +88,14 @@ const Placeholder = ({
         <Hint
           learningMethod="buttonClick"
           order={1}
-          groupName={`${HINTS_GROUP_NAMES.PLACEHOLDER}`}
+          groupName={HINTS_GROUP_NAMES.PLACEHOLDER}
           referenceRef={placeholderButtonRef}
           shiftY={150}
           shiftX={60}
           width={"small"}
           position={{ basePosition: "left", diagonalPosition: "top" }}
         >
-          This is a daily placeholder you'll encounter each day. Click the 'New
-          Activity' button or press ctrl + space to open the form for your
-          initial entry today. Alternatively, you can duplicate your last report
-          by clicking 'Copy Last Report.'
+          {HINTS_ALERTS.PLACEHOLDER_BUTTON}
         </Hint>
         <span className="block text-gray-500 text-xs">
           or press ctrl + space

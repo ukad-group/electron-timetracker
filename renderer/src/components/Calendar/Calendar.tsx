@@ -43,7 +43,8 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { Hint } from "@/shared/Hint";
-import { SCREENS, HINTS_GROUP_NAMES } from "@/constants";
+import { SCREENS } from "@/constants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 
 export function Calendar({
@@ -366,7 +367,7 @@ export function Calendar({
             displayCondition={true}
             learningMethod="nextClick"
             order={1}
-            groupName={`${HINTS_GROUP_NAMES.CALENDAR}`}
+            groupName={HINTS_GROUP_NAMES.CALENDAR}
             referenceRef={allCalendarRef}
             shiftY={150}
             shiftX={50}
@@ -376,11 +377,7 @@ export function Calendar({
               diagonalPosition: "top",
             }}
           >
-            Within the calendar, you can easily track the time you've reported
-            for each day. It provides visibility into your vacation days, sick
-            leave, and holidays, along with identifying reports containing
-            errors. The current day is highlighted in yellow, while the day
-            you've selected for viewing is marked in blue.
+            {HINTS_ALERTS.CALENDAR}
           </Hint>
         )}
         {screenWidth < SCREENS.LG && (
@@ -388,7 +385,7 @@ export function Calendar({
             displayCondition={true}
             learningMethod="nextClick"
             order={1}
-            groupName={`${HINTS_GROUP_NAMES.CALENDAR}`}
+            groupName={HINTS_GROUP_NAMES.CALENDAR}
             referenceRef={allCalendarRef}
             shiftY={50}
             shiftX={0}
@@ -398,17 +395,13 @@ export function Calendar({
               diagonalPosition: "right",
             }}
           >
-            Within the calendar, you can easily track the time you've reported
-            for each day. It provides visibility into your vacation days, sick
-            leave, and holidays, along with identifying reports containing
-            errors. The current day is highlighted in yellow, while the day
-            you've selected for viewing is marked in blue.
+            {HINTS_ALERTS.CALENDAR}
           </Hint>
         )}
         <Hint
           learningMethod="nextClick"
           order={2}
-          groupName={`${HINTS_GROUP_NAMES.CALENDAR}`}
+          groupName={HINTS_GROUP_NAMES.CALENDAR}
           referenceRef={totalTimeRef}
           shiftY={200}
           shiftX={50}
@@ -418,16 +411,12 @@ export function Calendar({
             diagonalPosition: "bottom",
           }}
         >
-          In the totals field, you can view the cumulative hours you've reported
-          for this month. The Required field displays the necessary number of
-          hours to be reported for the month, factoring in weekends, holidays,
-          vacations, and sick days (If you have connected the timetracker
-          website in the settings).
+          {HINTS_ALERTS.CALENDAR_TOTALS}
         </Hint>
         <Hint
           learningMethod="nextClick"
           order={3}
-          groupName={`${HINTS_GROUP_NAMES.CALENDAR}`}
+          groupName={HINTS_GROUP_NAMES.CALENDAR}
           referenceRef={weekNumberRef}
           shiftY={200}
           shiftX={50}
@@ -437,8 +426,7 @@ export function Calendar({
             diagonalPosition: "top",
           }}
         >
-          This indicates the week number along with the total hours you've
-          reported for that week.
+          {HINTS_ALERTS.CALENDAR_WEEKS}
         </Hint>
       </div>
       <FullCalendar

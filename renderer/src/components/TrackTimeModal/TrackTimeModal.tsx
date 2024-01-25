@@ -27,7 +27,7 @@ import {
   getTimetrackerYearProjects,
 } from "./utils";
 import { Hint } from "@/shared/Hint";
-import { HINTS_GROUP_NAMES } from "@/constants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 
 export default function TrackTimeModal({
   activities,
@@ -352,7 +352,7 @@ export default function TrackTimeModal({
           <Hint
             learningMethod="nextClick"
             order={1}
-            groupName={`${HINTS_GROUP_NAMES.TRACK_TIME_MODAL}`}
+            groupName={HINTS_GROUP_NAMES.TRACK_TIME_MODAL}
             referenceRef={timeInputRef}
             shiftY={25}
             shiftX={300}
@@ -362,12 +362,7 @@ export default function TrackTimeModal({
               diagonalPosition: "right",
             }}
           >
-            Upon form opening, the "from" time defaults to the prior entry's end
-            time (if exists) or the current time, rounded to the nearest 15
-            minutes.. The "to" time is set to the current time, rounded to the
-            nearest 15 minutes. You can manually modify the time by 15-minute
-            increments using the arrow keys. Alternatively, entering the desired
-            duration will automatically adjust the "to" field accordingly.
+            {HINTS_ALERTS.MODAL_TIME_FIELD}
           </Hint>
         </div>
         <div className="col-span-6 sm:col-span-2">
@@ -446,7 +441,7 @@ export default function TrackTimeModal({
         <Hint
           learningMethod="nextClick"
           order={2}
-          groupName={`${HINTS_GROUP_NAMES.TRACK_TIME_MODAL}`}
+          groupName={HINTS_GROUP_NAMES.TRACK_TIME_MODAL}
           referenceRef={textInputRef}
           shiftY={175}
           shiftX={30}
@@ -456,12 +451,7 @@ export default function TrackTimeModal({
             diagonalPosition: "top",
           }}
         >
-          In the text fields, you'll find suggestions for projects, activities,
-          and descriptions based on your usage in the past month. Upon linking
-          the timetracker website, all company projects become available for
-          selection. After connecting Trello and Jira, you'll be prompted to
-          choose tasks from your boards in the description field, prioritizing
-          those assigned to you.
+          {HINTS_ALERTS.MODAL_TEXT_FIELD}
         </Hint>
         <div className="col-span-6">
           <AutocompleteSelector

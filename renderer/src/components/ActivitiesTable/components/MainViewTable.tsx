@@ -11,7 +11,7 @@ import { ActivitiesTableContext } from "../context";
 import { Hint } from "@/shared/Hint";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
-import { HINTS_GROUP_NAMES } from "@/constants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 
 const MainViewTable = () => {
@@ -49,7 +49,7 @@ const MainViewTable = () => {
         existingConditions: ["same", false],
       },
       {
-        groupName: HINTS_GROUP_NAMES.CALENDAR_EVENT,
+        groupName: HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT,
         newConditions: [false],
         existingConditions: [false],
       },
@@ -109,7 +109,7 @@ const MainViewTable = () => {
           displayCondition={true}
           learningMethod="ctrlArrowNumberPress"
           order={1}
-          groupName={`${HINTS_GROUP_NAMES.SHORTCUTS_EDITING}`}
+          groupName={HINTS_GROUP_NAMES.SHORTCUTS_EDITING}
           referenceRef={firstRowRef}
           shiftY={25}
           shiftX={150}
@@ -119,15 +119,12 @@ const MainViewTable = () => {
             diagonalPosition: "right",
           }}
         >
-          Simplify edits using shortcuts. Press ctrl to reveal numbers of each
-          registration. Then select the registration to edit by pressing its
-          corresponding number. Alternatively, use ArrowUp to edit the last
-          entry.
+          {HINTS_ALERTS.SHORTCUTS_EDITING}
         </Hint>
         <Hint
           learningMethod="buttonClick"
           order={1}
-          groupName={`${HINTS_GROUP_NAMES.EDITING_BUTTON}`}
+          groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
           referenceRef={firstEditButtonRef}
           shiftY={30}
           shiftX={200}
@@ -137,14 +134,13 @@ const MainViewTable = () => {
             diagonalPosition: "left",
           }}
         >
-          If you need to modify a registration, click this button to open the
-          corresponding form
+          {HINTS_ALERTS.EDITING_BUTTON}
         </Hint>
         <Hint
           displayCondition={true}
           learningMethod="buttonClick"
           order={1}
-          groupName={`${HINTS_GROUP_NAMES.COPY_BUTTON}`}
+          groupName={HINTS_GROUP_NAMES.COPY_BUTTON}
           referenceRef={lastCopyButtonRef}
           shiftY={150}
           shiftX={50}
@@ -154,8 +150,7 @@ const MainViewTable = () => {
             diagonalPosition: "bottom",
           }}
         >
-          It looks like you added the same registration as an existing one. You
-          can do it in a few clicks by clicking on this button, try it
+          {HINTS_ALERTS.COPY_BUTTON}
         </Hint>
 
         {tableActivities?.map((activity, i) => (
@@ -188,7 +183,7 @@ const MainViewTable = () => {
                 <Hint
                   learningMethod="buttonClick"
                   order={1}
-                  groupName={`${HINTS_GROUP_NAMES.VALIDATION}`}
+                  groupName={HINTS_GROUP_NAMES.VALIDATION}
                   referenceRef={invalidTimeRef}
                   shiftY={150}
                   shiftX={50}
@@ -198,8 +193,7 @@ const MainViewTable = () => {
                     diagonalPosition: "top",
                   }}
                 >
-                  If you make a mistake in creating a registration, it will be
-                  displayed in red in the table
+                  {HINTS_ALERTS.VALIDATION}
                 </Hint>
               )}
               <span
@@ -317,7 +311,7 @@ const MainViewTable = () => {
                     <Hint
                       learningMethod="buttonClick"
                       order={1}
-                      groupName="calendarEvent"
+                      groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
                       referenceRef={calendarEventRef}
                       shiftY={200}
                       shiftX={50}
@@ -327,15 +321,7 @@ const MainViewTable = () => {
                         diagonalPosition: "bottom",
                       }}
                     >
-                      The table also displays the events specified in your
-                      calendar (Google Calendar and Office 365 Calendar). If you
-                      write the title of the event in the calendar in the form
-                      of project - activity - description or activity -
-                      description, it will be parsed automatically. If the title
-                      is not separated by dashes, the entire title will be
-                      written in the description. And if there is a known
-                      project in the title, it will be written in the project
-                      field.
+                      {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
                     </Hint>
                   )}
                 {activity.calendarId && (

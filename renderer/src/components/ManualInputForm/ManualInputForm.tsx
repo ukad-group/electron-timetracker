@@ -10,7 +10,7 @@ import useEditingHistoryManager from "@/helpers/hooks/useEditingHistoryManager";
 import { ManualInputFormProps } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { Hint } from "@/shared/Hint";
-import { HINTS_GROUP_NAMES } from "@/constants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 
 export default function ManualInputForm({
@@ -214,7 +214,7 @@ export default function ManualInputForm({
         displayCondition={true}
         learningMethod="nextClick"
         order={1}
-        groupName={`${HINTS_GROUP_NAMES.MANUAL_INPUT}`}
+        groupName={HINTS_GROUP_NAMES.MANUAL_INPUT}
         referenceRef={textareaRef}
         shiftY={30}
         shiftX={200}
@@ -224,13 +224,7 @@ export default function ManualInputForm({
           diagonalPosition: "left",
         }}
       >
-        In the Manual Input section, view a serialized representation of your
-        report, mirroring its appearance in your file. Edit your report directly
-        in this field, and save changes with the 'Save' button or by pressing
-        ctrl + space.
-        <br />
-        You can increase the height of this box by dragging it from the bottom
-        right corner
+        {HINTS_ALERTS.MANUAL_INPUT}
       </Hint>
 
       <h2

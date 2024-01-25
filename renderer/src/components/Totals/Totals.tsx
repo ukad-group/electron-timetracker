@@ -9,7 +9,7 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { getTotals } from "./utils";
 import TotalsList from "./TotalsList";
 import { Hint } from "@/shared/Hint";
-import { HINTS_GROUP_NAMES } from "@/constants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 
 const Totals = ({ selectedDate }) => {
@@ -158,7 +158,7 @@ const Totals = ({ selectedDate }) => {
         displayCondition={true}
         learningMethod="nextClick"
         order={1}
-        groupName={`${HINTS_GROUP_NAMES.TOTALS}`}
+        groupName={HINTS_GROUP_NAMES.TOTALS}
         referenceRef={totalsRef}
         shiftY={200}
         shiftX={50}
@@ -168,19 +168,12 @@ const Totals = ({ selectedDate }) => {
           diagonalPosition: "top",
         }}
       >
-        This widget facilitates the seamless transfer of your reports to the
-        customer's tracker. You can easily copy all your actions for the day
-        onto the project collectively or individually in the "activity -
-        description" format (if there is activity) or simply the "description"
-        format (if there is no activity). Just click on the file icon to
-        initiate this process. If you require the time spent on each activity,
-        click on the plus file icon, and the log will be copied in the format
-        "description (hh:mm)."
+        {HINTS_ALERTS.TOTALS}
       </Hint>
       <Hint
         learningMethod="buttonClick"
         order={2}
-        groupName={`${HINTS_GROUP_NAMES.TOTALS}`}
+        groupName={HINTS_GROUP_NAMES.TOTALS}
         referenceRef={totalsSelectRef}
         shiftY={50}
         shiftX={150}
@@ -190,8 +183,7 @@ const Totals = ({ selectedDate }) => {
           diagonalPosition: "left",
         }}
       >
-        You can get data for the day, week and month by selecting the
-        appropriate item in the selector
+        {HINTS_ALERTS.TOTALS_PERIOD}
       </Hint>
       <h2
         ref={totalsRef}
