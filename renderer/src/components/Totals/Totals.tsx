@@ -9,6 +9,7 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { getTotals } from "./utils";
 import TotalsList from "./TotalsList";
 import { Hint } from "@/shared/Hint";
+import { SCREENS } from "@/constants";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 
@@ -23,6 +24,7 @@ const Totals = ({ selectedDate }) => {
   );
   const [totals, setTotals] = useState<Total[]>([]);
   const [period, setPeriod] = useState<PeriodName>("day");
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [showedProjects, setShowedProjects] = useState<string[]>([]);
   const totalsRef = useRef(null);
   const totalsSelectRef = useRef(null);
@@ -138,6 +140,16 @@ const Totals = ({ selectedDate }) => {
         existingConditions: [false],
       },
     ]);
+
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const onFocusHandler = () => {
@@ -154,37 +166,78 @@ const Totals = ({ selectedDate }) => {
       onFocus={onFocusHandler}
       className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border"
     >
-      <Hint
-        displayCondition={true}
-        learningMethod="nextClick"
-        order={1}
-        groupName={HINTS_GROUP_NAMES.TOTALS}
-        referenceRef={totalsRef}
-        shiftY={200}
-        shiftX={50}
-        width={"medium"}
-        position={{
-          basePosition: "left",
-          diagonalPosition: "top",
-        }}
-      >
-        {HINTS_ALERTS.TOTALS}
-      </Hint>
-      <Hint
-        learningMethod="buttonClick"
-        order={2}
-        groupName={HINTS_GROUP_NAMES.TOTALS}
-        referenceRef={totalsSelectRef}
-        shiftY={50}
-        shiftX={150}
-        width={"small"}
-        position={{
-          basePosition: "top",
-          diagonalPosition: "left",
-        }}
-      >
-        {HINTS_ALERTS.TOTALS_PERIOD}
-      </Hint>
+      {screenWidth >= SCREENS.LG && (
+        <>
+          <Hint
+            displayCondition={true}
+            learningMethod="nextClick"
+            order={1}
+            groupName={HINTS_GROUP_NAMES.TOTALS}
+            referenceRef={totalsRef}
+            shiftY={200}
+            shiftX={50}
+            width={"medium"}
+            position={{
+              basePosition: "left",
+              diagonalPosition: "top",
+            }}
+          >
+            {HINTS_ALERTS.TOTALS}
+          </Hint>
+          <Hint
+            learningMethod="buttonClick"
+            order={2}
+            groupName={HINTS_GROUP_NAMES.TOTALS}
+            referenceRef={totalsSelectRef}
+            shiftY={50}
+            shiftX={200}
+            width={"small"}
+            position={{
+              basePosition: "top",
+              diagonalPosition: "left",
+            }}
+          >
+            {HINTS_ALERTS.TOTALS_PERIOD}
+          </Hint>
+        </>
+      )}
+
+      {screenWidth < SCREENS.LG && (
+        <>
+          <Hint
+            displayCondition={true}
+            learningMethod="nextClick"
+            order={1}
+            groupName={HINTS_GROUP_NAMES.TOTALS}
+            referenceRef={totalsRef}
+            shiftY={50}
+            shiftX={200}
+            width={"medium"}
+            position={{
+              basePosition: "top",
+              diagonalPosition: "right",
+            }}
+          >
+            {HINTS_ALERTS.TOTALS}
+          </Hint>
+          <Hint
+            learningMethod="buttonClick"
+            order={2}
+            groupName={HINTS_GROUP_NAMES.TOTALS}
+            referenceRef={totalsSelectRef}
+            shiftY={50}
+            shiftX={220}
+            width={"small"}
+            position={{
+              basePosition: "top",
+              diagonalPosition: "right",
+            }}
+          >
+            {HINTS_ALERTS.TOTALS_PERIOD}
+          </Hint>
+        </>
+      )}
+
       <h2
         ref={totalsRef}
         className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading"

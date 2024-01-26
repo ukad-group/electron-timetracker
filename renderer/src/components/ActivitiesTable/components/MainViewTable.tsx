@@ -12,6 +12,7 @@ import { Hint } from "@/shared/Hint";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { SCREENS } from "@/constants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 
 const MainViewTable = () => {
@@ -31,6 +32,7 @@ const MainViewTable = () => {
   const invalidTimeRef = useRef(null);
   const calendarEventRef = useRef(null);
   const [dublicateIndex, setDublicateIndex] = useState(-1);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
   const [progress, setProgress] = useTutorialProgressStore(
     (state) => [state.progress, state.setProgress],
@@ -54,6 +56,16 @@ const MainViewTable = () => {
         existingConditions: [false],
       },
     ]);
+
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -80,7 +92,7 @@ const MainViewTable = () => {
     }
   }, [tableActivities]);
 
-  const editClickHandler = (activity) => {
+  const handleEditClick = (activity) => {
     changeHintConditions(progress, setProgress, [
       {
         groupName: HINTS_GROUP_NAMES.SHORTCUTS_EDITING,
@@ -91,7 +103,7 @@ const MainViewTable = () => {
     editActivityHandler(activity);
   };
 
-  const copyClickHandler = (activity) => {
+  const handleCopyClick = (activity) => {
     changeHintConditions(progress, setProgress, [
       {
         groupName: HINTS_GROUP_NAMES.COPY_BUTTON,
@@ -136,22 +148,42 @@ const MainViewTable = () => {
         >
           {HINTS_ALERTS.EDITING_BUTTON}
         </Hint>
-        <Hint
-          displayCondition={true}
-          learningMethod="buttonClick"
-          order={1}
-          groupName={HINTS_GROUP_NAMES.COPY_BUTTON}
-          referenceRef={lastCopyButtonRef}
-          shiftY={150}
-          shiftX={50}
-          width={"medium"}
-          position={{
-            basePosition: "right",
-            diagonalPosition: "bottom",
-          }}
-        >
-          {HINTS_ALERTS.COPY_BUTTON}
-        </Hint>
+        {screenWidth >= SCREENS.LG && (
+          <Hint
+            displayCondition={true}
+            learningMethod="buttonClick"
+            order={1}
+            groupName={HINTS_GROUP_NAMES.COPY_BUTTON}
+            referenceRef={lastCopyButtonRef}
+            shiftY={150}
+            shiftX={50}
+            width={"medium"}
+            position={{
+              basePosition: "right",
+              diagonalPosition: "bottom",
+            }}
+          >
+            {HINTS_ALERTS.COPY_BUTTON}
+          </Hint>
+        )}
+        {screenWidth < SCREENS.LG && (
+          <Hint
+            displayCondition={true}
+            learningMethod="buttonClick"
+            order={1}
+            groupName={HINTS_GROUP_NAMES.COPY_BUTTON}
+            referenceRef={lastCopyButtonRef}
+            shiftY={250}
+            shiftX={50}
+            width={"medium"}
+            position={{
+              basePosition: "left",
+              diagonalPosition: "bottom",
+            }}
+          >
+            {HINTS_ALERTS.COPY_BUTTON}
+          </Hint>
+        )}
 
         {tableActivities?.map((activity, i) => (
           <tr
@@ -276,18 +308,20 @@ const MainViewTable = () => {
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
               <div className={`${activity.calendarId ? "invisible" : ""}`}>
                 <button
-                  ref={
-                    !activity.calendarId && dublicateIndex === i
-                      ? lastCopyButtonRef
-                      : undefined
-                  }
                   className="group py-4 px-3"
                   title="Copy"
                   onClick={() => {
-                    copyClickHandler(activity);
+                    handleCopyClick(activity);
                   }}
                 >
-                  <Square2StackIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                  <Square2StackIcon
+                    ref={
+                      !activity.calendarId && dublicateIndex === i
+                        ? lastCopyButtonRef
+                        : undefined
+                    }
+                    className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
+                  />
                 </button>
               </div>
             </td>
@@ -296,7 +330,7 @@ const MainViewTable = () => {
                 className="group py-4 px-3"
                 title={activity.calendarId ? "Add" : "Edit"}
                 onClick={() => {
-                  editClickHandler(activity);
+                  handleEditClick(activity);
                 }}
               >
                 {!activity.calendarId && (
@@ -317,7 +351,7 @@ const MainViewTable = () => {
                       shiftX={50}
                       width={"medium"}
                       position={{
-                        basePosition: "right",
+                        basePosition: "left",
                         diagonalPosition: "bottom",
                       }}
                     >

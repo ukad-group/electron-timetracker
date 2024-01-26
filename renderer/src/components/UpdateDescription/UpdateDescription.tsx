@@ -7,6 +7,7 @@ import { GlobeAltIcon } from "@heroicons/react/24/solid";
 import SlackIcon from "@/shared/SlackIcon/SlackIcon";
 import { Release } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { SCREENS } from "@/constants";
 import { Hint } from "@/shared/Hint";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
@@ -26,6 +27,7 @@ export default function UpdateDescription() {
     shallow
   );
   const [isOpen, setIsOpen] = useState(update?.age === "new");
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const whatsNewRef = useRef(null);
   const SLACK_DESTOP_LINK = "slack://channel?team=T3PV37ANP&id=C069N5LUP3M";
   const SLACK_WEB_LINK = "https://app.slack.com/client/T3PV37ANP/C069N5LUP3M";
@@ -53,8 +55,14 @@ export default function UpdateDescription() {
         existingConditions: [false],
       },
     ]);
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
 
     return () => {
+      window.removeEventListener("resize", handleResize);
       global.ipcRenderer.removeAllListeners("update-available");
       global.ipcRenderer.removeAllListeners("downloaded");
       global.ipcRenderer.removeAllListeners("current-version");
@@ -102,22 +110,42 @@ export default function UpdateDescription() {
       isOpen={isOpen}
       title="What's new?"
     >
-      <Hint
-        displayCondition={true}
-        learningMethod="buttonClick"
-        order={1}
-        groupName={HINTS_GROUP_NAMES.WHATS_NEW}
-        referenceRef={whatsNewRef}
-        shiftY={150}
-        shiftX={50}
-        width={"medium"}
-        position={{
-          basePosition: "left",
-          diagonalPosition: "bottom",
-        }}
-      >
-        {HINTS_ALERTS.WHATS_NEW}
-      </Hint>
+      {screenWidth >= SCREENS.LG && (
+        <Hint
+          displayCondition={true}
+          learningMethod="buttonClick"
+          order={1}
+          groupName={HINTS_GROUP_NAMES.WHATS_NEW}
+          referenceRef={whatsNewRef}
+          shiftY={150}
+          shiftX={50}
+          width={"medium"}
+          position={{
+            basePosition: "left",
+            diagonalPosition: "bottom",
+          }}
+        >
+          {HINTS_ALERTS.WHATS_NEW}
+        </Hint>
+      )}
+      {screenWidth < SCREENS.LG && (
+        <Hint
+          displayCondition={true}
+          learningMethod="buttonClick"
+          order={1}
+          groupName={HINTS_GROUP_NAMES.WHATS_NEW}
+          referenceRef={whatsNewRef}
+          shiftY={50}
+          shiftX={0}
+          width={"medium"}
+          position={{
+            basePosition: "top",
+            diagonalPosition: "right",
+          }}
+        >
+          {HINTS_ALERTS.WHATS_NEW}
+        </Hint>
+      )}
       <p className="text-xs text-gray-700 font-semibold dark:text-dark-main mb-4">
         Current version {currentVersion} {!isUpdate && "(latest)"}
       </p>

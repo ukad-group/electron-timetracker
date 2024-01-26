@@ -28,6 +28,7 @@ import {
 } from "./utils";
 import { Hint } from "@/shared/Hint";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { SCREENS } from "@/constants";
 
 export default function TrackTimeModal({
   activities,
@@ -62,6 +63,7 @@ export default function TrackTimeModal({
   const [latestProjects, setLatestProjects] = useState([]);
   const [webTrackerProjects, setWebTrackerProjects] = useState([]);
   const [uniqueWebTrackerProjects, setUniqueWebTrackerProjects] = useState([]);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const timeInputRef = useRef(null);
   const textInputRef = useRef(null);
 
@@ -176,6 +178,16 @@ export default function TrackTimeModal({
     })();
 
     getTimetrackerYearProjects(setWebTrackerProjects);
+
+    const handleResize = () => {
+      setScreenWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   const onSave = (e: FormEvent | MouseEvent) => {
@@ -355,10 +367,10 @@ export default function TrackTimeModal({
             groupName={HINTS_GROUP_NAMES.TRACK_TIME_MODAL}
             referenceRef={timeInputRef}
             shiftY={25}
-            shiftX={300}
+            shiftX={screenWidth >= SCREENS.LG ? 300 : 150}
             width={"large"}
             position={{
-              basePosition: "top",
+              basePosition: screenWidth >= SCREENS.LG ? "top" : "bottom",
               diagonalPosition: "right",
             }}
           >
@@ -443,13 +455,20 @@ export default function TrackTimeModal({
           order={2}
           groupName={HINTS_GROUP_NAMES.TRACK_TIME_MODAL}
           referenceRef={textInputRef}
-          shiftY={175}
+          shiftY={screenWidth >= SCREENS.LG ? 175 : 30}
           shiftX={30}
           width={"medium"}
-          position={{
-            basePosition: "left",
-            diagonalPosition: "top",
-          }}
+          position={
+            screenWidth >= SCREENS.LG
+              ? {
+                  basePosition: "left",
+                  diagonalPosition: "top",
+                }
+              : {
+                  basePosition: "top",
+                  diagonalPosition: "right",
+                }
+          }
         >
           {HINTS_ALERTS.MODAL_TEXT_FIELD}
         </Hint>

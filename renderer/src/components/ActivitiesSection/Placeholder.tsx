@@ -93,7 +93,7 @@ const Placeholder = ({
           shiftY={150}
           shiftX={60}
           width={"small"}
-          position={{ basePosition: "left", diagonalPosition: "top" }}
+          position={{ basePosition: "left", diagonalPosition: "bottom" }}
         >
           {HINTS_ALERTS.PLACEHOLDER_BUTTON}
         </Hint>

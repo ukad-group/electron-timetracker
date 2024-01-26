@@ -308,7 +308,7 @@ export function Calendar({
         document.documentElement;
 
       if (scrollTop + clientHeight >= scrollHeight) {
-        console.log("scroll");
+        console.log("sjkllkjh");
         changeHintConditions(progress, setProgress, [
           {
             groupName: HINTS_GROUP_NAMES.CALENDAR,

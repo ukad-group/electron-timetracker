@@ -149,7 +149,7 @@ export const positioningBottom = (
   });
   Object.assign(SVGRef.current.style, {
     top: `${y}px`,
-    width: `${hintWidth + shiftX}`,
+    width: `${hintWidth / 2 + shiftX + 5}`,
   });
 
   VerticalLine.setAttribute("y1", "0");
