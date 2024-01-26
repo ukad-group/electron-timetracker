@@ -16,7 +16,7 @@ describe('Tooltip Component', () => {
   });
 
   test('handles mouse enter and leave events', async () => {
-    render(<Tooltip>Test</Tooltip>);
+    render(<Tooltip tooltipText={CONNECTION_MESSAGE}>Test</Tooltip>);
     const tooltipWrapper = screen.getByTestId('hover-tooltip-test-id');
     fireEvent.mouseEnter(tooltipWrapper);
 
