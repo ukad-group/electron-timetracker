@@ -5,18 +5,15 @@ import { JiraUser } from "@/helpers/utils/jira";
 import { FlagIcon } from "@heroicons/react/24/outline";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
-import { useOnlineStatus } from '@/helpers/hooks';
+import { CONNECTION_MESSAGE } from "@/helpers/contstants";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 
-const JiraConnection = () => {
+const JiraConnection = ({ isOnline }) => {
   const [users, setUsers] = useState(
     JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || []
   );
-  const [trigger, setTrigger] = useState(false);
-  const { isOnline } = useOnlineStatus(trigger)
 
   const handleSignInButton = async () => {
-    setTrigger(!trigger);
-
     if (isOnline) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.JIRA_LOGIN);
     } else {
@@ -90,11 +87,14 @@ const JiraConnection = () => {
       <div className="flex justify-between items-center w-full ">
         <span className="font-medium dark:text-dark-heading">Jira</span>
         {!users.length && (
-          <Button
-            text="Add account"
-            callback={handleSignInButton}
-            type="button"
-          />
+          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
+            <Button
+              text="Add account"
+              callback={handleSignInButton}
+              type="button"
+              disabled={!isOnline}
+            />
+          </Tooltip>
         )}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">

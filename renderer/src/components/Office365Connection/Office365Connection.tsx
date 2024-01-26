@@ -4,20 +4,16 @@ import { Office365User } from "@/helpers/utils/office365";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import Users from "./Users";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
-import { useOnlineStatus } from "@/helpers/hooks";
+import { CONNECTION_MESSAGE } from "@/helpers/contstants";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 
-const Office365Connection = () => {
+const Office365Connection = ({ isOnline }) => {
   const [users, setUsers] = useState(
     JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || []
   );
   const [showEventsInTable, setShowEventsInTable] = useState(false);
-  const [trigger, setTrigger] = useState(false);
-  const { isOnline } = useOnlineStatus(trigger)
-
 
   const handleSignInButton = async () => {
-    setTrigger(!trigger);
-
     if (isOnline) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.OFFICE365_LOGIN);
     } else {
@@ -115,11 +111,14 @@ const Office365Connection = () => {
           Microsoft Office 365
         </span>
         {!users.length && (
-          <Button
-            text="Add account"
-            callback={handleSignInButton}
-            type="button"
-          />
+          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
+            <Button
+              text="Add account"
+              callback={handleSignInButton}
+              type="button"
+              disabled={!isOnline}
+            />
+          </Tooltip>
         )}
         {users.length > 0 && (
           <button

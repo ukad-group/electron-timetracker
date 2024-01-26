@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { Button } from "@/shared/Button";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { useOnlineStatus } from "@/helpers/hooks";
+import { CONNECTION_MESSAGE } from "@/helpers/contstants";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 
 function extractTokenFromString(inputString: string) {
   const parts = inputString.split("#");
@@ -19,16 +20,12 @@ function extractTokenFromString(inputString: string) {
   return "";
 }
 
-const TrelloConnection = () => {
+const TrelloConnection = ({ isOnline }) => {
   const [user, setUser] = useState(
     JSON.parse(localStorage.getItem("trello-user")) || null
   );
-  const [trigger, setTrigger] = useState(false);
-  const { isOnline } = useOnlineStatus(trigger)
 
   const handleSignInButton = async () => {
-    setTrigger(!trigger);
-
     if (isOnline) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.TRELLO_LOGIN);
     } else {
@@ -73,11 +70,14 @@ const TrelloConnection = () => {
       <div className="flex justify-between items-center w-full">
         <span className="font-medium dark:text-dark-heading">Trello</span>
         {!user && (
-          <Button
-            text="Add account"
-            callback={handleSignInButton}
-            type="button"
-          />
+          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
+            <Button
+              text="Add account"
+              callback={handleSignInButton}
+              type="button"
+              disabled={!isOnline}
+            />
+          </Tooltip>
         )}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">

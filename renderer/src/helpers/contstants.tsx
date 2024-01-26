@@ -38,3 +38,5 @@ export const KEY_CODES = {
   CONTROL: 'Control'
   // ...Add more key codes as needed
 }
+
+export const CONNECTION_MESSAGE = "You're currently offline. Please, check your internet connection.";

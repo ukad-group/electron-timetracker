@@ -68,7 +68,7 @@ const MainView = () => {
           className="px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap"
           onClick={copyToClipboardHandle}
         >
-          <Tooltip>
+          <Tooltip isClickable>
             <p data-column="total">{formatDuration(totalDuration)}</p>
           </Tooltip>
         </td>

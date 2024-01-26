@@ -5,20 +5,17 @@ import { useRouter } from "next/router";
 import { Loader } from "@/shared/Loader";
 import { TTUserInfo } from "../Calendar/types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { useOnlineStatus } from "@/helpers/hooks";
+import { CONNECTION_MESSAGE } from "@/helpers/contstants";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 
-const TimetrackerWebsiteConnection = () => {
+const TimetrackerWebsiteConnection = ({ isOnline }) => {
   const router = useRouter();
   const [loggedUser, setLoggedUser] = useState(
     JSON.parse(localStorage.getItem("timetracker-user"))
   );
   const [loading, setLoading] = useState(false);
-  const [trigger, setTrigger] = useState(false);
-  const { isOnline } = useOnlineStatus(trigger)
 
   const handleSignInButton = async () => {
-    setTrigger(!trigger);
-
     if (isOnline) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.AZURE_LOGIN_BASE);
     } else {
@@ -196,11 +193,14 @@ const TimetrackerWebsiteConnection = () => {
           Timetracker website
         </span>
         {!loggedUser && (
-          <Button
-            text="Add account"
-            callback={handleSignInButton}
-            type="button"
-          />
+          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
+            <Button
+              text="Add account"
+              callback={handleSignInButton}
+              type="button"
+              disabled={!isOnline}
+            />
+          </Tooltip>
         )}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">

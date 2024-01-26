@@ -3,13 +3,13 @@ import useOnlineStatus from '../useOnlineStatus';
 
 describe('GIVEN useOnlineStatus', () => {
   it('should initialize with the correct online status', () => {
-    const { result } = renderHook(() => useOnlineStatus(true));
+    const { result } = renderHook(() => useOnlineStatus());
 
     expect(result.current.isOnline).toBe(navigator.onLine);
   });
 
   it('should update online status when the browser goes online', () => {
-    const { result } = renderHook(() => useOnlineStatus(false));
+    const { result } = renderHook(() => useOnlineStatus());
 
     act(() => {
       window.dispatchEvent(new Event('online'));
@@ -21,7 +21,7 @@ describe('GIVEN useOnlineStatus', () => {
   it('should update online status when the browser goes offline', () => {
     jest.spyOn(navigator, 'onLine', 'get').mockReturnValueOnce(true);
 
-    const { result } = renderHook(() => useOnlineStatus(false));
+    const { result } = renderHook(() => useOnlineStatus());
 
     expect(result.current.isOnline).toBe(true);
 
@@ -40,7 +40,7 @@ describe('GIVEN useOnlineStatus', () => {
 
     window.addEventListener = jest.fn();
 
-    const { unmount } = renderHook(() => useOnlineStatus(false));
+    const { unmount } = renderHook(() => useOnlineStatus());
 
     expect(window.addEventListener).toHaveBeenCalledWith('online', expect.any(Function));
     expect(window.addEventListener).toHaveBeenCalledWith('offline', expect.any(Function));

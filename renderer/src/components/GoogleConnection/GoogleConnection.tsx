@@ -9,19 +9,15 @@ import {
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { GoogleCredentails, GoogleUser } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
-import { useOnlineStatus } from '@/helpers/hooks';
+import { CONNECTION_MESSAGE, LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 
-const GoogleConnection = () => {
+const GoogleConnection = ({ isOnline }) => {
   const router = useRouter();
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);
-  const [trigger, setTrigger] = useState(false);
   const [loggedUsers, setLoggedUsers] = useState([]);
-  const { isOnline } = useOnlineStatus(trigger);
 
   const signInHandler = async () => {
-    setTrigger(!trigger);
-
     if (isOnline) {
       await router.push(getGoogleAuthUrl());
     } else {
@@ -123,7 +119,9 @@ const GoogleConnection = () => {
       <div className="flex justify-between items-center w-full">
         <span className="font-medium dark:text-dark-heading">Google</span>
         {!loggedUsers.length && (
-          <Button text="Add account" callback={signInHandler} type="button" />
+          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
+            <Button text="Add account" callback={signInHandler} type="button" disabled={!isOnline}/>
+          </Tooltip>
         )}
         {loggedUsers.length > 0 && (
           <button

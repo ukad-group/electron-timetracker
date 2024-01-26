@@ -1,9 +1,22 @@
-import { useState } from "react";
+import { useState, ReactNode } from "react";
 import { CheckIcon } from "@heroicons/react/24/solid";
 
-export default function Tooltip({ children, tooltipText = "Copied" }) {
+interface Props {
+  children: ReactNode;
+  tooltipText?: string;
+  isClickable?: boolean;
+  disabled?: boolean;
+}
+
+export default function Tooltip({
+  children,
+  tooltipText = "Copied",
+  isClickable = false,
+  disabled = false
+}: Props) {
   const [isTransparent, setIsTransparent] = useState(true);
   const [isRemoved, setIsRemoved] = useState(true);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const handleClick = () => {
     setIsTransparent(false);
@@ -16,10 +29,17 @@ export default function Tooltip({ children, tooltipText = "Copied" }) {
     }, 750);
   };
 
-  return (
+  const handleMouseEnter = () => {
+    setShowTooltip(true);
+  };
+
+  const handleMouseLeave = () => {
+    setShowTooltip(false);
+  };
+
+  const renderClickableTooltip = () => (
     <div className="tooltip-wrapper" onClick={handleClick}>
       {children}
-
       <p
         className={`tooltip 
         ${isTransparent ? "opacity-0" : "opacity-90"} 
@@ -30,4 +50,17 @@ export default function Tooltip({ children, tooltipText = "Copied" }) {
       </p>
     </div>
   );
+
+  const renderHoverTooltip = () => (
+    <div className="tooltip-wrapper" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      {children}
+      {showTooltip && !disabled && (
+        <p className="tooltip visible opacity-90">
+          {tooltipText}
+        </p>
+      )}
+    </div>
+  );
+
+  return isClickable ? renderClickableTooltip() : renderHoverTooltip();
 }
