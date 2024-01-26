@@ -55,8 +55,6 @@
   },
   "dependencies": {
     "@aptabase/electron": "^0.2.2",
-    "@azure/msal-browser": "^3.2.0",
-    "@azure/msal-react": "^2.0.4",
     "@floating-ui/react": "^0.26.5",
     "@fullcalendar/core": "^6.1.8",
     "@fullcalendar/daygrid": "^6.1.8",

@@ -25,22 +25,6 @@
   resolved "https://registry.npmjs.org/@aptabase/electron/-/electron-0.2.2.tgz"
   integrity sha512-Duutyc/3RAfJ18K0fr/mMutxPCdjjGJOyZFVqZEXdckT9ZlJjwwH2Dcq3IAcb3mnBbkJltlVOSQ2ktGzMQ4MhQ==
 
-"@azure/msal-browser@^3.2.0", "@azure/msal-browser@^3.7.0":
-  version "3.7.0"
-  resolved "https://registry.npmjs.org/@azure/msal-browser/-/msal-browser-3.7.0.tgz"
-  integrity sha512-ktDB/Gf7UDgYBJOnoIlh70lxIo4e1/D2UgHuayB4RntN1IlusfTtIVH3k8NpJMdl+38tfTXIaUoR+qlr5voZEg==
-  dependencies:
-    "@azure/msal-common" "14.6.0"
-
-"@azure/msal-common@14.6.0":
-  version "14.6.0"
-  resolved "https://registry.npmjs.org/@azure/msal-common/-/msal-common-14.6.0.tgz"
-  integrity sha512-AGusT/JvxdzJIYi5u0n97cmhd3pUT6UuI6rEkT5iDeT2FGcV0/EB8pk+dy6GLPpYg9vhDCuyoYrEZGd+2UeCCQ==
-
-"@azure/msal-react@^2.0.4":
-  version "2.0.9"
-  resolved "https://registry.npmjs.org/@azure/msal-react/-/msal-react-2.0.9.tgz"
-  integrity sha512-z8EvGIjJpVMgk97elUDedPLcByCibe3chipn9b8Ja//SJksovAhNW0ic7bvdDNsmKFK+H0e8PXciSnwZDtk52A==
 
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4", "@babel/code-frame@^7.12.13", "@babel/code-frame@^7.22.13":
   version "7.22.13"

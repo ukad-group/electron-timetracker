@@ -1,5 +1,6 @@
 import { MutableRefObject } from "react";
 import { Position } from "./types";
+import { PLACEMENTS } from "./constants";
 
 export const positioningTop = (
   position: Position,
@@ -29,7 +30,7 @@ export const positioningTop = (
   VerticalLine.setAttribute("y1", `${hintHeight / 2 - shiftY}`);
   VerticalLine.setAttribute("y2", `${hintHeight}`);
 
-  if (position.diagonalPosition === "right") {
+  if (position.diagonalPosition === PLACEMENTS.RIGHT) {
     HorizontalLine.setAttribute("x1", "5");
     HorizontalLine.setAttribute("x2", `${shiftX - hintWidth / 2}`);
 
@@ -50,7 +51,7 @@ export const positioningTop = (
       left: `${x + hintWidth / 2}px`,
     });
   }
-  if (position.diagonalPosition === "left") {
+  if (position.diagonalPosition === PLACEMENTS.LEFT) {
     HorizontalLine.setAttribute("x1", `${shiftX + hintWidth / 2}`);
     HorizontalLine.setAttribute("x2", `${hintWidth}`);
 
@@ -112,13 +113,13 @@ export const positioningRight = (
               ${10},  ${hintHeight / 2 + shiftY + 5} `
   );
 
-  if (position.diagonalPosition === "top") {
+  if (position.diagonalPosition === PLACEMENTS.TOP) {
     VerticalLine.setAttribute("y2", `${hintHeight}`);
 
     Object.assign(floatingRef.current.style, {
       top: `${y - shiftY}px`,
     });
-  } else if (position.diagonalPosition === "bottom") {
+  } else if (position.diagonalPosition === PLACEMENTS.BOTTOM) {
     VerticalLine.setAttribute("y2", `${hintHeight / 2 + shiftY * 2}`);
 
     Object.assign(SVGRef.current.style, {
@@ -158,7 +159,7 @@ export const positioningBottom = (
   HorizontalLine.setAttribute("y1", `${shiftY + hintHeight / 2}`);
   HorizontalLine.setAttribute("y2", `${shiftY + hintHeight / 2}`);
 
-  if (position.diagonalPosition === "right") {
+  if (position.diagonalPosition === PLACEMENTS.RIGHT) {
     HorizontalLine.setAttribute("x1", "5");
     HorizontalLine.setAttribute("x2", `${shiftX}`);
 
@@ -178,7 +179,7 @@ export const positioningBottom = (
     Object.assign(SVGRef.current.style, {
       left: `${x + hintWidth / 2}px`,
     });
-  } else if (position.diagonalPosition === "left") {
+  } else if (position.diagonalPosition === PLACEMENTS.LEFT) {
     HorizontalLine.setAttribute("x1", `${hintWidth}`);
     HorizontalLine.setAttribute("x2", `${hintWidth / 2 + shiftX}`);
 
@@ -241,13 +242,13 @@ export const positioningLeft = (
               ${hintWidth + shiftX - 10},  ${hintHeight / 2 + shiftY + 5} `
   );
 
-  if (position.diagonalPosition === "top") {
+  if (position.diagonalPosition === PLACEMENTS.TOP) {
     VerticalLine.setAttribute("y2", `${hintHeight}`);
 
     Object.assign(floatingRef.current.style, {
       top: `${y - shiftY}px`,
     });
-  } else if (position.diagonalPosition === "bottom") {
+  } else if (position.diagonalPosition === PLACEMENTS.BOTTOM) {
     VerticalLine.setAttribute("y2", `${hintHeight / 2 + shiftY * 2}`);
 
     Object.assign(SVGRef.current.style, {

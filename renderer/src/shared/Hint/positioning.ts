@@ -8,6 +8,7 @@ import {
   positioningLeft,
 } from "./utils";
 import { PLACEMENTS } from "./constants";
+import { KEY_CODES } from "@/helpers/contstants";
 
 export const positioning = (
   learnHint: () => void,
@@ -26,9 +27,9 @@ export const positioning = (
 ): void => {
   const handleKeyDown = (e) => {
     if (
-      (e.ctrlKey && e.key === "ArrowUp") ||
-      (e.key === "Meta" && e.key === "ArrowUp") ||
-      ((e.ctrlKey || e.key === "Control" || e.key === "Meta") &&
+      (e.ctrlKey && e.key === KEY_CODES.ARROW_UP) ||
+      (e.key === KEY_CODES.META && e.key === KEY_CODES.ARROW_UP) ||
+      ((e.ctrlKey || e.key === KEY_CODES.CONTROL || e.key === KEY_CODES.META) &&
         /^[0-9]$/.test(e.key))
     ) {
       learnHint();
