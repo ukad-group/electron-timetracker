@@ -38,7 +38,7 @@ export default function Tooltip({
   };
 
   const renderClickableTooltip = () => (
-    <div className="tooltip-wrapper" onClick={handleClick}>
+    <div className="tooltip-wrapper" data-testid="clickable-tooltip-test-id" onClick={handleClick}>
       {children}
       <p
         className={`tooltip 
@@ -52,7 +52,12 @@ export default function Tooltip({
   );
 
   const renderHoverTooltip = () => (
-    <div className="tooltip-wrapper" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <div
+      className="tooltip-wrapper"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      data-testid="hover-tooltip-test-id"
+    >
       {children}
       {showTooltip && !disabled && (
         <p className="tooltip visible opacity-90">
