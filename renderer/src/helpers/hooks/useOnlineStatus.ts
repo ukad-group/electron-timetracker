@@ -16,7 +16,7 @@ const useOnlineStatus = (): UseOnlineStatusTypes => {
       window.removeEventListener('online', updateOnlineStatus);
       window.removeEventListener('offline', updateOnlineStatus);
     };
-  }, []); // <--- It's a temporary solution. Have to find a new one to replace the trigger logic.
+  }, []);
 
   return { isOnline, updateOnlineStatus };
 };
