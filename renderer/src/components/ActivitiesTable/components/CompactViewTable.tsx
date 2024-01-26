@@ -115,7 +115,7 @@ const CompactViewTable = () => {
     tableActivities.length > 0 && (
       <>
         <Hint
-          displayCondition={true}
+          displayCondition
           learningMethod="ctrlArrowNumberPress"
           order={1}
           groupName={HINTS_GROUP_NAMES.SHORTCUTS_EDITING}
@@ -146,7 +146,7 @@ const CompactViewTable = () => {
           {HINTS_ALERTS.EDITING_BUTTON}
         </Hint>
         <Hint
-          displayCondition={true}
+          displayCondition
           learningMethod="buttonClick"
           order={1}
           groupName={HINTS_GROUP_NAMES.COPY_BUTTON}

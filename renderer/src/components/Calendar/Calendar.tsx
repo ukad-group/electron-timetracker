@@ -46,6 +46,7 @@ import { Hint } from "@/shared/Hint";
 import { SCREENS } from "@/constants";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
+import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
 export function Calendar({
   reportsFolder,
@@ -71,7 +72,7 @@ export function Calendar({
     errorTitle: "",
     errorMessage: "",
   });
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const { screenSizes } = useScreenSizes();
   const timetrackerUserInfo: TTUserInfo = JSON.parse(
     localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)
   );
@@ -171,6 +172,10 @@ export function Calendar({
       global.ipcRenderer.removeAllListeners("window-focused");
     };
   }, [calendarDate]);
+
+  useEffect(() => {
+    setProgress(progress);
+  }, [screenSizes]);
 
   const getCalendarApi = () => calendarRef.current.getApi();
 
@@ -291,10 +296,6 @@ export function Calendar({
   );
 
   useEffect(() => {
-    const handleResize = () => {
-      setScreenWidth(window.innerWidth);
-    };
-
     changeHintConditions(progress, setProgress, [
       {
         groupName: HINTS_GROUP_NAMES.CALENDAR,
@@ -307,8 +308,7 @@ export function Calendar({
       const { scrollTop, scrollHeight, clientHeight } =
         document.documentElement;
 
-      if (scrollTop + clientHeight >= scrollHeight) {
-        console.log("sjkllkjh");
+      if (scrollTop + clientHeight + 50 >= scrollHeight) {
         changeHintConditions(progress, setProgress, [
           {
             groupName: HINTS_GROUP_NAMES.CALENDAR,
@@ -320,11 +320,9 @@ export function Calendar({
     };
 
     window.addEventListener("scroll", handleScroll);
-    window.addEventListener("resize", handleResize);
 
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -362,9 +360,9 @@ export function Calendar({
             nextCallback={nextButtonHandle}
           />
         </div>
-        {screenWidth >= SCREENS.LG && (
+        {screenSizes.screenWidth >= SCREENS.LG && (
           <Hint
-            displayCondition={true}
+            displayCondition
             learningMethod="nextClick"
             order={1}
             groupName={HINTS_GROUP_NAMES.CALENDAR}
@@ -380,9 +378,9 @@ export function Calendar({
             {HINTS_ALERTS.CALENDAR}
           </Hint>
         )}
-        {screenWidth < SCREENS.LG && (
+        {screenSizes.screenWidth < SCREENS.LG && (
           <Hint
-            displayCondition={true}
+            displayCondition
             learningMethod="nextClick"
             order={1}
             groupName={HINTS_GROUP_NAMES.CALENDAR}

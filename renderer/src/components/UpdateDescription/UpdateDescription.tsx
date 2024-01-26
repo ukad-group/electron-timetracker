@@ -11,6 +11,7 @@ import { SCREENS } from "@/constants";
 import { Hint } from "@/shared/Hint";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
+import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
 export default function UpdateDescription() {
   const [release, setRelease] = useState<Release | null>();
@@ -27,7 +28,7 @@ export default function UpdateDescription() {
     shallow
   );
   const [isOpen, setIsOpen] = useState(update?.age === "new");
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const { screenSizes } = useScreenSizes();
   const whatsNewRef = useRef(null);
   const SLACK_DESTOP_LINK = "slack://channel?team=T3PV37ANP&id=C069N5LUP3M";
   const SLACK_WEB_LINK = "https://app.slack.com/client/T3PV37ANP/C069N5LUP3M";
@@ -55,19 +56,17 @@ export default function UpdateDescription() {
         existingConditions: [false],
       },
     ]);
-    const handleResize = () => {
-      setScreenWidth(window.innerWidth);
-    };
-
-    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
       global.ipcRenderer.removeAllListeners("update-available");
       global.ipcRenderer.removeAllListeners("downloaded");
       global.ipcRenderer.removeAllListeners("current-version");
     };
   }, []);
+
+  useEffect(() => {
+    setProgress(progress);
+  }, [screenSizes]);
 
   const isOpenToggle = () => {
     if (isOpen) {
@@ -110,9 +109,9 @@ export default function UpdateDescription() {
       isOpen={isOpen}
       title="What's new?"
     >
-      {screenWidth >= SCREENS.LG && (
+      {screenSizes.screenWidth >= SCREENS.LG && (
         <Hint
-          displayCondition={true}
+          displayCondition
           learningMethod="buttonClick"
           order={1}
           groupName={HINTS_GROUP_NAMES.WHATS_NEW}
@@ -128,9 +127,9 @@ export default function UpdateDescription() {
           {HINTS_ALERTS.WHATS_NEW}
         </Hint>
       )}
-      {screenWidth < SCREENS.LG && (
+      {screenSizes.screenWidth < SCREENS.LG && (
         <Hint
-          displayCondition={true}
+          displayCondition
           learningMethod="buttonClick"
           order={1}
           groupName={HINTS_GROUP_NAMES.WHATS_NEW}

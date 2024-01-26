@@ -211,7 +211,7 @@ export default function ManualInputForm({
   return (
     <div>
       <Hint
-        displayCondition={true}
+        displayCondition
         learningMethod="nextClick"
         order={1}
         groupName={HINTS_GROUP_NAMES.MANUAL_INPUT}

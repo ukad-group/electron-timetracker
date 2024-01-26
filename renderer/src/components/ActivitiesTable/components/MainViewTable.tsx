@@ -14,6 +14,7 @@ import { shallow } from "zustand/shallow";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { SCREENS } from "@/constants";
 import { changeHintConditions } from "@/helpers/utils/utils";
+import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
 const MainViewTable = () => {
   const {
@@ -32,7 +33,7 @@ const MainViewTable = () => {
   const invalidTimeRef = useRef(null);
   const calendarEventRef = useRef(null);
   const [dublicateIndex, setDublicateIndex] = useState(-1);
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const { screenSizes } = useScreenSizes();
 
   const [progress, setProgress] = useTutorialProgressStore(
     (state) => [state.progress, state.setProgress],
@@ -56,16 +57,6 @@ const MainViewTable = () => {
         existingConditions: [false],
       },
     ]);
-
-    const handleResize = () => {
-      setScreenWidth(window.innerWidth);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
   }, []);
 
   useEffect(() => {
@@ -91,6 +82,10 @@ const MainViewTable = () => {
       }
     }
   }, [tableActivities]);
+
+  useEffect(() => {
+    setProgress(progress);
+  }, [screenSizes]);
 
   const handleEditClick = (activity) => {
     changeHintConditions(progress, setProgress, [
@@ -118,7 +113,7 @@ const MainViewTable = () => {
     tableActivities.length > 0 && (
       <>
         <Hint
-          displayCondition={true}
+          displayCondition
           learningMethod="ctrlArrowNumberPress"
           order={1}
           groupName={HINTS_GROUP_NAMES.SHORTCUTS_EDITING}
@@ -148,9 +143,9 @@ const MainViewTable = () => {
         >
           {HINTS_ALERTS.EDITING_BUTTON}
         </Hint>
-        {screenWidth >= SCREENS.LG && (
+        {screenSizes.screenWidth >= SCREENS.LG && (
           <Hint
-            displayCondition={true}
+            displayCondition
             learningMethod="buttonClick"
             order={1}
             groupName={HINTS_GROUP_NAMES.COPY_BUTTON}
@@ -166,9 +161,9 @@ const MainViewTable = () => {
             {HINTS_ALERTS.COPY_BUTTON}
           </Hint>
         )}
-        {screenWidth < SCREENS.LG && (
+        {screenSizes.screenWidth < SCREENS.LG && (
           <Hint
-            displayCondition={true}
+            displayCondition
             learningMethod="buttonClick"
             order={1}
             groupName={HINTS_GROUP_NAMES.COPY_BUTTON}

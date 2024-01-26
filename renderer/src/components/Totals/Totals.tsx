@@ -12,6 +12,7 @@ import { Hint } from "@/shared/Hint";
 import { SCREENS } from "@/constants";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
+import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
 const Totals = ({ selectedDate }) => {
   const [reportsFolder] = useMainStore(
@@ -24,7 +25,7 @@ const Totals = ({ selectedDate }) => {
   );
   const [totals, setTotals] = useState<Total[]>([]);
   const [period, setPeriod] = useState<PeriodName>("day");
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const { screenSizes } = useScreenSizes();
   const [showedProjects, setShowedProjects] = useState<string[]>([]);
   const totalsRef = useRef(null);
   const totalsSelectRef = useRef(null);
@@ -140,17 +141,11 @@ const Totals = ({ selectedDate }) => {
         existingConditions: [false],
       },
     ]);
-
-    const handleResize = () => {
-      setScreenWidth(window.innerWidth);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
   }, []);
+
+  useEffect(() => {
+    setProgress(progress);
+  }, [screenSizes]);
 
   const onFocusHandler = () => {
     changeHintConditions(progress, setProgress, [
@@ -166,10 +161,10 @@ const Totals = ({ selectedDate }) => {
       onFocus={onFocusHandler}
       className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border"
     >
-      {screenWidth >= SCREENS.LG && (
+      {screenSizes.screenWidth >= SCREENS.LG && (
         <>
           <Hint
-            displayCondition={true}
+            displayCondition
             learningMethod="nextClick"
             order={1}
             groupName={HINTS_GROUP_NAMES.TOTALS}
@@ -202,10 +197,10 @@ const Totals = ({ selectedDate }) => {
         </>
       )}
 
-      {screenWidth < SCREENS.LG && (
+      {screenSizes.screenWidth < SCREENS.LG && (
         <>
           <Hint
-            displayCondition={true}
+            displayCondition
             learningMethod="nextClick"
             order={1}
             groupName={HINTS_GROUP_NAMES.TOTALS}

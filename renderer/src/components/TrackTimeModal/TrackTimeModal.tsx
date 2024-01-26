@@ -29,6 +29,7 @@ import {
 import { Hint } from "@/shared/Hint";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { SCREENS } from "@/constants";
+import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
 export default function TrackTimeModal({
   activities,
@@ -63,7 +64,7 @@ export default function TrackTimeModal({
   const [latestProjects, setLatestProjects] = useState([]);
   const [webTrackerProjects, setWebTrackerProjects] = useState([]);
   const [uniqueWebTrackerProjects, setUniqueWebTrackerProjects] = useState([]);
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const { screenSizes } = useScreenSizes();
   const timeInputRef = useRef(null);
   const textInputRef = useRef(null);
 
@@ -178,17 +179,11 @@ export default function TrackTimeModal({
     })();
 
     getTimetrackerYearProjects(setWebTrackerProjects);
-
-    const handleResize = () => {
-      setScreenWidth(window.innerWidth);
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
   }, []);
+
+  useEffect(() => {
+    setProgress(progress);
+  }, [screenSizes]);
 
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
@@ -367,10 +362,11 @@ export default function TrackTimeModal({
             groupName={HINTS_GROUP_NAMES.TRACK_TIME_MODAL}
             referenceRef={timeInputRef}
             shiftY={25}
-            shiftX={screenWidth >= SCREENS.LG ? 300 : 150}
+            shiftX={screenSizes.screenWidth >= SCREENS.LG ? 300 : 150}
             width={"large"}
             position={{
-              basePosition: screenWidth >= SCREENS.LG ? "top" : "bottom",
+              basePosition:
+                screenSizes.screenWidth >= SCREENS.LG ? "top" : "bottom",
               diagonalPosition: "right",
             }}
           >
@@ -455,11 +451,11 @@ export default function TrackTimeModal({
           order={2}
           groupName={HINTS_GROUP_NAMES.TRACK_TIME_MODAL}
           referenceRef={textInputRef}
-          shiftY={screenWidth >= SCREENS.LG ? 175 : 30}
+          shiftY={screenSizes.screenWidth >= SCREENS.LG ? 175 : 30}
           shiftX={30}
           width={"medium"}
           position={
-            screenWidth >= SCREENS.LG
+            screenSizes.screenWidth >= SCREENS.LG
               ? {
                   basePosition: "left",
                   diagonalPosition: "top",

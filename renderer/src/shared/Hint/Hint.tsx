@@ -10,7 +10,7 @@ import { positioning } from "./positioning";
 import { Hint } from "./types";
 
 export default function Hint({
-  displayCondition,
+  displayCondition = false,
   learningMethod,
   order,
   groupName,

@@ -34,7 +34,7 @@ export const positioning = (
       learnHint();
     }
   };
-  if (referenceRef && floatingRef.current && SVGRef.current) {
+  if (referenceRef.current && floatingRef.current && SVGRef.current) {
     const hintHeight = floatingRef.current.offsetHeight;
     const hintWidth = floatingRef.current.offsetWidth;
     const HorizontalLine = HorizontalLineRef.current;

@@ -24,6 +24,7 @@ import { Totals } from "@/components/Totals";
 import { Bookings } from "@/components/Bookings";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { SCREENS } from "@/constants";
+import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -51,7 +52,7 @@ export default function Home() {
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
   const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const [isDropboxConnected, setIsDropboxConnected] = useState(true);
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const { screenSizes } = useScreenSizes();
   const isManualInputMain =
     localStorage.getItem("is-manual-input-main-section") === "true";
   const [theme] = useThemeStore(
@@ -73,10 +74,6 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const handleResize = () => {
-      setScreenWidth(window.innerWidth);
-    };
-
     global.ipcRenderer.send(
       IPC_MAIN_CHANNELS.START_FOLDER_WATCHER,
       reportsFolder
@@ -87,15 +84,12 @@ export default function Home() {
     });
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
 
-    window.addEventListener("resize", handleResize);
-
     return () => {
       global.ipcRenderer.removeAllListeners("dropbox-connection");
       global.ipcRenderer.send(
         IPC_MAIN_CHANNELS.STOP_PATH_WATCHER,
         reportsFolder
       );
-      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -430,7 +424,7 @@ export default function Home() {
                     />
                   </section>
                 )}
-                {screenWidth >= SCREENS.LG && (
+                {screenSizes.screenWidth >= SCREENS.LG && (
                   <section className="lg:col-span-2">
                     <Calendar
                       reportsFolder={reportsFolder}
@@ -473,7 +467,7 @@ export default function Home() {
 
                 {showBookings && <Bookings calendarDate={calendarDate} />}
 
-                {screenWidth < SCREENS.LG && (
+                {screenSizes.screenWidth < SCREENS.LG && (
                   <section className="lg:col-span-2">
                     <Calendar
                       reportsFolder={reportsFolder}
