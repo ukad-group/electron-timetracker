@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import useTimeInput from "@/helpers/hooks/useTimeInput";
+import { useTimeInput } from "@/helpers/hooks";
 import {
   calcDurationBetweenTimes,
   formatDurationAsDecimals,

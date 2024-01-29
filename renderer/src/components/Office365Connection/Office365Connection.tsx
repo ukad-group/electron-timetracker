@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/shared/Button";
-import isOnline from "is-online";
 import { Office365User } from "@/helpers/utils/office365";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import Users from "./Users";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { CONNECTION_MESSAGE } from "@/helpers/contstants";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 
-const Office365Connection = () => {
+const Office365Connection = ({ isOnline }) => {
   const [users, setUsers] = useState(
     JSON.parse(
       localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)
@@ -14,10 +15,8 @@ const Office365Connection = () => {
   );
   const [showEventsInTable, setShowEventsInTable] = useState(false);
 
-  const handleSignInButton = async () => {
-    const online = await isOnline();
-
-    if (online) {
+  const handleSignInButton = () => {
+    if (isOnline) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "office365");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
@@ -134,11 +133,14 @@ const Office365Connection = () => {
           Microsoft Office 365
         </span>
         {!users.length && (
-          <Button
-            text="Add account"
-            callback={handleSignInButton}
-            type="button"
-          />
+          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
+            <Button
+              text="Add account"
+              callback={handleSignInButton}
+              type="button"
+              disabled={!isOnline}
+            />
+          </Tooltip>
         )}
         {users.length > 0 && (
           <button

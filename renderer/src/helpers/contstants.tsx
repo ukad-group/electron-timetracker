@@ -37,9 +37,12 @@ export const LOCAL_STORAGE_VARIABLES = {
 };
 
 export const KEY_CODES = {
-  SPACE: "Space",
-  ARROW_UP: "ArrowUp",
-  META: "Meta",
-  CONTROL: "Control",
+  SPACE: 'Space',
+  ARROW_UP: 'ArrowUp',
+  ARROW_DOWN: 'ArrowDown',
+  META: 'Meta',
+  CONTROL: 'Control'
   // ...Add more key codes as needed
 };
+
+export const CONNECTION_MESSAGE = "You're currently offline. Please, check your internet connection.";

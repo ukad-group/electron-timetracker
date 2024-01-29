@@ -5,19 +5,17 @@ import {
   getGoogleUserInfo,
 } from "@/API/googleCalendarAPI";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
-import isOnline from "is-online";
 import { GoogleCredentails, GoogleUser } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { CONNECTION_MESSAGE, LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 
-const GoogleConnection = () => {
+const GoogleConnection = ({ isOnline }) => {
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);
   const [loggedUsers, setLoggedUsers] = useState([]);
 
-  const signInHandler = async () => {
-    const online = await isOnline();
-
-    if (online) {
+  const signInHandler = () => {
+    if (isOnline) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "google");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
@@ -157,7 +155,9 @@ const GoogleConnection = () => {
       <div className="flex justify-between items-center w-full">
         <span className="font-medium dark:text-dark-heading">Google</span>
         {!loggedUsers.length && (
-          <Button text="Add account" callback={signInHandler} type="button" />
+          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
+            <Button text="Add account" callback={signInHandler} type="button" disabled={!isOnline}/>
+          </Tooltip>
         )}
         {loggedUsers.length > 0 && (
           <button

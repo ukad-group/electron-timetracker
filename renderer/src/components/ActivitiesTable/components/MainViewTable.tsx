@@ -57,7 +57,7 @@ const MainViewTable = () => {
             activity.calendarId ? "opacity-50" : ""
           }`}
         >
-          <Tooltip>
+          <Tooltip isClickable>
             <p data-column="duration" onClick={copyToClipboardHandle}>
               {formatDuration(activity.duration)}
             </p>
@@ -69,7 +69,7 @@ const MainViewTable = () => {
           }`}
         >
           <div className="flex items-center gap-1">
-            <Tooltip>
+            <Tooltip isClickable>
               <p
                 className="text-sm font-medium text-gray-900 dark:text-dark-heading"
                 onClick={copyToClipboardHandle}
@@ -85,7 +85,7 @@ const MainViewTable = () => {
             )}
           </div>
           {activity.activity && (
-            <Tooltip>
+            <Tooltip isClickable>
               <p
                 className="block text-xs font-semibold mt-1 old-break-word "
                 onClick={copyToClipboardHandle}
@@ -101,7 +101,7 @@ const MainViewTable = () => {
           }`}
         >
           {activity.description && (
-            <Tooltip>
+            <Tooltip isClickable>
               <p onClick={copyToClipboardHandle} className="old-break-word">
                 {activity.description}
               </p>
