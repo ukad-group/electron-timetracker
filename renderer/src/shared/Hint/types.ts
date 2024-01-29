@@ -18,7 +18,7 @@ export type Position =
       diagonalPosition: "bottom" | "top";
     };
 
-export type Hint = {
+export type HintProps = {
   displayCondition?: boolean;
   learningMethod: "buttonClick" | "nextClick" | "ctrlArrowNumberPress";
   order: number;

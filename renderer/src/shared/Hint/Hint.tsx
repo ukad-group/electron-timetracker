@@ -7,9 +7,9 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { positioning } from "./positioning";
-import { Hint } from "./types";
+import { HintProps } from "./types";
 
-export default function Hint({
+function Hint({
   displayCondition = false,
   learningMethod,
   order,
@@ -20,7 +20,7 @@ export default function Hint({
   shiftX,
   width,
   position,
-}: Hint) {
+}: HintProps) {
   const SVGRef = useRef(null);
   const HorizontalLineRef = useRef(null);
   const VerticalLineRef = useRef(null);
@@ -236,3 +236,4 @@ export default function Hint({
     </>
   );
 }
+export default Hint;
