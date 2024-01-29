@@ -23,6 +23,8 @@ import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 import { Totals } from "@/components/Totals";
 import { Bookings } from "@/components/Bookings";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { SCREENS } from "@/constants";
+import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -50,6 +52,7 @@ export default function Home() {
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
   const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const [isDropboxConnected, setIsDropboxConnected] = useState(true);
+  const { screenSizes } = useScreenSizes();
   const isManualInputMain =
     localStorage.getItem("is-manual-input-main-section") === "true";
   const [theme] = useThemeStore(
@@ -75,7 +78,6 @@ export default function Home() {
       IPC_MAIN_CHANNELS.START_FOLDER_WATCHER,
       reportsFolder
     );
-
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
       setIsDropboxConnected(!reportsFolder.includes("Dropbox") || data);
@@ -422,16 +424,17 @@ export default function Home() {
                     />
                   </section>
                 )}
-
-                <section className="hidden lg:block lg:col-span-2">
-                  <Calendar
-                    reportsFolder={reportsFolder}
-                    selectedDate={selectedDate}
-                    setSelectedDate={setSelectedDate}
-                    calendarDate={calendarDate}
-                    setCalendarDate={setCalendarDate}
-                  />
-                </section>
+                {screenSizes.screenWidth >= SCREENS.LG && (
+                  <section className="lg:col-span-2">
+                    <Calendar
+                      reportsFolder={reportsFolder}
+                      selectedDate={selectedDate}
+                      setSelectedDate={setSelectedDate}
+                      calendarDate={calendarDate}
+                      setCalendarDate={setCalendarDate}
+                    />
+                  </section>
+                )}
               </div>
 
               <aside className="lg:col-start-3 lg:col-span-1 lg:row-span-2 relative flex flex-col gap-6">
@@ -464,15 +467,17 @@ export default function Home() {
 
                 {showBookings && <Bookings calendarDate={calendarDate} />}
 
-                <section className="lg:hidden lg:col-span-2">
-                  <Calendar
-                    reportsFolder={reportsFolder}
-                    selectedDate={selectedDate}
-                    setSelectedDate={setSelectedDate}
-                    calendarDate={calendarDate}
-                    setCalendarDate={setCalendarDate}
-                  />
-                </section>
+                {screenSizes.screenWidth < SCREENS.LG && (
+                  <section className="lg:col-span-2">
+                    <Calendar
+                      reportsFolder={reportsFolder}
+                      selectedDate={selectedDate}
+                      setSelectedDate={setSelectedDate}
+                      calendarDate={calendarDate}
+                      setCalendarDate={setCalendarDate}
+                    />
+                  </section>
+                )}
 
                 <section>
                   <UpdateDescription />
