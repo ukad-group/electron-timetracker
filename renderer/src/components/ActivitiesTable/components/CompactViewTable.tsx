@@ -58,7 +58,7 @@ const CompactViewTable = () => {
                     new
                   </p>
                 )}
-                <Tooltip>
+                <Tooltip isClickable>
                   <p
                     className="text-sm font-medium text-gray-900 dark:text-dark-heading old-break-word"
                     onClick={copyToClipboardHandle}
@@ -69,7 +69,7 @@ const CompactViewTable = () => {
               </div>
 
               {activity.activity && (
-                <Tooltip>
+                <Tooltip isClickable>
                   <p
                     className="block text-xs font-semibold old-break-word text-gray-500 dark:text-slate-400"
                     onClick={copyToClipboardHandle}
@@ -123,7 +123,7 @@ const CompactViewTable = () => {
             }`}
           >
             <div className="flex flex-nowrap gap-1 items-center">
-              <Tooltip>
+              <Tooltip isClickable>
                 <p
                   data-column="duration"
                   onClick={copyToClipboardHandle}
@@ -134,7 +134,7 @@ const CompactViewTable = () => {
                   {formatDuration(activity.duration)}
                 </p>
               </Tooltip>
-              <Tooltip>
+              <Tooltip isClickable>
                 <p
                   onClick={copyToClipboardHandle}
                   className={clsx("old-break-word", {

@@ -73,6 +73,7 @@ const TotalsList = ({
             </>
           )}
         </div>
+
         {isShowedActivitiesList(name) && showActivity && (
           <div className="flex flex-col gap-1">
             {activities.map((activity) => (
@@ -119,5 +120,4 @@ const TotalsList = ({
       </div>
     );
   });
-
 export default TotalsList;
