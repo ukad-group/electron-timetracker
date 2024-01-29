@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { FormEvent, useEffect, useMemo, useState, useRef } from "react";
-import useTimeInput from "@/helpers/hooks/useTimeInput";
+import { useTimeInput } from "@/helpers/hooks";
 import {
   calcDurationBetweenTimes,
   formatDurationAsDecimals,
@@ -179,8 +179,13 @@ export default function TrackTimeModal({
     })();
 
     getTimetrackerYearProjects(setWebTrackerProjects);
-  }, []);
 
+    document.addEventListener("keyup", handleCloseModal);
+
+    return () => {
+      document.removeEventListener("keyup", handleCloseModal);
+    };
+  }, []);
   useEffect(() => {
     setProgress(progress);
   }, [screenSizes]);
@@ -282,15 +287,15 @@ export default function TrackTimeModal({
   };
 
   const handleKey = (
-    event: React.KeyboardEvent<HTMLInputElement>,
+    e: React.KeyboardEvent<HTMLInputElement>,
     callback: (value: string) => void | undefined = undefined
   ) => {
-    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
-      event.preventDefault();
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
 
       if (!callback) return;
 
-      const input = event.target as HTMLInputElement;
+      const input = e.target as HTMLInputElement;
       const value = input.value;
 
       if (value.length < 5) return;
@@ -305,14 +310,14 @@ export default function TrackTimeModal({
 
       if (cursorPosition > 2) {
         const [newMinutes, newHours] = changeMinutesAndHours(
-          event.key,
+          e.key,
           minutes,
           hours
         );
         minutes = newMinutes;
         hours = newHours;
       } else {
-        hours = changeHours(event.key, hours);
+        hours = changeHours(e.key, hours);
       }
 
       const adjustedTime =
@@ -325,10 +330,16 @@ export default function TrackTimeModal({
       input.selectionEnd = cursorPosition;
       callback(adjustedTime);
     }
+  };
 
-    if (event.ctrlKey && event.key === "Enter") {
-      event.preventDefault();
-      onSave(event);
+  const handleCloseModal = (e) => {
+    if (e.ctrlKey && e.key === "Enter") {
+      e.preventDefault();
+      onSave(e);
+    }
+
+    if (e.key === "Escape" || e.key === "Esc") {
+      close();
     }
   };
 

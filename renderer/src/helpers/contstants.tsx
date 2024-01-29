@@ -30,6 +30,12 @@ export const LOCAL_STORAGE_VARIABLES = {
   GOOGLE_USERS: "googleUsers",
   JIRA_USERS: "jira-users",
   OFFICE_365_USERS: "office365-users",
+  TIMETRACKER_WEBSITE_CODE: "timetracker-website-code",
+  GOOGLE_AUTH_CODE: "google-auth-code",
+  JIRA_AUTH_CODE: "jira-auth-code",
+  OFFICE_365_AUTH_CODE: "office365-auth-code",
+  TRELLO_USER: "trello-user",
+  TRELLO_AUTH_TOKEN: "trello-auth-token",
   // ...Add more local storage variables as needed
 };
 
@@ -88,3 +94,6 @@ export const HINTS_ALERTS = {
   WHATS_NEW:
     "Here you can see your application version. Links to contact us. And the list of changes that were added in this version.",
 };
+
+export const CONNECTION_MESSAGE =
+  "You're currently offline. Please, check your internet connection.";

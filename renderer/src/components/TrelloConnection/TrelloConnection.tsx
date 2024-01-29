@@ -1,81 +1,85 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { Button } from "@/shared/Button";
-import isOnline from "is-online";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { LOCAL_STORAGE_VARIABLES, CONNECTION_MESSAGE } from "@/helpers/contstants";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 
-function extractTokenFromString(inputString: string) {
-  const parts = inputString.split("#");
-
-  if (parts.length >= 2) {
-    const afterHash = parts[1];
-    const tokenPart = afterHash.split("=");
-
-    if (tokenPart.length === 2 && tokenPart[0] === "token") {
-      return tokenPart[1];
-    }
-  }
-
-  return "";
-}
-
-const TrelloConnection = () => {
+const TrelloConnection = ({ isOnline }) => {
   const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem("trello-user")) || null
+    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER)) ||
+      null
   );
 
-  const handleSignInButton = async () => {
-    const online = await isOnline();
-
-    if (online) {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.TRELLO_LOGIN);
+  const handleSignInButton = () => {
+    if (isOnline) {
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "trello");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
   };
 
   const handleSignOutButton = () => {
-    localStorage.removeItem("trello-user");
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER);
     setUser(null);
   };
 
   const addUser = async () => {
-    const tokenFromUrl = extractTokenFromString(window.location.hash);
+    const token = localStorage.getItem(
+      LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN
+    );
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN);
+
+    if (!token) return;
 
     const { id, username, fullName } = await global.ipcRenderer.invoke(
       "trello:get-profile-info",
-      tokenFromUrl
+      token
     );
 
     const newUser = {
       userId: id,
-      accessToken: tokenFromUrl,
+      accessToken: token,
       username: username || fullName || "",
     };
 
-    localStorage.setItem("trello-user", JSON.stringify(newUser));
+    localStorage.setItem(
+      LOCAL_STORAGE_VARIABLES.TRELLO_USER,
+      JSON.stringify(newUser)
+    );
     setUser(newUser);
   };
 
+  const rerenderListener = () => {
+    (async () => addUser())();
+  };
+
   useEffect(() => {
-    if (
-      window.location.hash.includes("token") &&
-      !window.location.hash.includes("error")
-    ) {
-      (async () => addUser())();
-    }
-  }, []);
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.TRELLO_SHOULD_RERENDER,
+      rerenderListener
+    );
+
+    return () => {
+      global.ipcRenderer.removeAllListeners(
+        IPC_MAIN_CHANNELS.TRELLO_SHOULD_RERENDER
+      );
+    };
+  }, [user]);
 
   return (
     <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">
       <div className="flex justify-between items-center w-full">
         <span className="font-medium dark:text-dark-heading">Trello</span>
         {!user && (
-          <Button
-            text="Add account"
-            callback={handleSignInButton}
-            type="button"
-          />
+          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
+            <Button
+              text="Add account"
+              callback={handleSignInButton}
+              type="button"
+              disabled={!isOnline}
+            />
+          </Tooltip>
         )}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">

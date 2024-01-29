@@ -13,6 +13,8 @@ import { SCREENS } from "@/constants";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
+import { Listbox } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/24/solid";
 
 const Totals = ({ selectedDate }) => {
   const [reportsFolder] = useMainStore(
@@ -126,13 +128,6 @@ const Totals = ({ selectedDate }) => {
     setPeriod(rangeName);
   };
 
-  const renderTotalPeriods = (totalPeriods) =>
-    totalPeriods.map((range) => (
-      <option key={range.id} value={range.name}>
-        {range.name}
-      </option>
-    ));
-
   useEffect(() => {
     changeHintConditions(progress, setProgress, [
       {
@@ -156,6 +151,7 @@ const Totals = ({ selectedDate }) => {
       },
     ]);
   };
+
   return (
     <section
       onFocus={onFocusHandler}
@@ -238,16 +234,26 @@ const Totals = ({ selectedDate }) => {
         className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading"
       >
         <div>
-          <label htmlFor="select">Totals</label>
-          <select
-            ref={totalsSelectRef}
-            className="cursor-pointer rounded-lg dark:text-dark-heading px-1 capitalize bg-white dark:bg-dark-container focus:outline-none"
-            id="select"
-            value={period}
-            onChange={(e) => onChangeRange(e.target.value as PeriodName)}
-          >
-            {renderTotalPeriods(TOTAL_PERIODS)}
-          </select>
+          <Listbox value={period} onChange={onChangeRange}>
+            <Listbox.Button ref={totalsSelectRef} className="capitalize flex">
+              Totals {period}
+              <ChevronDownIcon
+                className="w-3 h-3 ml-1 mt-2 dark:text-gray-200"
+                aria-hidden="true"
+              />
+            </Listbox.Button>
+            <Listbox.Options className="absolute z-10 py-1  ml-12 border border-gray-700 cursor-pointer rounded-lg dark:text-dark-heading  capitalize bg-white dark:bg-dark-container focus:outline-none">
+              {TOTAL_PERIODS.map((period) => (
+                <Listbox.Option
+                  className="px-2 hover:bg-dark-button-gray-hover"
+                  key={period.id}
+                  value={period.name}
+                >
+                  {period.name}
+                </Listbox.Option>
+              ))}
+            </Listbox.Options>
+          </Listbox>
         </div>
       </h2>
       {totals.length > 0 && (

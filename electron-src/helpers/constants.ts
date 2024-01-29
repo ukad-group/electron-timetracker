@@ -25,5 +25,11 @@ export const IPC_MAIN_CHANNELS = {
   APP_SELECT_FOLDER: "app:select-folder",
   TIMETRACKER_GET_PROJECTS: "timetracker:get-projects",
   TIMETRACKER_REFRESH_USER_INFO_TOKEN: "timetracker:refresh-user-info-token",
-  TIMETRACKER_LOGIN: "timetracker:login"
+  TIMETRACKER_LOGIN: "timetracker:login",
+  OPEN_CHILD_WINDOW: "open-child-window",
+  GOOGLE_SHOULD_RERENDER: "google:should-rerender",
+  OFFICE365_SHOULD_RERENDER: "office365:should-rerender",
+  TRELLO_SHOULD_RERENDER: "trello:should-rerender",
+  TIMETRACKER_SHOULD_RERENDER: "timetracker:should-rerender",
+  JIRA_SHOULD_RERENDER: "jira:should-rerender",
 };

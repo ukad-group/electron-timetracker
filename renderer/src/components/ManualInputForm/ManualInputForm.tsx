@@ -6,7 +6,7 @@ import { getCurrentTimeRoundedUp } from "@/helpers/utils/datetime-ui";
 import { useMainStore } from "@/store/mainStore";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
-import useEditingHistoryManager from "@/helpers/hooks/useEditingHistoryManager";
+import { useEditingHistoryManager } from "@/helpers/hooks";
 import { ManualInputFormProps } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { Hint } from "@/shared/Hint";

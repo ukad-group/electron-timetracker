@@ -3,22 +3,24 @@ import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { Button } from "@/shared/Button";
 import { useRouter } from "next/router";
 import { Loader } from "@/shared/Loader";
-import isOnline from "is-online";
 import { TTUserInfo } from "../Calendar/types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { CONNECTION_MESSAGE, LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 
-const TimetrackerWebsiteConnection = () => {
+const TimetrackerWebsiteConnection = ({ isOnline }) => {
   const router = useRouter();
   const [loggedUser, setLoggedUser] = useState(
     JSON.parse(localStorage.getItem("timetracker-user"))
   );
   const [loading, setLoading] = useState(false);
 
-  const handleSignInButton = async () => {
-    const online = await isOnline();
-
-    if (online) {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.AZURE_LOGIN_BASE);
+  const handleSignInButton = () => {
+    if (isOnline) {
+      global.ipcRenderer.send(
+        IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW,
+        "timetracker-website"
+      );
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -33,8 +35,13 @@ const TimetrackerWebsiteConnection = () => {
     setLoading(true);
     document.body.style.overflow = "hidden"; // remove scrolling
 
-    const params = new URLSearchParams(window.location.search);
-    const authorizationCode = params.get("code");
+    const authorizationCode = localStorage.getItem(
+      LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE
+    );
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE);
+
+    if (!authorizationCode) return;
+
     const userPromises = [];
 
     try {
@@ -155,6 +162,10 @@ const TimetrackerWebsiteConnection = () => {
     }
   };
 
+  const rerenderListener = () => {
+    (async () => loadUserInfo())();
+  };
+
   useEffect(() => {
     const searchParams = window.location.search;
 
@@ -166,15 +177,21 @@ const TimetrackerWebsiteConnection = () => {
 
     if (
       searchParams.includes("code") &&
-      searchParams.includes("state=azure-base")
-    ) {
-      loadUserInfo();
-    } else if (
-      searchParams.includes("code") &&
       searchParams.includes("state=azure-additional")
     ) {
       loadPlannerInfo();
     }
+
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER,
+      rerenderListener
+    );
+
+    return () => {
+      global.ipcRenderer.removeAllListeners(
+        IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER
+      );
+    };
   }, []);
 
   if (loading) {
@@ -194,11 +211,14 @@ const TimetrackerWebsiteConnection = () => {
           Timetracker website
         </span>
         {!loggedUser && (
-          <Button
-            text="Add account"
-            callback={handleSignInButton}
-            type="button"
-          />
+          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
+            <Button
+              text="Add account"
+              callback={handleSignInButton}
+              type="button"
+              disabled={!isOnline}
+            />
+          </Tooltip>
         )}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">

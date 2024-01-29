@@ -14,6 +14,7 @@ import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
+import usePrevious from "@/helpers/hooks/usePrevious";
 
 const CompactViewTable = () => {
   const {
@@ -59,27 +60,36 @@ const CompactViewTable = () => {
     ]);
   }, []);
 
+  const prevTableActivities = usePrevious(tableActivities) || [];
+
   useEffect(() => {
+    const isNewActivity =
+      tableActivities?.length - prevTableActivities?.length === 1;
     if (
+      prevTableActivities &&
+      tableActivities &&
+      isNewActivity &&
       progress[`${HINTS_GROUP_NAMES.COPY_BUTTON}Conditions`] &&
       progress[`${HINTS_GROUP_NAMES.COPY_BUTTON}Conditions`].includes(false)
     ) {
-      for (let i = 0; i < tableActivities.length; i++) {
-        const description = tableActivities[i].description;
-        tableActivities.forEach((item, index) => {
-          if (index !== i && item.description === description) {
-            setDublicateIndex(index);
-            changeHintConditions(progress, setProgress, [
-              {
-                groupName: HINTS_GROUP_NAMES.COPY_BUTTON,
-                newConditions: [true, true],
-                existingConditions: ["same", true],
-              },
-            ]);
-            return;
-          }
-        });
-      }
+      const description =
+        tableActivities[tableActivities.length - 1].description;
+      tableActivities.forEach((item, index) => {
+        if (
+          index !== tableActivities.length - 1 &&
+          item.description === description
+        ) {
+          setDublicateIndex(index);
+          changeHintConditions(progress, setProgress, [
+            {
+              groupName: HINTS_GROUP_NAMES.COPY_BUTTON,
+              newConditions: [true, true],
+              existingConditions: ["same", true],
+            },
+          ]);
+          return;
+        }
+      });
     }
   }, [tableActivities]);
 
