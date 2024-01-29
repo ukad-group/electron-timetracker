@@ -64,7 +64,7 @@ export const HINTS_ALERTS = {
   EDITING_BUTTON:
     "If you need to modify a registration, click this button to open the corresponding form",
   COPY_BUTTON:
-    "It looks like you added the same registration as an existing one. You can do it in a few clicks by clicking on this button, try it",
+    "It seems that you've added a time registration similar to an existing one. Next time, you can do this in just a few clicks: simply click the 'Copy' button and save the copied time registration.",
   VALIDATION:
     " If you make a mistake in creating a registration, it will be displayed in red in the table",
   ONLINE_CALENDAR_EVENT:
@@ -76,7 +76,7 @@ export const HINTS_ALERTS = {
   CALENDAR_WEEKS:
     "This indicates the week number along with the total hours you've reported for that week.",
   MANUAL_INPUT:
-    "In the Manual Input section, view a serialized representation of your report, mirroring its appearance in your file. Edit your report directly in this field, and save changes with the 'Save' button or by pressing ctrl + space. You can increase the height of this box by dragging it from the bottom right corner",
+    "In the 'Manual Input', your report is displayed in plain text, as it is stored in a file. You can directly edit your report here and save the changes using the 'Save' button or by pressing Ctrl + Space. Life hack: You can increase the height of this box by dragging it from the bottom right corner.",
   TOTALS:
     "This widget facilitates the seamless transfer of your reports to the customer's tracker. You can easily copy all your actions for the day onto the project collectively or individually in the 'activity - description' format (if there is activity) or simply the 'description' format (if there is no activity). Just click on the file icon to initiate this process. If you require the time spent on each activity, click on the plus file icon, and the log will be copied in the format 'description (hh:mm).'",
   TOTALS_PERIOD:
