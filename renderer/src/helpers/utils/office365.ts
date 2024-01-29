@@ -1,3 +1,5 @@
+import { LOCAL_STORAGE_VARIABLES } from "../contstants";
+
 export interface Office365User {
   accessToken: string;
   refreshToken: string;
@@ -12,20 +14,29 @@ export const updateAccessToken = async (refreshToken: string) =>
   );
 
 export const removeStoredUser = (userId: string) => {
-  const storedUsers = JSON.parse(localStorage.getItem("office365-users")) || [];
+  const storedUsers =
+    JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)
+    ) || [];
   const filteredUsers = storedUsers.filter(
     (user: Office365User) => user.userId !== userId
   );
 
   if (filteredUsers.length > 0) {
-    localStorage.setItem("office365-users", JSON.stringify(filteredUsers));
+    localStorage.setItem(
+      LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS,
+      JSON.stringify(filteredUsers)
+    );
   } else {
-    localStorage.removeItem("office365-users");
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS);
   }
 };
 
 export const updateStoredUser = (userId: string, newAccessToken: string) => {
-  const storedUsers = JSON.parse(localStorage.getItem("office365-users")) || [];
+  const storedUsers =
+    JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)
+    ) || [];
   const updatedUsers = storedUsers.map((user: Office365User) => {
     if (user.userId === userId) {
       return { ...user, accessToken: newAccessToken };
@@ -34,11 +45,17 @@ export const updateStoredUser = (userId: string, newAccessToken: string) => {
     }
   });
 
-  localStorage.setItem("office365-users", JSON.stringify(updatedUsers));
+  localStorage.setItem(
+    LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS,
+    JSON.stringify(updatedUsers)
+  );
 };
 
 export const getOffice365Events = async () => {
-  const storedUsers = JSON.parse(localStorage.getItem("office365-users")) || [];
+  const storedUsers =
+    JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)
+    ) || [];
 
   if (!storedUsers.length) return [];
 
@@ -48,7 +65,7 @@ export const getOffice365Events = async () => {
     return getOffice365EventByUser(accessToken, refreshToken, userId);
   });
   const promisedOffice365Events = await Promise.all(usersPromises);
-    
+
   return promisedOffice365Events.reduce(
     (acc, curr) => (!curr ? acc : [...acc, ...curr]),
     []

@@ -3,7 +3,16 @@ import path from "path";
 import next from "next";
 import { parse } from "url";
 import { createServer } from "http";
-import { app, dialog, ipcMain, Menu, MenuItem, shell, Tray } from "electron";
+import {
+  app,
+  BrowserWindow,
+  dialog,
+  ipcMain,
+  Menu,
+  MenuItem,
+  shell,
+  Tray,
+} from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
 import { createWindow } from "./helpers/create-window";
@@ -50,6 +59,7 @@ import {
   getJiraTokens,
 } from "./helpers/API/jiraApi";
 import { IPC_MAIN_CHANNELS } from "./helpers/constants";
+import { getGoogleAuthUrl } from "./helpers/API/googleApi";
 
 initialize("A-EU-9361517871");
 ipcMain.on(
@@ -60,6 +70,7 @@ ipcMain.on(
 );
 
 const PORT = 51432;
+let childWindow: any;
 
 let updateStatus: null | "available" | "downloaded" = null;
 let updateVersion = "";
@@ -292,6 +303,95 @@ app.on("ready", async () => {
           "Tray error. Encountered errors while integrating the application into the system tray.",
           err
         );
+      }
+    });
+
+    function createChildWindow(url: string) {
+      childWindow = createWindow({
+        width: 1000,
+        height: 700,
+        modal: true,
+        show: false,
+        autoHideMenuBar: true,
+        parent: mainWindow as BrowserWindow | undefined,
+        webPreferences: {},
+      });
+
+      childWindow.loadURL(url);
+      childWindow.once("ready-to-show", () => {
+        childWindow.show();
+      });
+      childWindow.on("closed", () => {
+        childWindow = null;
+      });
+    }
+
+    const getConnectionUrl = (connectionName: string) => {
+      switch (connectionName) {
+        case "office365":
+          return getAuthUrl(getOffice365Options());
+
+        case "jira":
+          return getJiraAuthUrl(getJiraOptions());
+
+        case "trello":
+          return getTrelloAuthUrl(getTrelloOptions());
+
+        case "google":
+          return getGoogleAuthUrl(getGoogleOptions());
+
+        case "timetracker-website":
+          const options = getOffice365Options();
+
+          const optionsWithAllScope = {
+            ...options,
+            scope:
+              "api://d7d02680-bd82-47ed-95f9-e977ab5f0487/access_as_user offline_access profile email offline_access openid User.Read Calendars.Read",
+          };
+
+          return getAzureAuthUrl(optionsWithAllScope);
+
+        default:
+          return "";
+      }
+    };
+
+    ipcMain.on(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, (_, connectionName) => {
+      createChildWindow(getConnectionUrl(connectionName));
+    });
+
+    ipcMain.on("child-window-closed", (_, componentName) => {
+      switch (componentName) {
+        case "google":
+          mainWindow?.webContents.send(
+            IPC_MAIN_CHANNELS.GOOGLE_SHOULD_RERENDER
+          );
+          break;
+
+        case "jira":
+          mainWindow?.webContents.send(IPC_MAIN_CHANNELS.JIRA_SHOULD_RERENDER);
+          break;
+
+        case "office365":
+          mainWindow?.webContents.send(
+            IPC_MAIN_CHANNELS.OFFICE365_SHOULD_RERENDER
+          );
+          break;
+
+        case "timetracker-website":
+          mainWindow?.webContents.send(
+            IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER
+          );
+          break;
+
+        case "trello":
+          mainWindow?.webContents.send(
+            IPC_MAIN_CHANNELS.TRELLO_SHOULD_RERENDER
+          );
+          break;
+
+        default:
+          break;
       }
     });
 
@@ -708,6 +808,20 @@ ipcMain.handle(
 ipcMain.on(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE, async () => {
   mainWindow?.loadURL(`http://localhost:${PORT}/offline`);
 });
+
+//#region GOOGLE FUNCTIONS
+
+const getGoogleOptions = () => {
+  return {
+    clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "",
+    clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET || "",
+    redirectUri: `http://localhost:${PORT}/settings`,
+    scope:
+      "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile",
+  };
+};
+
+//#endregion
 
 //#region TRELLO FUNCTIONS
 

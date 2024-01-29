@@ -1,3 +1,4 @@
+import { LOCAL_STORAGE_VARIABLES } from "../contstants";
 import { Office365User } from "./office365";
 
 export interface JiraUser extends Office365User {}
@@ -20,15 +21,19 @@ export const updateJiraAccessToken = async (refreshToken: string) => {
 };
 
 export const removeJiraStoredUser = (userId: string) => {
-  const storedUsers = JSON.parse(localStorage.getItem("jira-users")) || [];
+  const storedUsers =
+    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || [];
   const filteredUsers = storedUsers.filter(
     (user: JiraUser) => user.userId !== userId
   );
 
   if (filteredUsers.length > 0) {
-    localStorage.setItem("jira-users", JSON.stringify(filteredUsers));
+    localStorage.setItem(
+      LOCAL_STORAGE_VARIABLES.JIRA_USERS,
+      JSON.stringify(filteredUsers)
+    );
   } else {
-    localStorage.removeItem("jira-users");
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS);
   }
 };
 
@@ -37,7 +42,8 @@ export const updateJiraStoredUser = (
   newAccessToken: string,
   newRefreshToken: string
 ) => {
-  const storedUsers = JSON.parse(localStorage.getItem("jira-users")) || [];
+  const storedUsers =
+    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || [];
   const updatedUsers = storedUsers.map((user: JiraUser) => {
     if (user.userId === userId) {
       return {
@@ -50,7 +56,10 @@ export const updateJiraStoredUser = (
     }
   });
 
-  localStorage.setItem("jira-users", JSON.stringify(updatedUsers));
+  localStorage.setItem(
+    LOCAL_STORAGE_VARIABLES.JIRA_USERS,
+    JSON.stringify(updatedUsers)
+  );
 };
 
 export const getJiraCardsFromAPI = async () => {
@@ -61,7 +70,9 @@ export const getJiraCardsFromAPI = async () => {
 
 export const getJiraResources = async () => {
   try {
-    const storedUsers = JSON.parse(localStorage.getItem("jira-users")) || [];
+    const storedUsers =
+      JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) ||
+      [];
 
     if (!storedUsers.length) return [];
 
