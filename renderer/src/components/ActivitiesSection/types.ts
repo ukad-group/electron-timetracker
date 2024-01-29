@@ -3,9 +3,11 @@ import { Dispatch, SetStateAction } from "react";
 
 export type TrackTimeButtonProps = {
   onEditActivity: (activity: ReportActivity | "new") => void;
-}
+  isLoading: boolean;
+};
 
-export type ActivitiesSectionProps = TrackTimeButtonProps & {
+export type ActivitiesSectionProps = {
+  onEditActivity: (activity: ReportActivity | "new") => void;
   activities: Array<ReportActivity>;
   onDeleteActivity: (id: number) => void;
   selectedDate: Date;
@@ -14,7 +16,8 @@ export type ActivitiesSectionProps = TrackTimeButtonProps & {
   showAsMain: boolean;
 };
 
-export type PlaceholderProps = TrackTimeButtonProps & {
+export type PlaceholderProps = {
+  onEditActivity: (activity: ReportActivity | "new") => void;
   backgroundError: string;
   selectedDate: Date;
   setSelectedDateReport: Dispatch<SetStateAction<String>>;

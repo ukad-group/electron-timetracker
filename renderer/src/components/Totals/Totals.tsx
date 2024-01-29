@@ -1,12 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { convertMillisecondsToTime } from "@/helpers/utils/datetime-ui";
 import { useMainStore } from "@/store/mainStore";
+import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { Description, Total, PeriodName } from "./types";
 import { TOTAL_PERIODS } from "./constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { getTotals } from "./utils";
 import TotalsList from "./TotalsList";
+import { Hint } from "@/shared/Hint";
+import { SCREENS } from "@/constants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { changeHintConditions } from "@/helpers/utils/utils";
+import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import { Listbox } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 
@@ -15,9 +21,16 @@ const Totals = ({ selectedDate }) => {
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
   );
+  const [progress, setProgress] = useTutorialProgressStore(
+    (state) => [state.progress, state.setProgress],
+    shallow
+  );
   const [totals, setTotals] = useState<Total[]>([]);
   const [period, setPeriod] = useState<PeriodName>("day");
+  const { screenSizes } = useScreenSizes();
   const [showedProjects, setShowedProjects] = useState<string[]>([]);
+  const totalsRef = useRef(null);
+  const totalsSelectRef = useRef(null);
   const isShowedActivitiesList = (projectName: string) => {
     return showedProjects.includes(projectName);
   };
@@ -115,12 +128,114 @@ const Totals = ({ selectedDate }) => {
     setPeriod(rangeName);
   };
 
+  useEffect(() => {
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.TOTALS,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+    ]);
+  }, []);
+
+  useEffect(() => {
+    setProgress(progress);
+  }, [screenSizes]);
+
+  const onFocusHandler = () => {
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.TOTALS,
+        newConditions: [true],
+        existingConditions: [true],
+      },
+    ]);
+  };
+
   return (
-    <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-      <h2 className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading">
+    <section
+      onFocus={onFocusHandler}
+      className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border"
+    >
+      {screenSizes.screenWidth >= SCREENS.LG && (
+        <>
+          <Hint
+            displayCondition
+            learningMethod="nextClick"
+            order={1}
+            groupName={HINTS_GROUP_NAMES.TOTALS}
+            referenceRef={totalsRef}
+            shiftY={200}
+            shiftX={50}
+            width={"medium"}
+            position={{
+              basePosition: "left",
+              diagonalPosition: "top",
+            }}
+          >
+            {HINTS_ALERTS.TOTALS}
+          </Hint>
+          <Hint
+            learningMethod="buttonClick"
+            order={2}
+            groupName={HINTS_GROUP_NAMES.TOTALS}
+            referenceRef={totalsSelectRef}
+            shiftY={50}
+            shiftX={200}
+            width={"small"}
+            position={{
+              basePosition: "top",
+              diagonalPosition: "left",
+            }}
+          >
+            {HINTS_ALERTS.TOTALS_PERIOD}
+          </Hint>
+        </>
+      )}
+
+      {screenSizes.screenWidth < SCREENS.LG && (
+        <>
+          <Hint
+            displayCondition
+            learningMethod="nextClick"
+            order={1}
+            groupName={HINTS_GROUP_NAMES.TOTALS}
+            referenceRef={totalsRef}
+            shiftY={50}
+            shiftX={200}
+            width={"medium"}
+            position={{
+              basePosition: "top",
+              diagonalPosition: "right",
+            }}
+          >
+            {HINTS_ALERTS.TOTALS}
+          </Hint>
+          <Hint
+            learningMethod="buttonClick"
+            order={2}
+            groupName={HINTS_GROUP_NAMES.TOTALS}
+            referenceRef={totalsSelectRef}
+            shiftY={50}
+            shiftX={220}
+            width={"small"}
+            position={{
+              basePosition: "top",
+              diagonalPosition: "right",
+            }}
+          >
+            {HINTS_ALERTS.TOTALS_PERIOD}
+          </Hint>
+        </>
+      )}
+
+      <h2
+        ref={totalsRef}
+        className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading"
+      >
         <div>
           <Listbox value={period} onChange={onChangeRange}>
-            <Listbox.Button className="capitalize flex">
+            <Listbox.Button ref={totalsSelectRef} className="capitalize flex">
               Totals {period}
               <ChevronDownIcon
                 className="w-3 h-3 ml-1 mt-2 dark:text-gray-200"

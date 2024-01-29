@@ -4,15 +4,9 @@ const TextField = ({
   id,
   type = "text",
   label,
-  onKeyDown,
-  onChange,
-  onBlur,
-  onFocus,
-  onDragStart,
-  className,
-  value,
   required = false,
-  tabIndex
+  reference,
+  ...props
 }: TextFieldProps) => (
   <>
     {label && (
@@ -23,21 +17,8 @@ const TextField = ({
         {label}
       </label>
     )}
-    <input
-      onKeyDown={onKeyDown}
-      required={required}
-      value={value}
-      onChange={onChange}
-      onBlur={onBlur}
-      onFocus={onFocus}
-      type={type}
-      id={id}
-      tabIndex={tabIndex}
-      className={className}
-      onDragStart={onDragStart}
-    />
+    <input ref={reference} {...props} required={required} type={type} id={id} />
   </>
-)
+);
 
 export default TextField;
-
