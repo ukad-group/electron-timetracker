@@ -13,9 +13,9 @@ const JiraConnection = ({ isOnline }) => {
     JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || []
   );
 
-  const handleSignInButton = async () => {
+  const handleSignInButton = () => {
     if (isOnline) {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.JIRA_LOGIN);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "jira");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -25,7 +25,10 @@ const JiraConnection = ({ isOnline }) => {
     const filteredUsers = users.filter((user: JiraUser) => user.userId !== id);
 
     if (filteredUsers.length > 0) {
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(filteredUsers));
+      localStorage.setItem(
+        LOCAL_STORAGE_VARIABLES.JIRA_USERS,
+        JSON.stringify(filteredUsers)
+      );
     } else {
       localStorage.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS);
     }
@@ -34,8 +37,12 @@ const JiraConnection = ({ isOnline }) => {
   };
 
   const addUser = async () => {
-    const params = new URLSearchParams(window.location.search);
-    const authorizationCode = params.get("code");
+    const authorizationCode = localStorage.getItem(
+      LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE
+    );
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE);
+
+    if (!authorizationCode) return;
 
     const { access_token, refresh_token } = await global.ipcRenderer.invoke(
       "jira:get-tokens",
@@ -68,19 +75,29 @@ const JiraConnection = ({ isOnline }) => {
 
     const newUsers = [...users, user];
 
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(newUsers));
+    localStorage.setItem(
+      LOCAL_STORAGE_VARIABLES.JIRA_USERS,
+      JSON.stringify(newUsers)
+    );
     setUsers(newUsers);
   };
 
+  const rerenderListener = () => {
+    (async () => addUser())();
+  };
+
   useEffect(() => {
-    if (
-      window.location.search.includes("code") &&
-      window.location.search.includes("state=jiracode") &&
-      !window.location.search.includes("error")
-    ) {
-      (async () => addUser())();
-    }
-  }, []);
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.JIRA_SHOULD_RERENDER,
+      rerenderListener
+    );
+
+    return () => {
+      global.ipcRenderer.removeAllListeners(
+        IPC_MAIN_CHANNELS.JIRA_SHOULD_RERENDER
+      );
+    };
+  }, [users]);
 
   return (
     <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">

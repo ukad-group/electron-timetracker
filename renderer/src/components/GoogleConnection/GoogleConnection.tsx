@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/shared/Button";
-import { useRouter } from "next/router";
 import {
-  getGoogleAuthUrl,
   getGoogleCredentials,
   getGoogleUserInfo,
 } from "@/API/googleCalendarAPI";
@@ -13,20 +11,21 @@ import { CONNECTION_MESSAGE, LOCAL_STORAGE_VARIABLES } from "@/helpers/contstant
 import Tooltip from "@/shared/Tooltip/Tooltip";
 
 const GoogleConnection = ({ isOnline }) => {
-  const router = useRouter();
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);
   const [loggedUsers, setLoggedUsers] = useState([]);
 
-  const signInHandler = async () => {
+  const signInHandler = () => {
     if (isOnline) {
-      await router.push(getGoogleAuthUrl());
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "google");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
   };
 
   const signOutHandler = (id: string) => {
-    const loggedUsersFromLs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
+    const loggedUsersFromLs = JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS)
+    );
     const filteredUsers = loggedUsersFromLs.filter(
       (user: GoogleUser) => user.accountId !== id
     );
@@ -36,7 +35,10 @@ const GoogleConnection = ({ isOnline }) => {
       localStorage.setItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS, "false");
     }
 
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify(filteredUsers));
+    localStorage.setItem(
+      LOCAL_STORAGE_VARIABLES.GOOGLE_USERS,
+      JSON.stringify(filteredUsers)
+    );
     setLoggedUsers(filteredUsers);
   };
 
@@ -46,7 +48,9 @@ const GoogleConnection = ({ isOnline }) => {
       const googleProfileInfo = await loadGoogleUserInfo(credentials);
       const googleProfileUsername = googleProfileInfo?.names[0]?.displayName;
       const googleProfileId = googleProfileInfo?.resourceName;
-      const googleUsersFromLs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
+      const googleUsersFromLs = JSON.parse(
+        localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS)
+      );
 
       if (
         googleUsersFromLs.some((user) => {
@@ -69,7 +73,10 @@ const GoogleConnection = ({ isOnline }) => {
           }
         );
         googleUsersFromLs.push(userObject);
-        localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify(googleUsersFromLs));
+        localStorage.setItem(
+          LOCAL_STORAGE_VARIABLES.GOOGLE_USERS,
+          JSON.stringify(googleUsersFromLs)
+        );
         setLoggedUsers(googleUsersFromLs);
       }
     } catch (e) {
@@ -88,30 +95,59 @@ const GoogleConnection = ({ isOnline }) => {
   const handleCheckboxChange = () => {
     setShowGoogleEvents((prev) => !prev);
     const reversShowGoogleEvents = !showGoogleEvents;
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS, reversShowGoogleEvents.toString());
+    localStorage.setItem(
+      LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS,
+      reversShowGoogleEvents.toString()
+    );
+  };
+
+  const rerenderListener = () => {
+    const googleUsers = JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS)
+    );
+    const authorizationCode = localStorage.getItem(
+      LOCAL_STORAGE_VARIABLES.GOOGLE_AUTH_CODE
+    );
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.GOOGLE_AUTH_CODE);
+
+    if (!googleUsers) {
+      localStorage.setItem(
+        LOCAL_STORAGE_VARIABLES.GOOGLE_USERS,
+        JSON.stringify([])
+      );
+    }
+
+    if (authorizationCode) {
+      loadGoogleCredentials(authorizationCode);
+    }
   };
 
   useEffect(() => {
-    const googleUsers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
-    const params = new URLSearchParams(window.location.search);
-    const authorizationCode = params.get("code");
-    const googleUrlState = params.get("state") === "googlecalendarcode";
-
-    if (authorizationCode && googleUrlState && !googleUsers) {
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify([]));
-      loadGoogleCredentials(authorizationCode);
-    } else if (authorizationCode && googleUrlState) {
-      loadGoogleCredentials(authorizationCode);
-    }
-
-    if (localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS) === "true") {
+    if (
+      localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS) ===
+      "true"
+    ) {
       setShowGoogleEvents(true);
     }
 
-    const loggedUsersFromLs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
+    const loggedUsersFromLs = JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS)
+    );
+
     if (loggedUsersFromLs) {
       setLoggedUsers(loggedUsersFromLs);
     }
+
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.GOOGLE_SHOULD_RERENDER,
+      rerenderListener
+    );
+
+    return () => {
+      global.ipcRenderer.removeAllListeners(
+        IPC_MAIN_CHANNELS.GOOGLE_SHOULD_RERENDER
+      );
+    };
   }, []);
 
   return (

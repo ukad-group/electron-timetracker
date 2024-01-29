@@ -1,3 +1,4 @@
+import { LOCAL_STORAGE_VARIABLES } from "../contstants";
 import { replaceHyphensWithSpaces } from "./utils";
 
 type Card = {
@@ -8,7 +9,9 @@ type Card = {
 };
 
 export const getAllTrelloCardsFromApi = async () => {
-  const user = JSON.parse(localStorage.getItem("trello-user")) || null;
+  const user =
+    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER)) ||
+    null;
 
   if (!user) return [[], []];
 

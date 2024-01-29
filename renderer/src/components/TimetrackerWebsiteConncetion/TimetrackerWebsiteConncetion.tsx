@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { Loader } from "@/shared/Loader";
 import { TTUserInfo } from "../Calendar/types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { CONNECTION_MESSAGE } from "@/helpers/contstants";
+import { CONNECTION_MESSAGE, LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 
 const TimetrackerWebsiteConnection = ({ isOnline }) => {
@@ -15,9 +15,12 @@ const TimetrackerWebsiteConnection = ({ isOnline }) => {
   );
   const [loading, setLoading] = useState(false);
 
-  const handleSignInButton = async () => {
+  const handleSignInButton = () => {
     if (isOnline) {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.AZURE_LOGIN_BASE);
+      global.ipcRenderer.send(
+        IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW,
+        "timetracker-website"
+      );
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -32,8 +35,13 @@ const TimetrackerWebsiteConnection = ({ isOnline }) => {
     setLoading(true);
     document.body.style.overflow = "hidden"; // remove scrolling
 
-    const params = new URLSearchParams(window.location.search);
-    const authorizationCode = params.get("code");
+    const authorizationCode = localStorage.getItem(
+      LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE
+    );
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE);
+
+    if (!authorizationCode) return;
+
     const userPromises = [];
 
     try {
@@ -154,6 +162,10 @@ const TimetrackerWebsiteConnection = ({ isOnline }) => {
     }
   };
 
+  const rerenderListener = () => {
+    (async () => loadUserInfo())();
+  };
+
   useEffect(() => {
     const searchParams = window.location.search;
 
@@ -165,15 +177,21 @@ const TimetrackerWebsiteConnection = ({ isOnline }) => {
 
     if (
       searchParams.includes("code") &&
-      searchParams.includes("state=azure-base")
-    ) {
-      loadUserInfo();
-    } else if (
-      searchParams.includes("code") &&
       searchParams.includes("state=azure-additional")
     ) {
       loadPlannerInfo();
     }
+
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER,
+      rerenderListener
+    );
+
+    return () => {
+      global.ipcRenderer.removeAllListeners(
+        IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER
+      );
+    };
   }, []);
 
   if (loading) {
