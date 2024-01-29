@@ -35,6 +35,7 @@ const TextField = ({
       tabIndex={tabIndex}
       className={className}
       onDragStart={onDragStart}
+      data-testid="text-field-test-id"
     />
   </>
 )
