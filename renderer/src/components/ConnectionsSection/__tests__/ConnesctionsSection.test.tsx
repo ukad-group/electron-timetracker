@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ConnectionsSection from '../ConnectionsSection';
-import { ipcRenderer } from 'electron'
+import { globalIpcRendererMock } from '@/tests/mocks/electron';
 
 jest.mock('next/router', () => ({
   useRouter: () => ({
@@ -27,7 +27,7 @@ jest.mock('next/router', () => ({
 global.ipcRenderer = {
   on: jest.fn(),
   removeAllListeners: jest.fn(),
-  ...ipcRenderer
+  ...globalIpcRendererMock
 };
 
 jest.mock('@/helpers/hooks', () => ({
@@ -38,7 +38,7 @@ describe("GIVEN ConnectionsSection", () => {
   afterAll(() => {
     jest.restoreAllMocks();
 
-    global.ipcRenderer = ipcRenderer;
+    global.ipcRenderer = globalIpcRendererMock;
   });
 
   test('renders ConnectionsSection correctly', () => {
