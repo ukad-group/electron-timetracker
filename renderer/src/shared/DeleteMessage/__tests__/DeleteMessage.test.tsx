@@ -7,15 +7,6 @@ jest.mock("@/store/mainStore", () => ({
   useMainStore: jest.fn(),
 }));
 
-jest.mock("electron", () => ({
-  ipcRenderer: {
-    on: jest.fn(),
-    removeAllListeners: jest.fn(),
-    invoke: jest.fn(),
-    send: jest.fn(),
-  },
-}));
-
 describe("DeleteMessage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -38,7 +29,7 @@ describe("DeleteMessage", () => {
     const setShowDeleteMessageMock = jest.fn();
 
     // @ts-ignore
-    useMainStore.mockReturnValue([null, jest.fn()]); // Mock the useMainStore hook as needed
+    useMainStore.mockReturnValue([null, jest.fn()]);
     render(
       <DeleteMessage
         setShowDeleteButton={() => {}}
