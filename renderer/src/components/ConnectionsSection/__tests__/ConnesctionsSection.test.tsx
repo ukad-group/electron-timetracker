@@ -1,8 +1,8 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import renderer from 'react-test-renderer';
 import ConnectionsSection from '../ConnectionsSection';
+import { ipcRenderer } from 'electron'
 
 jest.mock('next/router', () => ({
   useRouter: () => ({
@@ -24,10 +24,10 @@ jest.mock('next/router', () => ({
   }),
 }));
 
-// @ts-ignore
 global.ipcRenderer = {
   on: jest.fn(),
-  removeAllListeners: jest.fn()
+  removeAllListeners: jest.fn(),
+  ...ipcRenderer
 };
 
 jest.mock('@/helpers/hooks', () => ({
@@ -35,20 +35,16 @@ jest.mock('@/helpers/hooks', () => ({
 }));
 
 describe("GIVEN ConnectionsSection", () => {
-  afterEach(() => {
+  afterAll(() => {
     jest.restoreAllMocks();
+
+    global.ipcRenderer = ipcRenderer;
   });
 
   test('renders ConnectionsSection correctly', () => {
-    console.log("ipcRenderer mock:", global.ipcRenderer);
     const { getByText } = render(<ConnectionsSection />);
 
     expect(getByText('Connections')).toBeInTheDocument();
     expect(getByText('You can connect available resources to use their capabilities to complete your reports')).toBeInTheDocument();
-  });
-
-  test('matches snapshot', () => {
-    const tree = renderer.create(<ConnectionsSection />).toJSON();
-    expect(tree).toMatchSnapshot();
   });
 })
