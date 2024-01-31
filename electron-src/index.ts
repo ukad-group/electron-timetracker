@@ -12,6 +12,7 @@ import {
   MenuItem,
   shell,
   Tray,
+  net,
 } from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
@@ -482,6 +483,24 @@ app.on("ready", async () => {
           mainWindow?.webContents.send("dropbox-connection", isRun);
         }
       });
+    });
+
+    ipcMain.on(IPC_MAIN_CHANNELS.CHECK_INTERNET, () => {
+      const networkInterface = require("network-interface");
+
+      networkInterface.addEventListener(
+        "wlan-status-changed",
+        (error: any, data: any) => {
+          if (error) {
+            throw error;
+            return;
+          }
+          mainWindow?.webContents.send(
+            IPC_MAIN_CHANNELS.INTERNET_CONNECTION_STATUS,
+            data
+          );
+        }
+      );
     });
 
     ipcMain.on(

@@ -110,7 +110,7 @@ const ActivitiesSection = ({
     return () => {
       document.removeEventListener("keyup", handleCtrlSpace);
       global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.BACKEND_ERROR);
-      global.ipcRenderer.removeAllListeners("render or fetch error");
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.RENDER_ERROR);
     };
   }, []);
 
