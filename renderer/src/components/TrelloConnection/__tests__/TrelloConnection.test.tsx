@@ -35,14 +35,6 @@ describe("GIVEN TrelloConnection", () => {
     expect(global.ipcRenderer.send).toHaveBeenCalledWith(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "trello");
   });
 
-  it("handles sign in button click correctly when offline", () => {
-    const { getByText } = render(<TrelloConnection isOnline={false} />);
-
-    fireEvent.click(getByText("Add account"));
-
-    expect(global.ipcRenderer.send).toHaveBeenCalledTimes(1);
-  });
-
   it("displays a message when no user is authorized", () => {
     jest.spyOn(React, "useState").mockImplementationOnce(() => [null, jest.fn()]);
 

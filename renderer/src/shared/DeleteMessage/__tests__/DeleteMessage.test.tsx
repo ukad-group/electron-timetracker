@@ -7,14 +7,14 @@ jest.mock("@/store/mainStore", () => ({
   useMainStore: jest.fn(),
 }));
 
-describe("DeleteMessage", () => {
+describe("GIVEN DeleteMessage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("renders without errors", () => {
     // @ts-ignore
-    useMainStore.mockReturnValue([null, jest.fn()]); // Mock the useMainStore hook as needed
+    useMainStore.mockReturnValue([null, jest.fn()]);
     render(
       <DeleteMessage
         setShowDeleteButton={() => {}}
