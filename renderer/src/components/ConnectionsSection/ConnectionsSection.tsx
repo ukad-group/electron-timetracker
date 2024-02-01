@@ -7,17 +7,17 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { useEffect, useState } from "react";
 
 const ConnectionsSection = () => {
-  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
+  const [isOnline, setIsOnline] = useState<boolean>(true);
 
   useEffect(() => {
-    global.ipcRenderer.on("net-connection", (_, connection) => {
-      console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-      console.log(
-        connection.code === "wlan_notification_acm_disconnected"
-          ? "Disconected"
-          : "Connected"
-      );
-    });
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_INTERNET);
+    global.ipcRenderer.on(
+      IPC_MAIN_CHANNELS.INTERNET_CONNECTION_STATUS,
+      (_, connection) => {
+        setIsOnline(connection);
+      }
+    );
+
     return () => {
       global.ipcRenderer.removeAllListeners(
         IPC_MAIN_CHANNELS.INTERNET_CONNECTION_STATUS

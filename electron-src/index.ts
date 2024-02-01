@@ -76,6 +76,20 @@ let childWindow: any;
 let updateStatus: null | "available" | "downloaded" = null;
 let updateVersion = "";
 
+let isOnline = true;
+
+const networkInterface = require("network-interface");
+networkInterface.addEventListener(
+  "wlan-status-changed",
+  (error: any, data: any) => {
+    if (error) {
+      throw error;
+      return;
+    }
+    isOnline = data.code !== "wlan_notification_acm_disconnected";
+  }
+);
+
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
@@ -486,20 +500,9 @@ app.on("ready", async () => {
     });
 
     ipcMain.on(IPC_MAIN_CHANNELS.CHECK_INTERNET, () => {
-      const networkInterface = require("network-interface");
-
-      networkInterface.addEventListener(
-        "wlan-status-changed",
-        (error: any, data: any) => {
-          if (error) {
-            throw error;
-            return;
-          }
-          mainWindow?.webContents.send(
-            IPC_MAIN_CHANNELS.INTERNET_CONNECTION_STATUS,
-            data
-          );
-        }
+      mainWindow?.webContents.send(
+        IPC_MAIN_CHANNELS.INTERNET_CONNECTION_STATUS,
+        isOnline
       );
     });
 
