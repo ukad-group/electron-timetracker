@@ -34,4 +34,5 @@ export const IPC_MAIN_CHANNELS = {
   JIRA_SHOULD_RERENDER: "jira:should-rerender",
   CHECK_INTERNET: "check-internet-connection",
   INTERNET_CONNECTION_STATUS: "internet-connection-status",
+  CHILD_WINDOW_CLOSED: "child-window-closed",
 };
