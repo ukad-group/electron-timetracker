@@ -39,7 +39,7 @@ const ActivitiesSection = ({
     localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS)
   );
   const nonBreakActivities = useMemo(() => {
-    return validation(activities.filter((activity) => !activity.isBreak));
+    return validation(activities.filter((activity) => activity.to));
   }, [activities]);
 
   const handleCtrlSpace = (e: KeyboardEvent) => {

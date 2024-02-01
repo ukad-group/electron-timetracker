@@ -174,7 +174,7 @@ const CompactViewTable = () => {
 
         {tableActivities?.map((activity, i) => (
           <Fragment key={i}>
-            <tr>
+            <tr className={activity.isBreak && "font-medium diagonalLines "}>
               <td
                 className={`w-24 relative pt-4 pl-1 pr-1 text-sm whitespace-nowrap sm:pl-6 md:pl-0 ${
                   activity.calendarId ? "opacity-50" : ""
@@ -224,7 +224,7 @@ const CompactViewTable = () => {
               >
                 <div className="flex flex-wrap gap-x-2 items-center">
                   <div className="flex gap-1">
-                    {activity.isNewProject && (
+                    {activity.isNewProject && !activity.isBreak && (
                       <p className="flex items-center shrink-0 w-fit h-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
                         new
                       </p>
@@ -234,7 +234,7 @@ const CompactViewTable = () => {
                         className="text-sm font-medium text-gray-900 dark:text-dark-heading old-break-word"
                         onClick={copyToClipboardHandle}
                       >
-                        {activity.project}
+                        {!activity.isBreak && activity.project}
                       </p>
                     </Tooltip>
                   </div>
@@ -279,9 +279,10 @@ const CompactViewTable = () => {
                 `border-b border-gray-200 dark:border-gray-300 transition-transform `,
                 {
                   "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
-                    tableActivities[i].to != tableActivities[i + 1]?.from &&
-                    i + 1 !== tableActivities.length &&
-                    !activity.calendarId,
+                    (tableActivities[i + 1] &&
+                      tableActivities[i + 1].isBreak) ||
+                    activity.isBreak,
+                  "font-medium diagonalLines": activity.isBreak,
                   "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
                   "scale-105 ":
                     (Number(firstKey) === i + 1 && !secondKey) ||
@@ -315,7 +316,9 @@ const CompactViewTable = () => {
                           activity.mistakes?.includes("startsWith!"),
                       })}
                     >
-                      {activity.description}
+                      {activity.isBreak
+                        ? activity.project
+                        : activity.description}
                     </p>
                     {activity.mistakes?.includes("startsWith!") && (
                       <span className="block text-xs mt-1">
