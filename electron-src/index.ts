@@ -12,6 +12,7 @@ import {
   MenuItem,
   shell,
   Tray,
+  net,
 } from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
@@ -74,6 +75,20 @@ let childWindow: any;
 
 let updateStatus: null | "available" | "downloaded" = null;
 let updateVersion = "";
+
+let isOnline = true;
+
+const networkInterface = require("network-interface");
+networkInterface.addEventListener(
+  "wlan-status-changed",
+  (error: any, data: any) => {
+    if (error) {
+      throw error;
+      return;
+    }
+    isOnline = data.code !== "wlan_notification_acm_disconnected";
+  }
+);
 
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
@@ -482,6 +497,13 @@ app.on("ready", async () => {
           mainWindow?.webContents.send("dropbox-connection", isRun);
         }
       });
+    });
+
+    ipcMain.on(IPC_MAIN_CHANNELS.CHECK_INTERNET, () => {
+      mainWindow?.webContents.send(
+        IPC_MAIN_CHANNELS.INTERNET_CONNECTION_STATUS,
+        isOnline
+      );
     });
 
     ipcMain.on(

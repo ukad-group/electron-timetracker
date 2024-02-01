@@ -72,6 +72,7 @@
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.1",
     "functions-have-names": "^1.2.3",
+    "network-interface": "^18.0.1",
     "next": "^13.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
