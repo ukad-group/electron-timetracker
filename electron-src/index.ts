@@ -244,7 +244,7 @@ app.on("ready", async () => {
   });
 
   globalShortcut.register("CommandOrControl+Q", () => {
-    app.quit();
+    app.exit();
   });
 
   const requestHandler = nextApp.getRequestHandler();
