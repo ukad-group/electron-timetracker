@@ -1,5 +1,4 @@
 import { TrackTimeButtonProps } from "./types";
-import { Hint } from "@/shared/Hint";
 
 const TrackTimeButton = ({
   isLoading,
@@ -12,7 +11,7 @@ const TrackTimeButton = ({
     >
       Track more time
       <span className="block text-blue-500 text-xs dark:text-dark-heading">
-        click or press ctrl + space
+        click or press ctrl/command + space
       </span>
     </button>
   </>
