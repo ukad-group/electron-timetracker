@@ -64,9 +64,9 @@ export const HINTS_GROUP_NAMES = {
 
 export const HINTS_ALERTS = {
   PLACEHOLDER_BUTTON:
-    "This is a daily placeholder you'll encounter each day. Click the 'New Activity' button or press ctrl + space to open the form for your initial entry today. Alternatively, you can duplicate your last report by clicking 'Copy Last Report.'",
+    "This is a daily placeholder you'll encounter each day. Click the 'New Activity' button or press ctrl/command + space to open the form for your initial entry today. Alternatively, you can duplicate your last report by clicking 'Copy Last Report.'",
   SHORTCUTS_EDITING:
-    "Simplify edits using shortcuts. Press ctrl to reveal numbers of each registration. Then select the registration to edit by pressing its corresponding number. Alternatively, use ArrowUp to edit the last entry.",
+    "Simplify edits using shortcuts. Press ctrl/command to reveal numbers of each registration. Then select the registration to edit by pressing its corresponding number. Alternatively, use ArrowUp to edit the last entry.",
   EDITING_BUTTON:
     "If you need to modify a registration, click this button to open the corresponding form",
   COPY_BUTTON:
