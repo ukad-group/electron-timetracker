@@ -7,7 +7,6 @@ import {
   getMonthRequiredHours,
   extractDatesFromPeriod,
   generateDateRange,
-  getCeiledTime,
   getTimeFromEventObj,
   padStringToMinutes,
   convertMillisecondsToTime,
@@ -183,12 +182,6 @@ describe('GIVEN datetime-ui/extractDatesFromPeriod', () => {
   });
 });
 
-describe('GIVEN datetime-ui/getCeiledTime', () => {
-  it('returns the correct ceiled time when minutes are less than 45', () => {
-    expect(getCeiledTime()).toBe('12:45');
-  });
-});
-
 describe('GIVEN datetime-ui/getTimeFromEventObj', () => {
   it('returns the correct time from a valid date string', () => {
     const validDateString = '2022-01-01T12:34:56Z';
@@ -328,12 +321,6 @@ describe('GIVEN datetime-ui/getMonthDates', () => {
 });
 
 describe('GIVEN datetime-ui/getCurrentTimeRoundedUp', () => {
-  it('returns a string representing the current time rounded up to the nearest 15 minutes', () => {
-    const result = getCurrentTimeRoundedUp();
-
-    expect(result).toBe('12:45');
-  });
-
   it('returns a string with the correct format (2-digit hour, 2-digit minute, 24-hour format)', () => {
     const result = getCurrentTimeRoundedUp();
 

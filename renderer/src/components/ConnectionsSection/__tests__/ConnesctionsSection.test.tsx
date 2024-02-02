@@ -26,6 +26,7 @@ jest.mock('next/router', () => ({
 
 global.ipcRenderer = {
   on: jest.fn(),
+  send: jest.fn(),
   removeAllListeners: jest.fn(),
   ...globalIpcRendererMock
 };
