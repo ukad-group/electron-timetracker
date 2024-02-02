@@ -154,7 +154,7 @@ function Hint({
   }, [showHint]);
 
   const skipAllClockHandler = () => {
-    setShowHint(false);
+    learnHint();
     progress.skipAll[0] = true;
     setProgress(progress);
     Object.assign(referenceRef.current.style, {
@@ -164,7 +164,7 @@ function Hint({
 
   return (
     <>
-      {showHint && (
+      {showHint && !progress["skipAll"][0] && (
         <>
           {createPortal(
             <div className="h-screen w-full fixed justify-center top-0 z-20 items-center bg-gray-900/40 pointer-events-auto" />,

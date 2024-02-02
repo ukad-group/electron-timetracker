@@ -8,7 +8,7 @@ export const useTutorialProgressStore =
     devtools(
       persist(
         (set) => ({
-          progress: { skipAll: [false] },
+          progress: { skipAll: [true] },
           setProgress: (event: TutorialProgress) => set({ progress: event }),
         }),
         {
