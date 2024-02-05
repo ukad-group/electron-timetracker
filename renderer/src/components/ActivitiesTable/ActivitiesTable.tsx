@@ -118,7 +118,7 @@ export default function ActivitiesTable({
   const handleKeyDown = (event) => {
     if (
       (event.ctrlKey && event.key === KEY_CODES.ARROW_UP) ||
-      (event.metaKey === KEY_CODES.META && event.key === KEY_CODES.ARROW_UP)
+      (event.metaKey && event.key === KEY_CODES.ARROW_UP)
     ) {
       if (nonBreakActivities.length > 0) {
         const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
@@ -171,7 +171,7 @@ export default function ActivitiesTable({
   };
 
   const handleKeyUp = (event) => {
-    if (event.key === KEY_CODES.CONTROL || event.metaKey) {
+    if (event.key === KEY_CODES.CONTROL || event.key === KEY_CODES.META) {
       setFirstKey(null);
       setSecondtKey(null);
       setCtrlPressed(false);
