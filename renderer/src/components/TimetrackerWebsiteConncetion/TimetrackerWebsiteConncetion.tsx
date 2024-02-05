@@ -5,18 +5,20 @@ import { useRouter } from "next/router";
 import { Loader } from "@/shared/Loader";
 import { TTUserInfo } from "../Calendar/types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { CONNECTION_MESSAGE, LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
-import Tooltip from "@/shared/Tooltip/Tooltip";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import isOnline from "is-online";
 
-const TimetrackerWebsiteConnection = ({ isOnline }) => {
+const TimetrackerWebsiteConnection = () => {
   const router = useRouter();
   const [loggedUser, setLoggedUser] = useState(
     JSON.parse(localStorage.getItem("timetracker-user"))
   );
   const [loading, setLoading] = useState(false);
 
-  const handleSignInButton = () => {
-    if (isOnline) {
+  const handleSignInButton = async () => {
+    const online = await isOnline();
+
+    if (online) {
       global.ipcRenderer.send(
         IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW,
         "timetracker-website"
@@ -211,14 +213,11 @@ const TimetrackerWebsiteConnection = ({ isOnline }) => {
           Timetracker website
         </span>
         {!loggedUser && (
-          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
-            <Button
-              text="Add account"
-              callback={handleSignInButton}
-              type="button"
-              disabled={!isOnline}
-            />
-          </Tooltip>
+          <Button
+            text="Add account"
+            callback={handleSignInButton}
+            type="button"
+          />
         )}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">

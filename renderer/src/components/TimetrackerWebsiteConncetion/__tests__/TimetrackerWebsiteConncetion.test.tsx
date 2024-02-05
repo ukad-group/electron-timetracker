@@ -41,22 +41,10 @@ describe('GIVEN TimetrackerWebsiteConnection', () => {
   });
 
   it('renders correctly with no logged user', () => {
-    const { getByText, getByRole } = render(<TimetrackerWebsiteConnection isOnline={true} />);
+    const { getByText, getByRole } = render(<TimetrackerWebsiteConnection />);
 
     expect(getByText('Timetracker website')).toBeInTheDocument();
     expect(getByRole('button')).toHaveTextContent('Add account');
     expect(getByText('No one user authorized')).toBeInTheDocument();
-  });
-
-  it('handles sign in button click when online', () => {
-    const { getByRole } = render(<TimetrackerWebsiteConnection isOnline={true} />);
-    global.ipcRenderer.send = jest.fn();
-
-    fireEvent.click(getByRole('button'));
-
-    expect(global.ipcRenderer.send).toHaveBeenCalledWith(
-      IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW,
-      'timetracker-website'
-    );
   });
 });

@@ -3,11 +3,8 @@ import { GoogleConnection } from "../GoogleConnection";
 import { Office365Connection } from "../Office365Connection";
 import { JiraConnection } from "../JiraConnection";
 import { TimetrackerWebsiteConnection } from "../TimetrackerWebsiteConncetion";
-import { useState } from "react";
 
 const ConnectionsSection = () => {
-  const [isOnline, setIsOnline] = useState<boolean>(true);
-
   return (
     <section className="h-full">
       <div className="overflow-y-auto h-full bg-white sm:rounded-lg p-2 flex flex-col gap-6 dark:bg-dark-container">
@@ -20,11 +17,11 @@ const ConnectionsSection = () => {
             complete your reports
           </p>
         </div>
-        <TrelloConnection isOnline={isOnline} />
-        <GoogleConnection isOnline={isOnline} />
-        <Office365Connection isOnline={isOnline} />
-        <JiraConnection isOnline={isOnline} />
-        <TimetrackerWebsiteConnection isOnline={isOnline} />
+        <TrelloConnection />
+        <GoogleConnection />
+        <Office365Connection />
+        <JiraConnection />
+        <TimetrackerWebsiteConnection />
       </div>
     </section>
   );
