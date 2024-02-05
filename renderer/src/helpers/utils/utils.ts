@@ -1,4 +1,6 @@
 import { ReportActivity } from "./reports";
+import { TutorialProgress } from "@/store/types";
+import { HintConitions } from "./types";
 
 export const replaceHyphensWithSpaces = (inputString: string): string =>
   inputString.replace(/ - /g, " ");
@@ -99,4 +101,39 @@ export function parseEventTitle(
   }
 
   return event;
+}
+
+export const changeHintConditions = (
+  progress: TutorialProgress,
+  setProgress: (event: TutorialProgress) => void,
+  hints: Array<HintConitions>
+) => {
+  hints.forEach((hint) => {
+    if (!progress[`${hint.groupName}Conditions`]) {
+      progress[`${hint.groupName}Conditions`] = hint.newConditions;
+    } else {
+      hint.existingConditions.forEach((condition, i) => {
+        if (condition !== "same") {
+          progress[`${hint.groupName}Conditions`][i] = condition;
+        }
+      });
+    }
+  });
+
+  setProgress(progress);
+};
+
+export function extractTokenFromString(inputString: string) {
+  const parts = inputString.split("#");
+
+  if (parts.length >= 2) {
+    const afterHash = parts[1];
+    const tokenPart = afterHash.split("=");
+
+    if (tokenPart.length === 2 && tokenPart[0] === "token") {
+      return tokenPart[1];
+    }
+  }
+
+  return "";
 }

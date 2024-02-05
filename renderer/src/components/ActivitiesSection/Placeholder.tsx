@@ -1,11 +1,17 @@
 import { PlaceholderProps } from "@/components/ActivitiesSection/types";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import { ClockIcon, ExclamationCircleIcon, Square2StackIcon } from "@heroicons/react/24/outline";
+import {
+  ClockIcon,
+  ExclamationCircleIcon,
+  Square2StackIcon,
+} from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { ButtonTransparent } from "@/shared/ButtonTransparent";
-import Popup from "@/shared/Popup/Popup";
+import { Popup } from "@/shared/Popup";
+import { Hint } from "@/shared/Hint";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 
 const Placeholder = ({
   onEditActivity,
@@ -14,6 +20,7 @@ const Placeholder = ({
   setSelectedDateReport,
 }: PlaceholderProps) => {
   const [showModal, setShowModal] = useState(false);
+  const placeholderButtonRef = useRef(null);
   const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
@@ -70,6 +77,7 @@ const Placeholder = ({
       </p>
       <div className="mt-6 mb-2">
         <button
+          ref={placeholderButtonRef}
           onClick={() => onEditActivity("new")}
           type="button"
           className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500   dark:bg-dark-button-back  dark:hover:bg-dark-button-hover"
@@ -77,8 +85,20 @@ const Placeholder = ({
           <PlusIcon className="w-5 h-5 mr-2 -ml-1" aria-hidden="true" />
           New activity
         </button>
+        <Hint
+          learningMethod="buttonClick"
+          order={1}
+          groupName={HINTS_GROUP_NAMES.PLACEHOLDER}
+          referenceRef={placeholderButtonRef}
+          shiftY={150}
+          shiftX={60}
+          width={"small"}
+          position={{ basePosition: "left", diagonalPosition: "bottom" }}
+        >
+          {HINTS_ALERTS.PLACEHOLDER_BUTTON}
+        </Hint>
         <span className="block text-gray-500 text-xs">
-          or press ctrl + space
+          or press ctrl/command + space
         </span>
       </div>
       <ButtonTransparent callback={copyLastReport}>
@@ -102,6 +122,6 @@ const Placeholder = ({
       )}
     </div>
   );
-}
+};
 
 export default Placeholder;

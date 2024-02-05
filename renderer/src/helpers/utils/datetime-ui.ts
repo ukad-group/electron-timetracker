@@ -43,7 +43,7 @@ export function getWeekNumber(dateString: string) {
     (dateObj.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000)
   );
 
-  return Math.ceil((days + startOfYear.getDay() + 1) / 7);
+  return Math.ceil((days + startOfYear.getDay()) / 7);
 }
 
 export function getDateFromString(dateString: string) {
@@ -127,7 +127,7 @@ export function extractDatesFromPeriod(period: ApiDayOff, holidays: DayOff[]) {
     });
 }
 
-function generateDateRange(startDate: Date, endDate: Date) {
+export function generateDateRange(startDate: Date, endDate: Date) {
   const dateRange: Date[] = [];
   let currentDate = new Date(startDate);
 
@@ -243,7 +243,6 @@ export const getCurrentTimeRoundedUp = () => {
   return `${formattedTime}`;
 };
 
-
 export const formatDate = (date: Date, type: "short" | "long" = "long") =>
   date.toLocaleDateString("en-US", {
     month: type,
@@ -277,6 +276,6 @@ export const getDateTimeData = (selectedDate: Date) => {
     floorMinutes,
     ceilHours,
     ceilMinutes,
-    isToday
-  }
-}
+    isToday,
+  };
+};

@@ -1,6 +1,6 @@
 import clsx from "clsx";
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import useTimeInput from "@/helpers/hooks/useTimeInput";
+import { FormEvent, useEffect, useMemo, useState, useRef } from "react";
+import { useTimeInput } from "@/helpers/hooks";
 import {
   calcDurationBetweenTimes,
   formatDurationAsDecimals,
@@ -14,6 +14,7 @@ import {
 import { AutocompleteSelector } from "@/shared/AutocompleteSelector";
 import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "@/store/googleEventsStore";
+import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { getJiraCardsFromAPI } from "@/helpers/utils/jira";
 import { getAllTrelloCardsFromApi } from "@/helpers/utils/trello";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
@@ -25,6 +26,10 @@ import {
   changeHours,
   getTimetrackerYearProjects,
 } from "./utils";
+import { Hint } from "@/shared/Hint";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { SCREENS } from "@/constants";
+import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
 export default function TrackTimeModal({
   activities,
@@ -52,9 +57,16 @@ export default function TrackTimeModal({
     (state) => [state.event, state.setEvent],
     shallow
   );
+  const [progress, setProgress] = useTutorialProgressStore(
+    (state) => [state.progress, state.setProgress],
+    shallow
+  );
   const [latestProjects, setLatestProjects] = useState([]);
   const [webTrackerProjects, setWebTrackerProjects] = useState([]);
   const [uniqueWebTrackerProjects, setUniqueWebTrackerProjects] = useState([]);
+  const { screenSizes } = useScreenSizes();
+  const timeInputRef = useRef(null);
+  const textInputRef = useRef(null);
 
   const duration = useMemo(() => {
     if (!from.includes(":") || !to.includes(":")) return null;
@@ -174,6 +186,9 @@ export default function TrackTimeModal({
       document.removeEventListener("keyup", handleCloseModal);
     };
   }, []);
+  useEffect(() => {
+    setProgress(progress);
+  }, [screenSizes]);
 
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
@@ -183,6 +198,13 @@ export default function TrackTimeModal({
       return;
     }
 
+    if (
+      progress["shortcutsEditingConditions"] &&
+      progress["shortcutsEditingConditions"][0]
+    ) {
+      progress["shortcutsEditingConditions"][1] = true;
+      setProgress(progress);
+    }
     let dashedDescription = description;
 
     if (description.includes(" - ")) {
@@ -311,7 +333,7 @@ export default function TrackTimeModal({
   };
 
   const handleCloseModal = (e) => {
-    if (e.ctrlKey && e.key === "Enter") {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
       e.preventDefault();
       onSave(e);
     }
@@ -327,6 +349,7 @@ export default function TrackTimeModal({
         <div className="col-span-6 sm:col-span-2">
           <TextField
             id="from"
+            reference={timeInputRef}
             label="From"
             onKeyDown={(event) => handleKey(event, setFrom)}
             required
@@ -344,6 +367,22 @@ export default function TrackTimeModal({
             )}
             onDragStart={disableTextDrag}
           />
+          <Hint
+            learningMethod="nextClick"
+            order={1}
+            groupName={HINTS_GROUP_NAMES.TRACK_TIME_MODAL}
+            referenceRef={timeInputRef}
+            shiftY={25}
+            shiftX={screenSizes.screenWidth >= SCREENS.LG ? 300 : 150}
+            width={"large"}
+            position={{
+              basePosition:
+                screenSizes.screenWidth >= SCREENS.LG ? "top" : "bottom",
+              diagonalPosition: "right",
+            }}
+          >
+            {HINTS_ALERTS.MODAL_TIME_FIELD}
+          </Hint>
         </div>
         <div className="col-span-6 sm:col-span-2">
           <TextField
@@ -404,7 +443,7 @@ export default function TrackTimeModal({
             tabIndex={4}
           />
         </div>
-        <div className="col-span-6">
+        <div ref={textInputRef} className="col-span-6">
           <AutocompleteSelector
             isNewCheck
             onSave={onSave}
@@ -418,6 +457,28 @@ export default function TrackTimeModal({
             tabIndex={5}
           />
         </div>
+        <Hint
+          learningMethod="nextClick"
+          order={2}
+          groupName={HINTS_GROUP_NAMES.TRACK_TIME_MODAL}
+          referenceRef={textInputRef}
+          shiftY={screenSizes.screenWidth >= SCREENS.LG ? 175 : 30}
+          shiftX={30}
+          width={"medium"}
+          position={
+            screenSizes.screenWidth >= SCREENS.LG
+              ? {
+                  basePosition: "left",
+                  diagonalPosition: "top",
+                }
+              : {
+                  basePosition: "top",
+                  diagonalPosition: "right",
+                }
+          }
+        >
+          {HINTS_ALERTS.MODAL_TEXT_FIELD}
+        </Hint>
         <div className="col-span-6">
           <AutocompleteSelector
             onSave={onSave}

@@ -29,7 +29,7 @@ const CompactView = () => {
         <tr>
           <td className="pt-4 px-3 text-sm whitespace-nowrap">
             Total{" "}
-            <Tooltip>
+            <Tooltip isClickable>
               <p
                 data-column="total"
                 className="px-1 py-1 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap"

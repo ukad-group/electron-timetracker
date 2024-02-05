@@ -4,10 +4,14 @@ import { DeleteMessage } from "@/shared/DeleteMessage";
 import { parseReport, serializeReport } from "@/helpers/utils/reports";
 import { getCurrentTimeRoundedUp } from "@/helpers/utils/datetime-ui";
 import { useMainStore } from "@/store/mainStore";
+import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
-import useEditingHistoryManager from "@/helpers/hooks/useEditingHistoryManager";
+import { useEditingHistoryManager } from "@/helpers/hooks";
 import { ManualInputFormProps } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { Hint } from "@/shared/Hint";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { changeHintConditions } from "@/helpers/utils/utils";
 
 export default function ManualInputForm({
   onSave,
@@ -26,6 +30,11 @@ export default function ManualInputForm({
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   const [isFileExist, setIsFileExist] = useState(false);
   const editingHistoryManager = useEditingHistoryManager(report);
+
+  const [progress, setProgress] = useTutorialProgressStore(
+    (state) => [state.progress, state.setProgress],
+    shallow
+  );
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if (
@@ -179,9 +188,45 @@ export default function ManualInputForm({
 
     setReportHandler(serializedReport);
   };
+  useEffect(() => {
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.MANUAL_INPUT,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+    ]);
+  }, []);
+
+  const onFocusHandler = () => {
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.MANUAL_INPUT,
+        newConditions: [true],
+        existingConditions: [true],
+      },
+    ]);
+  };
 
   return (
     <div>
+      <Hint
+        displayCondition
+        learningMethod="nextClick"
+        order={1}
+        groupName={HINTS_GROUP_NAMES.MANUAL_INPUT}
+        referenceRef={textareaRef}
+        shiftY={30}
+        shiftX={200}
+        width={"medium"}
+        position={{
+          basePosition: "bottom",
+          diagonalPosition: "left",
+        }}
+      >
+        {HINTS_ALERTS.MANUAL_INPUT}
+      </Hint>
+
       <h2
         id="manual-input-title"
         className="text-lg font-medium text-gray-900 dark:text-dark-heading"
@@ -191,6 +236,7 @@ export default function ManualInputForm({
 
       <textarea
         value={report}
+        onFocus={onFocusHandler}
         onChange={(e) => setReportHandler(e.target.value)}
         rows={15}
         className="block w-full px-3 py-2 mt-3 border border-gray-300 rounded-md shadow-sm focus-visible:outline-blue-500 sm:text-sm dark:bg-dark-back dark:border-dark-border dark:text-slate-400 focus-visible:dark:outline-slate-500"
@@ -216,7 +262,7 @@ export default function ManualInputForm({
             type={"button"}
           />
           <span className="block text-xs text-gray-500 text-center">
-            or press ctrl + s
+            or press ctrl/command + s
           </span>
         </div>
         {showDeleteButton && (

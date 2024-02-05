@@ -39,7 +39,7 @@ const ActivitiesSection = ({
     localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS)
   );
   const nonBreakActivities = useMemo(() => {
-    return validation(activities.filter((activity) => !activity.isBreak));
+    return validation(activities.filter((activity) => activity.to));
   }, [activities]);
 
   const handleCtrlSpace = (e: KeyboardEvent) => {
@@ -110,7 +110,7 @@ const ActivitiesSection = ({
     return () => {
       document.removeEventListener("keyup", handleCtrlSpace);
       global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.BACKEND_ERROR);
-      global.ipcRenderer.removeAllListeners("render or fetch error");
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.RENDER_ERROR);
     };
   }, []);
 
@@ -181,7 +181,10 @@ const ActivitiesSection = ({
           />
         </div>
         <div>
-          <TrackTimeButton onEditActivity={onEditActivity} />
+          <TrackTimeButton
+            isLoading={isLoading}
+            onEditActivity={onEditActivity}
+          />
         </div>
       </div>
     </div>

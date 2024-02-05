@@ -36,10 +36,17 @@ import {
   CalendarProps,
   ParsedReport,
   FormattedReport,
-  TTUserInfo
+  TTUserInfo,
 } from "./types";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
+import { shallow } from "zustand/shallow";
+import { Hint } from "@/shared/Hint";
+import { SCREENS } from "@/constants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { changeHintConditions } from "@/helpers/utils/utils";
+import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
 export function Calendar({
   reportsFolder,
@@ -55,6 +62,9 @@ export function Calendar({
     FormattedReport[]
   >([]);
   const calendarRef = useRef(null);
+  const allCalendarRef = useRef(null);
+  const totalTimeRef = useRef(null);
+  const weekNumberRef = useRef(null);
   const currentReadableMonth = MONTHS[calendarDate.getMonth()];
   const currentYear = calendarDate.getFullYear();
   const [daysOff, setDaysOff] = useState([]);
@@ -62,6 +72,7 @@ export function Calendar({
     errorTitle: "",
     errorMessage: "",
   });
+  const { screenSizes } = useScreenSizes();
   const timetrackerUserInfo: TTUserInfo = JSON.parse(
     localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)
   );
@@ -100,7 +111,10 @@ export function Calendar({
         })();
       };
 
-      global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
+      global.ipcRenderer.on(
+        IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
+        fileChangeListener
+      );
 
       return () => {
         global.ipcRenderer.removeListener(
@@ -159,6 +173,10 @@ export function Calendar({
     };
   }, [calendarDate]);
 
+  useEffect(() => {
+    setProgress(progress);
+  }, [screenSizes]);
+
   const getCalendarApi = () => calendarRef.current.getApi();
 
   useEffect(() => {
@@ -214,7 +232,7 @@ export function Calendar({
     );
 
     return (
-      <div className="flex flex-col text-xs text-zinc-400">
+      <div ref={weekNumberRef} className="flex flex-col text-xs text-zinc-400">
         <span>week {options.num}</span>
         <span className="self-start">{weekTotalHours}</span>
       </div>
@@ -272,14 +290,53 @@ export function Calendar({
     }
   };
 
+  const [progress, setProgress] = useTutorialProgressStore(
+    (state) => [state.progress, state.setProgress],
+    shallow
+  );
+
+  useEffect(() => {
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.CALENDAR,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+    ]);
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } =
+        document.documentElement;
+
+      if (scrollTop + clientHeight + 50 >= scrollHeight) {
+        changeHintConditions(progress, setProgress, [
+          {
+            groupName: HINTS_GROUP_NAMES.CALENDAR,
+            newConditions: [true],
+            existingConditions: [true],
+          },
+        ]);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   if (renderError.errorMessage && renderError.errorTitle) {
     return <ErrorPlaceholder {...renderError} />;
   }
 
   return (
-    <div className="wrapper bg-white p-4 rounded-lg shadow dark:bg-dark-container dark:border dark:border-dark-border">
+    <div
+      ref={allCalendarRef}
+      className="wrapper bg-white p-4 rounded-lg shadow dark:bg-dark-container dark:border dark:border-dark-border"
+    >
       <div className="calendar-header h-10 flex items-center justify-between mb-4">
-        <div>
+        <div ref={totalTimeRef}>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-heading">{`${currentReadableMonth} ${currentYear}`}</h3>
           <p className="text-xs text-gray-500 dark:text-dark-main">
             Total: {monthWorkedHours}
@@ -303,6 +360,72 @@ export function Calendar({
             nextCallback={nextButtonHandle}
           />
         </div>
+        {screenSizes.screenWidth >= SCREENS.LG && (
+          <Hint
+            displayCondition
+            learningMethod="nextClick"
+            order={1}
+            groupName={HINTS_GROUP_NAMES.CALENDAR}
+            referenceRef={allCalendarRef}
+            shiftY={150}
+            shiftX={50}
+            width={"medium"}
+            position={{
+              basePosition: "right",
+              diagonalPosition: "top",
+            }}
+          >
+            {HINTS_ALERTS.CALENDAR}
+          </Hint>
+        )}
+        {screenSizes.screenWidth < SCREENS.LG && (
+          <Hint
+            displayCondition
+            learningMethod="nextClick"
+            order={1}
+            groupName={HINTS_GROUP_NAMES.CALENDAR}
+            referenceRef={allCalendarRef}
+            shiftY={50}
+            shiftX={0}
+            width={"medium"}
+            position={{
+              basePosition: "top",
+              diagonalPosition: "right",
+            }}
+          >
+            {HINTS_ALERTS.CALENDAR}
+          </Hint>
+        )}
+        <Hint
+          learningMethod="nextClick"
+          order={2}
+          groupName={HINTS_GROUP_NAMES.CALENDAR}
+          referenceRef={totalTimeRef}
+          shiftY={200}
+          shiftX={50}
+          width={"medium"}
+          position={{
+            basePosition: "right",
+            diagonalPosition: "bottom",
+          }}
+        >
+          {HINTS_ALERTS.CALENDAR_TOTALS}
+        </Hint>
+        <Hint
+          learningMethod="nextClick"
+          order={3}
+          groupName={HINTS_GROUP_NAMES.CALENDAR}
+          referenceRef={weekNumberRef}
+          shiftY={200}
+          shiftX={50}
+          width={"medium"}
+          position={{
+            basePosition: "right",
+            diagonalPosition: "top",
+          }}
+        >
+          {HINTS_ALERTS.CALENDAR_WEEKS}
+        </Hint>
       </div>
       <FullCalendar
         ref={calendarRef}
