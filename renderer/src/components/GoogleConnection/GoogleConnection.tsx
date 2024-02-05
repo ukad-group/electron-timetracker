@@ -7,15 +7,17 @@ import {
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { GoogleCredentails, GoogleUser } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { CONNECTION_MESSAGE, LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
-import Tooltip from "@/shared/Tooltip/Tooltip";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import isOnline from "is-online";
 
-const GoogleConnection = ({ isOnline }) => {
+const GoogleConnection = () => {
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);
   const [loggedUsers, setLoggedUsers] = useState([]);
 
-  const signInHandler = () => {
-    if (isOnline) {
+  const signInHandler = async () => {
+    const online = await isOnline();
+
+    if (online) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "google");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
@@ -155,14 +157,11 @@ const GoogleConnection = ({ isOnline }) => {
       <div className="flex justify-between items-center w-full">
         <span className="font-medium dark:text-dark-heading">Google</span>
         {!loggedUsers.length && (
-          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
-            <Button
-              text={!loggedUsers.length ? "Add account" : "Add another account"}
-              callback={signInHandler}
-              type="button"
-              disabled={!isOnline}
-            />
-          </Tooltip>
+          <Button
+            text={!loggedUsers.length ? "Add account" : "Add another account"}
+            callback={signInHandler}
+            type="button"
+          />
         )}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">

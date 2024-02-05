@@ -94,6 +94,3 @@ export const HINTS_ALERTS = {
   WHATS_NEW:
     "Here you can see your application version. Links to contact us. And the list of changes that were added in this version.",
 };
-
-export const CONNECTION_MESSAGE =
-  "You're currently offline. Please, check your internet connection.";

@@ -4,10 +4,9 @@ import { Office365User } from "@/helpers/utils/office365";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import Users from "./Users";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
-import { CONNECTION_MESSAGE } from "@/helpers/contstants";
-import Tooltip from "@/shared/Tooltip/Tooltip";
+import isOnline from "is-online";
 
-const Office365Connection = ({ isOnline }) => {
+const Office365Connection = () => {
   const [users, setUsers] = useState(
     JSON.parse(
       localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)
@@ -15,8 +14,10 @@ const Office365Connection = ({ isOnline }) => {
   );
   const [showEventsInTable, setShowEventsInTable] = useState(false);
 
-  const handleSignInButton = () => {
-    if (isOnline) {
+  const handleSignInButton = async () => {
+    const online = isOnline();
+
+    if (online) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "office365");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
@@ -132,14 +133,11 @@ const Office365Connection = ({ isOnline }) => {
         <span className="font-medium dark:text-dark-heading">
           Microsoft Office 365
         </span>
-        <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
-          <Button
-            text={!users.length ? "Add account" : "Add another account"}
-            callback={handleSignInButton}
-            type="button"
-            disabled={!isOnline}
-          />
-        </Tooltip>
+        <Button
+          text={!users.length ? "Add account" : "Add another account"}
+          callback={handleSignInButton}
+          type="button"
+        />
       </div>
       <div className="flex items-center justify-between gap-4 w-full">
         {!users.length && (

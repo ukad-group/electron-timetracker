@@ -28,7 +28,7 @@ describe("GIVEN TrelloConnection", () => {
   });
 
   it("handles sign in button click correctly when online", () => {
-    const { getByText } = render(<TrelloConnection isOnline={true} />);
+    const { getByText } = render(<TrelloConnection />);
 
     fireEvent.click(getByText("Add account"));
 
@@ -38,7 +38,7 @@ describe("GIVEN TrelloConnection", () => {
   it("displays a message when no user is authorized", () => {
     jest.spyOn(React, "useState").mockImplementationOnce(() => [null, jest.fn()]);
 
-    const { getByText } = render(<TrelloConnection isOnline={true} />);
+    const { getByText } = render(<TrelloConnection />);
 
     expect(getByText("No one user authorized")).toBeDefined();
   });

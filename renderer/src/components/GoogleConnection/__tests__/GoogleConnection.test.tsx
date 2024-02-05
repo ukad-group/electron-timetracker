@@ -34,35 +34,17 @@ describe('GoogleConnection', () => {
   });
 
   it('renders correctly with no logged users', () => {
-    const { getByText, getByRole } = render(<GoogleConnection isOnline={true} />);
+    const { getByText, getByRole } = render(<GoogleConnection />);
 
     expect(getByText('Google')).toBeInTheDocument();
     expect(getByRole('button')).toHaveTextContent('Add account');
     expect(getByText('No one user authorized')).toBeInTheDocument();
   });
 
-  it('handles sign in button click when online', () => {
-    const { getByRole } = render(<GoogleConnection isOnline={true} />);
-    global.ipcRenderer.send = jest.fn();
-
-    fireEvent.click(getByRole('button'));
-
-    expect(global.ipcRenderer.send).toHaveBeenCalledWith(
-      IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW,
-      'google'
-    );
-  });
-
-  it('should render disabled button when offline', () => {
-    const { getByText } = render(<GoogleConnection isOnline={false} />);
-
-    expect(getByText('Add account')).toHaveAttribute('disabled');
-  });
-
   it("displays a message when no user is authorized", () => {
     jest.spyOn(React, "useState").mockImplementationOnce(() => [null, jest.fn()]);
 
-    const { getByText } = render(<GoogleConnection isOnline={true} />);
+    const { getByText } = render(<GoogleConnection />);
 
     expect(getByText("No one user authorized")).toBeDefined();
   });

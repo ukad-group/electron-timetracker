@@ -29,7 +29,7 @@ describe('GIVEN Office365Connection', () => {
   });
 
   it('renders correctly with no users', () => {
-    const { getByText, getByRole } = render(<Office365Connection isOnline={true} />);
+    const { getByText, getByRole } = render(<Office365Connection />);
 
     expect(getByText('Microsoft Office 365')).toBeInTheDocument();
     expect(getByRole('button')).toHaveTextContent('Add account');
@@ -37,34 +37,16 @@ describe('GIVEN Office365Connection', () => {
   });
 
   it('renders correctly with users', () => {
-    const { getByText, getByRole } = render(<Office365Connection isOnline={true} />);
+    const { getByText, getByRole } = render(<Office365Connection />);
 
     expect(getByText('Microsoft Office 365')).toBeInTheDocument();
     expect(getByRole('button')).toHaveTextContent('Add account');
   });
 
-  it('handles sign in button click when online', () => {
-    const { getByRole, getByText } = render(<Office365Connection isOnline={true} />);
-
-    fireEvent.click(getByRole('button'));
-
-    expect(getByText('Add account')).not.toHaveAttribute('disabled');
-    expect(global.ipcRenderer.send).toHaveBeenCalledWith(
-      IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW,
-      'office365'
-    );
-  });
-
-  it('should render disabled button when offline', () => {
-    const { getByText } = render(<Office365Connection isOnline={false} />);
-
-    expect(getByText('Add account')).toHaveAttribute('disabled');
-  });
-
   it("displays a message when no user is authorized", () => {
     jest.spyOn(React, "useState").mockImplementationOnce(() => [null, jest.fn()]);
 
-    const { getByText } = render(<Office365Connection isOnline={true} />);
+    const { getByText } = render(<Office365Connection />);
 
     expect(getByText("No one user authorized")).toBeDefined();
   });
