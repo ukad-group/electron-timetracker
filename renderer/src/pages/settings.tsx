@@ -11,6 +11,7 @@ import {
   LOCAL_STORAGE_VARIABLES,
 } from "@/helpers/contstants";
 import { extractTokenFromString } from "@/helpers/utils/utils";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const SettingsPage = () => {
   const [theme] = useThemeStore(
@@ -40,7 +41,10 @@ const SettingsPage = () => {
           LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE,
           urlParams.get("code")
         );
-        global.ipcRenderer.send("child-window-closed", "office365");
+        global.ipcRenderer.send(
+          IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED,
+          "office365"
+        );
       }
 
       if (
@@ -52,7 +56,7 @@ const SettingsPage = () => {
           LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE,
           urlParams.get("code")
         );
-        global.ipcRenderer.send("child-window-closed", "jira");
+        global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, "jira");
       }
 
       if (
@@ -64,7 +68,10 @@ const SettingsPage = () => {
           LOCAL_STORAGE_VARIABLES.GOOGLE_AUTH_CODE,
           urlParams.get("code")
         );
-        global.ipcRenderer.send("child-window-closed", "google");
+        global.ipcRenderer.send(
+          IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED,
+          "google"
+        );
       }
 
       if (
@@ -77,7 +84,10 @@ const SettingsPage = () => {
           LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN,
           tokenFromUrl
         );
-        global.ipcRenderer.send("child-window-closed", "trello");
+        global.ipcRenderer.send(
+          IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED,
+          "trello"
+        );
       }
 
       if (
@@ -88,7 +98,10 @@ const SettingsPage = () => {
           LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE,
           urlParams.get("code")
         );
-        global.ipcRenderer.send("child-window-closed", "timetracker-website");
+        global.ipcRenderer.send(
+          IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED,
+          "timetracker-website"
+        );
       }
 
       if (

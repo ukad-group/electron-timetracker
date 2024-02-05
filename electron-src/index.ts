@@ -12,6 +12,7 @@ import {
   MenuItem,
   shell,
   Tray,
+  globalShortcut,
 } from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
@@ -228,6 +229,10 @@ app.on("ready", async () => {
     dir: app.getAppPath() + "/renderer",
   });
 
+  globalShortcut.register("CommandOrControl+Q", () => {
+    app.exit();
+  });
+
   const requestHandler = nextApp.getRequestHandler();
 
   await nextApp.prepare();
@@ -360,7 +365,7 @@ app.on("ready", async () => {
       createChildWindow(getConnectionUrl(connectionName));
     });
 
-    ipcMain.on("child-window-closed", (_, componentName) => {
+    ipcMain.on(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, (_, componentName) => {
       switch (componentName) {
         case "google":
           mainWindow?.webContents.send(

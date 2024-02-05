@@ -132,27 +132,14 @@ const Office365Connection = ({ isOnline }) => {
         <span className="font-medium dark:text-dark-heading">
           Microsoft Office 365
         </span>
-        {!users.length && (
-          <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
-            <Button
-              text="Add account"
-              callback={handleSignInButton}
-              type="button"
-              disabled={!isOnline}
-            />
-          </Tooltip>
-        )}
-        {users.length > 0 && (
-          <button
-            onClick={handleSignInButton}
+        <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
+          <Button
+            text={!users.length ? "Add account" : "Add another account"}
+            callback={handleSignInButton}
             type="button"
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border shadow-sm dark:border-dark-form-border"
-          >
-            <span className="hover:underline text-gray-500 dark:text-dark-main">
-              Add another account
-            </span>
-          </button>
-        )}
+            disabled={!isOnline}
+          />
+        </Tooltip>
       </div>
       <div className="flex items-center justify-between gap-4 w-full">
         {!users.length && (

@@ -118,21 +118,19 @@ export default function ActivitiesTable({
   const handleKeyDown = (event) => {
     if (
       (event.ctrlKey && event.key === KEY_CODES.ARROW_UP) ||
-      (event.key === KEY_CODES.META && event.key === KEY_CODES.ARROW_UP)
+      (event.metaKey && event.key === KEY_CODES.ARROW_UP)
     ) {
       if (nonBreakActivities.length > 0) {
         const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
         onEditActivity(lastActivity);
       }
     }
-    if (event.key === KEY_CODES.CONTROL || event.key === KEY_CODES.META) {
+    if (event.key === KEY_CODES.CONTROL || event.metaKey) {
       setCtrlPressed(true);
     }
 
     if (
-      (event.ctrlKey ||
-        event.key === KEY_CODES.CONTROL ||
-        event.key === KEY_CODES.META) &&
+      (event.ctrlKey || event.key === KEY_CODES.CONTROL || event.metaKey) &&
       /^[0-9]$/.test(event.key)
     ) {
       const number = parseInt(event.key, 10);
