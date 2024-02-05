@@ -32,6 +32,4 @@ export const IPC_MAIN_CHANNELS = {
   TRELLO_SHOULD_RERENDER: "trello:should-rerender",
   TIMETRACKER_SHOULD_RERENDER: "timetracker:should-rerender",
   JIRA_SHOULD_RERENDER: "jira:should-rerender",
-  CHECK_INTERNET: "check-internet-connection",
-  INTERNET_CONNECTION_STATUS: "internet-connection-status",
 };
