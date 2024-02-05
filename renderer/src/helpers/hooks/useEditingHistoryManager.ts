@@ -14,7 +14,7 @@ interface EditingHistoryState {
   redoStack: string[];
 }
 
-const EditingHistoryReducer = <T>(
+export const EditingHistoryReducer = <T>(
   state: EditingHistoryState,
   action: EditingHistoryAction
 ): EditingHistoryState => {

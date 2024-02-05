@@ -156,19 +156,13 @@ const GoogleConnection = ({ isOnline }) => {
         <span className="font-medium dark:text-dark-heading">Google</span>
         {!loggedUsers.length && (
           <Tooltip tooltipText={CONNECTION_MESSAGE} disabled={isOnline}>
-            <Button text="Add account" callback={signInHandler} type="button" disabled={!isOnline}/>
+            <Button
+              text={!loggedUsers.length ? "Add account" : "Add another account"}
+              callback={signInHandler}
+              type="button"
+              disabled={!isOnline}
+            />
           </Tooltip>
-        )}
-        {loggedUsers.length > 0 && (
-          <button
-            onClick={signInHandler}
-            type="button"
-            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md border shadow-sm dark:border-dark-form-border"
-          >
-            <span className="hover:underline text-gray-500 dark:text-dark-main">
-              Add another account
-            </span>
-          </button>
         )}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">

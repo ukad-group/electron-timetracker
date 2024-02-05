@@ -17,7 +17,14 @@ const TextField = ({
         {label}
       </label>
     )}
-    <input ref={reference} {...props} required={required} type={type} id={id} />
+    <input
+      ref={reference}
+      {...props}
+      required={required}
+      type={type}
+      id={id}
+      data-testid="text-field-test-id"
+    />
   </>
 );
 
