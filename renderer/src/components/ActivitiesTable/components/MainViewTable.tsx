@@ -40,6 +40,7 @@ const MainViewTable = () => {
     (state) => [state.progress, state.setProgress],
     shallow
   );
+
   useEffect(() => {
     changeHintConditions(progress, setProgress, [
       {
@@ -192,15 +193,15 @@ const MainViewTable = () => {
 
         {tableActivities?.map((activity, i) => (
           <tr
-            ref={i === 0 ? firstRowRef : undefined}
             key={i}
+            ref={i === 0 ? firstRowRef : undefined}
             className={clsx(
               `border-b border-gray-200 dark:border-gray-300 transition-transform `,
               {
                 "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
-                  tableActivities[i].to != tableActivities[i + 1]?.from &&
-                  i + 1 !== tableActivities.length &&
-                  !activity.calendarId,
+                  (tableActivities[i + 1] && tableActivities[i + 1].isBreak) ||
+                  activity.isBreak,
+                "font-medium diagonalLines": activity.isBreak,
                 "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
                 "scale-105 ":
                   (Number(firstKey) === i + 1 && !secondKey) ||
@@ -209,7 +210,7 @@ const MainViewTable = () => {
             )}
           >
             <td
-              className={`relative py-4 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
+              className={`relative  pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
                 activity.calendarId ? "opacity-50" : ""
               }`}
             >
@@ -248,7 +249,7 @@ const MainViewTable = () => {
               </span>
             </td>
             <td
-              className={`px-3 py-4 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
+              className={`px-3  text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
                 activity.calendarId ? "opacity-50" : ""
               }`}
             >
@@ -259,7 +260,7 @@ const MainViewTable = () => {
               </Tooltip>
             </td>
             <td
-              className={`relative px-3 py-4 ${
+              className={`relative px-3  ${
                 activity.calendarId ? "opacity-50" : ""
               }`}
             >
@@ -269,10 +270,10 @@ const MainViewTable = () => {
                     className="text-sm font-medium text-gray-900 dark:text-dark-heading"
                     onClick={copyToClipboardHandle}
                   >
-                    {activity.project}
+                    {!activity.isBreak && activity.project}
                   </p>
                 </Tooltip>
-                {activity.isNewProject && (
+                {activity.isNewProject && !activity.isBreak && (
                   <p className="flex items-center h-fit w-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
                     new
                   </p>
@@ -290,7 +291,7 @@ const MainViewTable = () => {
               )}
             </td>
             <td
-              className={`px-3 py-4 text-sm ${
+              className={`px-3 text-sm ${
                 activity.calendarId ? "opacity-50" : ""
               }`}
             >
@@ -300,6 +301,11 @@ const MainViewTable = () => {
                     {activity.description}
                   </p>
                 </Tooltip>
+              )}
+              {activity.isBreak && (
+                <p onClick={copyToClipboardHandle} className="old-break-word">
+                  {activity.project}
+                </p>
               )}
               {activity.mistakes && (
                 <p
@@ -311,65 +317,69 @@ const MainViewTable = () => {
               )}
             </td>
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              <div className={`${activity.calendarId ? "invisible" : ""}`}>
-                <button
-                  className="group py-4 px-3"
-                  title="Copy"
-                  onClick={() => {
-                    handleCopyClick(activity);
-                  }}
-                >
-                  <Square2StackIcon
-                    ref={
-                      !activity.calendarId && dublicateIndex === i
-                        ? lastCopyButtonRef
-                        : undefined
-                    }
-                    className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
-                  />
-                </button>
-              </div>
+              {!activity.isBreak && (
+                <div className={`${activity.calendarId ? "invisible" : ""}`}>
+                  <button
+                    className="group py-4 px-3"
+                    title="Copy"
+                    onClick={() => {
+                      handleCopyClick(activity);
+                    }}
+                  >
+                    <Square2StackIcon
+                      ref={
+                        !activity.calendarId && dublicateIndex === i
+                          ? lastCopyButtonRef
+                          : undefined
+                      }
+                      className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
+                    />
+                  </button>
+                </div>
+              )}
             </td>
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              <button
-                className="group py-4 px-3"
-                title={activity.calendarId ? "Add" : "Edit"}
-                onClick={() => {
-                  handleEditClick(activity);
-                }}
-              >
-                {!activity.calendarId && (
-                  <PencilSquareIcon
-                    ref={i === 0 ? firstEditButtonRef : undefined}
-                    className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
-                  />
-                )}
-                {activity.calendarId &&
-                  progress["editButton"] &&
-                  !progress["editButton"].includes(false) && (
-                    <Hint
-                      learningMethod="buttonClick"
-                      order={1}
-                      groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
-                      referenceRef={calendarEventRef}
-                      shiftY={200}
-                      shiftX={50}
-                      width={"medium"}
-                      position={{
-                        basePosition: "left",
-                        diagonalPosition: "bottom",
-                      }}
-                    >
-                      {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
-                    </Hint>
+              {!activity.isBreak && (
+                <button
+                  className="group py-4 px-3"
+                  title={activity.calendarId ? "Add" : "Edit"}
+                  onClick={() => {
+                    handleEditClick(activity);
+                  }}
+                >
+                  {!activity.calendarId && (
+                    <PencilSquareIcon
+                      ref={i === 0 ? firstEditButtonRef : undefined}
+                      className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
+                    />
                   )}
-                {activity.calendarId && (
-                  <PlusIcon
-                    ref={activity.calendarId ? calendarEventRef : undefined}
-                    className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
-                  />
-                )}
-              </button>
+                  {activity.calendarId &&
+                    progress["editButton"] &&
+                    !progress["editButton"].includes(false) && (
+                      <Hint
+                        learningMethod="buttonClick"
+                        order={1}
+                        groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
+                        referenceRef={calendarEventRef}
+                        shiftY={200}
+                        shiftX={50}
+                        width={"medium"}
+                        position={{
+                          basePosition: "left",
+                          diagonalPosition: "bottom",
+                        }}
+                      >
+                        {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
+                      </Hint>
+                    )}
+                  {activity.calendarId && (
+                    <PlusIcon
+                      ref={activity.calendarId ? calendarEventRef : undefined}
+                      className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
+                    />
+                  )}
+                </button>
+              )}
             </td>
           </tr>
         ))}
