@@ -382,35 +382,6 @@ const MainViewTable = () => {
               )}
             </td>
           </tr>
-          /* {tableActivities[i].to != tableActivities[i + 1]?.from &&
-              i + 1 !== tableActivities.length &&
-              !activity.calendarId && (
-                <tr
-                  className="border-dashed border-b-2 border-gray-200 dark:border-gray-400"
-                  style={style}
-                >
-                  <td className="relative py-0 pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0">
-                    <span className="py-1 px-2 -mx-2 rounded-full font-medium ">
-                      {activity.to} - {tableActivities[i + 1]?.from}
-                    </span>
-                  </td>
-                  <td className="px-3 py-0 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap">
-                    <p data-column="duration" onClick={copyToClipboardHandle}>
-                      {formatDuration(activity.duration)}
-                    </p>
-                  </td>
-                  <td className="relative px-3 py-0">
-                    <div className="flex items-center gap-1">
-                      <p className="text-sm font-medium text-gray-900 dark:text-dark-heading"></p>
-                    </div>
-                  </td>
-                  <td className="px-3 py-0 text-sm ">
-                    <p>!break</p>
-                  </td>
-                  <td></td>
-                  <td></td>
-                </tr>
-              )} */
         ))}
       </>
     )
