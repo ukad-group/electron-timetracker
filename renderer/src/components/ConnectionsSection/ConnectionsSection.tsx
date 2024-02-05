@@ -3,27 +3,10 @@ import { GoogleConnection } from "../GoogleConnection";
 import { Office365Connection } from "../Office365Connection";
 import { JiraConnection } from "../JiraConnection";
 import { TimetrackerWebsiteConnection } from "../TimetrackerWebsiteConncetion";
-import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const ConnectionsSection = () => {
   const [isOnline, setIsOnline] = useState<boolean>(true);
-
-  useEffect(() => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_INTERNET);
-    global.ipcRenderer.on(
-      IPC_MAIN_CHANNELS.INTERNET_CONNECTION_STATUS,
-      (_, connection) => {
-        setIsOnline(connection);
-      }
-    );
-
-    return () => {
-      global.ipcRenderer.removeAllListeners(
-        IPC_MAIN_CHANNELS.INTERNET_CONNECTION_STATUS
-      );
-    };
-  }, []);
 
   return (
     <section className="h-full">
