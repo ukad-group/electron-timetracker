@@ -74,7 +74,6 @@ export default function Home() {
   }
 
   useEffect(() => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_INTERNET);
     global.ipcRenderer.send(
       IPC_MAIN_CHANNELS.START_FOLDER_WATCHER,
       reportsFolder
