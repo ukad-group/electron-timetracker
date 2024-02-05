@@ -262,7 +262,7 @@ export default function ManualInputForm({
             type={"button"}
           />
           <span className="block text-xs text-gray-500 text-center">
-            or press ctrl + s
+            or press ctrl/command + s
           </span>
         </div>
         {showDeleteButton && (

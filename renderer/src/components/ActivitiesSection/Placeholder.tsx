@@ -98,7 +98,7 @@ const Placeholder = ({
           {HINTS_ALERTS.PLACEHOLDER_BUTTON}
         </Hint>
         <span className="block text-gray-500 text-xs">
-          or press ctrl + space
+          or press ctrl/command + space
         </span>
       </div>
       <ButtonTransparent callback={copyLastReport}>

@@ -11,10 +11,13 @@ const HelpSection = () => (
           </h2>
           <ul className="list-disc pl-4">
             <li>
-              <strong className="mr-2">Ctrl + Z:</strong> Undo changes
+              <strong className="mr-2">Ctrl/Command + Z:</strong> Undo changes
             </li>
             <li>
-              <strong className="mr-2">Ctrl + Y:</strong> Redo changes
+              <strong className="mr-2">Ctrl/Command + Y:</strong> Redo changes
+            </li>
+            <li>
+              <strong className="mr-2">Ctrl/Command + Q:</strong> Quit the app
             </li>
             <li>
               <strong className="mr-2">Tab:</strong> Move forward (Next)
@@ -29,16 +32,16 @@ const HelpSection = () => (
           </h2>
           <ul className="list-disc pl-4">
             <li>
-              <strong className="mr-2">Ctrl + Space:</strong> Add a new
+              <strong className="mr-2">Ctrl/Command + Space:</strong> Add a new
               registration
             </li>
             <li>
-              <strong className="mr-2">Ctrl + ArrowUp:</strong> Edit last
-              registration
+              <strong className="mr-2">Ctrl/Command + ArrowUp:</strong> Edit
+              last registration
             </li>
             <li>
-              <strong className="mr-2">Ctrl + [number]:</strong> Edit specific
-              registration (replace [number] with the actual number)
+              <strong className="mr-2">Ctrl/Command + [number]:</strong> Edit
+              specific registration (replace [number] with the actual number)
             </li>
           </ul>
 
@@ -47,10 +50,11 @@ const HelpSection = () => (
           </h2>
           <ul className="list-disc pl-4">
             <li>
-              <strong className="mr-2">Ctrl + D:</strong> Duplicate string
+              <strong className="mr-2">Ctrl/Command + D:</strong> Duplicate
+              string
             </li>
             <li>
-              <strong className="mr-2">Ctrl + S:</strong> Save changes
+              <strong className="mr-2">Ctrl/Command + S:</strong> Save changes
             </li>
           </ul>
 
@@ -59,7 +63,7 @@ const HelpSection = () => (
           </h2>
           <ul className="list-disc pl-4">
             <li>
-              <strong className="mr-2">Ctrl + Enter:</strong> Force Save
+              <strong className="mr-2">Ctrl/Command + Enter:</strong> Force Save
             </li>
             <li>
               <strong className="mr-2">Esc:</strong> Close the suggestions
