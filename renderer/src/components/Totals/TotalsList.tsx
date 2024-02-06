@@ -27,8 +27,7 @@ const TotalsList = ({
             className={clsx(
               "flex items-center gap-1",
               {
-                "ml-5 relative before:rounded-full before:block before:content-[''] before:w-2 before:h-2 before:bg-gray-400 before:absolute before:-left-4 before:top-1/2 before:-translate-y-1/2":
-                  !showActivity,
+                "ml-5 ": !showActivity,
               },
               {
                 "hover:text-gray-400 dark:hover:text-white ml-0 cursor-pointer":
