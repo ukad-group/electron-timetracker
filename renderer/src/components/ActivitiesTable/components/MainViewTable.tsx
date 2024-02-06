@@ -26,6 +26,7 @@ const MainViewTable = () => {
     copyToClipboardHandle,
     copyActivityHandler,
     editActivityHandler,
+    isLoading,
   } = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
@@ -57,6 +58,38 @@ const MainViewTable = () => {
         groupName: HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT,
         newConditions: [false],
         existingConditions: [false],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.EDITING_BUTTON,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.TRACK_TIME_MODAL,
+        newConditions: [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+        ],
+        existingConditions: [
+          "same",
+          "same",
+          "same",
+          "same",
+          "same",
+          "same",
+          "same",
+          "same",
+          "same",
+          "same",
+        ],
       },
     ]);
   }, []);
@@ -92,6 +125,22 @@ const MainViewTable = () => {
         }
       });
     }
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.EDITING_BUTTON,
+        newConditions: [!isLoading],
+        existingConditions: [!isLoading],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT,
+        newConditions: [
+          progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading,
+        ],
+        existingConditions: [
+          progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading,
+        ],
+      },
+    ]);
   }, [tableActivities]);
 
   useEffect(() => {
@@ -139,21 +188,7 @@ const MainViewTable = () => {
         >
           {HINTS_ALERTS.SHORTCUTS_EDITING}
         </Hint>
-        <Hint
-          learningMethod="buttonClick"
-          order={1}
-          groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
-          referenceRef={firstEditButtonRef}
-          shiftY={30}
-          shiftX={200}
-          width={"small"}
-          position={{
-            basePosition: "bottom",
-            diagonalPosition: "left",
-          }}
-        >
-          {HINTS_ALERTS.EDITING_BUTTON}
-        </Hint>
+
         {screenSizes.screenWidth >= SCREENS.LG && (
           <Hint
             displayCondition
@@ -194,14 +229,14 @@ const MainViewTable = () => {
         {tableActivities?.map((activity, i) => (
           <tr
             key={i}
-            ref={i === 0 ? firstRowRef : undefined}
+            ref={!activity.calendarId ? firstRowRef : undefined}
             className={clsx(
               `border-b border-gray-200 dark:border-gray-300 transition-transform `,
               {
-                "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
+                "border-dashed border-b-2 border-gray-200/80 dark:border-gray-400/80":
                   (tableActivities[i + 1] && tableActivities[i + 1].isBreak) ||
                   activity.isBreak,
-                "font-medium diagonalLines": activity.isBreak,
+                "opacity-70 diagonalLines": activity.isBreak,
                 "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
                 "scale-105 ":
                   (Number(firstKey) === i + 1 && !secondKey) ||
@@ -348,10 +383,27 @@ const MainViewTable = () => {
                   }}
                 >
                   {!activity.calendarId && (
-                    <PencilSquareIcon
-                      ref={i === 0 ? firstEditButtonRef : undefined}
-                      className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
-                    />
+                    <>
+                      <Hint
+                        learningMethod="buttonClick"
+                        order={1}
+                        groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
+                        referenceRef={firstEditButtonRef}
+                        shiftY={30}
+                        shiftX={200}
+                        width={"small"}
+                        position={{
+                          basePosition: "bottom",
+                          diagonalPosition: "left",
+                        }}
+                      >
+                        {HINTS_ALERTS.EDITING_BUTTON}
+                      </Hint>
+                      <PencilSquareIcon
+                        ref={firstEditButtonRef}
+                        className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
+                      />
+                    </>
                   )}
                   {activity.calendarId &&
                     progress["editButton"] &&

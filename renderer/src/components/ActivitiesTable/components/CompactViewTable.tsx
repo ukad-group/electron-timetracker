@@ -27,6 +27,7 @@ const CompactViewTable = () => {
     firstKey,
     secondKey,
     editActivityHandler,
+    isLoading,
   } = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
@@ -91,6 +92,22 @@ const CompactViewTable = () => {
         }
       });
     }
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.EDITING_BUTTON,
+        newConditions: [!isLoading],
+        existingConditions: [!isLoading],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT,
+        newConditions: [
+          progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading,
+        ],
+        existingConditions: [
+          progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading,
+        ],
+      },
+    ]);
   }, [tableActivities]);
 
   const handleEditClick = (activity) => {
@@ -140,21 +157,7 @@ const CompactViewTable = () => {
         >
           {HINTS_ALERTS.SHORTCUTS_EDITING}
         </Hint>
-        <Hint
-          learningMethod="buttonClick"
-          order={1}
-          groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
-          referenceRef={firstEditButtonRef}
-          shiftY={30}
-          shiftX={200}
-          width={"small"}
-          position={{
-            basePosition: "bottom",
-            diagonalPosition: "left",
-          }}
-        >
-          {HINTS_ALERTS.EDITING_BUTTON}
-        </Hint>
+
         <Hint
           displayCondition
           learningMethod="buttonClick"
@@ -174,7 +177,7 @@ const CompactViewTable = () => {
 
         {tableActivities?.map((activity, i) => (
           <Fragment key={i}>
-            <tr className={activity.isBreak && "font-medium diagonalLines "}>
+            <tr className={activity.isBreak && "opacity-70 diagonalLines "}>
               <td
                 className={`w-24 relative pt-4 pl-1 pr-1 text-sm whitespace-nowrap sm:pl-6 md:pl-0 ${
                   activity.calendarId ? "opacity-50" : ""
@@ -274,7 +277,7 @@ const CompactViewTable = () => {
               </td>
             </tr>
             <tr
-              ref={i === 0 ? firstRowRef : undefined}
+              ref={!activity.calendarId ? firstRowRef : undefined}
               className={clsx(
                 `border-b border-gray-200 dark:border-gray-300 transition-transform `,
                 {
@@ -282,7 +285,7 @@ const CompactViewTable = () => {
                     (tableActivities[i + 1] &&
                       tableActivities[i + 1].isBreak) ||
                     activity.isBreak,
-                  "font-medium diagonalLines": activity.isBreak,
+                  "opacity-80 diagonalLines": activity.isBreak,
                   "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
                   "scale-105 ":
                     (Number(firstKey) === i + 1 && !secondKey) ||
@@ -338,10 +341,27 @@ const CompactViewTable = () => {
                   }}
                 >
                   {!activity.calendarId && (
-                    <PencilSquareIcon
-                      ref={i === 0 ? firstEditButtonRef : undefined}
-                      className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
-                    />
+                    <>
+                      <Hint
+                        learningMethod="buttonClick"
+                        order={1}
+                        groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
+                        referenceRef={firstEditButtonRef}
+                        shiftY={30}
+                        shiftX={200}
+                        width={"small"}
+                        position={{
+                          basePosition: "bottom",
+                          diagonalPosition: "left",
+                        }}
+                      >
+                        {HINTS_ALERTS.EDITING_BUTTON}
+                      </Hint>
+                      <PencilSquareIcon
+                        ref={firstEditButtonRef}
+                        className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
+                      />
+                    </>
                   )}
                   {activity.calendarId &&
                     progress["editButton"] &&
