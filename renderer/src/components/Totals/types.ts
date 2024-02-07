@@ -13,3 +13,5 @@ export interface Total extends Activity {
 }
 
 export type PeriodName = "day" | "week" | "month";
+
+export type PeriodWithDate = { periodName: PeriodName; date: string };

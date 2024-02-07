@@ -3,7 +3,7 @@ import { convertMillisecondsToTime } from "@/helpers/utils/datetime-ui";
 import { useMainStore } from "@/store/mainStore";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
-import { Description, Total, PeriodName } from "./types";
+import { Description, Total, PeriodName, PeriodWithDate } from "./types";
 import { TOTAL_PERIODS } from "./constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { getTotals } from "./utils";
@@ -15,6 +15,7 @@ import { changeHintConditions } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import { Listbox } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
+import { getWeekNumber } from "@/helpers/utils/datetime-ui";
 
 const Totals = ({ selectedDate }) => {
   const [reportsFolder] = useMainStore(
@@ -26,7 +27,13 @@ const Totals = ({ selectedDate }) => {
     shallow
   );
   const [totals, setTotals] = useState<Total[]>([]);
-  const [period, setPeriod] = useState<PeriodName>("day");
+  const [period, setPeriod] = useState<PeriodWithDate>({
+    periodName: "day",
+    date:
+      selectedDate.getDate().toString().padStart(2, "0") +
+      " " +
+      selectedDate.toLocaleDateString("en-US", { month: "short" }),
+  });
   const { screenSizes } = useScreenSizes();
   const [showedProjects, setShowedProjects] = useState<string[]>([]);
   const totalsRef = useRef(null);
@@ -37,7 +44,7 @@ const Totals = ({ selectedDate }) => {
 
   useEffect(() => {
     getTotals({
-      period,
+      period: period.periodName,
       selectedDate,
       reportsFolder,
       setTotals,
@@ -45,7 +52,7 @@ const Totals = ({ selectedDate }) => {
 
     const fileChangeListener = () => {
       getTotals({
-        period,
+        period: period.periodName,
         selectedDate,
         reportsFolder,
         setTotals,
@@ -64,6 +71,10 @@ const Totals = ({ selectedDate }) => {
       );
     };
   }, [selectedDate, period]);
+
+  useEffect(() => {
+    changePeriod(period.periodName, selectedDate);
+  }, [selectedDate]);
 
   const toggleActivitiesList = (projectName: string) => {
     if (isShowedActivitiesList(projectName)) {
@@ -123,9 +134,34 @@ const Totals = ({ selectedDate }) => {
     }
   };
 
+  const changePeriod = (periodName, selectedDate) => {
+    let dateName = "";
+    switch (periodName) {
+      case "day":
+        dateName =
+          selectedDate.getDate().toString().padStart(2, "0") +
+          " " +
+          selectedDate.toLocaleDateString("en-US", { month: "short" });
+        break;
+      case "week":
+        const year = selectedDate.getFullYear();
+        const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
+        const day = selectedDate.getDate().toString().padStart(2, "0");
+
+        dateName = `week ${getWeekNumber(`${year}${month}${day}`)}`;
+        break;
+      case "month":
+        dateName = selectedDate.toLocaleDateString("en-US", {
+          month: "long",
+        });
+        break;
+    }
+    setPeriod({ periodName: periodName, date: dateName });
+  };
+
   const onChangeRange = (rangeName: PeriodName) => {
     setShowedProjects([]);
-    setPeriod(rangeName);
+    changePeriod(rangeName, selectedDate);
   };
 
   useEffect(() => {
@@ -234,9 +270,9 @@ const Totals = ({ selectedDate }) => {
         className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading"
       >
         <div>
-          <Listbox value={period} onChange={onChangeRange}>
+          <Listbox value={period.periodName} onChange={onChangeRange}>
             <Listbox.Button ref={totalsSelectRef} className="capitalize flex">
-              Totals {period}
+              Totals {period.date}
               <ChevronDownIcon
                 className="w-3 h-3 ml-1 mt-2 dark:text-gray-200"
                 aria-hidden="true"
@@ -269,7 +305,7 @@ const Totals = ({ selectedDate }) => {
       )}
       {!totals.length && (
         <div className="text-sm text-gray-700 font-semibold pt-2 dark:text-dark-main ml-5">
-          No tracked time this {period}
+          No tracked time this {period.date}
         </div>
       )}
     </section>
