@@ -88,7 +88,7 @@ export const HINTS_ALERTS = {
   TOTALS_PERIOD:
     "You can get data for the day, week and month by selecting the appropriate item in the selector",
   MODAL_TIME_FIELD:
-    "Upon form opening, the 'from' time defaults to the prior entry's end time (if exists) or the current time, rounded to the nearest 15 minutes.. The 'to' time is set to the current time, rounded to the nearest 15 minutes. You can manually modify the time by 15-minute increments using the arrow keys. Alternatively, entering the desired duration will automatically adjust the 'to' field accordingly.",
+    "You can manually modify the time by 15-minute increments using the arrow keys. Alternatively, entering the desired duration will automatically adjust the 'to' field accordingly.",
   MODAL_TEXT_FIELD:
     "In the text fields, you'll find suggestions for projects, activities, and descriptions based on your usage in the past month. Upon linking the timetracker website, all company projects become available for selection. After connecting Trello and Jira, you'll be prompted to choose tasks from your boards in the description field, prioritizing those assigned to you.",
   WHATS_NEW:

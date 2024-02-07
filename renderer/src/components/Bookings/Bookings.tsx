@@ -95,8 +95,14 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         reportsFolder,
         calendarDate
       );
+      const oneMonthLocalReports = monthLocalReports.filter((report) => {
+        return (
+          report.reportDate.split("").slice(4, 6).join("") ===
+          (calendarDate.getMonth() + 1).toString().padStart(2, "0")
+        );
+      });
 
-      const monthParsedActivities = monthLocalReports.map(
+      const monthParsedActivities = oneMonthLocalReports.map(
         (report: ParsedReport) => {
           return (parseReport(report?.data)[0] || []).filter(
             (activity: ReportActivity) => !activity.isBreak
