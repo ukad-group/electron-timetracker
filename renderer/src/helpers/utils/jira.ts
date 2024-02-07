@@ -1,5 +1,6 @@
 import { LOCAL_STORAGE_VARIABLES } from "../contstants";
 import { Office365User } from "./office365";
+import { trackConnections } from "./utils";
 
 export interface JiraUser extends Office365User {}
 
@@ -75,6 +76,8 @@ export const getJiraResources = async () => {
       [];
 
     if (!storedUsers.length) return [];
+
+    trackConnections("jira");
 
     const resourcesPromises = storedUsers.map(async (user: JiraUser) => {
       const { accessToken, refreshToken, userId } = user;

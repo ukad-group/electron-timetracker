@@ -1,5 +1,6 @@
 import { LOCAL_STORAGE_VARIABLES } from "../contstants";
 import { replaceHyphensWithSpaces } from "./utils";
+import { trackConnections } from "./utils";
 
 type Card = {
   id: string;
@@ -14,6 +15,8 @@ export const getAllTrelloCardsFromApi = async () => {
     null;
 
   if (!user) return [[], []];
+
+  trackConnections("trello");
 
   try {
     const { assignedCards, notAssignedCards } = await global.ipcRenderer.invoke(

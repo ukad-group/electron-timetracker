@@ -47,6 +47,7 @@ import { SCREENS } from "@/constants";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
+import { trackConnections } from "@/helpers/utils/utils";
 
 export function Calendar({
   reportsFolder,
@@ -193,6 +194,11 @@ export function Calendar({
     });
   }, [selectedDate]);
 
+  useEffect(() => {
+    if (timetrackerUserInfo) {
+      trackConnections("timetrackerWeb");
+    }
+  }, []);
   const prevButtonHandle = () => {
     getCalendarApi().prev();
     setCalendarDate((date) => new Date(date.setMonth(date.getMonth() - 1, 1)));
