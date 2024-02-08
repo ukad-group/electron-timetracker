@@ -6,7 +6,7 @@ import { shallow } from "zustand/shallow";
 import { Description, Total, PeriodName, PeriodWithDate } from "./types";
 import { TOTAL_PERIODS } from "./constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { getTotals } from "./utils";
+import { getTotals, createEnding } from "./utils";
 import TotalsList from "./TotalsList";
 import { Hint } from "@/shared/Hint";
 import { SCREENS } from "@/constants";
@@ -159,7 +159,7 @@ const Totals = ({ selectedDate }) => {
         ) {
           dateName = "yesterday";
         } else {
-          dateName = day + " " + shortMonth;
+          dateName = shortMonth + " " + createEnding(day);
         }
         break;
       case "week":

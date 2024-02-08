@@ -29,12 +29,20 @@ const fakeDate = new Date("2024-03-20T11:30:00");
 const fakeTomorrowDate = new Date("2024-03-21T11:30:00");
 
 describe("Totals date changes", () => {
-  it("displays the correct date text ", () => {
+  it("displays the correct date text for 20", () => {
     render(<Totals selectedDate={fakeDate} />);
 
     const totalsButton = screen.getByTestId("totals-list-button");
 
-    expect(totalsButton.textContent).toBe("Totals 20 Mar");
+    expect(totalsButton.textContent).toBe("Totals Mar 20th");
+  });
+
+  it("displays the correct date text for 21", () => {
+    render(<Totals selectedDate={fakeTomorrowDate} />);
+
+    const totalsButton = screen.getByTestId("totals-list-button");
+
+    expect(totalsButton.textContent).toBe("Totals Mar 21st");
   });
 
   it("displays options when clicking button", () => {
