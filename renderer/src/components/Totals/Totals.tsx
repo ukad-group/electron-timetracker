@@ -18,6 +18,15 @@ import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { getWeekNumber } from "@/helpers/utils/datetime-ui";
 
 const Totals = ({ selectedDate }) => {
+  const year = selectedDate.getFullYear();
+  const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
+  const shortMonth = selectedDate.toLocaleDateString("en-US", {
+    month: "short",
+  });
+  const longMonth = selectedDate.toLocaleDateString("en-US", {
+    month: "long",
+  });
+  const day = selectedDate.getDate().toString().padStart(2, "0");
   const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
@@ -29,10 +38,7 @@ const Totals = ({ selectedDate }) => {
   const [totals, setTotals] = useState<Total[]>([]);
   const [period, setPeriod] = useState<PeriodWithDate>({
     periodName: "day",
-    date:
-      selectedDate.getDate().toString().padStart(2, "0") +
-      " " +
-      selectedDate.toLocaleDateString("en-US", { month: "short" }),
+    date: day + " " + shortMonth,
   });
   const { screenSizes } = useScreenSizes();
   const [showedProjects, setShowedProjects] = useState<string[]>([]);
@@ -136,26 +142,36 @@ const Totals = ({ selectedDate }) => {
 
   const changePeriod = (periodName, selectedDate) => {
     let dateName = "";
+
     switch (periodName) {
       case "day":
-        dateName =
-          selectedDate.getDate().toString().padStart(2, "0") +
-          " " +
-          selectedDate.toLocaleDateString("en-US", { month: "short" });
+        const today = new Date();
+        if (
+          selectedDate.getFullYear() === today.getFullYear() &&
+          selectedDate.getDate() === today.getDate() &&
+          selectedDate.getMonth() === today.getMonth()
+        ) {
+          dateName = "today";
+        } else if (
+          selectedDate.getFullYear() === today.getFullYear() &&
+          today.getDate() - selectedDate.getDate() === 1 &&
+          selectedDate.getMonth() === today.getMonth()
+        ) {
+          dateName = "yesterday";
+        } else {
+          dateName = day + " " + shortMonth;
+        }
         break;
       case "week":
-        const year = selectedDate.getFullYear();
-        const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
-        const day = selectedDate.getDate().toString().padStart(2, "0");
-
         dateName = `week ${getWeekNumber(`${year}${month}${day}`)}`;
         break;
       case "month":
-        dateName = selectedDate.toLocaleDateString("en-US", {
-          month: "long",
-        });
+        dateName = longMonth;
+        break;
+      default:
         break;
     }
+
     setPeriod({ periodName: periodName, date: dateName });
   };
 

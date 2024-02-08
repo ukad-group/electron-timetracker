@@ -26,9 +26,10 @@ global.ipcRenderer = {
 };
 
 const fakeDate = new Date("2024-03-20T11:30:00");
+const fakeTomorrowDate = new Date("2024-03-21T11:30:00");
 
 describe("Totals date changes", () => {
-  it("displays the correct date text when setting a fake date", () => {
+  it("displays the correct date text ", () => {
     render(<Totals selectedDate={fakeDate} />);
 
     const totalsButton = screen.getByTestId("totals-list-button");
@@ -71,5 +72,25 @@ describe("Totals date changes", () => {
     fireEvent.click(weekOption);
 
     expect(totalsButton.textContent).toBe("Totals March");
+  });
+
+  it("displays the 'today' text when setting a fake today date", () => {
+    jest.spyOn(global, "Date").mockImplementation(() => fakeDate);
+
+    render(<Totals selectedDate={fakeDate} />);
+
+    const totalsButton = screen.getByTestId("totals-list-button");
+
+    expect(totalsButton.textContent).toBe("Totals today");
+  });
+
+  it("displays the 'yesterday' text when setting a fake tomorrow date", () => {
+    jest.spyOn(global, "Date").mockImplementation(() => fakeTomorrowDate);
+
+    render(<Totals selectedDate={fakeDate} />);
+
+    const totalsButton = screen.getByTestId("totals-list-button");
+
+    expect(totalsButton.textContent).toBe("Totals yesterday");
   });
 });
