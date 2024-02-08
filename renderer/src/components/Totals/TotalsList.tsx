@@ -51,7 +51,7 @@ const TotalsList = ({
           </div>
           {period === "day" && (
             <>
-              <Tooltip>
+              <Tooltip isClickable>
                 <button
                   className="group"
                   title="Copy project descriptions without time"
@@ -60,7 +60,7 @@ const TotalsList = ({
                   <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
                 </button>
               </Tooltip>
-              <Tooltip>
+              <Tooltip isClickable>
                 <button
                   className="group"
                   title="Copy project descriptions with time"
@@ -88,7 +88,7 @@ const TotalsList = ({
                 </div>
                 {period === "day" && (
                   <>
-                    <Tooltip>
+                    <Tooltip isClickable>
                       <button
                         className="group"
                         title="Copy activity descriptions without time"
@@ -99,7 +99,7 @@ const TotalsList = ({
                         <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
                       </button>
                     </Tooltip>
-                    <Tooltip>
+                    <Tooltip isClickable>
                       <button
                         className="group"
                         title="Copy activity descriptions with time"
