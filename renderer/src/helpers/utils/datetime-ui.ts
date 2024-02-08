@@ -71,18 +71,16 @@ export function getMonthWorkHours(
   }, 0);
 }
 
-export function getMonthRequiredHours(calendarDate: Date, daysOff: DayOff[]) {
+export function getRequiredHours(
+  calendarDate: Date,
+  daysOff: DayOff[],
+  lastDay: Date
+) {
   if (!daysOff) return;
-
-  const lastDayOfMonth = new Date(
-    calendarDate.getFullYear(),
-    calendarDate.getMonth() + 1,
-    0
-  );
 
   let totalWorkHours = 0;
 
-  for (let i = 1; i <= lastDayOfMonth.getDate(); i++) {
+  for (let i = 1; i <= lastDay.getDate(); i++) {
     const monthDay = new Date(
       calendarDate.getFullYear(),
       calendarDate.getMonth(),
@@ -100,6 +98,39 @@ export function getMonthRequiredHours(calendarDate: Date, daysOff: DayOff[]) {
   }
 
   return totalWorkHours * 3600000;
+}
+
+export function mathOvertimeUndertime(
+  formattedQuarterReports: FormattedReport[],
+  calendarDate: Date,
+  daysOff: DayOff[],
+  selectedDate: Date
+) {
+  if (
+    getMonthWorkHours(formattedQuarterReports, selectedDate) -
+      getRequiredHours(calendarDate, daysOff, selectedDate) ===
+    0
+  ) {
+    return { overUnder: "", overUnderHours: 0 };
+  }
+  if (
+    getMonthWorkHours(formattedQuarterReports, selectedDate) >
+    getRequiredHours(calendarDate, daysOff, selectedDate)
+  ) {
+    return {
+      overUnder: "overtime",
+      overUnderHours:
+        getMonthWorkHours(formattedQuarterReports, selectedDate) -
+        getRequiredHours(calendarDate, daysOff, selectedDate),
+    };
+  } else {
+    return {
+      overUnder: "undertime",
+      overUnderHours:
+        getRequiredHours(calendarDate, daysOff, selectedDate) -
+        getMonthWorkHours(formattedQuarterReports, selectedDate),
+    };
+  }
 }
 
 export function extractDatesFromPeriod(period: ApiDayOff, holidays: DayOff[]) {
