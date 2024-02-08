@@ -19,7 +19,7 @@ export default function ActivitiesTable({
   events,
   isLoading,
   showAsMain,
-  nonBreakActivities,
+  validatedActivities,
 }: ActivitiesTableProps) {
   const [ctrlPressed, setCtrlPressed] = useState(false);
   const [firstKey, setFirstKey] = useState(null);
@@ -32,12 +32,15 @@ export default function ActivitiesTable({
   );
 
   const totalDuration = useMemo(
-    () => getTotalDuration(nonBreakActivities),
-    [nonBreakActivities]
+    () =>
+      getTotalDuration(
+        validatedActivities.filter((activity) => !activity.isBreak)
+      ),
+    [validatedActivities]
   );
 
   const tableActivities = useMemo(() => {
-    const badgedActivities = nonBreakActivities.map((activity) => {
+    const badgedActivities = validatedActivities.map((activity) => {
       const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
       if (userInfo && !userInfo?.yearProjects?.includes(activity.project)) {
         return { ...activity, isNewProject: true };
@@ -65,7 +68,7 @@ export default function ActivitiesTable({
     return formattedEvents && formattedEvents.length > 0
       ? concatSortArrays(badgedActivities, formattedEvents)
       : badgedActivities;
-  }, [nonBreakActivities, events]);
+  }, [validatedActivities, events]);
 
   const copyToClipboardHandle = (e) => {
     const cell = e.target;
@@ -120,8 +123,9 @@ export default function ActivitiesTable({
       (event.ctrlKey && event.key === KEY_CODES.ARROW_UP) ||
       (event.metaKey && event.key === KEY_CODES.ARROW_UP)
     ) {
-      if (nonBreakActivities.length > 0) {
-        const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
+      if (validatedActivities.length > 0) {
+        const lastActivity =
+          validatedActivities[validatedActivities.length - 1];
         onEditActivity(lastActivity);
       }
     }

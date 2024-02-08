@@ -30,6 +30,7 @@ import { Hint } from "@/shared/Hint";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { SCREENS } from "@/constants";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
+import { changeHintConditions } from "@/helpers/utils/utils";
 
 export default function TrackTimeModal({
   activities,
@@ -97,6 +98,39 @@ export default function TrackTimeModal({
 
   useEffect(() => {
     if (!editedActivity || editedActivity === "new") {
+      let trackingConditions = [];
+      if (
+        progress[HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"] &&
+        progress[HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"].includes(
+          false
+        )
+      ) {
+        const lastFalse =
+          progress[
+            HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"
+          ].lastIndexOf(false);
+        trackingConditions =
+          progress[HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"];
+        trackingConditions[lastFalse] = true;
+      }
+      changeHintConditions(progress, setProgress, [
+        {
+          groupName: HINTS_GROUP_NAMES.TRACK_TIME_MODAL,
+          newConditions: trackingConditions,
+          existingConditions: [
+            "same",
+            "same",
+            "same",
+            "same",
+            "same",
+            "same",
+            "same",
+            "same",
+            "same",
+            "same",
+          ],
+        },
+      ]);
       resetModal();
       return;
     }

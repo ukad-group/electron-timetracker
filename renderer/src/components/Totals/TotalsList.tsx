@@ -27,8 +27,7 @@ const TotalsList = ({
             className={clsx(
               "flex items-center gap-1",
               {
-                "ml-5 relative before:rounded-full before:block before:content-[''] before:w-2 before:h-2 before:bg-gray-400 before:absolute before:-left-4 before:top-1/2 before:-translate-y-1/2":
-                  !showActivity,
+                "ml-5 ": !showActivity,
               },
               {
                 "hover:text-gray-400 dark:hover:text-white ml-0 cursor-pointer":
@@ -52,7 +51,7 @@ const TotalsList = ({
           </div>
           {period === "day" && (
             <>
-              <Tooltip>
+              <Tooltip isClickable>
                 <button
                   className="group"
                   title="Copy project descriptions without time"
@@ -61,7 +60,7 @@ const TotalsList = ({
                   <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
                 </button>
               </Tooltip>
-              <Tooltip>
+              <Tooltip isClickable>
                 <button
                   className="group"
                   title="Copy project descriptions with time"
@@ -89,7 +88,7 @@ const TotalsList = ({
                 </div>
                 {period === "day" && (
                   <>
-                    <Tooltip>
+                    <Tooltip isClickable>
                       <button
                         className="group"
                         title="Copy activity descriptions without time"
@@ -100,7 +99,7 @@ const TotalsList = ({
                         <DocumentIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
                       </button>
                     </Tooltip>
-                    <Tooltip>
+                    <Tooltip isClickable>
                       <button
                         className="group"
                         title="Copy activity descriptions with time"

@@ -38,7 +38,7 @@ const ActivitiesSection = ({
   const isOffice365EventsShown = JSON.parse(
     localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS)
   );
-  const nonBreakActivities = useMemo(() => {
+  const validatedActivities = useMemo(() => {
     return validation(activities.filter((activity) => activity.to));
   }, [activities]);
 
@@ -126,7 +126,7 @@ const ActivitiesSection = ({
     return <ErrorPlaceholder {...renderError} />;
   }
 
-  if (!nonBreakActivities?.length && !events?.length && !isLoading) {
+  if (!validatedActivities?.length && !events?.length && !isLoading) {
     return (
       <Placeholder
         onEditActivity={onEditActivity}
@@ -177,7 +177,7 @@ const ActivitiesSection = ({
             events={events}
             isLoading={isLoading}
             showAsMain={showAsMain}
-            nonBreakActivities={nonBreakActivities}
+            validatedActivities={validatedActivities}
           />
         </div>
         <div>
