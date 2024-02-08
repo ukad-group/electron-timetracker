@@ -271,14 +271,21 @@ const Totals = ({ selectedDate }) => {
       >
         <div>
           <Listbox value={period.periodName} onChange={onChangeRange}>
-            <Listbox.Button ref={totalsSelectRef} className="capitalize flex">
+            <Listbox.Button
+              ref={totalsSelectRef}
+              className="capitalize flex"
+              data-testid="totals-list-button"
+            >
               Totals {period.date}
               <ChevronDownIcon
                 className="w-3 h-3 ml-1 mt-2 dark:text-gray-200"
                 aria-hidden="true"
               />
             </Listbox.Button>
-            <Listbox.Options className="absolute z-10 py-1  ml-12 border border-gray-700 cursor-pointer rounded-lg dark:text-dark-heading  capitalize bg-white dark:bg-dark-container focus:outline-none">
+            <Listbox.Options
+              className="absolute z-10 py-1  ml-12 border border-gray-700 cursor-pointer rounded-lg dark:text-dark-heading  capitalize bg-white dark:bg-dark-container focus:outline-none"
+              data-testid="totals-options"
+            >
               {TOTAL_PERIODS.map((period) => (
                 <Listbox.Option
                   className="px-2 hover:bg-dark-button-gray-hover"
