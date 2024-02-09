@@ -1,1 +1,1 @@
-export { default as TrelloConnection } from './TrelloConnection';
+export { default as TrelloConnection } from "./TrelloConnection";

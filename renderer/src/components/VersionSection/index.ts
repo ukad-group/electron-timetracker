@@ -1,1 +1,1 @@
-export { default as VersionSection } from './VersionSection';
+export { default as VersionSection } from "./VersionSection";

@@ -1,1 +1,1 @@
-export { default as ActivitiesTable } from './ActivitiesTable';
+export { default as ActivitiesTable } from "./ActivitiesTable";

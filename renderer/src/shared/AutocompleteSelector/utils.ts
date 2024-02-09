@@ -2,16 +2,16 @@ export const filterList = ({
   selectedItem,
   availableItems,
   additionalItems,
-  showedSuggestionsNumber,
-}) => selectedItem === ''
+  showedSuggestionsNumber
+}) => selectedItem === ""
   ? availableItems
       && [...availableItems]
         .concat(additionalItems ? additionalItems : [])
         .filter((activity, i) => {
           if (showedSuggestionsNumber) {
-            return activity !== '' && i < showedSuggestionsNumber;
+            return activity !== "" && i < showedSuggestionsNumber;
           }
-          return activity !== '';
+          return activity !== "";
         })
   : availableItems
       && [...availableItems]
@@ -19,14 +19,14 @@ export const filterList = ({
         .concat(additionalItems ? additionalItems : [])
         .reduce((accumulator, current) => {
           let duplicate = false;
-          if (current.startsWith('TT:: ') || current.startsWith('JI:: ')) {
+          if (current.startsWith("TT:: ") || current.startsWith("JI:: ")) {
             duplicate = availableItems.includes(current.slice(5));
           }
           if (
             !duplicate
             && current
               .toLowerCase()
-              .includes((selectedItem || '').toLowerCase())
+              .includes((selectedItem || "").toLowerCase())
             && current.toLowerCase() !== selectedItem.toLowerCase()
           ) {
             accumulator.push(current);

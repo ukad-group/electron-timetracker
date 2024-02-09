@@ -1,1 +1,1 @@
-export { default as ActivitiesSection } from './ActivitiesSection';
+export { default as ActivitiesSection } from "./ActivitiesSection";

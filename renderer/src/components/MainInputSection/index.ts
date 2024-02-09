@@ -1,1 +1,1 @@
-export { default as MainInputSection } from './MainInputSection';
+export { default as MainInputSection } from "./MainInputSection";

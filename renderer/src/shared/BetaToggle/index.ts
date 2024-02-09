@@ -1,1 +1,1 @@
-export { default as BetaToggle } from './BetaToggle';
+export { default as BetaToggle } from "./BetaToggle";

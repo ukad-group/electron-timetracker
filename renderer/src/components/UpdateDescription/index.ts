@@ -1,1 +1,1 @@
-export { default as UpdateDescription } from './UpdateDescription';
+export { default as UpdateDescription } from "./UpdateDescription";
