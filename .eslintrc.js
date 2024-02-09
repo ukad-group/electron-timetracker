@@ -58,7 +58,6 @@ module.exports = {
     "no-extra-parens": 2,
     "no-multiple-empty-lines": [2, { "max": 1, "maxEOF": 1, "maxBOF": 0 }],
     "no-return-assign": [2, "always"],
-    "no-trailing-spaces": 2,
     "no-var": 2,
     "object-curly-spacing": [2, "always"],
     "object-shorthand": ["error", "always", {
@@ -88,15 +87,6 @@ module.exports = {
     "semi": [2, "always"],
     "semi-spacing": [2, { "before": false, "after": true }],
     "semi-style": [2, "last"],
-    "space-before-blocks": [2, { "functions": "always", "keywords": "always", "classes": "always" }],
-    "space-before-function-paren": ["error", {
-      "anonymous": "always",
-      "named": "never",
-      "asyncArrow": "always",
-    }],
-    "space-in-parens": [2, "never"],
-    "space-infix-ops": [2],
-    "space-unary-ops": [2, { "words": true, "nonwords": false }],
     "switch-colon-spacing": [2, { "after": true, "before": false }],
     "template-curly-spacing": [2, "never"],
     "template-tag-spacing": [2, "never"],

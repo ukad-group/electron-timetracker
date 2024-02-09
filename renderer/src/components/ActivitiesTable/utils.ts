@@ -10,8 +10,8 @@ export const formatEvents = (events, latestProjAndAct) => {
   return events.map((event) => {
     const { start, end } = event;
 
-    const startDateTime =      start?.timeZone === "UTC" ? `${start?.dateTime}Z` : start?.dateTime;
-    const endDateTime =      end?.timeZone === "UTC" ? `${end?.dateTime}Z` : end?.dateTime;
+    const startDateTime = start?.timeZone === "UTC" ? `${start?.dateTime}Z` : start?.dateTime;
+    const endDateTime = end?.timeZone === "UTC" ? `${end?.dateTime}Z` : end?.dateTime;
 
     const from = getTimeFromEventObj(startDateTime);
     const to = getTimeFromEventObj(endDateTime);
@@ -36,7 +36,7 @@ export const getActualEvents = (events, activities) => {
 
   return events.filter((event) => {
     const { end } = event;
-    const endDateTime =      end?.timeZone === "UTC" ? `${end?.dateTime}Z` : end?.dateTime;
+    const endDateTime = end?.timeZone === "UTC" ? `${end?.dateTime}Z` : end?.dateTime;
     const to = getTimeFromEventObj(endDateTime);
     const isOverlapped = activities.some((activity) => padStringToMinutes(activity.to) >= padStringToMinutes(to));
 

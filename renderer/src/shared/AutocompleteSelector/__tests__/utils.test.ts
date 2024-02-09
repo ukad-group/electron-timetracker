@@ -7,7 +7,7 @@ describe("GIVEN utils/filterList", () => {
     "Banana",
     "Strawberry",
     "Orange",
-    "Pear",
+    "Pear"
   ];
   const additionalItems = ["Grapes", "Kiwi"];
   const showedSuggestionsNumber = 3;
@@ -18,7 +18,7 @@ describe("GIVEN utils/filterList", () => {
       selectedItem,
       availableItems,
       additionalItems,
-      showedSuggestionsNumber,
+      showedSuggestionsNumber
     });
 
     expect(result).toEqual(["Apple", "Cranberry", "Banana"]);
@@ -30,7 +30,7 @@ describe("GIVEN utils/filterList", () => {
       selectedItem,
       availableItems,
       additionalItems,
-      showedSuggestionsNumber,
+      showedSuggestionsNumber
     });
 
     expect(result).toEqual(["Banana"]);
@@ -42,7 +42,7 @@ describe("GIVEN utils/filterList", () => {
       selectedItem,
       availableItems,
       additionalItems,
-      showedSuggestionsNumber,
+      showedSuggestionsNumber
     });
 
     expect(result).toEqual([]);
@@ -54,7 +54,7 @@ describe("GIVEN utils/filterList", () => {
       selectedItem,
       availableItems,
       additionalItems,
-      showedSuggestionsNumber,
+      showedSuggestionsNumber
     });
 
     expect(result).toEqual([]);
@@ -66,7 +66,7 @@ describe("GIVEN utils/filterList", () => {
       selectedItem,
       availableItems,
       additionalItems,
-      showedSuggestionsNumber,
+      showedSuggestionsNumber
     });
 
     expect(result).toEqual(["Banana", "Cranberry", "Strawberry"]);
