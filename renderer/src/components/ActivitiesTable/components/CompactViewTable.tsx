@@ -100,12 +100,12 @@ const CompactViewTable = () => {
       },
       {
         groupName: HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT,
-        newConditions: [
-          progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading,
-        ],
-        existingConditions: [
-          progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading,
-        ],
+        newConditions: progress[HINTS_GROUP_NAMES.EDITING_BUTTON]
+          ? [progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading]
+          : [false],
+        existingConditions: progress[HINTS_GROUP_NAMES.EDITING_BUTTON]
+          ? [progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading]
+          : [false],
       },
     ]);
   }, [tableActivities]);
@@ -343,6 +343,7 @@ const CompactViewTable = () => {
                   {!activity.calendarId && (
                     <>
                       <Hint
+                        displayCondition
                         learningMethod="buttonClick"
                         order={1}
                         groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
@@ -367,6 +368,7 @@ const CompactViewTable = () => {
                     progress["editButton"] &&
                     !progress["editButton"].includes(false) && (
                       <Hint
+                        displayCondition
                         learningMethod="buttonClick"
                         order={1}
                         groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
