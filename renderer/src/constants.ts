@@ -3,5 +3,5 @@ export const SCREENS = {
   MD: 768,
   LG: 1024,
   XL: 1280,
-  "2XL": 1536,
+  '2XL': 1536,
 };

@@ -13,7 +13,7 @@ import {
   getWeekDates,
   getMonthDates,
   getCurrentTimeRoundedUp,
-  formatDate
+  formatDate,
 } from '../datetime-ui';
 
 describe('GIVEN datetime-ui/checkIsToday', () => {
@@ -100,7 +100,7 @@ describe('GIVEN datetime-ui/getMonthWorkHours', () => {
 
   it('returns 0 when no reports for the specified month', () => {
     const monthReports = [
-      { date: '20220201', workDurationMs: 3600000, week: 2, isValid: false }
+      { date: '20220201', workDurationMs: 3600000, week: 2, isValid: false },
     ];
 
     const calendarDate = new Date('2022-01-20');
@@ -110,7 +110,7 @@ describe('GIVEN datetime-ui/getMonthWorkHours', () => {
 
   it('handles edge cases and empty input', () => {
     const monthReports = [
-      { date: '20220201', workDurationMs: 3600000, week: 2, isValid: false }
+      { date: '20220201', workDurationMs: 3600000, week: 2, isValid: false },
     ];
 
     expect(getMonthWorkHours([], new Date('2022-01-20'))).toBe(0);
@@ -123,8 +123,8 @@ describe('GIVEN datetime-ui/getMonthRequiredHours', () => {
   it('calculates the correct total required work hours for the month', () => {
     const calendarDate = new Date('2022-01-01');
     const daysOff = [
-      { date: new Date('2022-01-05'), duration: 4, description: "Desc", type: 1 },
-      { date: new Date('2022-01-10'), duration: 8, description: "Desc", type: 1 }
+      { date: new Date('2022-01-05'), duration: 4, description: 'Desc', type: 1 },
+      { date: new Date('2022-01-10'), duration: 8, description: 'Desc', type: 1 },
     ];
 
     isTheSameDates(calendarDate, calendarDate);
@@ -165,8 +165,8 @@ describe('GIVEN datetime-ui/extractDatesFromPeriod', () => {
     ];
 
     const dateRangeMock = [
-      new Date("2022-01-03T22:00:00.000Z"),
-      new Date("2022-01-04T22:00:00.000Z")
+      new Date('2022-01-03T22:00:00.000Z'),
+      new Date('2022-01-04T22:00:00.000Z'),
     ];
 
     generateDateRange(new Date('2022-01-01'), new Date('2022-01-01'));
@@ -261,7 +261,7 @@ describe('GIVEN datetime-ui/getWeekDates', () => {
       new Date('2022-01-13'),
       new Date('2022-01-14'),
       new Date('2022-01-15'),
-      new Date('2022-01-16')
+      new Date('2022-01-16'),
     ]);
   });
 
@@ -276,7 +276,7 @@ describe('GIVEN datetime-ui/getWeekDates', () => {
       new Date('2022-01-13'),
       new Date('2022-01-14'),
       new Date('2022-01-15'),
-      new Date('2022-01-16')
+      new Date('2022-01-16'),
     ]);
   });
 
@@ -291,7 +291,7 @@ describe('GIVEN datetime-ui/getWeekDates', () => {
       new Date('2022-01-13'),
       new Date('2022-01-14'),
       new Date('2022-01-15'),
-      new Date('2022-01-16')
+      new Date('2022-01-16'),
     ]);
   });
 });
@@ -345,5 +345,4 @@ describe('GIVEN datetime-ui/formatDate', () => {
     expect(result).toBe('Jan 15, 2022');
   });
 });
-
 

@@ -21,7 +21,8 @@
     "build-client": "run-script-os",
     "build-client:win32": "electron-builder --win",
     "build-client:darwin": "npm list -g dmg-license || sudo npm i -g dmg-license && electron-builder --mac",
-    "type-check": "tsc -p ./renderer/tsconfig.json && tsc -p ./electron-src/tsconfig.json"
+    "type-check": "tsc -p ./renderer/tsconfig.json && tsc -p ./electron-src/tsconfig.json",
+    "lint": "eslint \"renderer/src/**/*.ts\" --fix"
   },
   "repository": "https://github.com/ukad-group/timetracker-desktop-client",
   "publish": {
@@ -73,6 +74,10 @@
     "electron-next": "^3.1.5",
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.1",
+    "eslint": "^8.56.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-eslint-plugin": "^5.3.0",
+    "eslint-plugin-import": "^2.29.1",
     "functions-have-names": "^1.2.3",
     "is-online": "^10.0.0",
     "network-interface": "^18.0.1",

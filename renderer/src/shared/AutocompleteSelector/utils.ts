@@ -3,32 +3,31 @@ export const filterList = ({
   availableItems,
   additionalItems,
   showedSuggestionsNumber,
-}) =>
-  selectedItem === ""
-    ? availableItems &&
-      [...availableItems]
+}) => selectedItem === ''
+  ? availableItems
+      && [...availableItems]
         .concat(additionalItems ? additionalItems : [])
         .filter((activity, i) => {
           if (showedSuggestionsNumber) {
-            return activity !== "" && i < showedSuggestionsNumber;
+            return activity !== '' && i < showedSuggestionsNumber;
           }
-          return activity !== "";
+          return activity !== '';
         })
-    : availableItems &&
-      [...availableItems]
+  : availableItems
+      && [...availableItems]
         .sort()
         .concat(additionalItems ? additionalItems : [])
         .reduce((accumulator, current) => {
           let duplicate = false;
-          if (current.startsWith("TT:: ") || current.startsWith("JI:: ")) {
+          if (current.startsWith('TT:: ') || current.startsWith('JI:: ')) {
             duplicate = availableItems.includes(current.slice(5));
           }
           if (
-            !duplicate &&
-            current
+            !duplicate
+            && current
               .toLowerCase()
-              .includes((selectedItem || "").toLowerCase()) &&
-            current.toLowerCase() !== selectedItem.toLowerCase()
+              .includes((selectedItem || '').toLowerCase())
+            && current.toLowerCase() !== selectedItem.toLowerCase()
           ) {
             accumulator.push(current);
           }

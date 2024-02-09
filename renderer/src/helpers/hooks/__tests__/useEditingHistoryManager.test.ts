@@ -1,11 +1,11 @@
 import useEditingHistoryManager, {
-  EditingHistoryReducer
+  EditingHistoryReducer,
 } from '../useEditingHistoryManager';
 import {
   SET_VALUE,
   UNDO,
-  REDO
-} from "@/actions/editingActions";
+  REDO,
+} from '@/actions/editingActions';
 import { renderHook, act } from '@testing-library/react';
 
 describe('GIVEN EditingHistoryReducer', () => {
