@@ -106,29 +106,24 @@ export function mathOvertimeUndertime(
   daysOff: DayOff[],
   selectedDate: Date
 ) {
-  if (
-    getMonthWorkHours(formattedQuarterReports, selectedDate) -
-      getRequiredHours(calendarDate, daysOff, selectedDate) ===
-    0
-  ) {
+  const monthWorkHours = getMonthWorkHours(
+    formattedQuarterReports,
+    selectedDate
+  );
+  const requiredHours = getRequiredHours(calendarDate, daysOff, selectedDate);
+
+  if (monthWorkHours - requiredHours === 0) {
     return { overUnder: "", overUnderHours: 0 };
   }
-  if (
-    getMonthWorkHours(formattedQuarterReports, selectedDate) >
-    getRequiredHours(calendarDate, daysOff, selectedDate)
-  ) {
+  if (monthWorkHours > requiredHours) {
     return {
       overUnder: "overtime",
-      overUnderHours:
-        getMonthWorkHours(formattedQuarterReports, selectedDate) -
-        getRequiredHours(calendarDate, daysOff, selectedDate),
+      overUnderHours: monthWorkHours - requiredHours,
     };
   } else {
     return {
       overUnder: "undertime",
-      overUnderHours:
-        getRequiredHours(calendarDate, daysOff, selectedDate) -
-        getMonthWorkHours(formattedQuarterReports, selectedDate),
+      overUnderHours: requiredHours - monthWorkHours,
     };
   }
 }
