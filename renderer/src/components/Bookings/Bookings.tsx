@@ -198,6 +198,10 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         fileChangeListener
       );
     };
+  }, []);
+
+  useEffect(() => {
+    getBookedStatistic();
   }, [calendarDate]);
 
   const renderProjectsHours = () =>
