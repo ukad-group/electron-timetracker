@@ -82,8 +82,7 @@ export default function Home() {
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
       setIsDropboxConnected(!reportsFolder.includes("Dropbox") || data);
     });
-    console.log("isBeta ", isBeta);
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta, true);
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
 
     return () => {
       global.ipcRenderer.removeAllListeners("dropbox-connection");

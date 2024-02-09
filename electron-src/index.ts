@@ -75,18 +75,13 @@ let childWindow: any;
 
 let updateStatus: null | "available" | "downloaded" = null;
 let updateVersion = "";
-let isBetaChecked = false;
 
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
-ipcMain.on(
-  IPC_MAIN_CHANNELS.BETA_CHANNEL,
-  (event: any, isBeta: boolean, checked: boolean) => {
-    autoUpdater.allowPrerelease = isBeta;
-    isBetaChecked = checked;
-  }
-);
+ipcMain.on(IPC_MAIN_CHANNELS.BETA_CHANNEL, (event: any, isBeta: boolean) => {
+  autoUpdater.allowPrerelease = isBeta;
+});
 
 function setUpdateStatus(status: "available" | "downloaded", version: string) {
   updateStatus = status;
@@ -108,13 +103,10 @@ ipcMain.on(IPC_MAIN_CHANNELS.GET_CURRENT_VERSION, () => {
 });
 
 autoUpdater.on("update-available", (info: UpdateInfo) => {
-  if (isBetaChecked) {
-    setUpdateStatus("available", info.version);
-    autoUpdater.downloadUpdate();
-
-    if (mainWindow) {
-      mainWindow.webContents.send("update-available", true, info);
-    }
+  setUpdateStatus("available", info.version);
+  autoUpdater.downloadUpdate();
+  if (mainWindow) {
+    mainWindow.webContents.send("update-available", true, info);
   }
 });
 
