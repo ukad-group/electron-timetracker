@@ -94,3 +94,11 @@ export const HINTS_ALERTS = {
   WHATS_NEW:
     "Here you can see your application version. Links to contact us. And the list of changes that were added in this version.",
 };
+
+export const TRACK_CONNECTIONS = {
+  TIMETRACKER_WEB: "timetrackerWeb",
+  GOOGLE_CALENDAR: "google-calendar",
+  JIRA: "jira",
+  OFFICE365_CALENDAR: "office365-calendar",
+  TRELLO: "trello",
+};

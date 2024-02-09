@@ -38,7 +38,10 @@ import {
   FormattedReport,
   TTUserInfo,
 } from "./types";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import {
+  LOCAL_STORAGE_VARIABLES,
+  TRACK_CONNECTIONS,
+} from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
@@ -196,7 +199,7 @@ export function Calendar({
 
   useEffect(() => {
     if (timetrackerUserInfo) {
-      trackConnections("timetrackerWeb");
+      trackConnections(TRACK_CONNECTIONS.TIMETRACKER_WEB);
     }
   }, []);
   const prevButtonHandle = () => {

@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_VARIABLES } from "../contstants";
+import { LOCAL_STORAGE_VARIABLES, TRACK_CONNECTIONS } from "../contstants";
 import { Office365User } from "./office365";
 import { trackConnections } from "./utils";
 
@@ -77,7 +77,7 @@ export const getJiraResources = async () => {
 
     if (!storedUsers.length) return [];
 
-    trackConnections("jira");
+    trackConnections(TRACK_CONNECTIONS.JIRA);
 
     const resourcesPromises = storedUsers.map(async (user: JiraUser) => {
       const { accessToken, refreshToken, userId } = user;
