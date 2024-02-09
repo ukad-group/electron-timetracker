@@ -4,7 +4,7 @@ import { useMainStore } from "@/store/mainStore";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { Description, Total, PeriodName, PeriodWithDate } from "./types";
-import { TOTAL_PERIODS } from "./constants";
+import { TOTAL_PERIODS, DATE_PERIODS } from "./constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { getTotals, createEnding } from "./utils";
 import TotalsList from "./TotalsList";
@@ -37,7 +37,7 @@ const Totals = ({ selectedDate }) => {
   );
   const [totals, setTotals] = useState<Total[]>([]);
   const [period, setPeriod] = useState<PeriodWithDate>({
-    periodName: "day",
+    periodName: DATE_PERIODS.DAY,
     date: day + " " + shortMonth,
   });
   const { screenSizes } = useScreenSizes();
@@ -140,32 +140,36 @@ const Totals = ({ selectedDate }) => {
     }
   };
 
+  const handlePeriodDay = (selectedDate) => {
+    const today = new Date();
+    if (
+      selectedDate.getFullYear() === today.getFullYear() &&
+      selectedDate.getDate() === today.getDate() &&
+      selectedDate.getMonth() === today.getMonth()
+    ) {
+      return "today";
+    } else if (
+      selectedDate.getFullYear() === today.getFullYear() &&
+      today.getDate() - selectedDate.getDate() === 1 &&
+      selectedDate.getMonth() === today.getMonth()
+    ) {
+      return "yesterday";
+    } else {
+      return shortMonth + " " + createEnding(day);
+    }
+  };
+
   const changePeriod = (periodName, selectedDate) => {
     let dateName = "";
 
     switch (periodName) {
-      case "day":
-        const today = new Date();
-        if (
-          selectedDate.getFullYear() === today.getFullYear() &&
-          selectedDate.getDate() === today.getDate() &&
-          selectedDate.getMonth() === today.getMonth()
-        ) {
-          dateName = "today";
-        } else if (
-          selectedDate.getFullYear() === today.getFullYear() &&
-          today.getDate() - selectedDate.getDate() === 1 &&
-          selectedDate.getMonth() === today.getMonth()
-        ) {
-          dateName = "yesterday";
-        } else {
-          dateName = shortMonth + " " + createEnding(day);
-        }
+      case DATE_PERIODS.DAY:
+        dateName = handlePeriodDay(selectedDate);
         break;
-      case "week":
+      case DATE_PERIODS.WEEK:
         dateName = `week ${getWeekNumber(`${year}${month}${day}`)}`;
         break;
-      case "month":
+      case DATE_PERIODS.MONTH:
         dateName = longMonth;
         break;
       default:

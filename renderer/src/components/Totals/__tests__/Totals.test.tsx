@@ -29,6 +29,12 @@ const fakeDate = new Date("2024-03-20T11:30:00");
 const fakeTomorrowDate = new Date("2024-03-21T11:30:00");
 
 describe("Totals date changes", () => {
+  afterAll(() => {
+    jest.restoreAllMocks();
+
+    global.ipcRenderer = globalIpcRendererMock;
+  });
+
   it("displays the correct date text for 20", () => {
     render(<Totals selectedDate={fakeDate} />);
 
