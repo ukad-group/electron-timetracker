@@ -10,7 +10,7 @@ export default function BetaToggle() {
   );
 
   useEffect(() => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta, true);
   }, [isBeta]);
 
   return (
