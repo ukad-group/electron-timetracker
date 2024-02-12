@@ -2,44 +2,23 @@ import { PlaceholderProps } from "@/components/ActivitiesSection/types";
 import { useState, useRef } from "react";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import {
-  ClockIcon,
-  ExclamationCircleIcon,
-  Square2StackIcon,
-} from "@heroicons/react/24/outline";
+import { ClockIcon, ExclamationCircleIcon, Square2StackIcon } from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { Popup } from "@/shared/Popup";
 import { Hint } from "@/shared/Hint";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 
-const Placeholder = ({
-  onEditActivity,
-  backgroundError,
-  selectedDate,
-  setSelectedDateReport,
-}: PlaceholderProps) => {
+const Placeholder = ({ onEditActivity, backgroundError, selectedDate, setSelectedDateReport }: PlaceholderProps) => {
   const [showModal, setShowModal] = useState(false);
   const placeholderButtonRef = useRef(null);
-  const [reportsFolder] = useMainStore(
-    (state) => [state.reportsFolder, state.setReportsFolder],
-    shallow
-  );
+  const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
 
   const copyLastReport = async () => {
-    const prevDayReport = await global.ipcRenderer.invoke(
-      "app:find-last-report",
-      reportsFolder,
-      selectedDate
-    );
+    const prevDayReport = await global.ipcRenderer.invoke("app:find-last-report", reportsFolder, selectedDate);
 
     if (prevDayReport) {
-      global.ipcRenderer.invoke(
-        "app:write-day-report",
-        reportsFolder,
-        selectedDate,
-        prevDayReport
-      );
+      global.ipcRenderer.invoke("app:write-day-report", reportsFolder, selectedDate, prevDayReport);
 
       setSelectedDateReport(prevDayReport);
     } else {
@@ -52,29 +31,16 @@ const Placeholder = ({
       {backgroundError && (
         <div className="border-t-4  border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 dark:text-slate-400 text-left">
           <div className="flex justify-start gap-2 w-full text-gray-900 dark:text-dark-heading font-bold">
-            <ExclamationCircleIcon
-              className="w-7 h-7 text-red-700"
-              aria-hidden="true"
-            />
+            <ExclamationCircleIcon className="w-7 h-7 text-red-700" aria-hidden="true" />
             <p>Noncritical error</p>
           </div>
-          <div className="pl-9 pr-8">
-            {backgroundError} Refer to the console for specific error
-            information.
-          </div>
+          <div className="pl-9 pr-8">{backgroundError} Refer to the console for specific error information.</div>
         </div>
       )}
-      <ClockIcon
-        className="w-12 h-12 mx-auto text-gray-400"
-        aria-hidden="true"
-      />
+      <ClockIcon className="w-12 h-12 mx-auto text-gray-400" aria-hidden="true" />
 
-      <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-dark-heading">
-        No tracked time
-      </h3>
-      <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
-        Get started by tracking some activity
-      </p>
+      <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-dark-heading">No tracked time</h3>
+      <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">Get started by tracking some activity</p>
       <div className="mt-6 mb-2">
         <button
           ref={placeholderButtonRef}
@@ -97,9 +63,7 @@ const Placeholder = ({
         >
           {HINTS_ALERTS.PLACEHOLDER_BUTTON}
         </Hint>
-        <span className="block text-gray-500 text-xs">
-          or press ctrl/command + space
-        </span>
+        <span className="block text-gray-500 text-xs">or press ctrl/command + space</span>
       </div>
       <ButtonTransparent callback={copyLastReport}>
         <Square2StackIcon className="w-5 h-5" />

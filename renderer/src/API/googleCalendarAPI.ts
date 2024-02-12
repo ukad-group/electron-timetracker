@@ -2,8 +2,7 @@ const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const clientSecret = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET;
 const PORT = process.env.NEXT_PUBLIC_PORT;
 const redirectURI = `http://localhost:${PORT}/settings`;
-const scope =
-  "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile";
+const scope = "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile";
 
 export const getGoogleAuthUrl = () => {
   const googleAuthUrl = new URL("https://accounts.google.com/o/oauth2/auth");
@@ -61,9 +60,7 @@ export const getGoogleEvents = async (token: string) => {
   const endOfDay = new Date(currentDate);
   endOfDay.setHours(23, 59);
 
-  const googleEventsUrl = new URL(
-    "https://www.googleapis.com/calendar/v3/calendars/primary/events"
-  );
+  const googleEventsUrl = new URL("https://www.googleapis.com/calendar/v3/calendars/primary/events");
 
   const params = new URLSearchParams({
     timeMin: startOfDay.toISOString(),
@@ -92,14 +89,11 @@ export const getGoogleEvents = async (token: string) => {
 };
 
 export const getGoogleUserInfo = async (googleAccessToken: string) => {
-  const response = await fetch(
-    "https://people.googleapis.com/v1/people/me?personFields=names",
-    {
-      headers: {
-        Authorization: `Bearer ${googleAccessToken}`,
-      },
-    }
-  );
+  const response = await fetch("https://people.googleapis.com/v1/people/me?personFields=names", {
+    headers: {
+      Authorization: `Bearer ${googleAccessToken}`,
+    },
+  });
 
   if (!response.ok) {
     throw new Error();

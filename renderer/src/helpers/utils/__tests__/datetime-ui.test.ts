@@ -13,7 +13,7 @@ import {
   getWeekDates,
   getMonthDates,
   getCurrentTimeRoundedUp,
-  formatDate
+  formatDate,
 } from "../datetime-ui";
 
 describe("GIVEN datetime-ui/checkIsToday", () => {
@@ -90,7 +90,7 @@ describe("GIVEN datetime-ui/getMonthWorkHours", () => {
   it("returns the correct total work hours for a specific month", () => {
     const monthReports = [
       { date: "20220101", workDurationMs: 3600000, week: 2, isValid: false },
-      { date: "20220115", workDurationMs: 7200000, week: 2, isValid: false }
+      { date: "20220115", workDurationMs: 7200000, week: 2, isValid: false },
     ];
 
     const calendarDate = new Date("2022-01-20");
@@ -99,9 +99,7 @@ describe("GIVEN datetime-ui/getMonthWorkHours", () => {
   });
 
   it("returns 0 when no reports for the specified month", () => {
-    const monthReports = [
-      { date: "20220201", workDurationMs: 3600000, week: 2, isValid: false }
-    ];
+    const monthReports = [{ date: "20220201", workDurationMs: 3600000, week: 2, isValid: false }];
 
     const calendarDate = new Date("2022-01-20");
 
@@ -109,9 +107,7 @@ describe("GIVEN datetime-ui/getMonthWorkHours", () => {
   });
 
   it("handles edge cases and empty input", () => {
-    const monthReports = [
-      { date: "20220201", workDurationMs: 3600000, week: 2, isValid: false }
-    ];
+    const monthReports = [{ date: "20220201", workDurationMs: 3600000, week: 2, isValid: false }];
 
     expect(getMonthWorkHours([], new Date("2022-01-20"))).toBe(0);
 
@@ -124,7 +120,7 @@ describe("GIVEN datetime-ui/getMonthRequiredHours", () => {
     const calendarDate = new Date("2022-01-01");
     const daysOff = [
       { date: new Date("2022-01-05"), duration: 4, description: "Desc", type: 1 },
-      { date: new Date("2022-01-10"), duration: 8, description: "Desc", type: 1 }
+      { date: new Date("2022-01-10"), duration: 8, description: "Desc", type: 1 },
     ];
 
     isTheSameDates(calendarDate, calendarDate);
@@ -157,17 +153,12 @@ describe("GIVEN datetime-ui/extractDatesFromPeriod", () => {
       dateTo: "2022-01-05",
       quantity: 8,
       description: "Vacation",
-      type: 1
+      type: 1,
     };
 
-    const holidays = [
-      { date: new Date("2022-01-03"), duration: 8, description: "New Year", type: 2 }
-    ];
+    const holidays = [{ date: new Date("2022-01-03"), duration: 8, description: "New Year", type: 2 }];
 
-    const dateRangeMock = [
-      new Date("2022-01-03T22:00:00.000Z"),
-      new Date("2022-01-04T22:00:00.000Z")
-    ];
+    const dateRangeMock = [new Date("2022-01-03T22:00:00.000Z"), new Date("2022-01-04T22:00:00.000Z")];
 
     generateDateRange(new Date("2022-01-01"), new Date("2022-01-01"));
 
@@ -177,7 +168,7 @@ describe("GIVEN datetime-ui/extractDatesFromPeriod", () => {
 
     expect(result).toEqual([
       { date: dateRangeMock[0], duration: 8, description: "Vacation", type: 1 },
-      { date: dateRangeMock[1], duration: 8, description: "Vacation", type: 1 }
+      { date: dateRangeMock[1], duration: 8, description: "Vacation", type: 1 },
     ]);
   });
 });
@@ -261,7 +252,7 @@ describe("GIVEN datetime-ui/getWeekDates", () => {
       new Date("2022-01-13"),
       new Date("2022-01-14"),
       new Date("2022-01-15"),
-      new Date("2022-01-16")
+      new Date("2022-01-16"),
     ]);
   });
 
@@ -276,7 +267,7 @@ describe("GIVEN datetime-ui/getWeekDates", () => {
       new Date("2022-01-13"),
       new Date("2022-01-14"),
       new Date("2022-01-15"),
-      new Date("2022-01-16")
+      new Date("2022-01-16"),
     ]);
   });
 
@@ -291,7 +282,7 @@ describe("GIVEN datetime-ui/getWeekDates", () => {
       new Date("2022-01-13"),
       new Date("2022-01-14"),
       new Date("2022-01-15"),
-      new Date("2022-01-16")
+      new Date("2022-01-16"),
     ]);
   });
 });
@@ -345,4 +336,3 @@ describe("GIVEN datetime-ui/formatDate", () => {
     expect(result).toBe("Jan 15, 2022");
   });
 });
-

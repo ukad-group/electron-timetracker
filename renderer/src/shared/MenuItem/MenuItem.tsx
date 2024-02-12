@@ -7,13 +7,7 @@ type MenuItemProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 // import { MenuItemProps } from './types';
 
-
-export default function MenuItem({
-  children,
-  callback,
-  isActive,
-  ...props
-}: MenuItemProps) {
+export default function MenuItem({ children, callback, isActive, ...props }: MenuItemProps) {
   return (
     <button
       onClick={callback}

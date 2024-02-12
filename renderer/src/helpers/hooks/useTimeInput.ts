@@ -1,13 +1,8 @@
 import { ChangeEvent, SetStateAction, useState } from "react";
 
 const useTimeInput = (
-  initialTime = ""
-): [
-  string,
-  (e: ChangeEvent<HTMLInputElement>) => void,
-  () => void,
-  (value: SetStateAction<string>) => void
-] => {
+  initialTime = "",
+): [string, (e: ChangeEvent<HTMLInputElement>) => void, () => void, (value: SetStateAction<string>) => void] => {
   const [time, setTime] = useState(initialTime);
 
   const onTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -20,11 +15,7 @@ const useTimeInput = (
       value += ":";
     }
 
-    if (
-      time.length - value.length === 1 &&
-      time.slice(-1) === ":" &&
-      value.slice(-1) !== ":"
-    ) {
+    if (time.length - value.length === 1 && time.slice(-1) === ":" && value.slice(-1) !== ":") {
       value = value.substring(0, value.length - 1);
     }
 

@@ -6,11 +6,7 @@ import { ModalProps } from "./types";
 
 const Modal = ({ isOpen, children, onSubmit, title, onClose }: ModalProps) => (
   <Transition.Root appear={true} show={isOpen} as={Fragment}>
-    <Dialog
-      as="div"
-      className="fixed inset-0 z-10 overflow-y-auto"
-      onClose={() => null}
-    >
+    <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={() => null}>
       <div className="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
         <Transition.Child
           as={Fragment}
@@ -23,10 +19,7 @@ const Modal = ({ isOpen, children, onSubmit, title, onClose }: ModalProps) => (
         >
           <Dialog.Overlay className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-gray-900/80" />
         </Transition.Child>
-        <span
-          className="hidden sm:inline-block sm:align-middle sm:h-screen"
-          aria-hidden="true"
-        >
+        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
           &#8203;
         </span>
         <Transition.Child
@@ -54,10 +47,7 @@ const Modal = ({ isOpen, children, onSubmit, title, onClose }: ModalProps) => (
               </button>
             </div>
             <div className="mt-3 space-y-6 text-center sm:mt-0 sm:text-left">
-              <Dialog.Title
-                as="h3"
-                className="text-lg font-medium leading-6 text-gray-900 dark:text-dark-heading"
-              >
+              <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 dark:text-dark-heading">
                 {title}
               </Dialog.Title>
               {children}
@@ -65,19 +55,8 @@ const Modal = ({ isOpen, children, onSubmit, title, onClose }: ModalProps) => (
             <div className="mt-6 flex justify-end">
               <div className="flex gap-3">
                 <div className="flex gap-3">
-                  <Button
-                    text="Cancel"
-                    type={"button"}
-                    callback={onClose}
-                    status={"cancel"}
-                    tabIndex={8}
-                  />
-                  <Button
-                    text="Save"
-                    type={"submit"}
-                    status={"enabled"}
-                    tabIndex={7}
-                  />
+                  <Button text="Cancel" type={"button"} callback={onClose} status={"cancel"} tabIndex={8} />
+                  <Button text="Save" type={"submit"} status={"enabled"} tabIndex={7} />
                 </div>
               </div>
             </div>

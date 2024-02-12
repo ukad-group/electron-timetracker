@@ -29,10 +29,7 @@ function Hint({
   const [showHint, setShowHint] = useState(false);
   const [groupSize, setGroupSize] = useState(0);
 
-  const [progress, setProgress] = useTutorialProgressStore(
-    (state) => [state.progress, state.setProgress],
-    shallow
-  );
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
 
   useEffect(() => {
     const handleResize = () => {
@@ -49,7 +46,7 @@ function Hint({
         HorizontalLineRef,
         VerticalLineRef,
         TriangleRef,
-        setShowHint
+        setShowHint,
       );
     };
     window.addEventListener("resize", handleResize);
@@ -69,9 +66,7 @@ function Hint({
     }
 
     const unsubscribe = useTutorialProgressStore.subscribe((newProgress) => {
-      newProgress[groupName]?.length
-        ? setGroupSize(newProgress[groupName]?.length)
-        : null;
+      newProgress[groupName]?.length ? setGroupSize(newProgress[groupName]?.length) : null;
 
       if (
         (!newProgress.progress.hasOwnProperty(groupName) &&
@@ -99,9 +94,7 @@ function Hint({
   }, []);
 
   useEffect(() => {
-    progress[groupName]?.length
-      ? setGroupSize(progress[groupName]?.length)
-      : null;
+    progress[groupName]?.length ? setGroupSize(progress[groupName]?.length) : null;
 
     if (progress.hasOwnProperty(groupName) && progress[groupName][order - 1]) {
       setShowHint(false);
@@ -143,7 +136,7 @@ function Hint({
         HorizontalLineRef,
         VerticalLineRef,
         TriangleRef,
-        setShowHint
+        setShowHint,
       );
     }
     if (referenceRef.current && !showHint) {
@@ -168,7 +161,7 @@ function Hint({
         <>
           {createPortal(
             <div className="h-screen w-full fixed justify-center top-0 z-20 items-center bg-gray-900/40 pointer-events-auto" />,
-            document.body
+            document.body,
           )}
           {createPortal(
             <svg
@@ -176,7 +169,7 @@ function Hint({
                 "absolute w-2/5 h-screen z-40 pointer-events-none",
                 { "w-3/5 lg:w-2/5": width === "small" },
                 { "w-3/5 lg:w-3/5": width === "medium" },
-                { "w-4/5 lg:w-3/5": width === "large" }
+                { "w-4/5 lg:w-3/5": width === "large" },
               )}
               xmlns="http://www.w3.org/2000/svg"
               ref={SVGRef}
@@ -187,7 +180,7 @@ function Hint({
 
               <polygon className="z-50" ref={TriangleRef} fill="white" />
             </svg>,
-            document.body
+            document.body,
           )}
           {createPortal(
             <div
@@ -196,15 +189,13 @@ function Hint({
                 "p-4 pt-5 flex gap-2 flex-col text-sm rounded-lg  z-50 border border-gray-500 bg-black absolute text-gray-900 dark:text-dark-heading",
                 { "w-1/3 lg:w-1/5": width === "small" },
                 { "w-2/5 lg:w-1/4": width === "medium" },
-                { "w-3/5 lg:w-2/5": width === "large" }
+                { "w-3/5 lg:w-2/5": width === "large" },
               )}
               ref={floatingRef}
             >
               <p className={groupName}>{children}</p>
               <div className="flex gap-4 justify-end">
-                <ButtonTransparent callback={skipAllClockHandler}>
-                  Skip all
-                </ButtonTransparent>
+                <ButtonTransparent callback={skipAllClockHandler}>Skip all</ButtonTransparent>
                 {order < groupSize && (
                   <button
                     type="button"
@@ -229,7 +220,7 @@ function Hint({
                 onClick={learnHint}
               />
             </div>,
-            document.body
+            document.body,
           )}
         </>
       )}

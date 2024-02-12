@@ -1,23 +1,17 @@
-import useEditingHistoryManager, {
-  EditingHistoryReducer
-} from "../useEditingHistoryManager";
-import {
-  SET_VALUE,
-  UNDO,
-  REDO
-} from "@/actions/editingActions";
+import useEditingHistoryManager, { EditingHistoryReducer } from "../useEditingHistoryManager";
+import { SET_VALUE, UNDO, REDO } from "@/actions/editingActions";
 import { renderHook, act } from "@testing-library/react";
 
 describe("GIVEN EditingHistoryReducer", () => {
   it("should handle SET_VALUE action", () => {
     const initialState = {
       undoStack: ["initialValue"],
-      redoStack: []
+      redoStack: [],
     };
 
     const action = {
       type: SET_VALUE,
-      value: "newValue"
+      value: "newValue",
     };
 
     // @ts-ignore
@@ -25,19 +19,19 @@ describe("GIVEN EditingHistoryReducer", () => {
 
     expect(newState).toEqual({
       undoStack: ["initialValue", "newValue"],
-      redoStack: []
+      redoStack: [],
     });
   });
 
   it("should not add the same value to undoStack multiple times in a row", () => {
     const initialState = {
       undoStack: ["value"],
-      redoStack: []
+      redoStack: [],
     };
 
     const action = {
       type: SET_VALUE,
-      value: "value"
+      value: "value",
     };
 
     // @ts-ignore
@@ -49,11 +43,11 @@ describe("GIVEN EditingHistoryReducer", () => {
   it("should handle UNDO action", () => {
     const initialState = {
       undoStack: ["value1", "value2"],
-      redoStack: []
+      redoStack: [],
     };
 
     const action = {
-      type: UNDO
+      type: UNDO,
     };
 
     // @ts-ignore
@@ -61,18 +55,18 @@ describe("GIVEN EditingHistoryReducer", () => {
 
     expect(newState).toEqual({
       undoStack: ["value1"],
-      redoStack: ["value2"]
+      redoStack: ["value2"],
     });
   });
 
   it("should handle REDO action", () => {
     const initialState = {
       undoStack: ["value1"],
-      redoStack: ["value2"]
+      redoStack: ["value2"],
     };
 
     const action = {
-      type: REDO
+      type: REDO,
     };
 
     // @ts-ignore
@@ -80,18 +74,18 @@ describe("GIVEN EditingHistoryReducer", () => {
 
     expect(newState).toEqual({
       undoStack: ["value1", "value2"],
-      redoStack: []
+      redoStack: [],
     });
   });
 
   it("should return the same state for unknown action types", () => {
     const initialState = {
       undoStack: ["value"],
-      redoStack: []
+      redoStack: [],
     };
 
     const action = {
-      type: "UNKNOWN_ACTION_TYPE"
+      type: "UNKNOWN_ACTION_TYPE",
     };
 
     // @ts-ignore
@@ -109,7 +103,7 @@ describe("GIVEN useEditingHistoryManager", () => {
     expect(result.current).toEqual({
       setValue: expect.any(Function),
       undoEditing: expect.any(Function),
-      redoEditing: expect.any(Function)
+      redoEditing: expect.any(Function),
     });
 
     expect(result.current.undoEditing()).toEqual(initialValue);
@@ -129,4 +123,3 @@ describe("GIVEN useEditingHistoryManager", () => {
     expect(result.current.undoEditing()).toEqual("initial");
   });
 });
-

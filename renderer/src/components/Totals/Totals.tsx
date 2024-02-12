@@ -27,14 +27,8 @@ const Totals = ({ selectedDate }) => {
     month: "long",
   });
   const day = selectedDate.getDate().toString().padStart(2, "0");
-  const [reportsFolder] = useMainStore(
-    (state) => [state.reportsFolder, state.setReportsFolder],
-    shallow
-  );
-  const [progress, setProgress] = useTutorialProgressStore(
-    (state) => [state.progress, state.setProgress],
-    shallow
-  );
+  const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const [totals, setTotals] = useState<Total[]>([]);
   const [period, setPeriod] = useState<PeriodWithDate>({
     periodName: DATE_PERIODS.DAY,
@@ -65,16 +59,10 @@ const Totals = ({ selectedDate }) => {
       });
     };
 
-    global.ipcRenderer.on(
-      IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
-      fileChangeListener
-    );
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
 
     return () => {
-      global.ipcRenderer.removeListener(
-        IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
-        fileChangeListener
-      );
+      global.ipcRenderer.removeListener(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
     };
   }, [selectedDate, period]);
 
@@ -84,9 +72,7 @@ const Totals = ({ selectedDate }) => {
 
   const toggleActivitiesList = (projectName: string) => {
     if (isShowedActivitiesList(projectName)) {
-      const filteredShowedProjects = showedProjects.filter(
-        (project) => project !== projectName
-      );
+      const filteredShowedProjects = showedProjects.filter((project) => project !== projectName);
 
       setShowedProjects(filteredShowedProjects);
     } else {
@@ -94,39 +80,33 @@ const Totals = ({ selectedDate }) => {
     }
   };
 
-  const copyDescriptionsHandler = (
-    descriptions: Description[],
-    withTime: boolean
-  ) => {
-    const formattedDescriptions = descriptions.reduce(
-      (acc: string[], curr: Description) => {
-        const name = curr.name ? curr.name : "";
-        const duration = convertMillisecondsToTime(curr.duration);
-        let textForCopying = "";
+  const copyDescriptionsHandler = (descriptions: Description[], withTime: boolean) => {
+    const formattedDescriptions = descriptions.reduce((acc: string[], curr: Description) => {
+      const name = curr.name ? curr.name : "";
+      const duration = convertMillisecondsToTime(curr.duration);
+      let textForCopying = "";
 
-        switch (true) {
-          case name.length > 0 && withTime:
-            textForCopying = `${name} (${duration})`;
-            break;
+      switch (true) {
+        case name.length > 0 && withTime:
+          textForCopying = `${name} (${duration})`;
+          break;
 
-          case !name.length && withTime:
-            textForCopying = `(${duration})`;
-            break;
+        case !name.length && withTime:
+          textForCopying = `(${duration})`;
+          break;
 
-          case name.length > 0 && !withTime:
-            textForCopying = name;
-            break;
+        case name.length > 0 && !withTime:
+          textForCopying = name;
+          break;
 
-          default:
-            break;
-        }
+        default:
+          break;
+      }
 
-        textForCopying.length > 0 && acc.push(textForCopying);
+      textForCopying.length > 0 && acc.push(textForCopying);
 
-        return acc;
-      },
-      []
-    );
+      return acc;
+    }, []);
 
     const descriptionsString = formattedDescriptions.join(", ");
 
@@ -285,33 +265,19 @@ const Totals = ({ selectedDate }) => {
         </>
       )}
 
-      <h2
-        ref={totalsRef}
-        className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading"
-      >
+      <h2 ref={totalsRef} className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading">
         <div>
           <Listbox value={period.periodName} onChange={onChangeRange}>
-            <Listbox.Button
-              ref={totalsSelectRef}
-              className="capitalize flex"
-              data-testid="totals-list-button"
-            >
+            <Listbox.Button ref={totalsSelectRef} className="capitalize flex" data-testid="totals-list-button">
               Totals {period.date}
-              <ChevronDownIcon
-                className="w-3 h-3 ml-1 mt-2 dark:text-gray-200"
-                aria-hidden="true"
-              />
+              <ChevronDownIcon className="w-3 h-3 ml-1 mt-2 dark:text-gray-200" aria-hidden="true" />
             </Listbox.Button>
             <Listbox.Options
               className="absolute z-10 py-1  ml-12 border border-gray-700 cursor-pointer rounded-lg dark:text-dark-heading  capitalize bg-white dark:bg-dark-container focus:outline-none"
               data-testid="totals-options"
             >
               {TOTAL_PERIODS.map((period) => (
-                <Listbox.Option
-                  className="px-2 hover:bg-dark-button-gray-hover"
-                  key={period.id}
-                  value={period.name}
-                >
+                <Listbox.Option className="px-2 hover:bg-dark-button-gray-hover" key={period.id} value={period.name}>
                   {period.name}
                 </Listbox.Option>
               ))}

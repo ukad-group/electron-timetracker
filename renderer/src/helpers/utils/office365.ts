@@ -8,35 +8,21 @@ export interface Office365User {
 }
 
 export const updateAccessToken = async (refreshToken: string) =>
-  await global.ipcRenderer.invoke(
-    "office365:refresh-access-token",
-    refreshToken
-  );
+  await global.ipcRenderer.invoke("office365:refresh-access-token", refreshToken);
 
 export const removeStoredUser = (userId: string) => {
-  const storedUsers =
-    JSON.parse(
-      localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)
-    ) || [];
-  const filteredUsers = storedUsers.filter(
-    (user: Office365User) => user.userId !== userId
-  );
+  const storedUsers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || [];
+  const filteredUsers = storedUsers.filter((user: Office365User) => user.userId !== userId);
 
   if (filteredUsers.length > 0) {
-    localStorage.setItem(
-      LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS,
-      JSON.stringify(filteredUsers)
-    );
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS, JSON.stringify(filteredUsers));
   } else {
     localStorage.removeItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS);
   }
 };
 
 export const updateStoredUser = (userId: string, newAccessToken: string) => {
-  const storedUsers =
-    JSON.parse(
-      localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)
-    ) || [];
+  const storedUsers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || [];
   const updatedUsers = storedUsers.map((user: Office365User) => {
     if (user.userId === userId) {
       return { ...user, accessToken: newAccessToken };
@@ -45,17 +31,11 @@ export const updateStoredUser = (userId: string, newAccessToken: string) => {
     }
   });
 
-  localStorage.setItem(
-    LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS,
-    JSON.stringify(updatedUsers)
-  );
+  localStorage.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS, JSON.stringify(updatedUsers));
 };
 
 export const getOffice365Events = async () => {
-  const storedUsers =
-    JSON.parse(
-      localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)
-    ) || [];
+  const storedUsers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || [];
 
   if (!storedUsers.length) return [];
 
@@ -68,21 +48,11 @@ export const getOffice365Events = async () => {
   });
   const promisedOffice365Events = await Promise.all(usersPromises);
 
-  return promisedOffice365Events.reduce(
-    (acc, curr) => (!curr ? acc : [...acc, ...curr]),
-    []
-  );
+  return promisedOffice365Events.reduce((acc, curr) => (!curr ? acc : [...acc, ...curr]), []);
 };
 
-export const getOffice365EventByUser = async (
-  accessToken: string,
-  refreshToken: string,
-  userId: string
-) => {
-  let res = await global.ipcRenderer.invoke(
-    "office365:get-today-events",
-    accessToken
-  );
+export const getOffice365EventByUser = async (accessToken: string, refreshToken: string, userId: string) => {
+  let res = await global.ipcRenderer.invoke("office365:get-today-events", accessToken);
 
   if (res?.error?.code === "MailboxNotEnabledForRESTAPI") {
     return [];
@@ -97,11 +67,7 @@ export const getOffice365EventByUser = async (
     } else {
       updateStoredUser(userId, data.access_token);
 
-      return await getOffice365EventByUser(
-        data.access_token,
-        refreshToken,
-        userId
-      );
+      return await getOffice365EventByUser(data.access_token, refreshToken, userId);
     }
   }
 
