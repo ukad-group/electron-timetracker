@@ -15,7 +15,6 @@ import { SelectFolderPlaceholder } from "@/components/SelectFolderPlaceholder";
 import { VersionMessage } from "@/shared/VersionMessage";
 import { UpdateDescription } from "@/components/UpdateDescription";
 import { useMainStore } from "@/store/mainStore";
-import { useThemeStore } from "@/store/themeStore";
 import { useBetaStore } from "@/store/betaUpdatesStore";
 import { Calendar } from "@/components/Calendar/Calendar";
 import Link from "next/link";
@@ -25,6 +24,7 @@ import { Bookings } from "@/components/Bookings";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { SCREENS } from "@/constants";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
+import useColorTheme from "@/helpers/hooks/useTheme";
 
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -50,28 +50,16 @@ export default function Home() {
     []
   );
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
-  const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const [isDropboxConnected, setIsDropboxConnected] = useState(true);
   const { screenSizes } = useScreenSizes();
   const isManualInputMain =
     localStorage.getItem("is-manual-input-main-section") === "true";
-  const [theme] = useThemeStore(
-    (state) => [state.theme, state.setTheme],
-    shallow
-  );
+
   const [isBeta] = useBetaStore(
     (state) => [state.isBeta, state.setIsBeta],
     shallow
   );
   const showBookings = !!JSON.parse(localStorage.getItem("timetracker-user"));
-
-  function handleThemeChange(e) {
-    if (e.matches) {
-      setIsOSDarkTheme(true);
-    } else {
-      setIsOSDarkTheme(false);
-    }
-  }
 
   useEffect(() => {
     global.ipcRenderer.send(
@@ -106,22 +94,6 @@ export default function Home() {
 
     return () => clearInterval(intervalId);
   }, [lastRenderedDay]);
-
-  useEffect(() => {
-    const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
-
-    mediaQueryList.addListener(handleThemeChange);
-    setIsOSDarkTheme(mediaQueryList.matches);
-
-    document.body.className =
-      (theme.os && isOSDarkTheme) || (!theme.os && theme.custom === "dark")
-        ? "dark bg-dark-back"
-        : "light bg-grey-100";
-
-    return () => {
-      mediaQueryList.removeListener(handleThemeChange);
-    };
-  }, [theme, isOSDarkTheme]);
 
   useEffect(() => {
     try {
@@ -372,6 +344,8 @@ export default function Home() {
     setTrackTimeModalActivity(null);
     setFocusOnNewActivityBtn();
   };
+
+  useColorTheme();
 
   return (
     <div className="h-full bg-gray-100 dark:bg-dark-back">
