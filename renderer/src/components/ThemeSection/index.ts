@@ -1,1 +1,1 @@
-export { default as ThemeSection } from './ThemeSection';
+export { default as ThemeSection } from "./ThemeSection";

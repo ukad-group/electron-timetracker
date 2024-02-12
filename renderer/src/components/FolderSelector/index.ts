@@ -1,1 +1,1 @@
-export { default as FolderSelector } from './FolderSelector';
+export { default as FolderSelector } from "./FolderSelector";

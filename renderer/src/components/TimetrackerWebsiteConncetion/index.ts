@@ -1,1 +1,1 @@
-export { default as TimetrackerWebsiteConnection } from './TimetrackerWebsiteConncetion';
+export { default as TimetrackerWebsiteConnection } from "./TimetrackerWebsiteConncetion";

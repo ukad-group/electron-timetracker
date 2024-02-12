@@ -1,1 +1,1 @@
-export { default as GoogleConnection } from './GoogleConnection';
+export { default as GoogleConnection } from "./GoogleConnection";

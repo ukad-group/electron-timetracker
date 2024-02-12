@@ -6,7 +6,7 @@ describe("GIVEN editingActions/actions.ts", () => {
     const value = "testValue";
     const expectedAction = {
       type: SET_VALUE,
-      value,
+      value
     };
 
     expect(setValue(value)).toEqual(expectedAction);
@@ -14,7 +14,7 @@ describe("GIVEN editingActions/actions.ts", () => {
 
   it("should create an action to undo editing", () => {
     const expectedAction = {
-      type: UNDO,
+      type: UNDO
     };
 
     expect(undoEditing()).toEqual(expectedAction);
@@ -22,7 +22,7 @@ describe("GIVEN editingActions/actions.ts", () => {
 
   it("should create an action to redo editing", () => {
     const expectedAction = {
-      type: REDO,
+      type: REDO
     };
 
     expect(redoEditing()).toEqual(expectedAction);

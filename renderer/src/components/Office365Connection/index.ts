@@ -1,1 +1,1 @@
-export { default as Office365Connection } from './Office365Connection';
+export { default as Office365Connection } from "./Office365Connection";

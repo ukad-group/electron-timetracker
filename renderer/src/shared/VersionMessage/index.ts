@@ -1,1 +1,1 @@
-export { default as VersionMessage } from './VersionMessages';
+export { default as VersionMessage } from "./VersionMessages";

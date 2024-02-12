@@ -1,1 +1,1 @@
-export { default as ButtonTransparent } from './ButtonTransparent';
+export { default as ButtonTransparent } from "./ButtonTransparent";

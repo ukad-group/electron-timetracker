@@ -1,1 +1,1 @@
-export { default as ManualInputForm } from './ManualInputForm';
+export { default as ManualInputForm } from "./ManualInputForm";

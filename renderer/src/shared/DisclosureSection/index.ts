@@ -1,1 +1,1 @@
-export { default as DisclosureSection } from './DisclosureSection';
+export { default as DisclosureSection } from "./DisclosureSection";

@@ -1,1 +1,1 @@
-export { default as TimeBadge } from './TimeBadge';
+export { default as TimeBadge } from "./TimeBadge";
