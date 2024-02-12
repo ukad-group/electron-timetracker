@@ -99,9 +99,7 @@ describe("GIVEN datetime-ui/getMonthWorkHours", () => {
   });
 
   it("returns 0 when no reports for the specified month", () => {
-    const monthReports = [
-      { date: "20220201", workDurationMs: 3600000, week: 2, isValid: false },
-    ];
+    const monthReports = [{ date: "20220201", workDurationMs: 3600000, week: 2, isValid: false }];
 
     const calendarDate = new Date("2022-01-20");
 
@@ -109,9 +107,7 @@ describe("GIVEN datetime-ui/getMonthWorkHours", () => {
   });
 
   it("handles edge cases and empty input", () => {
-    const monthReports = [
-      { date: "20220201", workDurationMs: 3600000, week: 2, isValid: false },
-    ];
+    const monthReports = [{ date: "20220201", workDurationMs: 3600000, week: 2, isValid: false }];
 
     expect(getMonthWorkHours([], new Date("2022-01-20"))).toBe(0);
 
@@ -136,45 +132,25 @@ describe("GIVEN datetime-ui/getRequiredHours", () => {
         type: 1,
       },
     ];
-    const lastDayOfMonth = new Date(
-      calendarDate.getFullYear(),
-      calendarDate.getMonth() + 1,
-      0
-    );
+    const lastDayOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
 
     isTheSameDates(calendarDate, calendarDate);
 
-    expect(getRequiredHours(calendarDate, daysOff, lastDayOfMonth)).toBe(
-      561600000
-    );
+    expect(getRequiredHours(calendarDate, daysOff, lastDayOfMonth)).toBe(561600000);
   });
 
   it("returns 0 when no days off for the month", () => {
     const calendarDate = new Date("2022-01-01");
     const daysOff = [];
-    const lastDayOfMonth = new Date(
-      calendarDate.getFullYear(),
-      calendarDate.getMonth() + 1,
-      0
-    );
+    const lastDayOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
 
-    expect(getRequiredHours(calendarDate, daysOff, lastDayOfMonth)).toBe(
-      604800000
-    );
+    expect(getRequiredHours(calendarDate, daysOff, lastDayOfMonth)).toBe(604800000);
   });
 
   it("handles edge cases and empty input", () => {
-    expect(
-      getRequiredHours(
-        new Date("2022-01-01"),
-        undefined,
-        new Date("2022-01-31")
-      )
-    ).toBe(undefined);
+    expect(getRequiredHours(new Date("2022-01-01"), undefined, new Date("2022-01-31"))).toBe(undefined);
 
-    expect(
-      getRequiredHours(new Date("2022-01-01"), [], new Date("2022-01-31"))
-    ).toBe(604800000);
+    expect(getRequiredHours(new Date("2022-01-01"), [], new Date("2022-01-31"))).toBe(604800000);
   });
 });
 
@@ -201,10 +177,7 @@ describe("GIVEN datetime-ui/extractDatesFromPeriod", () => {
       },
     ];
 
-    const dateRangeMock = [
-      new Date("2022-01-03T22:00:00.000Z"),
-      new Date("2022-01-04T22:00:00.000Z"),
-    ];
+    const dateRangeMock = [new Date("2022-01-03T22:00:00.000Z"), new Date("2022-01-04T22:00:00.000Z")];
 
     generateDateRange(new Date("2022-01-01"), new Date("2022-01-01"));
 
@@ -228,9 +201,7 @@ describe("GIVEN datetime-ui/getTimeFromEventObj", () => {
   it('returns the correct time when "Z" is removed from the date string', () => {
     const dateStringWithZ = "2022-01-01T23:45:00Z";
     const dateStringWithoutZ = "2022-01-01T23:45:00";
-    expect(getTimeFromEventObj(dateStringWithZ)).toBe(
-      getTimeFromEventObj(dateStringWithoutZ)
-    );
+    expect(getTimeFromEventObj(dateStringWithZ)).toBe(getTimeFromEventObj(dateStringWithoutZ));
   });
 
   it("returns an empty string for an empty date string", () => {
