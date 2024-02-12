@@ -215,7 +215,7 @@ export function Calendar({
     return () => {
       global.ipcRenderer.removeAllListeners("window-focused");
     };
-  }, [calendarDate]);
+  }, [calendarDate, selectedDate]);
 
   useEffect(() => {
     setProgress(progress);
