@@ -2,6 +2,8 @@ import {
   getGoogleEvents,
   updateGoogleCredentials,
 } from "@/API/googleCalendarAPI";
+import { trackConnections } from "./utils";
+import { TRACK_CONNECTIONS } from "../contstants";
 
 export const loadGoogleEvents = async (
   accessToken: string,
@@ -36,6 +38,8 @@ export const loadGoogleEventsFromAllUsers = async () => {
   const storedUsers = JSON.parse(localStorage.getItem("googleUsers")) || [];
 
   if (!storedUsers.length) return [];
+
+  trackConnections(TRACK_CONNECTIONS.GOOGLE_CALENDAR);
 
   const userPromises = storedUsers.map((user, i) =>
     loadGoogleEvents(user.googleAccessToken, user.googleRefreshToken, i)

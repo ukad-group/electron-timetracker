@@ -1,6 +1,7 @@
 import { ReportActivity } from "./reports";
 import { TutorialProgress } from "@/store/types";
 import { HintConitions } from "./types";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export const replaceHyphensWithSpaces = (inputString: string): string =>
   inputString.replace(/ - /g, " ");
@@ -137,3 +138,24 @@ export function extractTokenFromString(inputString: string) {
 
   return "";
 }
+
+export const trackConnections = (connectedName: string) => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  if (
+    localStorage.getItem(connectedName + "Connection") !==
+    `${year}-${month}-${day}`
+  ) {
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "connections", {
+      connected: connectedName,
+    });
+
+    localStorage.setItem(
+      connectedName + "Connection",
+      `${year}-${month}-${day}`
+    );
+  }
+};
