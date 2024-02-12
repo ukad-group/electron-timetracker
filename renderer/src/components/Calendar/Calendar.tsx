@@ -26,10 +26,11 @@ import { Button } from "@/shared/Button";
 import { ErrorPlaceholder, RenderError } from "../../shared/ErrorPlaceholder";
 import {
   getMonthWorkHours,
-  getMonthRequiredHours,
+  getRequiredHours,
   getWeekNumber,
   isTheSameDates,
   MONTHS,
+  mathOvertimeUndertime,
 } from "@/helpers/utils/datetime-ui";
 import { loadHolidaysAndVacations } from "./utils";
 import {
@@ -84,8 +85,47 @@ export function Calendar({
   }, [formattedQuarterReports, calendarDate]);
 
   const monthRequiredHours = useMemo(() => {
-    return formatDuration(getMonthRequiredHours(calendarDate, daysOff));
+    const lastDayOfMonth = new Date(
+      calendarDate.getFullYear(),
+      calendarDate.getMonth() + 1,
+      0
+    );
+    return formatDuration(
+      getRequiredHours(calendarDate, daysOff, lastDayOfMonth)
+    );
   }, [daysOff, calendarDate]);
+
+  const workRequiredHours = useMemo(() => {
+    const { overUnder, overUnderHours } = mathOvertimeUndertime(
+      formattedQuarterReports,
+      calendarDate,
+      daysOff,
+      selectedDate
+    );
+
+    const daysRequiredHours = formatDuration(
+      getRequiredHours(calendarDate, daysOff, selectedDate)
+    );
+
+    if (!getRequiredHours(calendarDate, daysOff, selectedDate)) return;
+
+    return (
+      <p>
+        (out of {daysRequiredHours})
+        {!!overUnderHours && (
+          <span
+            className={
+              (overUnder === "overtime" && "text-green-500/50 ml-1") ||
+              (overUnder === "undertime" && "text-red-500/50 ml-1")
+            }
+          >
+            {overUnder === "undertime" && "-"}
+            {formatDuration(overUnderHours)}
+          </span>
+        )}
+      </p>
+    );
+  }, [formattedQuarterReports, calendarDate, selectedDate]);
 
   useEffect(() => {
     try {
@@ -338,9 +378,9 @@ export function Calendar({
       <div className="calendar-header h-10 flex items-center justify-between mb-4">
         <div ref={totalTimeRef}>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-dark-heading">{`${currentReadableMonth} ${currentYear}`}</h3>
-          <p className="text-xs text-gray-500 dark:text-dark-main">
-            Total: {monthWorkedHours}
-          </p>
+          <div className="flex gap-1 text-xs text-gray-500 dark:text-dark-main">
+            Total: {monthWorkedHours} {workRequiredHours}
+          </div>
           {timetrackerUserInfo && (
             <p className="text-xs text-gray-500 dark:text-dark-main">
               Required: {monthRequiredHours}

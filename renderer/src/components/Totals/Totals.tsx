@@ -3,10 +3,10 @@ import { convertMillisecondsToTime } from "@/helpers/utils/datetime-ui";
 import { useMainStore } from "@/store/mainStore";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
-import { Description, Total, PeriodName } from "./types";
-import { TOTAL_PERIODS } from "./constants";
+import { Description, Total, PeriodName, PeriodWithDate } from "./types";
+import { TOTAL_PERIODS, DATE_PERIODS } from "./constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { getTotals } from "./utils";
+import { getTotals, createEnding } from "./utils";
 import TotalsList from "./TotalsList";
 import { Hint } from "@/shared/Hint";
 import { SCREENS } from "@/constants";
@@ -15,8 +15,18 @@ import { changeHintConditions } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import { Listbox } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
+import { getWeekNumber } from "@/helpers/utils/datetime-ui";
 
 const Totals = ({ selectedDate }) => {
+  const year = selectedDate.getFullYear();
+  const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
+  const shortMonth = selectedDate.toLocaleDateString("en-US", {
+    month: "short",
+  });
+  const longMonth = selectedDate.toLocaleDateString("en-US", {
+    month: "long",
+  });
+  const day = selectedDate.getDate().toString().padStart(2, "0");
   const [reportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
     shallow
@@ -26,7 +36,10 @@ const Totals = ({ selectedDate }) => {
     shallow
   );
   const [totals, setTotals] = useState<Total[]>([]);
-  const [period, setPeriod] = useState<PeriodName>("day");
+  const [period, setPeriod] = useState<PeriodWithDate>({
+    periodName: DATE_PERIODS.DAY,
+    date: day + " " + shortMonth,
+  });
   const { screenSizes } = useScreenSizes();
   const [showedProjects, setShowedProjects] = useState<string[]>([]);
   const totalsRef = useRef(null);
@@ -37,7 +50,7 @@ const Totals = ({ selectedDate }) => {
 
   useEffect(() => {
     getTotals({
-      period,
+      period: period.periodName,
       selectedDate,
       reportsFolder,
       setTotals,
@@ -45,7 +58,7 @@ const Totals = ({ selectedDate }) => {
 
     const fileChangeListener = () => {
       getTotals({
-        period,
+        period: period.periodName,
         selectedDate,
         reportsFolder,
         setTotals,
@@ -64,6 +77,10 @@ const Totals = ({ selectedDate }) => {
       );
     };
   }, [selectedDate, period]);
+
+  useEffect(() => {
+    changePeriod(period.periodName, selectedDate);
+  }, [selectedDate]);
 
   const toggleActivitiesList = (projectName: string) => {
     if (isShowedActivitiesList(projectName)) {
@@ -123,9 +140,48 @@ const Totals = ({ selectedDate }) => {
     }
   };
 
+  const handlePeriodDay = (selectedDate) => {
+    const today = new Date();
+    if (
+      selectedDate.getFullYear() === today.getFullYear() &&
+      selectedDate.getDate() === today.getDate() &&
+      selectedDate.getMonth() === today.getMonth()
+    ) {
+      return "today";
+    } else if (
+      selectedDate.getFullYear() === today.getFullYear() &&
+      today.getDate() - selectedDate.getDate() === 1 &&
+      selectedDate.getMonth() === today.getMonth()
+    ) {
+      return "yesterday";
+    } else {
+      return shortMonth + " " + createEnding(day);
+    }
+  };
+
+  const changePeriod = (periodName, selectedDate) => {
+    let dateName = "";
+
+    switch (periodName) {
+      case DATE_PERIODS.DAY:
+        dateName = handlePeriodDay(selectedDate);
+        break;
+      case DATE_PERIODS.WEEK:
+        dateName = `week ${getWeekNumber(`${year}${month}${day}`)}`;
+        break;
+      case DATE_PERIODS.MONTH:
+        dateName = longMonth;
+        break;
+      default:
+        break;
+    }
+
+    setPeriod({ periodName: periodName, date: dateName });
+  };
+
   const onChangeRange = (rangeName: PeriodName) => {
     setShowedProjects([]);
-    setPeriod(rangeName);
+    changePeriod(rangeName, selectedDate);
   };
 
   useEffect(() => {
@@ -234,15 +290,22 @@ const Totals = ({ selectedDate }) => {
         className="flex gap-1 items-center text-lg font-medium text-gray-900 dark:text-dark-heading"
       >
         <div>
-          <Listbox value={period} onChange={onChangeRange}>
-            <Listbox.Button ref={totalsSelectRef} className="capitalize flex">
-              Totals {period}
+          <Listbox value={period.periodName} onChange={onChangeRange}>
+            <Listbox.Button
+              ref={totalsSelectRef}
+              className="capitalize flex"
+              data-testid="totals-list-button"
+            >
+              Totals {period.date}
               <ChevronDownIcon
                 className="w-3 h-3 ml-1 mt-2 dark:text-gray-200"
                 aria-hidden="true"
               />
             </Listbox.Button>
-            <Listbox.Options className="absolute z-10 py-1  ml-12 border border-gray-700 cursor-pointer rounded-lg dark:text-dark-heading  capitalize bg-white dark:bg-dark-container focus:outline-none">
+            <Listbox.Options
+              className="absolute z-10 py-1  ml-12 border border-gray-700 cursor-pointer rounded-lg dark:text-dark-heading  capitalize bg-white dark:bg-dark-container focus:outline-none"
+              data-testid="totals-options"
+            >
               {TOTAL_PERIODS.map((period) => (
                 <Listbox.Option
                   className="px-2 hover:bg-dark-button-gray-hover"
@@ -269,7 +332,7 @@ const Totals = ({ selectedDate }) => {
       )}
       {!totals.length && (
         <div className="text-sm text-gray-700 font-semibold pt-2 dark:text-dark-main ml-5">
-          No tracked time this {period}
+          No tracked time this {period.date}
         </div>
       )}
     </section>
