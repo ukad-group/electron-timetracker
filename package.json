@@ -22,7 +22,7 @@
     "build-client:win32": "electron-builder --win",
     "build-client:darwin": "npm list -g dmg-license || sudo npm i -g dmg-license && electron-builder --mac",
     "type-check": "tsc -p ./renderer/tsconfig.json && tsc -p ./electron-src/tsconfig.json",
-    "lint": "eslint 'renderer/src/**' --fix"
+    "lint": "eslint \"./renderer/src/**\" --fix"
   },
   "repository": "https://github.com/ukad-group/timetracker-desktop-client",
   "publish": {
