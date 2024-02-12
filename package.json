@@ -105,6 +105,7 @@
     "jest-date-mock": "^1.0.8",
     "jest-environment-jsdom": "^29.6.4",
     "postcss": "^8.4.30",
+    "prettier": "^3.2.5",
     "react-test-renderer": "^18.2.0",
     "rimraf": "^3.0.0",
     "run-script-os": "^1.1.6",
