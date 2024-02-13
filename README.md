@@ -69,6 +69,12 @@ npm run dist
 
 App version in `package.json` modify using tag version (tag`v0.0.1` -> `0.0.1`)
 
+Commit pattern:
+
+```sh
+FEATURE | ISSUE | NONE: commit message
+```
+
 ## Contact
 
 Telegram: [@mrdr_scn](https://t.me/mrdr_scn)
