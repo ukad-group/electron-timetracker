@@ -89,7 +89,7 @@ export function Calendar({
         )}
       </p>
     );
-  }, [formattedQuarterReports, calendarDate, selectedDate]);
+  }, [formattedQuarterReports, calendarDate, daysOff, selectedDate]);
 
   useEffect(() => {
     try {
