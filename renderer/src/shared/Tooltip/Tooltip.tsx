@@ -12,6 +12,8 @@ export default function Tooltip({ children, tooltipText = "Copied", isClickable 
   const [isTransparent, setIsTransparent] = useState(true);
   const [isRemoved, setIsRemoved] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
+  const hello = 2;
+  console.log("hello", hello);
 
   const handleClick = () => {
     setIsTransparent(false);
