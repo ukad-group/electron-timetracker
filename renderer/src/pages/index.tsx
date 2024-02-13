@@ -290,13 +290,19 @@ export default function Home() {
   };
 
   const onDeleteActivity = (id: number) => {
-    submitActivity({
-      id: id,
-      from: "",
-      to: "",
-      duration: 0,
-      project: "delete",
+    setSelectedDateActivities((activities) => {
+      const newActivities = activities.map((activity) => {
+        if (activity.id === id) {
+          activity.isBreak = true;
+          activity.description = "";
+          activity.activity = "";
+          activity.project = "!removed";
+        }
+        return activity;
+      });
+      return newActivities;
     });
+    setShouldAutosave(true);
   };
 
   const handleSave = (report: string, shouldAutosave: boolean) => {

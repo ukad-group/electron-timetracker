@@ -2,7 +2,7 @@ import { useState, useContext, useEffect, useRef } from "react";
 import clsx from "clsx";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { formatDuration } from "@/helpers/utils/reports";
-import { PencilSquareIcon, Square2StackIcon } from "@heroicons/react/24/outline";
+import { PencilSquareIcon, Square2StackIcon, ArchiveBoxXMarkIcon } from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { ActivitiesTableContext } from "../context";
 import { Hint } from "@/shared/Hint";
@@ -23,6 +23,7 @@ const MainViewTable = () => {
     copyToClipboardHandle,
     copyActivityHandler,
     editActivityHandler,
+    onDeleteActivity,
   } = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
@@ -281,6 +282,19 @@ const MainViewTable = () => {
                 >
                   {activity.mistakes}
                 </p>
+              )}
+            </td>
+            <td className="relative text-sm font-medium text-right whitespace-nowrap">
+              {!activity.isBreak && (
+                <button
+                  className="group py-4 px-3"
+                  title="Delete"
+                  onClick={() => {
+                    onDeleteActivity(activity.id);
+                  }}
+                >
+                  <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+                </button>
               )}
             </td>
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
