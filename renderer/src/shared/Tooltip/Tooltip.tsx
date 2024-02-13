@@ -24,11 +24,11 @@ export default function Tooltip({ children, tooltipText = "Copied", isClickable 
     }, 750);
   };
 
-  const handleMouseEnter = () => {
+    const handleMouseEnter = () => {
     setShowTooltip(true);
   };
 
-  const handleMouseLeave = () => {
+        const handleMouseLeave = () => {
     setShowTooltip(false);
   };
 
