@@ -53,7 +53,7 @@ export default function DeleteMessage({
             </h3>
             <div className="mt-2">
               <p className="text-sm text-gray-500 dark:text-dark-main">
-                The file is devoid of content or entries.
+                The file is empty.
                 <br />
                 Do you want to delete it?
               </p>

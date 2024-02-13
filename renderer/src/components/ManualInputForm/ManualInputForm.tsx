@@ -38,13 +38,6 @@ export default function ManualInputForm({
 
   useEffect(() => {
     setShowDeleteMessage(false);
-
-    (async () => {
-      const dayReport = await global.ipcRenderer.invoke("app:read-day-report", reportsFolder, selectedDate);
-
-      setIsFileExist(dayReport !== null);
-      setShowDeleteButton(dayReport === "");
-    })();
   }, [selectedDate]);
 
   useEffect(() => {
@@ -52,6 +45,8 @@ export default function ManualInputForm({
   }, [selectedDateReport]);
 
   useEffect(() => {
+    readReport();
+
     editingHistoryManager.setValue(report);
     setReportHandler(report);
 
@@ -68,11 +63,27 @@ export default function ManualInputForm({
     };
   }, [report]);
 
+  const readReport = async () => {
+    const dayReport = await global.ipcRenderer.invoke(
+      "app:read-day-report",
+      reportsFolder,
+      selectedDate
+    );
+
+    setIsFileExist(dayReport !== null);
+    setShowDeleteButton(dayReport === "");
+  };
+
   const saveReportHandler = () => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "manuall_save");
     onSave(report, true);
     setSaveBtnStatus("inprogress");
-    setIsFileExist(true);
+
+    if (isFileExist) {
+      setShowDeleteButton(!report.length);
+    } else {
+      setShowDeleteButton(false);
+    }
   };
 
   const setReportHandler = (report: string) => {
