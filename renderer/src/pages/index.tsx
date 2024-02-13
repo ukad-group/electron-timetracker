@@ -325,6 +325,16 @@ export default function Home() {
     setShouldAutosave(true);
   };
 
+  const onDeleteActivity = (id: number) => {
+    submitActivity({
+      id: id,
+      from: "",
+      to: "",
+      duration: 0,
+      project: "delete",
+    });
+  };
+
   const handleSave = (report: string, shouldAutosave: boolean) => {
     setSelectedDateReport(report);
     setShouldAutosave(shouldAutosave);
@@ -369,6 +379,7 @@ export default function Home() {
                     <ActivitiesSection
                       activities={selectedDateActivities}
                       onEditActivity={setTrackTimeModalActivity}
+                      onDeleteActivity={onDeleteActivity}
                       selectedDate={selectedDate}
                       latestProjAndAct={latestProjAndAct}
                       setSelectedDateReport={setSelectedDateReport}
@@ -406,6 +417,7 @@ export default function Home() {
                     <ActivitiesSection
                       activities={selectedDateActivities}
                       onEditActivity={setTrackTimeModalActivity}
+                      onDeleteActivity={onDeleteActivity}
                       selectedDate={selectedDate}
                       latestProjAndAct={latestProjAndAct}
                       setSelectedDateReport={setSelectedDateReport}

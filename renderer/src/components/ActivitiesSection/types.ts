@@ -9,6 +9,7 @@ export type TrackTimeButtonProps = {
 export type ActivitiesSectionProps = {
   onEditActivity: (activity: ReportActivity | "new") => void;
   activities: Array<ReportActivity>;
+  onDeleteActivity: (id: number) => void;
   selectedDate: Date;
   latestProjAndAct: Record<string, [string]>;
   setSelectedDateReport: Dispatch<SetStateAction<String>>;
