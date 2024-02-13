@@ -7,10 +7,7 @@ import {
   addSuggestions,
   addDurationToTime,
 } from "@/helpers/utils/reports";
-import {
-  padStringToMinutes,
-  getDateTimeData,
-} from "@/helpers/utils/datetime-ui";
+import { padStringToMinutes, getDateTimeData } from "@/helpers/utils/datetime-ui";
 import { AutocompleteSelector } from "@/shared/AutocompleteSelector";
 import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "@/store/googleEventsStore";
@@ -21,11 +18,7 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { TrackTimeModalProps } from "./types";
 import { Modal } from "@/shared/Modal";
 import { TextField } from "@/shared/TextField";
-import {
-  changeMinutesAndHours,
-  changeHours,
-  getTimetrackerYearProjects,
-} from "./utils";
+import { changeMinutesAndHours, changeHours, getTimetrackerYearProjects } from "./utils";
 import { Hint } from "@/shared/Hint";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { SCREENS } from "@/constants";
@@ -55,12 +48,9 @@ export default function TrackTimeModal({
   const [otherJiraTasks, setOtherJiraTasks] = useState([]);
   const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
     (state) => [state.event, state.setEvent],
-    shallow
+    shallow,
   );
-  const [progress, setProgress] = useTutorialProgressStore(
-    (state) => [state.progress, state.setProgress],
-    shallow
-  );
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const [latestProjects, setLatestProjects] = useState([]);
   const [webTrackerProjects, setWebTrackerProjects] = useState([]);
   const [uniqueWebTrackerProjects, setUniqueWebTrackerProjects] = useState([]);
@@ -75,24 +65,11 @@ export default function TrackTimeModal({
   }, [from, to]);
 
   const isFormInvalid = useMemo(() => {
-    return (
-      !from ||
-      !to ||
-      !duration ||
-      duration < 0 ||
-      !project ||
-      to.length < 5 ||
-      from.length < 5
-    );
+    return !from || !to || !duration || duration < 0 || !project || to.length < 5 || from.length < 5;
   }, [from, to, duration, project]);
 
   const thirdPartyItems = useMemo(() => {
-    return [
-      ...userTrelloTasks,
-      ...userJiraTasks,
-      ...otherTrelloTasks,
-      ...otherJiraTasks,
-    ];
+    return [...userTrelloTasks, ...userJiraTasks, ...otherTrelloTasks, ...otherJiraTasks];
   }, [userTrelloTasks, otherTrelloTasks, userJiraTasks, otherJiraTasks]);
 
   useEffect(() => {
@@ -104,8 +81,7 @@ export default function TrackTimeModal({
     if (editedActivity?.calendarId) {
       const lastRegistrationTo = activities[activities?.length - 2]?.to;
 
-      padStringToMinutes(lastRegistrationTo) >
-      padStringToMinutes(editedActivity?.from)
+      padStringToMinutes(lastRegistrationTo) > padStringToMinutes(editedActivity?.from)
         ? setFrom(lastRegistrationTo || "")
         : setFrom(editedActivity?.from || "");
     } else {
@@ -113,9 +89,7 @@ export default function TrackTimeModal({
     }
 
     setTo(editedActivity.to || "");
-    setFormattedDuration(
-      formatDurationAsDecimals(editedActivity.duration) || ""
-    );
+    setFormattedDuration(formatDurationAsDecimals(editedActivity.duration) || "");
     setProject(editedActivity.project || "");
     setActivity(editedActivity.activity || "");
     setDescription(editedActivity.description || "");
@@ -126,8 +100,7 @@ export default function TrackTimeModal({
       return;
     }
 
-    const { hours, floorMinutes, isToday, ceilHours, ceilMinutes } =
-      getDateTimeData(selectedDate);
+    const { hours, floorMinutes, isToday, ceilHours, ceilMinutes } = getDateTimeData(selectedDate);
 
     if (activities?.length && activities[activities?.length - 1].to) {
       setFrom(activities[activities?.length - 1].to);
@@ -149,10 +122,7 @@ export default function TrackTimeModal({
       for (let i = 0; i < webTrackerProjects.length; i++) {
         if (!tempLatestProj.includes(webTrackerProjects[i])) {
           tempWebTrackerProjects.push(webTrackerProjects[i]);
-          global.ipcRenderer.send(
-            IPC_MAIN_CHANNELS.DICTIONATY_UPDATE,
-            webTrackerProjects[i]
-          );
+          global.ipcRenderer.send(IPC_MAIN_CHANNELS.DICTIONATY_UPDATE, webTrackerProjects[i]);
         }
       }
       setUniqueWebTrackerProjects(tempWebTrackerProjects);
@@ -198,10 +168,7 @@ export default function TrackTimeModal({
       return;
     }
 
-    if (
-      progress["shortcutsEditingConditions"] &&
-      progress["shortcutsEditingConditions"][0]
-    ) {
+    if (progress["shortcutsEditingConditions"] && progress["shortcutsEditingConditions"][0]) {
       progress["shortcutsEditingConditions"][1] = true;
       setProgress(progress);
     }
@@ -223,24 +190,14 @@ export default function TrackTimeModal({
       calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
     });
 
-    if (
-      !scheduledEvents[dashedDescription] &&
-      editedActivity !== "new" &&
-      editedActivity.calendarId?.length > 0
-    ) {
+    if (!scheduledEvents[dashedDescription] && editedActivity !== "new" && editedActivity.calendarId?.length > 0) {
       scheduledEvents[dashedDescription] = { project: "", activity: "" };
     }
-    if (
-      scheduledEvents[dashedDescription] &&
-      !scheduledEvents[dashedDescription].project
-    ) {
+    if (scheduledEvents[dashedDescription] && !scheduledEvents[dashedDescription].project) {
       scheduledEvents[dashedDescription].project = project;
     }
 
-    if (
-      scheduledEvents[dashedDescription] &&
-      scheduledEvents[dashedDescription].activity !== activity
-    ) {
+    if (scheduledEvents[dashedDescription] && scheduledEvents[dashedDescription].activity !== activity) {
       scheduledEvents[dashedDescription].activity = activity || "";
     }
 
@@ -288,7 +245,7 @@ export default function TrackTimeModal({
 
   const handleKey = (
     e: React.KeyboardEvent<HTMLInputElement>,
-    callback: (value: string) => void | undefined = undefined
+    callback: (value: string) => void | undefined = undefined,
   ) => {
     if (e.key === "ArrowUp" || e.key === "ArrowDown") {
       e.preventDefault();
@@ -309,21 +266,14 @@ export default function TrackTimeModal({
       let [hours, minutes] = value.split(":").map(Number);
 
       if (cursorPosition > 2) {
-        const [newMinutes, newHours] = changeMinutesAndHours(
-          e.key,
-          minutes,
-          hours
-        );
+        const [newMinutes, newHours] = changeMinutesAndHours(e.key, minutes, hours);
         minutes = newMinutes;
         hours = newHours;
       } else {
         hours = changeHours(e.key, hours);
       }
 
-      const adjustedTime =
-        hours.toString().padStart(2, "0") +
-        ":" +
-        minutes.toString().padStart(2, "0");
+      const adjustedTime = hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
 
       input.value = adjustedTime;
       input.selectionStart = cursorPosition;
@@ -363,7 +313,7 @@ export default function TrackTimeModal({
               {
                 "border-red-300 text-red-900 placeholder-red-300 dark:border-red-700/40 dark:text-red-500 dark:placeholder-red-300":
                   isValidationEnabled && (!from || from.length < 5),
-              }
+              },
             )}
             onDragStart={disableTextDrag}
           />
@@ -376,8 +326,7 @@ export default function TrackTimeModal({
             shiftX={screenSizes.screenWidth >= SCREENS.LG ? 300 : 150}
             width={"large"}
             position={{
-              basePosition:
-                screenSizes.screenWidth >= SCREENS.LG ? "top" : "bottom",
+              basePosition: screenSizes.screenWidth >= SCREENS.LG ? "top" : "bottom",
               diagonalPosition: "right",
             }}
           >
@@ -400,7 +349,7 @@ export default function TrackTimeModal({
               {
                 "border-red-300 text-red-900 placeholder-red-300 dark:border-red-700/40 dark:text-red-500 dark:placeholder-red-300":
                   isValidationEnabled && (!to || to.length < 5),
-              }
+              },
             )}
             onDragStart={disableTextDrag}
           />
@@ -421,7 +370,7 @@ export default function TrackTimeModal({
               {
                 "border-red-300 text-red-900 placeholder-red-300 dark:border-red-700/40 dark:text-red-500 dark:placeholder-red-300":
                   isValidationEnabled && (!duration || duration < 0),
-              }
+              },
             )}
             onDragStart={disableTextDrag}
           />
@@ -433,9 +382,7 @@ export default function TrackTimeModal({
             title="Project"
             required
             availableItems={latestProjects}
-            additionalItems={
-              uniqueWebTrackerProjects ? uniqueWebTrackerProjects : []
-            }
+            additionalItems={uniqueWebTrackerProjects ? uniqueWebTrackerProjects : []}
             selectedItem={project}
             setSelectedItem={setProject}
             isValidationEnabled={isValidationEnabled}
@@ -448,9 +395,7 @@ export default function TrackTimeModal({
             isNewCheck
             onSave={onSave}
             title="Activity"
-            availableItems={
-              latestProjAndAct[project] ? latestProjAndAct[project] : []
-            }
+            availableItems={latestProjAndAct[project] ? latestProjAndAct[project] : []}
             selectedItem={activity}
             setSelectedItem={setActivity}
             showedSuggestionsNumber={3}
@@ -483,9 +428,7 @@ export default function TrackTimeModal({
           <AutocompleteSelector
             onSave={onSave}
             title="Description"
-            availableItems={
-              latestProjAndDesc[project] ? latestProjAndDesc[project] : []
-            }
+            availableItems={latestProjAndDesc[project] ? latestProjAndDesc[project] : []}
             additionalItems={thirdPartyItems}
             selectedItem={description}
             setSelectedItem={setDescription}

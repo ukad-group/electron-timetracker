@@ -20,11 +20,7 @@ export const changeHours = (eventKey: string, hours: number) => {
   return newHours;
 };
 
-export const changeMinutesAndHours = (
-  eventKey: string,
-  minutes: number,
-  hours: number
-) => {
+export const changeMinutesAndHours = (eventKey: string, minutes: number, hours: number) => {
   let newMinutes = minutes;
   let newHours = hours;
 
@@ -46,19 +42,14 @@ export const changeMinutesAndHours = (
 };
 
 export const getTimetrackerYearProjects = async (setWebTrackerProjects) => {
-  const userInfo = JSON.parse(
-    localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)
-  );
+  const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
   if (!userInfo) return;
 
   const timetrackerCookie = userInfo?.TTCookie;
 
   try {
-    const yearProjects = await global.ipcRenderer.invoke(
-      IPC_MAIN_CHANNELS.TIMETRACKER_GET_PROJECTS,
-      timetrackerCookie
-    );
+    const yearProjects = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.TIMETRACKER_GET_PROJECTS, timetrackerCookie);
 
     if (yearProjects === "invalid_token") {
       const refresh_token = userInfo?.userInfoRefreshToken;
@@ -67,15 +58,12 @@ export const getTimetrackerYearProjects = async (setWebTrackerProjects) => {
 
       const updatedCreds = await global.ipcRenderer.invoke(
         IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_USER_INFO_TOKEN,
-        refresh_token
+        refresh_token,
       );
 
       const updatedIdToken = updatedCreds?.id_token;
 
-      const updatedCookie = await global.ipcRenderer.invoke(
-        IPC_MAIN_CHANNELS.TIMETRACKER_LOGIN,
-        updatedIdToken
-      );
+      const updatedCookie = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.TIMETRACKER_LOGIN, updatedIdToken);
 
       const updatedUser = {
         ...userInfo,
@@ -83,10 +71,7 @@ export const getTimetrackerYearProjects = async (setWebTrackerProjects) => {
         TTCookie: updatedCookie,
       };
 
-      localStorage.setItem(
-        LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER,
-        JSON.stringify(updatedUser)
-      );
+      localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUser));
       return await getTimetrackerYearProjects(setWebTrackerProjects);
     }
 
@@ -95,10 +80,7 @@ export const getTimetrackerYearProjects = async (setWebTrackerProjects) => {
       yearProjects: yearProjects,
     };
 
-    localStorage.setItem(
-      LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER,
-      JSON.stringify(updatedUserInfo)
-    );
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUserInfo));
 
     setWebTrackerProjects(yearProjects);
   } catch (error) {

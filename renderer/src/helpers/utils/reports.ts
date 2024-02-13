@@ -66,7 +66,7 @@ export function parseReport(fileContent: string) {
 
         reportItems[reportCount - 1].duration = calcDurationBetweenTimes(
           reportItems[reportCount - 1].from,
-          reportItems[reportCount - 1].to
+          reportItems[reportCount - 1].to,
         );
       }
       // removing time
@@ -82,8 +82,7 @@ export function parseReport(fileContent: string) {
       currentLine = currentLine.replace(separatorRegex, "");
 
       // should skip registraion when task starts from !
-      const isBreak =
-        !currentLine.trim().length || workingTimeRegex.test(currentLine);
+      const isBreak = !currentLine.trim().length || workingTimeRegex.test(currentLine);
 
       if (isBreak) {
         registration.project = currentLine;
@@ -92,9 +91,7 @@ export function parseReport(fileContent: string) {
         reportCount++;
         continue;
       }
-      let projectName = currentLine.match(textRegex)
-        ? currentLine.match(textRegex)[0]
-        : "";
+      let projectName = currentLine.match(textRegex) ? currentLine.match(textRegex)[0] : "";
 
       if (projectName) {
         registration.project = projectName.trim().toLowerCase();
@@ -102,25 +99,19 @@ export function parseReport(fileContent: string) {
         // removing project name
         const index = currentLine.indexOf(projectName);
         currentLine =
-          index < 0
-            ? currentLine
-            : currentLine.slice(0, index) +
-              currentLine.slice(index + projectName.length);
+          index < 0 ? currentLine : currentLine.slice(0, index) + currentLine.slice(index + projectName.length);
         // removing ' - '
         currentLine = currentLine.replace(separatorRegex, "");
       }
 
-      const activityInTheLinePattern =
-        startTime > new Date(2016, 7, 23) ? /(.+?)\s-\s+/ : /(.+?)-\s*/;
+      const activityInTheLinePattern = startTime > new Date(2016, 7, 23) ? /(.+?)\s-\s+/ : /(.+?)-\s*/;
       const activityInTheLineRegex = new RegExp(activityInTheLinePattern);
 
       if (activityInTheLineRegex.test(currentLine)) {
         let activityName = currentLine.match(activityInTheLineRegex)[1];
 
         registration.activity =
-          startTime > new Date(2016, 7, 26)
-            ? activityName.trim()
-            : activityName.trim().toLowerCase();
+          startTime > new Date(2016, 7, 26) ? activityName.trim() : activityName.trim().toLowerCase();
 
         // removing activity with '-'
         currentLine = currentLine.replace(activityInTheLineRegex, "");
@@ -138,7 +129,7 @@ export function parseReport(fileContent: string) {
       IPC_MAIN_CHANNELS.FRONTEND_ERROR,
       "Parsing error",
       "An issue with the file has been identified. Please attempt to rectify the error within the report using the Manual Input field.",
-      err
+      err,
     );
     return reportAndNotes as ReportAndNotes;
   }
@@ -165,10 +156,7 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
       }
 
       const notLastEmptyRegistration =
-        !activity.project &&
-        !activity.activity &&
-        !activity.description &&
-        i !== activities.length - 1;
+        !activity.project && !activity.activity && !activity.description && i !== activities.length - 1;
 
       if (notLastEmptyRegistration) {
         report += `${parts.join(" - ")}!\n`;
@@ -191,7 +179,7 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
       IPC_MAIN_CHANNELS.FRONTEND_ERROR,
       "Serializing error",
       "An issue with the file has been identified. Please attempt to rectify the error within the report using the Manual Input field. ",
-      err
+      err,
     );
     return report;
   }
@@ -295,23 +283,15 @@ export function checkIntersection(previousTo: string, currentFrom: string) {
 export function validation(activities: Array<ReportActivity>) {
   try {
     for (let i = 0; i < activities.length; i++) {
-      const [toHours, toMinutes] = activities[i].to
-        ? activities[i].to.split(":").map((item) => Number(item))
-        : [];
+      const [toHours, toMinutes] = activities[i].to ? activities[i].to.split(":").map((item) => Number(item)) : [];
       const [fromHours, fromMinutes] = activities[i].from
         ? activities[i].from?.split(":")?.map((item) => Number(item))
         : [];
 
-      if (
-        i > 0 &&
-        checkIntersection(activities[i - 1].to, activities[i].from)
-      ) {
+      if (i > 0 && checkIntersection(activities[i - 1].to, activities[i].from)) {
         activities[i - 1].isValid = false;
       }
-      if (
-        activities[i].duration <= 0 ||
-        (activities[i].project && !activities[i].to)
-      ) {
+      if (activities[i].duration <= 0 || (activities[i].project && !activities[i].to)) {
         activities[i].isValid = false;
       }
       if (activities[i].description.startsWith("!")) {
@@ -355,7 +335,7 @@ export function validation(activities: Array<ReportActivity>) {
 export function addSuggestions(
   activities: Array<ReportActivity> | null,
   latestProjAndDesc: Record<string, [string]>,
-  latestProjAndAct: Record<string, [string]>
+  latestProjAndAct: Record<string, [string]>,
 ) {
   try {
     for (let i = 0; i < activities.length; i++) {
@@ -371,25 +351,17 @@ export function addSuggestions(
 
       const projectKey = activities[i].project.trim();
 
-      if (
-        !latestProjAndDesc.hasOwnProperty(projectKey) ||
-        !latestProjAndAct.hasOwnProperty(projectKey)
-      ) {
+      if (!latestProjAndDesc.hasOwnProperty(projectKey) || !latestProjAndAct.hasOwnProperty(projectKey)) {
         latestProjAndDesc[projectKey] = [activities[i].description];
         latestProjAndAct[projectKey] = [activities[i].activity];
         continue;
       }
 
       if (activities[i].description) {
-        if (
-          !latestProjAndDesc[projectKey].includes(activities[i].description)
-        ) {
+        if (!latestProjAndDesc[projectKey].includes(activities[i].description)) {
           latestProjAndDesc[projectKey].unshift(activities[i].description);
         } else {
-          latestProjAndDesc[projectKey]?.splice(
-            latestProjAndDesc[projectKey].indexOf(activities[i].description),
-            1
-          );
+          latestProjAndDesc[projectKey]?.splice(latestProjAndDesc[projectKey].indexOf(activities[i].description), 1);
           latestProjAndDesc[projectKey]?.unshift(activities[i].description);
         }
       }
@@ -398,10 +370,7 @@ export function addSuggestions(
         if (!latestProjAndAct[projectKey].includes(activities[i].activity)) {
           latestProjAndAct[projectKey].unshift(activities[i].activity);
         } else {
-          latestProjAndAct[projectKey]?.splice(
-            latestProjAndAct[projectKey].indexOf(activities[i].activity),
-            1
-          );
+          latestProjAndAct[projectKey]?.splice(latestProjAndAct[projectKey].indexOf(activities[i].activity), 1);
           latestProjAndAct[projectKey]?.unshift(activities[i].activity);
         }
       }

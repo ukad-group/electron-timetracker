@@ -1,28 +1,19 @@
 import React from "react";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { SelectFolderPlaceholderProps } from './types';
+import { SelectFolderPlaceholderProps } from "./types";
 
-const SelectFolderPlaceholder = ({
-  setFolder,
-}: SelectFolderPlaceholderProps) => {
+const SelectFolderPlaceholder = ({ setFolder }: SelectFolderPlaceholderProps) => {
   const handleButtonClick = () => {
-    global.ipcRenderer
-      .invoke("app:select-folder")
-      .then((folder: string | null) => {
-        if (folder) {
-          setFolder(folder);
-        }
-      });
+    global.ipcRenderer.invoke("app:select-folder").then((folder: string | null) => {
+      if (folder) {
+        setFolder(folder);
+      }
+    });
   };
 
   return (
     <div className="py-16 text-center bg-white shadow sm:rounded-lg lg:col-start-1 lg:col-span-3 dark:bg-dark-container  dark:border dark:border-dark-border">
-      <svg
-        className="w-12 h-12 mx-auto text-gray-400"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
+      <svg className="w-12 h-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path
           vectorEffect="non-scaling-stroke"
           strokeLinecap="round"
@@ -31,33 +22,23 @@ const SelectFolderPlaceholder = ({
           d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
         />
       </svg>
-      <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-dark-heading">
-        Select a Folder
-      </h3>
+      <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-dark-heading">Select a Folder</h3>
       <div className="mt-4 max-w-3xl mx-auto">
         <div className="mb-4">
-          <h4 className="text-gray-900 dark:text-dark-heading mb-1">
-            For UKAD Users
-          </h4>
+          <h4 className="text-gray-900 dark:text-dark-heading mb-1">For UKAD Users</h4>
           <p className="text-sm text-gray-500 dark:text-dark-main mx-auto">
-            The designated folder should be created and shared with you on
-            Dropbox by the UKAD DevOps team. <br /> To locate your Dropbox root
-            folder, please navigate to C:\Users[Windows user]\Dropbox. <br />{" "}
-            Our application's folder structure mirrors the format 'John Galt{" "}
-            {">"} 2024 {">"} week 05.' <br /> Kindly select the 'John Galt'
-            folder as your designated storage location.
+            The designated folder should be created and shared with you on Dropbox by the UKAD DevOps team. <br /> To
+            locate your Dropbox root folder, please navigate to C:\Users[Windows user]\Dropbox. <br /> Our application's
+            folder structure mirrors the format 'John Galt {">"} 2024 {">"} week 05.' <br /> Kindly select the 'John
+            Galt' folder as your designated storage location.
           </p>
         </div>
         <div>
-          <h4 className="text-gray-900 dark:text-dark-heading mb-1">
-            For other Users
-          </h4>
+          <h4 className="text-gray-900 dark:text-dark-heading mb-1">For other Users</h4>
           <p className="text-sm text-gray-500 dark:text-dark-main mx-auto">
-            As a Non-UKAD user, you have the flexibility to choose any folder of
-            your preference for storing your reports. However, we strongly
-            recommend utilizing cloud storage services like Dropbox, Google
-            Drive, etc. These services facilitate seamless report
-            synchronization across your devices, offer automatic backups, and
+            As a Non-UKAD user, you have the flexibility to choose any folder of your preference for storing your
+            reports. However, we strongly recommend utilizing cloud storage services like Dropbox, Google Drive, etc.
+            These services facilitate seamless report synchronization across your devices, offer automatic backups, and
             preserve a historical record of your data.
           </p>
         </div>

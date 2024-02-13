@@ -3,13 +3,9 @@ import { TutorialProgress } from "@/store/types";
 import { HintConitions } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
-export const replaceHyphensWithSpaces = (inputString: string): string =>
-  inputString.replace(/ - /g, " ");
+export const replaceHyphensWithSpaces = (inputString: string): string => inputString.replace(/ - /g, " ");
 
-export const concatSortArrays = (
-  firstArr: ReportActivity[],
-  secondArr: ReportActivity[]
-) => {
+export const concatSortArrays = (firstArr: ReportActivity[], secondArr: ReportActivity[]) => {
   const combinedArray = firstArr.concat(secondArr);
 
   combinedArray.sort((a, b) => {
@@ -26,10 +22,7 @@ export const concatSortArrays = (
   return combinedArray;
 };
 
-export function parseEventTitle(
-  event,
-  latestProjAndAct: Record<string, [string]>
-) {
+export function parseEventTitle(event, latestProjAndAct: Record<string, [string]>) {
   const { summary } = event; // Google
   const { subject } = event; // Office365
   const eventTitle = summary || subject;
@@ -56,8 +49,7 @@ export function parseEventTitle(
           for (let j = 0; words.length > j; j++) {
             const activities = latestProjAndAct[project];
             if (activities && activities.includes(words[j].toLowerCase())) {
-              event.activity =
-                activities[activities.indexOf(words[j].toLowerCase())];
+              event.activity = activities[activities.indexOf(words[j].toLowerCase())];
             }
           }
           break;
@@ -86,8 +78,7 @@ export function parseEventTitle(
         const activities = latestProjAndAct[project];
 
         if (activities && activities.includes(activity.toLowerCase())) {
-          event.activity =
-            activities[activities.indexOf(activity.toLowerCase())];
+          event.activity = activities[activities.indexOf(activity.toLowerCase())];
         } else event.activity = activity;
       } else event.activity = activity;
 
@@ -107,7 +98,7 @@ export function parseEventTitle(
 export const changeHintConditions = (
   progress: TutorialProgress,
   setProgress: (event: TutorialProgress) => void,
-  hints: Array<HintConitions>
+  hints: Array<HintConitions>,
 ) => {
   hints.forEach((hint) => {
     if (!progress[`${hint.groupName}Conditions`]) {
@@ -145,17 +136,11 @@ export const trackConnections = (connectedName: string) => {
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");
 
-  if (
-    localStorage.getItem(connectedName + "Connection") !==
-    `${year}-${month}-${day}`
-  ) {
+  if (localStorage.getItem(connectedName + "Connection") !== `${year}-${month}-${day}`) {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "connections", {
       connected: connectedName,
     });
 
-    localStorage.setItem(
-      connectedName + "Connection",
-      `${year}-${month}-${day}`
-    );
+    localStorage.setItem(connectedName + "Connection", `${year}-${month}-${day}`);
   }
 };

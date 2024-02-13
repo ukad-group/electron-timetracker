@@ -1,6 +1,6 @@
 import { shallow } from "zustand/shallow";
 import { useMainStore } from "@/store/mainStore";
-import { DeleteMessageProps } from './types';
+import { DeleteMessageProps } from "./types";
 
 export default function DeleteMessage({
   setShowDeleteButton,
@@ -8,10 +8,7 @@ export default function DeleteMessage({
   selectedDate,
   setSelectedDateReport,
 }: DeleteMessageProps) {
-  const [reportsFolder] = useMainStore(
-    (state) => [state.reportsFolder, state.setReportsFolder],
-    shallow
-  );
+  const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
 
   const deleteFileHandler = () => {
     setShowDeleteButton(false);
@@ -51,10 +48,7 @@ export default function DeleteMessage({
             </svg>
           </div>
           <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-            <h3
-              className="text-base font-semibold leading-6 text-gray-900 dark:text-dark-heading"
-              id="modal-title"
-            >
+            <h3 className="text-base font-semibold leading-6 text-gray-900 dark:text-dark-heading" id="modal-title">
               Empty file
             </h3>
             <div className="mt-2">

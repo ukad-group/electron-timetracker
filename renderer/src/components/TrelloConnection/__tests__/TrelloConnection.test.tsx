@@ -17,7 +17,7 @@ global.ipcRenderer = {
   on: jest.fn(),
   removeAllListeners: jest.fn(),
   send: jest.fn(),
-  ...globalIpcRendererMock
+  ...globalIpcRendererMock,
 };
 
 describe("GIVEN TrelloConnection", () => {

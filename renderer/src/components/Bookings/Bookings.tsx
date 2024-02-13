@@ -2,11 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import { MONTHS } from "@/helpers/utils/datetime-ui";
-import {
-  ReportActivity,
-  formatDurationAsDecimals,
-  parseReport,
-} from "@/helpers/utils/reports";
+import { ReportActivity, formatDurationAsDecimals, parseReport } from "@/helpers/utils/reports";
 import { ParsedReport, TTUserInfo } from "../Calendar/types";
 import { Loader } from "@/shared/Loader";
 import { BookingsProps, BookingFromApi, BookedSpentStat } from "./types";
@@ -15,35 +11,21 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
   const [bookedProjects, setBookedProjects] = useState<BookingFromApi[]>([]);
-  const [bookedSpentStatistic, setBookedSpentStatistic] = useState<
-    BookedSpentStat[]
-  >([]);
+  const [bookedSpentStatistic, setBookedSpentStatistic] = useState<BookedSpentStat[]>([]);
   const [loading, setLoading] = useState(false);
   const currentReadableMonth = MONTHS[calendarDate.getMonth()];
-  const [reportsFolder] = useMainStore(
-    (state) => [state.reportsFolder, state.setReportsFolder],
-    shallow
-  );
+  const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   let maxRecurse = 0;
 
   const totalBookingTime: number = useMemo(() => {
-    return bookedProjects.reduce(
-      (acc, project) => acc + (project?.plans[0]?.hours || 0),
-      0
-    );
+    return bookedProjects.reduce((acc, project) => acc + (project?.plans[0]?.hours || 0), 0);
   }, [bookedProjects]);
 
   const totalSpentTime: number = useMemo(() => {
-    return bookedSpentStatistic.reduce(
-      (acc, project) => acc + (project?.spent || 0),
-      0
-    );
+    return bookedSpentStatistic.reduce((acc, project) => acc + (project?.spent || 0), 0);
   }, [bookedSpentStatistic]);
 
-  const getBookings = async (
-    cookie: string,
-    userName: string
-  ): Promise<BookingFromApi[]> => {
+  const getBookings = async (cookie: string, userName: string): Promise<BookingFromApi[]> => {
     try {
       setLoading(true);
 
@@ -51,14 +33,14 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         IPC_MAIN_CHANNELS.TIMETRACKER_GET_BOOKINGS,
         cookie,
         userName,
-        calendarDate
+        calendarDate,
       );
 
       if (allLoggedProjects === "invalid_token" && maxRecurse <= 3) {
         maxRecurse += 1; // we are already refreshing the token in calendar compenent, so i just want to re execute function maximum 3 times to prevent loop
 
         const updatedTTUserInfo: TTUserInfo = JSON.parse(
-          localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)
+          localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
         );
         const updatedCookie = updatedTTUserInfo?.TTCookie;
 
@@ -93,16 +75,12 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
       const monthLocalReports = await global.ipcRenderer.invoke(
         IPC_MAIN_CHANNELS.APP_FIND_MONTH_PROJECTS,
         reportsFolder,
-        calendarDate
+        calendarDate,
       );
 
-      const monthParsedActivities = monthLocalReports.map(
-        (report: ParsedReport) => {
-          return (parseReport(report?.data)[0] || []).filter(
-            (activity: ReportActivity) => !activity.isBreak
-          );
-        }
-      );
+      const monthParsedActivities = monthLocalReports.map((report: ParsedReport) => {
+        return (parseReport(report?.data)[0] || []).filter((activity: ReportActivity) => !activity.isBreak);
+      });
 
       return monthParsedActivities.flat();
     } catch (error) {
@@ -111,19 +89,14 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   };
 
   const getBookedStatistic = async () => {
-    const TTUserInfo: TTUserInfo = JSON.parse(
-      localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)
-    );
+    const TTUserInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
     if (!TTUserInfo) return;
 
     const timetrackerCookie = TTUserInfo?.TTCookie;
     const timetrackerUserName = TTUserInfo?.name;
 
-    const bookedProjects = await getBookings(
-      timetrackerCookie,
-      timetrackerUserName
-    );
+    const bookedProjects = await getBookings(timetrackerCookie, timetrackerUserName);
 
     if (!bookedProjects || bookedProjects?.length === 0) {
       setBookedProjects([]);
@@ -137,20 +110,13 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
     const bookedSpentStatisticArray: BookedSpentStat[] = bookedProjects
       .map((booking) => {
-        const spentProjectTime = monthLocalActivities.reduce(
-          (acc, activity) => {
-            if (
-              activity?.project === booking?.name &&
-              activity?.duration &&
-              activity?.duration > 0
-            ) {
-              return acc + activity?.duration;
-            } else {
-              return acc;
-            }
-          },
-          0
-        );
+        const spentProjectTime = monthLocalActivities.reduce((acc, activity) => {
+          if (activity?.project === booking?.name && activity?.duration && activity?.duration > 0) {
+            return acc + activity?.duration;
+          } else {
+            return acc;
+          }
+        }, 0);
 
         return {
           project: booking?.name,
@@ -181,31 +147,19 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
       getBookedStatistic();
     };
 
-    global.ipcRenderer.on(
-      IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
-      fileChangeListener
-    );
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
 
     return () => {
-      global.ipcRenderer.removeListener(
-        IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
-        fileChangeListener
-      );
+      global.ipcRenderer.removeListener(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
     };
   }, [calendarDate]);
 
   const renderProjectsHours = () =>
     bookedSpentStatistic.map((project, i) => (
       <tr key={i} className="border-b dark:border-gray-700">
-        <td className="pr-6 py-2 text-gray-700 dark:text-dark-main">
-          {project.project}
-        </td>
-        <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-          {project.booked}h
-        </td>
-        <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-          {formatDurationAsDecimals(project.spent)}
-        </td>
+        <td className="pr-6 py-2 text-gray-700 dark:text-dark-main">{project.project}</td>
+        <td className="px-6 py-2 text-gray-700 dark:text-dark-main">{project.booked}h</td>
+        <td className="px-6 py-2 text-gray-700 dark:text-dark-main">{formatDurationAsDecimals(project.spent)}</td>
       </tr>
     ));
 
@@ -237,12 +191,8 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
           <tbody>
             {renderProjectsHours()}
             <tr>
-              <td className="pr-6 py-2 text-gray-700 dark:text-dark-main ">
-                Total:
-              </td>
-              <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
-                {totalBookingTime}h
-              </td>
+              <td className="pr-6 py-2 text-gray-700 dark:text-dark-main ">Total:</td>
+              <td className="px-6 py-2 text-gray-700 dark:text-dark-main">{totalBookingTime}h</td>
               <td className="px-6 py-2 text-gray-700 dark:text-dark-main">
                 {formatDurationAsDecimals(totalSpentTime)}
               </td>

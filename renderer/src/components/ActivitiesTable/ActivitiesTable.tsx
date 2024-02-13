@@ -26,15 +26,9 @@ export default function ActivitiesTable({
   const [secondKey, setSecondtKey] = useState(null);
   const [firstKeyPressTime, setFirstKeyPressTime] = useState(null);
   const [timerId, setTimerId] = useState(null);
-  const [scheduledEvents] = useScheduledEventsStore(
-    (state) => [state.event, state.setEvent],
-    shallow
-  );
+  const [scheduledEvents] = useScheduledEventsStore((state) => [state.event, state.setEvent], shallow);
 
-  const totalDuration = useMemo(
-    () => getTotalDuration(nonBreakActivities),
-    [nonBreakActivities]
-  );
+  const totalDuration = useMemo(() => getTotalDuration(nonBreakActivities), [nonBreakActivities]);
 
   const tableActivities = useMemo(() => {
     const badgedActivities = nonBreakActivities.map((activity) => {
@@ -45,15 +39,10 @@ export default function ActivitiesTable({
       return activity;
     });
     const actualEvents = getActualEvents(events, activities);
-    const formattedEvents: ReportActivity[] = formatEvents(
-      actualEvents,
-      latestProjAndAct
-    );
+    const formattedEvents: ReportActivity[] = formatEvents(actualEvents, latestProjAndAct);
 
     for (let i = 0; i < formattedEvents.length; i++) {
-      if (
-        Object.keys(scheduledEvents).includes(formattedEvents[i].description)
-      ) {
+      if (Object.keys(scheduledEvents).includes(formattedEvents[i].description)) {
         formattedEvents[i].project = formattedEvents[i].project
           ? formattedEvents[i].project
           : scheduledEvents[formattedEvents[i].description].project;
@@ -102,10 +91,7 @@ export default function ActivitiesTable({
   };
 
   const copyActivityHandler = (activity) => {
-    global.ipcRenderer.send(
-      IPC_MAIN_CHANNELS.ANALYTICS_DATA,
-      "copy_registration"
-    );
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "copy_registration");
     onEditActivity({
       ...activity,
       id: null,
@@ -116,10 +102,7 @@ export default function ActivitiesTable({
   };
 
   const handleKeyDown = (event) => {
-    if (
-      (event.ctrlKey && event.key === KEY_CODES.ARROW_UP) ||
-      (event.metaKey && event.key === KEY_CODES.ARROW_UP)
-    ) {
+    if ((event.ctrlKey && event.key === KEY_CODES.ARROW_UP) || (event.metaKey && event.key === KEY_CODES.ARROW_UP)) {
       if (nonBreakActivities.length > 0) {
         const lastActivity = nonBreakActivities[nonBreakActivities.length - 1];
         onEditActivity(lastActivity);
@@ -129,10 +112,7 @@ export default function ActivitiesTable({
       setCtrlPressed(true);
     }
 
-    if (
-      (event.ctrlKey || event.key === KEY_CODES.CONTROL || event.metaKey) &&
-      /^[0-9]$/.test(event.key)
-    ) {
+    if ((event.ctrlKey || event.key === KEY_CODES.CONTROL || event.metaKey) && /^[0-9]$/.test(event.key)) {
       const number = parseInt(event.key, 10);
 
       if (!firstKey && number >= 1 && number <= tableActivities.length) {
@@ -155,8 +135,7 @@ export default function ActivitiesTable({
       if (Date.now() - firstKeyPressTime < 500) {
         clearTimeout(timerId);
         setSecondtKey(event.key);
-        const selectedActivity =
-          tableActivities[Number(firstKey + event.key) - 1];
+        const selectedActivity = tableActivities[Number(firstKey + event.key) - 1];
 
         if (selectedActivity) {
           if (selectedActivity.calendarId) {
@@ -179,29 +158,18 @@ export default function ActivitiesTable({
   };
 
   const editActivityHandler = (activity) => {
-    global.ipcRenderer.send(
-      IPC_MAIN_CHANNELS.ANALYTICS_DATA,
-      "edit_registration"
-    );
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "edit_registration");
     if (activity.calendarId) {
       onEditActivity({
         ...activity,
         id: null,
       });
-      global.ipcRenderer.send(
-        IPC_MAIN_CHANNELS.ANALYTICS_DATA,
-        "registrations",
-        {
-          registration: "google-calendar-event_registration",
-        }
-      );
-      global.ipcRenderer.send(
-        IPC_MAIN_CHANNELS.ANALYTICS_DATA,
-        "registrations",
-        {
-          registration: `all_calendar-events_registration`,
-        }
-      );
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "registrations", {
+        registration: "google-calendar-event_registration",
+      });
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "registrations", {
+        registration: `all_calendar-events_registration`,
+      });
     } else {
       onEditActivity(activity);
     }
@@ -245,7 +213,7 @@ export default function ActivitiesTable({
       secondKey,
       editActivityHandler,
       copyActivityHandler,
-    ]
+    ],
   );
 
   return (

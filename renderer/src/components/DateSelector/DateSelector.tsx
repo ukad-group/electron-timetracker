@@ -17,10 +17,7 @@ export default function DateSelector({
 }: DateSelectorProps) {
   const today = new Date();
   const [showModal, setShowModal] = useState(false);
-  const [reportsFolder] = useMainStore(
-    (state) => [state.reportsFolder, state.setReportsFolder],
-    shallow
-  );
+  const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
 
   const increaseDate = () => {
     setSelectedDate((date) => new Date(date.getTime() + day));
@@ -45,20 +42,11 @@ export default function DateSelector({
   };
 
   const writeTodayReport = () => {
-    global.ipcRenderer.invoke(
-      "app:write-day-report",
-      reportsFolder,
-      today,
-      selectedDateReport
-    );
+    global.ipcRenderer.invoke("app:write-day-report", reportsFolder, today, selectedDateReport);
   };
 
   const copyCurrentReport = async () => {
-    const todayReportExist = await global.ipcRenderer.invoke(
-      "app:check-exist-report",
-      reportsFolder,
-      today
-    );
+    const todayReportExist = await global.ipcRenderer.invoke("app:check-exist-report", reportsFolder, today);
 
     if (todayReportExist) {
       setShowModal(true);
@@ -117,19 +105,14 @@ export default function DateSelector({
         </p>
       </div>
       <div className="flex gap-4">
-        {selectedDate.toDateString() !== new Date().toDateString() &&
-          selectedDateReport && (
-            <ButtonTransparent callback={copyCurrentReport}>
-              <Square2StackIcon className="w-5 h-5" />
-              Copy as today
-            </ButtonTransparent>
-          )}
+        {selectedDate.toDateString() !== new Date().toDateString() && selectedDateReport && (
+          <ButtonTransparent callback={copyCurrentReport}>
+            <Square2StackIcon className="w-5 h-5" />
+            Copy as today
+          </ButtonTransparent>
+        )}
         {selectedDate.toDateString() !== new Date().toDateString() && (
-          <Button
-            text="Go to current day"
-            callback={todayButtonHandle}
-            type={"button"}
-          />
+          <Button text="Go to current day" callback={todayButtonHandle} type={"button"} />
         )}
         <NavButtons prevCallback={descreaseDate} nextCallback={increaseDate} />
       </div>

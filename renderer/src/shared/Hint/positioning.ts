@@ -1,12 +1,7 @@
 import { computePosition } from "@floating-ui/dom";
 import { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { Position } from "./types";
-import {
-  positioningTop,
-  positioningRight,
-  positioningBottom,
-  positioningLeft,
-} from "./utils";
+import { positioningTop, positioningRight, positioningBottom, positioningLeft } from "./utils";
 import { PLACEMENTS } from "./constants";
 import { KEY_CODES } from "@/helpers/contstants";
 
@@ -23,14 +18,13 @@ export const positioning = (
   HorizontalLineRef: MutableRefObject<any>,
   VerticalLineRef: MutableRefObject<any>,
   TriangleRef: MutableRefObject<any>,
-  setShowHint: Dispatch<SetStateAction<boolean>>
+  setShowHint: Dispatch<SetStateAction<boolean>>,
 ): void => {
   const handleKeyDown = (e) => {
     if (
       (e.ctrlKey && e.key === KEY_CODES.ARROW_UP) ||
       (e.key === KEY_CODES.META && e.key === KEY_CODES.ARROW_UP) ||
-      ((e.ctrlKey || e.key === KEY_CODES.CONTROL || e.key === KEY_CODES.META) &&
-        /^[0-9]$/.test(e.key))
+      ((e.ctrlKey || e.key === KEY_CODES.CONTROL || e.key === KEY_CODES.META) && /^[0-9]$/.test(e.key))
     ) {
       learnHint();
     }
@@ -82,7 +76,7 @@ export const positioning = (
               hintWidth,
               hintHeight,
               HorizontalLine,
-              VerticalLine
+              VerticalLine,
             );
             break;
 
@@ -99,7 +93,7 @@ export const positioning = (
               hintWidth,
               hintHeight,
               HorizontalLine,
-              VerticalLine
+              VerticalLine,
             );
             break;
 
@@ -116,7 +110,7 @@ export const positioning = (
               hintWidth,
               hintHeight,
               HorizontalLine,
-              VerticalLine
+              VerticalLine,
             );
             break;
 
@@ -133,7 +127,7 @@ export const positioning = (
               hintWidth,
               hintHeight,
               HorizontalLine,
-              VerticalLine
+              VerticalLine,
             );
             break;
 

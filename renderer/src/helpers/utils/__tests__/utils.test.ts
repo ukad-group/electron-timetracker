@@ -268,16 +268,10 @@ describe("trackConnections", () => {
 
     trackConnections(mockConnectedName);
 
-    expect(global.ipcRenderer.send).toHaveBeenCalledWith(
-      IPC_MAIN_CHANNELS.ANALYTICS_DATA,
-      "connections",
-      {
-        connected: mockConnectedName,
-      }
-    );
-    expect(localStorage.getItem(`${mockConnectedName}Connection`)).toBe(
-      "2024-02-05"
-    );
+    expect(global.ipcRenderer.send).toHaveBeenCalledWith(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "connections", {
+      connected: mockConnectedName,
+    });
+    expect(localStorage.getItem(`${mockConnectedName}Connection`)).toBe("2024-02-05");
   });
 
   it("it does not send analytics data if connection already tracked today", () => {
@@ -290,9 +284,7 @@ describe("trackConnections", () => {
     trackConnections(mockConnectedName);
 
     expect(global.ipcRenderer.send).not.toHaveBeenCalled();
-    expect(localStorage.getItem(`${mockConnectedName}Connection`)).toBe(
-      "2024-02-05"
-    );
+    expect(localStorage.getItem(`${mockConnectedName}Connection`)).toBe("2024-02-05");
   });
 
   it("it sends analytics data and updates localStorage if connection tracked with non-today date", () => {
@@ -305,15 +297,9 @@ describe("trackConnections", () => {
 
     trackConnections(mockConnectedName);
 
-    expect(global.ipcRenderer.send).toHaveBeenCalledWith(
-      IPC_MAIN_CHANNELS.ANALYTICS_DATA,
-      "connections",
-      {
-        connected: mockConnectedName,
-      }
-    );
-    expect(localStorage.getItem(`${mockConnectedName}Connection`)).toBe(
-      "2024-02-05"
-    );
+    expect(global.ipcRenderer.send).toHaveBeenCalledWith(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "connections", {
+      connected: mockConnectedName,
+    });
+    expect(localStorage.getItem(`${mockConnectedName}Connection`)).toBe("2024-02-05");
   });
 });
