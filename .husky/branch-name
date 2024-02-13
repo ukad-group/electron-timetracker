@@ -1,0 +1,11 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+LOCAL_BRANCH_NAME="$(git rev-parse --abbrev-ref HEAD)"
+VALID_BRANCH_REGEX='^((fix|feature)\/[a-zA-Z0-9\-]+)$'
+MESSAGE="There is something wrong with your branch name. Branch names in this project must adhere to this contract: $VALID_BRANCH_REGEX. Your commit will be rejected. You should rename your branch to a valid name and try again."
+
+if [[ ! $local_branch_name =~ VALID_BRANCH_REGEX ]]; then
+    echo "$MESSAGE"
+    exit 1
+fi
