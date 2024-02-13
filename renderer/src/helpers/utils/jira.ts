@@ -15,36 +15,22 @@ interface JiraResourceData {
 }
 
 export const updateJiraAccessToken = async (refreshToken: string) => {
-  return await global.ipcRenderer.invoke(
-    "jira:refresh-access-token",
-    refreshToken
-  );
+  return await global.ipcRenderer.invoke("jira:refresh-access-token", refreshToken);
 };
 
 export const removeJiraStoredUser = (userId: string) => {
-  const storedUsers =
-    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || [];
-  const filteredUsers = storedUsers.filter(
-    (user: JiraUser) => user.userId !== userId
-  );
+  const storedUsers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || [];
+  const filteredUsers = storedUsers.filter((user: JiraUser) => user.userId !== userId);
 
   if (filteredUsers.length > 0) {
-    localStorage.setItem(
-      LOCAL_STORAGE_VARIABLES.JIRA_USERS,
-      JSON.stringify(filteredUsers)
-    );
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(filteredUsers));
   } else {
     localStorage.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS);
   }
 };
 
-export const updateJiraStoredUser = (
-  userId: string,
-  newAccessToken: string,
-  newRefreshToken: string
-) => {
-  const storedUsers =
-    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || [];
+export const updateJiraStoredUser = (userId: string, newAccessToken: string, newRefreshToken: string) => {
+  const storedUsers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || [];
   const updatedUsers = storedUsers.map((user: JiraUser) => {
     if (user.userId === userId) {
       return {
@@ -57,10 +43,7 @@ export const updateJiraStoredUser = (
     }
   });
 
-  localStorage.setItem(
-    LOCAL_STORAGE_VARIABLES.JIRA_USERS,
-    JSON.stringify(updatedUsers)
-  );
+  localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(updatedUsers));
 };
 
 export const getJiraCardsFromAPI = async () => {
@@ -71,9 +54,7 @@ export const getJiraCardsFromAPI = async () => {
 
 export const getJiraResources = async () => {
   try {
-    const storedUsers =
-      JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) ||
-      [];
+    const storedUsers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || [];
 
     if (!storedUsers.length) return [];
 
@@ -95,15 +76,8 @@ export const getJiraResources = async () => {
   }
 };
 
-export const getJiraResourcesByUser = async (
-  accessToken: string,
-  refreshToken: string,
-  userId: string
-) => {
-  const resources = await global.ipcRenderer.invoke(
-    "jira:get-resources",
-    accessToken
-  );
+export const getJiraResourcesByUser = async (accessToken: string, refreshToken: string, userId: string) => {
+  const resources = await global.ipcRenderer.invoke("jira:get-resources", accessToken);
 
   if (resources?.code === 401) {
     const data = await updateJiraAccessToken(refreshToken);
@@ -114,11 +88,7 @@ export const getJiraResourcesByUser = async (
     } else {
       updateJiraStoredUser(userId, data.access_token, data.refresh_token);
 
-      return await getJiraResourcesByUser(
-        data.access_token,
-        data.refresh_token,
-        userId
-      );
+      return await getJiraResourcesByUser(data.access_token, data.refresh_token, userId);
     }
   }
 
@@ -140,11 +110,7 @@ export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
 
       if (accessToken && assignee && resources.length > 0) {
         cardsPromises = resources.map(async (resource) => {
-          return await getJiraCardsByResourceId(
-            resource.id,
-            accessToken,
-            assignee
-          );
+          return await getJiraCardsByResourceId(resource.id, accessToken, assignee);
         });
       }
     });
@@ -159,11 +125,9 @@ export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
 
           return acc;
         },
-        [[], []]
+        [[], []],
       )
-      .map((list: string[]) =>
-        list.sort((a: string, b: string) => a.localeCompare(b))
-      );
+      .map((list: string[]) => list.sort((a: string, b: string) => a.localeCompare(b)));
 
     return cards || [[], []];
   } catch (error) {
@@ -173,17 +137,8 @@ export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
   }
 };
 
-export const getJiraCardsByResourceId = async (
-  resourceId: string,
-  accessToken: string,
-  assignee: string
-) => {
-  const cards = await global.ipcRenderer.invoke(
-    "jira:get-issues",
-    accessToken,
-    resourceId,
-    assignee
-  );
+export const getJiraCardsByResourceId = async (resourceId: string, accessToken: string, assignee: string) => {
+  const cards = await global.ipcRenderer.invoke("jira:get-issues", accessToken, resourceId, assignee);
 
   if (cards) return cards;
 

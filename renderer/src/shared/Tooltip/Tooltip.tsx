@@ -8,12 +8,7 @@ interface Props {
   disabled?: boolean;
 }
 
-export default function Tooltip({
-  children,
-  tooltipText = "Copied",
-  isClickable = false,
-  disabled = false
-}: Props) {
+export default function Tooltip({ children, tooltipText = "Copied", isClickable = false, disabled = false }: Props) {
   const [isTransparent, setIsTransparent] = useState(true);
   const [isRemoved, setIsRemoved] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -59,11 +54,7 @@ export default function Tooltip({
       data-testid="hover-tooltip-test-id"
     >
       {children}
-      {showTooltip && !disabled && (
-        <p className="tooltip visible opacity-90">
-          {tooltipText}
-        </p>
-      )}
+      {showTooltip && !disabled && <p className="tooltip visible opacity-90">{tooltipText}</p>}
     </div>
   );
 

@@ -1,7 +1,7 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import GoogleConnection from '../GoogleConnection';
+import React from "react";
+import { render } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import GoogleConnection from "../GoogleConnection";
 import { globalIpcRendererMock } from "@/tests/mocks/electron";
 
 jest.mock("electron", () => ({
@@ -17,27 +17,27 @@ global.ipcRenderer = {
   on: jest.fn(),
   removeAllListeners: jest.fn(),
   send: jest.fn(),
-  ...globalIpcRendererMock
+  ...globalIpcRendererMock,
 };
 
-jest.mock('@/API/googleCalendarAPI', () => ({
+jest.mock("@/API/googleCalendarAPI", () => ({
   getGoogleCredentials: jest.fn(),
   getGoogleUserInfo: jest.fn(),
 }));
 
-describe('GoogleConnection', () => {
+describe("GoogleConnection", () => {
   afterAll(() => {
     jest.restoreAllMocks();
 
     global.ipcRenderer = globalIpcRendererMock;
   });
 
-  it('renders correctly with no logged users', () => {
+  it("renders correctly with no logged users", () => {
     const { getByText, getByRole } = render(<GoogleConnection />);
 
-    expect(getByText('Google')).toBeInTheDocument();
-    expect(getByRole('button')).toHaveTextContent('Add account');
-    expect(getByText('No one user authorized')).toBeInTheDocument();
+    expect(getByText("Google")).toBeInTheDocument();
+    expect(getByRole("button")).toHaveTextContent("Add account");
+    expect(getByText("No one user authorized")).toBeInTheDocument();
   });
 
   it("displays a message when no user is authorized", () => {

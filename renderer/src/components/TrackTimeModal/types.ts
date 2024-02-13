@@ -7,8 +7,6 @@ export type TrackTimeModalProps = {
   latestProjAndAct: Record<string, [string]>;
   latestProjAndDesc: Record<string, [string]>;
   close: () => void;
-  submitActivity: (
-    activity: Omit<ReportActivity, "id"> & Pick<ReportActivity, "id">
-  ) => void;
+  submitActivity: (activity: Omit<ReportActivity, "id"> & Pick<ReportActivity, "id">) => void;
   selectedDate: Date;
 };

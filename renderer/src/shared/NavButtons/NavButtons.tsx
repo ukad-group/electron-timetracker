@@ -1,10 +1,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { NavButtonsProps } from './types';
+import { NavButtonsProps } from "./types";
 
-export default function NavButtons({
-  prevCallback,
-  nextCallback,
-}: NavButtonsProps) {
+export default function NavButtons({ prevCallback, nextCallback }: NavButtonsProps) {
   return (
     <div className="flex items-center rounded-md shadow-sm">
       <button
@@ -13,10 +10,7 @@ export default function NavButtons({
         onClick={prevCallback}
       >
         <span className="sr-only">Previous day</span>
-        <ChevronLeftIcon
-          className="w-5 h-5 dark:text-gray-200"
-          aria-hidden="true"
-        />
+        <ChevronLeftIcon className="w-5 h-5 dark:text-gray-200" aria-hidden="true" />
       </button>
       <span className="relative w-px h-5 -mx-px bg-gray-300 dark:bg-gray-800" />
       <button
@@ -25,10 +19,7 @@ export default function NavButtons({
         onClick={nextCallback}
       >
         <span className="sr-only">Next day</span>
-        <ChevronRightIcon
-          className="w-5 h-5 dark:text-gray-200"
-          aria-hidden="true"
-        />
+        <ChevronRightIcon className="w-5 h-5 dark:text-gray-200" aria-hidden="true" />
       </button>
     </div>
   );

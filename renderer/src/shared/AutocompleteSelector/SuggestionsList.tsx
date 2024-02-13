@@ -10,19 +10,13 @@ const SuggestionsList = ({ list }) =>
       className={({ active }) =>
         clsx(
           "relative cursor-default select-none py-2 pl-3 pr-9",
-          active
-            ? "bg-blue-600 text-white dark:bg-indigo-800"
-            : "text-gray-900 dark:text-dark-main",
+          active ? "bg-blue-600 text-white dark:bg-indigo-800" : "text-gray-900 dark:text-dark-main",
         )
       }
     >
       {({ active, selected }) => (
         <>
-            <span
-              className={clsx("block truncate", selected && "font-semibold")}
-            >
-              {item}
-            </span>
+          <span className={clsx("block truncate", selected && "font-semibold")}>{item}</span>
 
           {selected && (
             <span
@@ -31,8 +25,8 @@ const SuggestionsList = ({ list }) =>
                 active ? "text-white" : "text-blue-600",
               )}
             >
-                <CheckIcon className="w-5 h-5" aria-hidden="true" />
-              </span>
+              <CheckIcon className="w-5 h-5" aria-hidden="true" />
+            </span>
           )}
         </>
       )}

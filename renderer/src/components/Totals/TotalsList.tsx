@@ -1,24 +1,12 @@
 import React from "react";
 import clsx from "clsx";
-import {
-  ChevronRightIcon,
-  DocumentIcon,
-  DocumentPlusIcon,
-} from "@heroicons/react/24/outline";
+import { ChevronRightIcon, DocumentIcon, DocumentPlusIcon } from "@heroicons/react/24/outline";
 import { formatDurationAsDecimals } from "@/helpers/utils/reports";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 
-const TotalsList = ({
-  totals,
-  toggleActivitiesList,
-  isShowedActivitiesList,
-  period,
-  onCopyDescriptions,
-}) =>
+const TotalsList = ({ totals, toggleActivitiesList, isShowedActivitiesList, period, onCopyDescriptions }) =>
   totals.map(({ id, name, duration, activities, descriptions }) => {
-    const showActivity =
-      activities.length > 1 ||
-      (activities.length === 1 && activities[0].name.length > 0);
+    const showActivity = activities.length > 1 || (activities.length === 1 && activities[0].name.length > 0);
 
     return (
       <div key={id} className="flex flex-col gap-1">
@@ -31,9 +19,8 @@ const TotalsList = ({
                   !showActivity,
               },
               {
-                "hover:text-gray-400 dark:hover:text-white ml-0 cursor-pointer":
-                  showActivity,
-              }
+                "hover:text-gray-400 dark:hover:text-white ml-0 cursor-pointer": showActivity,
+              },
             )}
             onClick={() => {
               toggleActivitiesList(name);

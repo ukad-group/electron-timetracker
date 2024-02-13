@@ -1,9 +1,5 @@
 import { createWithEqualityFn } from "zustand/traditional";
-import {
-  createJSONStorage,
-  devtools,
-  persist,
-} from "zustand/middleware";
+import { createJSONStorage, devtools, persist } from "zustand/middleware";
 import { getStorage } from "./utils";
 import { MainStore } from "./types";
 
@@ -17,8 +13,8 @@ export const useMainStore = createWithEqualityFn<MainStore>()(
       {
         name: "main-storage",
         storage: createJSONStorage(() => getStorage()),
-      }
-    )
+      },
+    ),
   ),
-  Object.is
+  Object.is,
 );

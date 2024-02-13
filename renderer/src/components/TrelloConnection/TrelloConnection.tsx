@@ -6,10 +6,7 @@ import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import isOnline from "is-online";
 
 const TrelloConnection = () => {
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER)) ||
-      null
-  );
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER)) || null);
 
   const handleSignInButton = async () => {
     const online = isOnline();
@@ -27,17 +24,12 @@ const TrelloConnection = () => {
   };
 
   const addUser = async () => {
-    const token = localStorage.getItem(
-      LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN
-    );
+    const token = localStorage.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN);
     localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN);
 
     if (!token) return;
 
-    const { id, username, fullName } = await global.ipcRenderer.invoke(
-      "trello:get-profile-info",
-      token
-    );
+    const { id, username, fullName } = await global.ipcRenderer.invoke("trello:get-profile-info", token);
 
     const newUser = {
       userId: id,
@@ -45,10 +37,7 @@ const TrelloConnection = () => {
       username: username || fullName || "",
     };
 
-    localStorage.setItem(
-      LOCAL_STORAGE_VARIABLES.TRELLO_USER,
-      JSON.stringify(newUser)
-    );
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER, JSON.stringify(newUser));
     setUser(newUser);
   };
 
@@ -57,15 +46,10 @@ const TrelloConnection = () => {
   };
 
   useEffect(() => {
-    global.ipcRenderer.on(
-      IPC_MAIN_CHANNELS.TRELLO_SHOULD_RERENDER,
-      rerenderListener
-    );
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.TRELLO_SHOULD_RERENDER, rerenderListener);
 
     return () => {
-      global.ipcRenderer.removeAllListeners(
-        IPC_MAIN_CHANNELS.TRELLO_SHOULD_RERENDER
-      );
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.TRELLO_SHOULD_RERENDER);
     };
   }, [user]);
 
@@ -73,13 +57,7 @@ const TrelloConnection = () => {
     <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">
       <div className="flex justify-between items-center w-full">
         <span className="font-medium dark:text-dark-heading">Trello</span>
-        {!user && (
-          <Button
-            text="Add account"
-            callback={handleSignInButton}
-            type="button"
-          />
-        )}
+        {!user && <Button text="Add account" callback={handleSignInButton} type="button" />}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">
         {!user && (
@@ -106,10 +84,9 @@ const TrelloConnection = () => {
         )}
       </div>
       <p className="text-sm text-gray-500 dark:text-dark-main">
-        After connection, you will be able to fill in the Description field with
-        tasks from the drop-down list. Just begin typing and in the drop-down
-        list you will see Trello tasks that starting with "TT::". You can see
-        only those tasks you joined in Trello
+        After connection, you will be able to fill in the Description field with tasks from the drop-down list. Just
+        begin typing and in the drop-down list you will see Trello tasks that starting with "TT::". You can see only
+        those tasks you joined in Trello
       </p>
     </div>
   );

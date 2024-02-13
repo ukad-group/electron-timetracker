@@ -9,8 +9,7 @@ import {
 } from "../reports";
 
 const parsedReport = (activity) => parseReport(activity)[0];
-const useFakeTime = () =>
-  jest.useFakeTimers().setSystemTime(new Date("2013-05-05"));
+const useFakeTime = () => jest.useFakeTimers().setSystemTime(new Date("2013-05-05"));
 
 describe("parseReport function", () => {
   test("should return empty collection when null or empty string is passed", () => {
@@ -24,9 +23,7 @@ describe("parseReport function", () => {
   });
 
   test("should extract [project name], [activity name] and [description] from registration", () => {
-    const dayReport = parsedReport(
-      "18:00 2013-05-05 - project - activity - description\n19:00 2013-05-05"
-    );
+    const dayReport = parsedReport("18:00 2013-05-05 - project - activity - description\n19:00 2013-05-05");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
@@ -36,9 +33,7 @@ describe("parseReport function", () => {
   });
 
   test("should support spaces in [project name], [activity name] and [description]", () => {
-    const dayReport = parsedReport(
-      "18:00 2013-05-05 - pro ject - act ivity - des cription\n19:00 2013-05-05"
-    );
+    const dayReport = parsedReport("18:00 2013-05-05 - pro ject - act ivity - des cription\n19:00 2013-05-05");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
@@ -48,9 +43,7 @@ describe("parseReport function", () => {
   });
 
   test("should extract [project name] when [activity] and [description] are not set", () => {
-    const dayReport = parsedReport(
-      "18:00 2013-05-05 - project\n19:00 2013-05-05"
-    );
+    const dayReport = parsedReport("18:00 2013-05-05 - project\n19:00 2013-05-05");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
@@ -58,9 +51,7 @@ describe("parseReport function", () => {
   });
 
   test("should extract [project name] and [description] when [activity] is not set", () => {
-    const dayReport = parsedReport(
-      "18:00 2013-05-05 - project - description\n19:00 2013-05-05"
-    );
+    const dayReport = parsedReport("18:00 2013-05-05 - project - description\n19:00 2013-05-05");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
@@ -69,9 +60,7 @@ describe("parseReport function", () => {
   });
 
   test("should lowercase project name", () => {
-    const dayReport = parsedReport(
-      "18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05"
-    );
+    const dayReport = parsedReport("18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
@@ -79,9 +68,7 @@ describe("parseReport function", () => {
   });
 
   test("should keep activity name case sensitive after 26 Aug 2016", () => {
-    const dayReport = parsedReport(
-      "18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05"
-    );
+    const dayReport = parsedReport("18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
@@ -89,9 +76,7 @@ describe("parseReport function", () => {
   });
 
   test("should keep description case sensitive", () => {
-    const dayReport = parsedReport(
-      "18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05"
-    );
+    const dayReport = parsedReport("18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
@@ -99,9 +84,7 @@ describe("parseReport function", () => {
   });
 
   test('should parse the line when backslash "/" or slash "\\" are used in description', () => {
-    const dayReport = parsedReport(
-      "18:00 2013-05-05 - project - activity - de \\ scription /\n19:00 2013-05-05"
-    );
+    const dayReport = parsedReport("18:00 2013-05-05 - project - activity - de \\ scription /\n19:00 2013-05-05");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
@@ -118,9 +101,7 @@ describe("parseReport function", () => {
   });
 
   test("should parse time", () => {
-    const dayReport = parsedReport(
-      "18:00 2013-05-05 - project - activity - description\n19:00 2013-05-05"
-    );
+    const dayReport = parsedReport("18:00 2013-05-05 - project - activity - description\n19:00 2013-05-05");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
@@ -131,9 +112,7 @@ describe("parseReport function", () => {
   // 'should calcualate time spent on task in minutes' - is it actual?
 
   test("should support . in [project name], [activity name] and [description]", () => {
-    const dayReport = parsedReport(
-      "18:00 2013-05-05 - pro.ject - act.ivity - des.cription\n19:00 2013-05-05"
-    );
+    const dayReport = parsedReport("18:00 2013-05-05 - pro.ject - act.ivity - des.cription\n19:00 2013-05-05");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
@@ -162,11 +141,7 @@ describe("parseReport function", () => {
     ];
 
     for (let description of descriptions) {
-      const dayReport = parsedReport(
-        "18:00 2013-05-05 - pro.ject - act.ivity - " +
-          description +
-          "\n19:00 2013-05-05"
-      );
+      const dayReport = parsedReport("18:00 2013-05-05 - pro.ject - act.ivity - " + description + "\n19:00 2013-05-05");
       const registration = dayReport[0];
 
       expect(dayReport.length).toBeGreaterThan(0);
@@ -175,71 +150,47 @@ describe("parseReport function", () => {
   });
 
   test("it should undefined symbols in description not show in description", () => {
-    const dayReport = parsedReport(
-      "18:00 - project - activity - description � description\n19:00 - \n20:00"
-    );
+    const dayReport = parsedReport("18:00 - project - activity - description � description\n19:00 - \n20:00");
     const registration = dayReport[0];
 
-    expect(registration).toHaveProperty(
-      "description",
-      "description - description"
-    );
+    expect(registration).toHaveProperty("description", "description - description");
   });
 
   test("it should undefined symbols in activity and project name skip in description", () => {
-    const dayReport = parsedReport(
-      "18:00 - project - acti�vity - description � description\n19:00 - \n20:00"
-    );
+    const dayReport = parsedReport("18:00 - project - acti�vity - description � description\n19:00 - \n20:00");
     const registration = dayReport[0];
 
     expect(registration).toHaveProperty("activity", "acti�vity");
   });
 
   test("parser should recognize 3rd dash surrounded by spaces as separator after 23 Aug 2016", () => {
-    const dayReport = parsedReport(
-      "18:00 - project - description with some -dash- delimited-text\n19:00 - \n20:00"
-    );
+    const dayReport = parsedReport("18:00 - project - description with some -dash- delimited-text\n19:00 - \n20:00");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
     expect(registration).toHaveProperty("activity", "");
-    expect(registration).toHaveProperty(
-      "description",
-      "description with some -dash- delimited-text"
-    );
+    expect(registration).toHaveProperty("description", "description with some -dash- delimited-text");
   });
 
   test("parser should not delete [project name] from start [description]", () => {
-    const dayReport = parsedReport(
-      "18:00 - projectName - projectName description with some delimited-text\n19:00 -"
-    );
+    const dayReport = parsedReport("18:00 - projectName - projectName description with some delimited-text\n19:00 -");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
-    expect(registration).toHaveProperty(
-      "description",
-      "projectName description with some delimited-text"
-    );
+    expect(registration).toHaveProperty("description", "projectName description with some delimited-text");
   });
 
   test("parser should not delete [project name] from middle [description]", () => {
-    const dayReport = parsedReport(
-      "18:00 - projectName - description with projectName some delimited-text\n19:00 -"
-    );
+    const dayReport = parsedReport("18:00 - projectName - description with projectName some delimited-text\n19:00 -");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
-    expect(registration).toHaveProperty(
-      "description",
-      "description with projectName some delimited-text"
-    );
+    expect(registration).toHaveProperty("description", "description with projectName some delimited-text");
   });
 
   test("parser should recognize 3rd dash as separator before 23 Aug 2016", () => {
     useFakeTime();
-    const dayReport = parsedReport(
-      "18:00 - project - description with some -dash- delimited-text\n19:00 - \n20:00"
-    );
+    const dayReport = parsedReport("18:00 - project - description with some -dash- delimited-text\n19:00 - \n20:00");
     const registration = dayReport[0];
 
     expect(registration).toHaveProperty("activity", "description with some");
@@ -248,9 +199,7 @@ describe("parseReport function", () => {
 
   test("should lowercase activity name before 26 Aug 2016", () => {
     useFakeTime();
-    const dayReport = parsedReport(
-      "18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05"
-    );
+    const dayReport = parsedReport("18:00 2013-05-05 - prOjEct - ActIvItY - dEscrIptIOn\n19:00 2013-05-05");
     const registration = dayReport[0];
 
     expect(dayReport.length).toBeGreaterThan(0);
@@ -272,8 +221,7 @@ describe("serializeReport function", () => {
       },
     ];
 
-    const report: string =
-      "11:30 - timetracker - meeting - calendar discussion\n12:00 - \n";
+    const report: string = "11:30 - timetracker - meeting - calendar discussion\n12:00 - \n";
     expect(serializeReport(activities)).toBe(report);
   });
 
@@ -290,8 +238,7 @@ describe("serializeReport function", () => {
       },
     ];
 
-    const report: string =
-      "11:30 - timetracker - meeting - calendar discussion\n";
+    const report: string = "11:30 - timetracker - meeting - calendar discussion\n";
     expect(serializeReport(activities)).toBe(report);
   });
 
@@ -308,8 +255,7 @@ describe("serializeReport function", () => {
       },
     ];
 
-    const report: string =
-      "11:30 - timetracker - meeting - calendar discussion\n12:30 - \n";
+    const report: string = "11:30 - timetracker - meeting - calendar discussion\n12:30 - \n";
     expect(serializeReport(activities)).toBe(report);
   });
   test("should return same as report", () => {

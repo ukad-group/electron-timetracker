@@ -15,7 +15,7 @@ jest.mock("@electron/helpers/constants", () => ({
 
 global.ipcRenderer = {
   invoke: jest.fn(),
-  ...globalIpcRendererMock
+  ...globalIpcRendererMock,
 };
 
 describe("GIVEN FolderSelector", () => {
@@ -27,12 +27,7 @@ describe("GIVEN FolderSelector", () => {
     const folderLocation = "/path/to/folder";
     const setFolderLocation = jest.fn();
 
-    render(
-      <FolderSelector
-        folderLocation={folderLocation}
-        setFolderLocation={setFolderLocation}
-      />
-    );
+    render(<FolderSelector folderLocation={folderLocation} setFolderLocation={setFolderLocation} />);
 
     expect(screen.getByTitle(folderLocation)).toBeDefined();
     expect(screen.getByTestId("pencil-icon")).toBeDefined();
@@ -42,14 +37,9 @@ describe("GIVEN FolderSelector", () => {
     const folderLocation = "/path/to/folder";
     const setFolderLocation = jest.fn();
 
-    render(
-      <FolderSelector
-        folderLocation={folderLocation}
-        setFolderLocation={setFolderLocation}
-      />
-    );
+    render(<FolderSelector folderLocation={folderLocation} setFolderLocation={setFolderLocation} />);
 
-   (global.ipcRenderer.invoke as jest.Mock).mockResolvedValueOnce("/selected/folder");
+    (global.ipcRenderer.invoke as jest.Mock).mockResolvedValueOnce("/selected/folder");
 
     await act(async () => {
       fireEvent.click(screen.getByTitle(folderLocation));

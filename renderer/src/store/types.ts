@@ -33,10 +33,7 @@ export type BetaStore = {
   setIsBeta: (isDownload: boolean) => void;
 };
 
-export type ScheduledEvents = Record<
-  string,
-  { project?: string; activity?: string }
->;
+export type ScheduledEvents = Record<string, { project?: string; activity?: string }>;
 
 export type ScheduledEventsStore = {
   event: ScheduledEvents;

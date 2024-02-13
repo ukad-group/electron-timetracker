@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/shared/Button";
-import {
-  getGoogleCredentials,
-  getGoogleUserInfo,
-} from "@/API/googleCalendarAPI";
+import { getGoogleCredentials, getGoogleUserInfo } from "@/API/googleCalendarAPI";
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { GoogleCredentails, GoogleUser } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
@@ -25,22 +22,15 @@ const GoogleConnection = () => {
   };
 
   const signOutHandler = (id: string) => {
-    const loggedUsersFromLs = JSON.parse(
-      localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS)
-    );
-    const filteredUsers = loggedUsersFromLs.filter(
-      (user: GoogleUser) => user.accountId !== id
-    );
+    const loggedUsersFromLs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
+    const filteredUsers = loggedUsersFromLs.filter((user: GoogleUser) => user.accountId !== id);
 
     if (filteredUsers.length === 0) {
       setShowGoogleEvents(false);
       localStorage.setItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS, "false");
     }
 
-    localStorage.setItem(
-      LOCAL_STORAGE_VARIABLES.GOOGLE_USERS,
-      JSON.stringify(filteredUsers)
-    );
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify(filteredUsers));
     setLoggedUsers(filteredUsers);
   };
 
@@ -50,9 +40,7 @@ const GoogleConnection = () => {
       const googleProfileInfo = await loadGoogleUserInfo(credentials);
       const googleProfileUsername = googleProfileInfo?.names[0]?.displayName;
       const googleProfileId = googleProfileInfo?.resourceName;
-      const googleUsersFromLs = JSON.parse(
-        localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS)
-      );
+      const googleUsersFromLs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
 
       if (
         googleUsersFromLs.some((user) => {
@@ -67,18 +55,11 @@ const GoogleConnection = () => {
           userName: googleProfileUsername,
           accountId: googleProfileId,
         };
-        global.ipcRenderer.send(
-          IPC_MAIN_CHANNELS.ANALYTICS_DATA,
-          "calendars_connections",
-          {
-            calendar: "googleCalendar",
-          }
-        );
+        global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "calendars_connections", {
+          calendar: "googleCalendar",
+        });
         googleUsersFromLs.push(userObject);
-        localStorage.setItem(
-          LOCAL_STORAGE_VARIABLES.GOOGLE_USERS,
-          JSON.stringify(googleUsersFromLs)
-        );
+        localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify(googleUsersFromLs));
         setLoggedUsers(googleUsersFromLs);
       }
     } catch (e) {
@@ -97,26 +78,16 @@ const GoogleConnection = () => {
   const handleCheckboxChange = () => {
     setShowGoogleEvents((prev) => !prev);
     const reversShowGoogleEvents = !showGoogleEvents;
-    localStorage.setItem(
-      LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS,
-      reversShowGoogleEvents.toString()
-    );
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS, reversShowGoogleEvents.toString());
   };
 
   const rerenderListener = () => {
-    const googleUsers = JSON.parse(
-      localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS)
-    );
-    const authorizationCode = localStorage.getItem(
-      LOCAL_STORAGE_VARIABLES.GOOGLE_AUTH_CODE
-    );
+    const googleUsers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
+    const authorizationCode = localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_AUTH_CODE);
     localStorage.removeItem(LOCAL_STORAGE_VARIABLES.GOOGLE_AUTH_CODE);
 
     if (!googleUsers) {
-      localStorage.setItem(
-        LOCAL_STORAGE_VARIABLES.GOOGLE_USERS,
-        JSON.stringify([])
-      );
+      localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify([]));
     }
 
     if (authorizationCode) {
@@ -125,30 +96,20 @@ const GoogleConnection = () => {
   };
 
   useEffect(() => {
-    if (
-      localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS) ===
-      "true"
-    ) {
+    if (localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS) === "true") {
       setShowGoogleEvents(true);
     }
 
-    const loggedUsersFromLs = JSON.parse(
-      localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS)
-    );
+    const loggedUsersFromLs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
 
     if (loggedUsersFromLs) {
       setLoggedUsers(loggedUsersFromLs);
     }
 
-    global.ipcRenderer.on(
-      IPC_MAIN_CHANNELS.GOOGLE_SHOULD_RERENDER,
-      rerenderListener
-    );
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.GOOGLE_SHOULD_RERENDER, rerenderListener);
 
     return () => {
-      global.ipcRenderer.removeAllListeners(
-        IPC_MAIN_CHANNELS.GOOGLE_SHOULD_RERENDER
-      );
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.GOOGLE_SHOULD_RERENDER);
     };
   }, []);
 
@@ -190,14 +151,12 @@ const GoogleConnection = () => {
         )}
       </div>
       <p className="text-sm text-gray-500 dark:text-dark-main">
-        After connection, you will be able to fill in the Report with the
-        information from events of your Google Calendar
+        After connection, you will be able to fill in the Report with the information from events of your Google
+        Calendar
       </p>
       {loggedUsers?.length > 0 && (
         <div className="flex items-start justify-between gap-6 w-full">
-          <p className=" max-w-sm text-sm text-gray-500 dark:text-dark-main">
-            Show google events in activity table
-          </p>
+          <p className=" max-w-sm text-sm text-gray-500 dark:text-dark-main">Show google events in activity table</p>
           <div>
             <input
               onChange={handleCheckboxChange}

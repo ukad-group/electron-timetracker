@@ -1,4 +1,4 @@
-import { buttonColors } from './constants';
+import { buttonColors } from "./constants";
 
 export type PopupButton = {
   text: string;
