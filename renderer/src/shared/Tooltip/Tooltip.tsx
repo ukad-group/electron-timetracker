@@ -13,7 +13,7 @@ export default function Tooltip({ children, tooltipText = "Copied", isClickable 
   const [isRemoved, setIsRemoved] = useState(true);
   const [showTooltip, setShowTooltip] = useState(false);
 
-  const handleClick = () => {
+        const handleClick = () => {
     setIsTransparent(false);
     setIsRemoved(false);
 
@@ -24,7 +24,7 @@ export default function Tooltip({ children, tooltipText = "Copied", isClickable 
     }, 750);
   };
 
-    const handleMouseEnter = () => {
+       const handleMouseEnter = () => {
     setShowTooltip(true);
   };
 
