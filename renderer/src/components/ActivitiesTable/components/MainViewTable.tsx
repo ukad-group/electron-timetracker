@@ -278,7 +278,7 @@ const MainViewTable = () => {
               {activity.mistakes && (
                 <p
                   onClick={copyToClipboardHandle}
-                  className="w-fit old-break-word py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20"
+                  className="w-fit old-break-word py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-gray-400 dark:bg-transparent dark:border-2 dark:border-yellow-400/50"
                 >
                   {activity.mistakes}
                 </p>
