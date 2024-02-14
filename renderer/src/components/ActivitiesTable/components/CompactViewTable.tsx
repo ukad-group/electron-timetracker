@@ -2,7 +2,7 @@ import { Fragment, useState, useContext, useEffect, useRef } from "react";
 import clsx from "clsx";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { checkIsToday, getCeiledTime } from "@/helpers/utils/datetime-ui";
-import { PencilSquareIcon, Square2StackIcon } from "@heroicons/react/24/outline";
+import { PencilSquareIcon, Square2StackIcon, ArchiveBoxXMarkIcon } from "@heroicons/react/24/outline";
 import { formatDuration } from "@/helpers/utils/reports";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { ActivitiesTableContext } from "../context";
@@ -24,6 +24,7 @@ const CompactViewTable = () => {
     firstKey,
     secondKey,
     editActivityHandler,
+    onDeleteActivity,
   } = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
@@ -228,7 +229,19 @@ const CompactViewTable = () => {
                   )}
                 </div>
               </td>
-
+              <td className="relative text-sm font-medium text-right whitespace-nowrap">
+                {!activity.isBreak && (
+                  <button
+                    className="group pt-4 px-1"
+                    title="Delete"
+                    onClick={() => {
+                      onDeleteActivity(activity.id);
+                    }}
+                  >
+                    <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                  </button>
+                )}
+              </td>
               <td className="relative text-sm font-medium text-right whitespace-nowrap">
                 <div className={`${activity.calendarId ? "invisible" : ""}`}>
                   <button
@@ -258,7 +271,7 @@ const CompactViewTable = () => {
               })}
             >
               <td
-                colSpan={2}
+                colSpan={3}
                 className={`relative pb-4 pl-1 pr-1 text-sm sm:pl-6 md:pl-0 ${activity.calendarId ? "opacity-50" : ""}`}
               >
                 <div className="flex flex-nowrap gap-1 items-center">
@@ -289,7 +302,6 @@ const CompactViewTable = () => {
                   </Tooltip>
                 </div>
               </td>
-
               <td className="relative text-sm font-medium text-right whitespace-nowrap">
                 <button
                   className="group pb-4 px-1"

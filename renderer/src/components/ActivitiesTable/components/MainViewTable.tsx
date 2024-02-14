@@ -293,7 +293,7 @@ const MainViewTable = () => {
                     onDeleteActivity(activity.id);
                   }}
                 >
-                  <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900" />
+                  <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
                 </button>
               )}
             </td>
