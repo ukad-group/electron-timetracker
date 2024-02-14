@@ -78,22 +78,22 @@ describe("GIVEN utils/replaceHyphensWithSpaces", () => {
 describe("GIVEN utils/concatSortArrays", () => {
   it('should concatenate and sort arrays based on the "from" property', () => {
     const firstArr: ReportActivity[] = [
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
     ];
 
     const secondArr: ReportActivity[] = [
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
     ];
 
     const result = concatSortArrays(firstArr, secondArr);
 
     const expectedResult: ReportActivity[] = [
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
     ];
 
     expect(result).toEqual(expectedResult);

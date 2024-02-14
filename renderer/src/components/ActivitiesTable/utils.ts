@@ -28,7 +28,7 @@ export const formatEvents = (events, latestProjAndAct) => {
       project: event.project || "",
       activity: event.activity || "",
       description: event.description || "",
-      isValid: true,
+      validation: { isValid: true },
       calendarId: event.id,
     };
   });

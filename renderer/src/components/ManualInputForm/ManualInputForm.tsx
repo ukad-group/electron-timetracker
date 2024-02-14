@@ -64,11 +64,7 @@ export default function ManualInputForm({
   }, [report]);
 
   const readReport = async () => {
-    const dayReport = await global.ipcRenderer.invoke(
-      "app:read-day-report",
-      reportsFolder,
-      selectedDate
-    );
+    const dayReport = await global.ipcRenderer.invoke("app:read-day-report", reportsFolder, selectedDate);
 
     setIsFileExist(dayReport !== null);
     setShowDeleteButton(dayReport === "");
