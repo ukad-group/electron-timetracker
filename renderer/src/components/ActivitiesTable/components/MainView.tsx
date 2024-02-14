@@ -29,6 +29,9 @@ const MainView = () => {
             Description
           </th>
           <th scope="col" className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0">
+            <span className="sr-only">Delete</span>
+          </th>
+          <th scope="col" className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0">
             <span className="sr-only">Copy</span>
           </th>
           <th scope="col" className="relative w-8 pb-6 pl-3 pr-4 sm:pr-6 md:pr-0">

@@ -14,6 +14,7 @@ import { KEY_CODES } from "@/helpers/contstants";
 export default function ActivitiesTable({
   activities,
   onEditActivity,
+  onDeleteActivity,
   selectedDate,
   latestProjAndAct,
   events,
@@ -194,6 +195,7 @@ export default function ActivitiesTable({
       ctrlPressed,
       copyToClipboardHandle,
       onEditActivity,
+      onDeleteActivity,
       activities,
       firstKey,
       secondKey,
@@ -208,6 +210,7 @@ export default function ActivitiesTable({
       ctrlPressed,
       copyToClipboardHandle,
       onEditActivity,
+      onDeleteActivity,
       activities,
       firstKey,
       secondKey,

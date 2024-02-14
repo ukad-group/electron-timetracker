@@ -2,7 +2,7 @@ import { Fragment, useState, useContext, useEffect, useRef } from "react";
 import clsx from "clsx";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { checkIsToday, getCeiledTime } from "@/helpers/utils/datetime-ui";
-import { PencilSquareIcon, Square2StackIcon } from "@heroicons/react/24/outline";
+import { PencilSquareIcon, Square2StackIcon, ArchiveBoxXMarkIcon } from "@heroicons/react/24/outline";
 import { formatDuration } from "@/helpers/utils/reports";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { ActivitiesTableContext } from "../context";
@@ -24,6 +24,7 @@ const CompactViewTable = () => {
     firstKey,
     secondKey,
     editActivityHandler,
+    onDeleteActivity,
   } = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
@@ -206,7 +207,7 @@ const CompactViewTable = () => {
                         new
                       </p>
                     )}
-                    <Tooltip>
+                    <Tooltip isClickable>
                       <p
                         className="text-sm font-medium text-gray-900 dark:text-dark-heading old-break-word"
                         onClick={copyToClipboardHandle}
@@ -217,7 +218,7 @@ const CompactViewTable = () => {
                   </div>
 
                   {activity.activity && (
-                    <Tooltip>
+                    <Tooltip isClickable>
                       <p
                         className="block text-xs font-semibold old-break-word text-gray-500 dark:text-slate-400"
                         onClick={copyToClipboardHandle}
@@ -228,7 +229,19 @@ const CompactViewTable = () => {
                   )}
                 </div>
               </td>
-
+              <td className="relative text-sm font-medium text-right whitespace-nowrap">
+                {!activity.isBreak && (
+                  <button
+                    className="group pt-4 px-1"
+                    title="Delete"
+                    onClick={() => {
+                      onDeleteActivity(activity.id);
+                    }}
+                  >
+                    <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                  </button>
+                )}
+              </td>
               <td className="relative text-sm font-medium text-right whitespace-nowrap">
                 <div className={`${activity.calendarId ? "invisible" : ""}`}>
                   <button
@@ -258,11 +271,11 @@ const CompactViewTable = () => {
               })}
             >
               <td
-                colSpan={2}
+                colSpan={3}
                 className={`relative pb-4 pl-1 pr-1 text-sm sm:pl-6 md:pl-0 ${activity.calendarId ? "opacity-50" : ""}`}
               >
                 <div className="flex flex-nowrap gap-1 items-center">
-                  <Tooltip>
+                  <Tooltip isClickable>
                     <p
                       data-column="duration"
                       onClick={copyToClipboardHandle}
@@ -273,7 +286,7 @@ const CompactViewTable = () => {
                       {`${formatDuration(activity.duration)}`}
                     </p>
                   </Tooltip>
-                  <Tooltip>
+                  <Tooltip isClickable>
                     <p
                       onClick={copyToClipboardHandle}
                       className={clsx("old-break-word", {
@@ -289,7 +302,6 @@ const CompactViewTable = () => {
                   </Tooltip>
                 </div>
               </td>
-
               <td className="relative text-sm font-medium text-right whitespace-nowrap">
                 <button
                   className="group pb-4 px-1"
