@@ -341,7 +341,7 @@ const CompactViewTable = () => {
                           activity.calendarId ? "opacity-50" : ""
                         }`}
                       >
-                        {`${formatDuration(activity.duration)}`}
+                        {formatDuration(activity.duration)}
                       </p>
                     </span>
                   </Tooltip>
