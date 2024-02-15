@@ -6,8 +6,8 @@ import {
   parseReport,
   serializeReport,
   ReportAndNotes,
-  stringToMinutes,
 } from "@/helpers/utils/reports";
+import { addPastTime, editActivity } from "./utils";
 import TrackTimeModal from "@/components/TrackTimeModal/TrackTimeModal";
 import { ManualInputForm } from "@/components/ManualInputForm";
 import { ActivitiesSection } from "@/components/ActivitiesSection";
@@ -200,102 +200,33 @@ export default function Home() {
   const submitActivity = (activity: ReportActivity) => {
     let isEdit = false;
     let isPastTime = false;
-    const activityIndex = selectedDateActivities.findIndex(
-      (act) => act.id === activity.id
-    );
 
     const tempActivities: Array<ReportActivity> = [];
-    const newActFrom = stringToMinutes(activity.from);
-    // const newActTo = stringToMinutes(activity.to);
 
     if (!selectedDateActivities.length) {
       activity.id = 1;
       tempActivities.push(activity);
       setSelectedDateActivities(tempActivities);
-    }
-
-    if (activityIndex >= 0) {
-      setSelectedDateActivities((activities) => {
-        try {
-          const oldActivity = activities[activityIndex];
-
-          if (
-            Object.keys(activity).every((key) => {
-              return oldActivity[key] === activity[key];
-            })
-          ) {
-            return activities;
-          }
-
-          activities[activityIndex] = activity;
-
-          if (
-            activities[activityIndex - 1] &&
-            activities[activityIndex - 1].isBreak
-          ) {
-            activities[activityIndex - 1].to = activity.from;
-            if (activities[activityIndex - 1]?.from === activity.from) {
-              activities.splice(activityIndex - 1, 1);
-            }
-          }
-
-          if (
-            activities[activityIndex + 1] &&
-            activities[activityIndex + 1].isBreak
-          ) {
-            activities[activityIndex + 1].from = activity.to;
-            if (
-              activities[activityIndex + 2] &&
-              activities[activityIndex + 2]?.from === activity.to
-            ) {
-              activities.splice(activityIndex + 1, 1);
-            }
-          }
-
-          return [...activities];
-        } catch (err) {
-          global.ipcRenderer.send(
-            IPC_MAIN_CHANNELS.FRONTEND_ERROR,
-            "Activity editing error",
-            "An error occurred while editing reports. ",
-            err
-          );
-          return [...activities];
-        }
-      });
-
-      isEdit = true;
-    }
-
-    if (isEdit) {
       setShouldAutosave(true);
       return;
     }
 
-    for (let i = 0; i < selectedDateActivities.length; i++) {
-      try {
-        const indexActFrom = stringToMinutes(selectedDateActivities[i].from);
+    isEdit = editActivity(
+      activity,
+      selectedDateActivities,
+      setSelectedDateActivities,
+      setShouldAutosave
+    );
 
-        if (newActFrom < indexActFrom && !isPastTime) {
-          tempActivities.push(activity);
-          isPastTime = true;
-        }
+    if (isEdit) return;
 
-        if (!i && newActFrom < indexActFrom) {
-          tempActivities.push(...selectedDateActivities);
-          break;
-        }
-      } catch (err) {
-        global.ipcRenderer.send(
-          IPC_MAIN_CHANNELS.FRONTEND_ERROR,
-          "Adding activity error",
-          "An error occurred when adding a new activity to the report. ",
-          err
-        );
-        console.log(activity);
-      }
-      tempActivities.push(selectedDateActivities[i]);
-    }
+    isPastTime = addPastTime(
+      activity,
+      tempActivities,
+      selectedDateActivities,
+      setSelectedDateActivities,
+      isPastTime
+    );
 
     tempActivities.forEach(
       (act, i) => (
@@ -303,23 +234,9 @@ export default function Home() {
       )
     );
 
-    try {
-      if (tempActivities.length === selectedDateActivities.length && !isEdit) {
-        !isPastTime && tempActivities.push(activity);
-        setSelectedDateActivities(tempActivities.filter((act) => act.duration));
-      }
-
-      if (isPastTime && !isEdit) {
-        setSelectedDateActivities(tempActivities);
-      }
-    } catch (err) {
-      global.ipcRenderer.send(
-        IPC_MAIN_CHANNELS.FRONTEND_ERROR,
-        "Adding activity error",
-        "An error occurred when adding a new activity to the report. ",
-        err
-      );
-      console.log(activity);
+    if (tempActivities.length === selectedDateActivities.length) {
+      !isPastTime && tempActivities.push(activity);
+      setSelectedDateActivities(tempActivities.filter((act) => act.duration));
     }
 
     setShouldAutosave(true);
