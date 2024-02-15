@@ -1,12 +1,17 @@
 import React from "react";
 import { PlusIcon } from "@heroicons/react/24/solid";
-import { SelectFolderPlaceholderProps } from "./types";
+import { shallow } from "zustand/shallow";
+import { useMainStore } from "@/store/mainStore";
 
-const SelectFolderPlaceholder = ({ setFolder }: SelectFolderPlaceholderProps) => {
+const SelectFolderPlaceholder = () => {
+  const [reportsFolder, setReportsFolder] = useMainStore(
+    (state) => [state.reportsFolder, state.setReportsFolder],
+    shallow,
+  );
   const handleButtonClick = () => {
     global.ipcRenderer.invoke("app:select-folder").then((folder: string | null) => {
       if (folder) {
-        setFolder(folder);
+        setReportsFolder(folder);
       }
     });
   };

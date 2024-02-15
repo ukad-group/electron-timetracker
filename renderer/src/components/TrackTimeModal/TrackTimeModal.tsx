@@ -24,7 +24,7 @@ import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { SCREENS } from "@/constants";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
-export default function TrackTimeModal({
+const TrackTimeModal = ({
   activities,
   isOpen,
   editedActivity,
@@ -33,7 +33,7 @@ export default function TrackTimeModal({
   close,
   submitActivity,
   selectedDate,
-}: TrackTimeModalProps) {
+}: TrackTimeModalProps) => {
   const [from, onFromChange, onFromBlur, setFrom] = useTimeInput();
   const [to, onToChange, onToBlur, setTo] = useTimeInput();
   const [formattedDuration, setFormattedDuration] = useState("");
@@ -440,4 +440,5 @@ export default function TrackTimeModal({
       </div>
     </Modal>
   );
-}
+};
+export default TrackTimeModal;

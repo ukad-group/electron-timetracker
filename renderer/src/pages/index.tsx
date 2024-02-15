@@ -1,60 +1,25 @@
 import { useEffect, useState } from "react";
-import { shallow } from "zustand/shallow";
-import { DateSelector } from "@/components/DateSelector";
-import { ReportActivity, parseReport, serializeReport, ReportAndNotes } from "@/helpers/utils/reports";
-import { addPastTime, editActivity } from "./utils";
-import TrackTimeModal from "@/components/TrackTimeModal/TrackTimeModal";
-import { ManualInputForm } from "@/components/ManualInputForm";
-import { ActivitiesSection } from "@/components/ActivitiesSection";
-import { SelectFolderPlaceholder } from "@/components/SelectFolderPlaceholder";
-import { VersionMessage } from "@/shared/VersionMessage";
-import { UpdateDescription } from "@/components/UpdateDescription";
-import { useMainStore } from "@/store/mainStore";
-import { useBetaStore } from "@/store/betaUpdatesStore";
-import { Calendar } from "@/components/Calendar/Calendar";
 import Link from "next/link";
-import { Cog8ToothIcon } from "@heroicons/react/24/solid";
-import { Totals } from "@/components/Totals";
-import { Bookings } from "@/components/Bookings";
-import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { SCREENS } from "@/constants";
-import useScreenSizes from "@/helpers/hooks/useScreenSizes";
+import { TrackTimeModal } from "@/components/TrackTimeModal";
+import { MainPage } from "@/components/MainPage";
+import { VersionMessage } from "@/shared/VersionMessage";
+import { useMainStore } from "@/store/mainStore";
+import { shallow } from "zustand/shallow";
+import { ReportActivity } from "@/helpers/utils/reports";
+import { addPastTime, editActivity } from "./utils";
 import useColorTheme from "@/helpers/hooks/useTheme";
+import { Cog8ToothIcon } from "@heroicons/react/24/solid";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export default function Home() {
-  const [reportsFolder, setReportsFolder] = useMainStore(
-    (state) => [state.reportsFolder, state.setReportsFolder],
-    shallow,
-  );
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedDateReport, setSelectedDateReport] = useState("");
   const [selectedDateActivities, setSelectedDateActivities] = useState<Array<ReportActivity> | null>([]);
-  const [calendarDate, setCalendarDate] = useState(new Date());
   const [shouldAutosave, setShouldAutosave] = useState(false);
   const [trackTimeModalActivity, setTrackTimeModalActivity] = useState<ReportActivity | "new">(null);
   const [latestProjAndAct, setLatestProjAndAct] = useState<Record<string, [string]>>({});
   const [latestProjAndDesc, setLatestProjAndDesc] = useState<Record<string, [string]>>({});
-  const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>([]);
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
-  const [isDropboxConnected, setIsDropboxConnected] = useState(true);
-  const { screenSizes } = useScreenSizes();
-  const isManualInputMain = localStorage.getItem("is-manual-input-main-section") === "true";
-  const [isBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
-  const showBookings = !!JSON.parse(localStorage.getItem("timetracker-user"));
-
-  useEffect(() => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FOLDER_WATCHER, reportsFolder);
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
-    global.ipcRenderer.on("dropbox-connection", (event, data) => {
-      setIsDropboxConnected(!reportsFolder.includes("Dropbox") || data);
-    });
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
-
-    return () => {
-      global.ipcRenderer.removeAllListeners("dropbox-connection");
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.STOP_PATH_WATCHER, reportsFolder);
-    };
-  }, []);
+  const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
 
   useEffect(() => {
     const checkDayChange = () => {
@@ -73,14 +38,6 @@ export default function Home() {
   useEffect(() => {
     try {
       (async () => {
-        const dayReport = await global.ipcRenderer.invoke(
-          IPC_MAIN_CHANNELS.READ_DAY_REPORT,
-          reportsFolder,
-          selectedDate,
-        );
-
-        setSelectedDateReport(dayReport || "");
-
         const sortedActAndDesc = await global.ipcRenderer.invoke(
           "app:find-latest-projects",
           reportsFolder,
@@ -98,70 +55,9 @@ export default function Home() {
         err,
       );
     }
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FILE_WATCHER, reportsFolder, selectedDate);
-    global.ipcRenderer.on("file-changed", (event, data) => {
-      if (selectedDateReport != data) {
-        setSelectedDateReport(data || "");
-      }
-    });
-    global.ipcRenderer.on("errorMes", (event, data) => {
-      console.log("event ", event);
-      console.log("data ", data);
-    });
-
-    return () => {
-      global.ipcRenderer.removeAllListeners("file-changed");
-      global.ipcRenderer.removeAllListeners("errorMes");
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.STOP_PATH_WATCHER, reportsFolder, selectedDate);
-    };
   }, [selectedDate, reportsFolder, lastRenderedDay]);
 
-  useEffect(() => {
-    if (selectedDateReport?.length > 0) {
-      const parsedReportsAndNotes = parseReport(selectedDateReport);
-      const parsedActivities = parsedReportsAndNotes[0];
-
-      setReportAndNotes(parsedReportsAndNotes);
-      setSelectedDateActivities(parsedActivities);
-      return;
-    }
-
-    setReportAndNotes([]);
-    setSelectedDateActivities([]);
-  }, [selectedDateReport]);
-
-  // Save report on change
-  useEffect(() => {
-    try {
-      if (shouldAutosave) {
-        const serializedReport =
-          serializeReport(selectedDateActivities) +
-          (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined") ? "" : reportAndNotes[1]);
-
-        saveSerializedReport(serializedReport);
-        setShouldAutosave(false);
-      }
-    } catch (err) {
-      global.ipcRenderer.send(
-        IPC_MAIN_CHANNELS.FRONTEND_ERROR,
-        "Reports saving error",
-        "An error occurred while saving reports. ",
-        err,
-      );
-    }
-  }, [selectedDateActivities]);
-
-  const saveSerializedReport = (serializedReport: string) => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
-    global.ipcRenderer.invoke("app:write-day-report", reportsFolder, selectedDate, serializedReport);
-    setSelectedDateReport(serializedReport);
-  };
-
   const submitActivity = (activity: ReportActivity) => {
-    let isEdit = false;
-    let isPastTime = false;
-    const activityIndex = selectedDateActivities.findIndex((act) => act.id === activity.id);
-
     const tempActivities: Array<ReportActivity> = [];
 
     if (!selectedDateActivities.length) {
@@ -172,12 +68,11 @@ export default function Home() {
       return;
     }
 
-    isEdit = editActivity(activity, selectedDateActivities, setSelectedDateActivities, setShouldAutosave);
+    const isEdit = editActivity(activity, selectedDateActivities, setSelectedDateActivities, setShouldAutosave);
 
     if (isEdit) return;
 
-    isPastTime = addPastTime(activity, tempActivities, selectedDateActivities, setSelectedDateActivities, isPastTime);
-
+    const isPastTime = addPastTime(activity, tempActivities, selectedDateActivities, setSelectedDateActivities);
     tempActivities.forEach((act, i) => ((act.id = i), act.isBreak ? (act.to = "") : (act.to = act.to)));
 
     if (tempActivities.length === selectedDateActivities.length) {
@@ -186,27 +81,6 @@ export default function Home() {
     }
 
     setShouldAutosave(true);
-  };
-
-  const onDeleteActivity = (id: number) => {
-    setSelectedDateActivities((activities) => {
-      const newActivities = activities.map((activity) => {
-        if (activity.id === id) {
-          activity.isBreak = true;
-          activity.description = "";
-          activity.activity = "";
-          activity.project = "!removed";
-        }
-        return activity;
-      });
-      return newActivities;
-    });
-    setShouldAutosave(true);
-  };
-
-  const handleSave = (report: string, shouldAutosave: boolean) => {
-    setSelectedDateReport(report);
-    setShouldAutosave(shouldAutosave);
   };
 
   const setFocusOnNewActivityBtn = () => {
@@ -230,107 +104,16 @@ export default function Home() {
     <div className="h-full bg-gray-100 dark:bg-dark-back">
       <VersionMessage />
       <main className="py-10">
-        <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
-          {reportsFolder ? (
-            <>
-              <div className="lg:col-start-1 lg:col-span-2 flex flex-col gap-6">
-                <section className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
-                  <DateSelector
-                    selectedDate={selectedDate}
-                    setSelectedDate={setSelectedDate}
-                    isDropboxConnected={isDropboxConnected}
-                    selectedDateReport={selectedDateReport}
-                  />
-                </section>
-
-                {!isManualInputMain && (
-                  <section className="bg-white shadow sm:rounded-lg h-full dark:bg-dark-container dark:border dark:border-dark-border">
-                    <ActivitiesSection
-                      activities={selectedDateActivities}
-                      onEditActivity={setTrackTimeModalActivity}
-                      onDeleteActivity={onDeleteActivity}
-                      selectedDate={selectedDate}
-                      latestProjAndAct={latestProjAndAct}
-                      setSelectedDateReport={setSelectedDateReport}
-                      showAsMain={!isManualInputMain}
-                    />
-                  </section>
-                )}
-
-                {isManualInputMain && (
-                  <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                    <ManualInputForm
-                      onSave={handleSave}
-                      selectedDateReport={selectedDateReport}
-                      selectedDate={selectedDate}
-                      setSelectedDateReport={setSelectedDateReport}
-                    />
-                  </section>
-                )}
-                {screenSizes.screenWidth >= SCREENS.LG && (
-                  <section className="lg:col-span-2">
-                    <Calendar
-                      reportsFolder={reportsFolder}
-                      selectedDate={selectedDate}
-                      setSelectedDate={setSelectedDate}
-                      calendarDate={calendarDate}
-                      setCalendarDate={setCalendarDate}
-                    />
-                  </section>
-                )}
-              </div>
-
-              <aside className="lg:col-start-3 lg:col-span-1 lg:row-span-2 relative flex flex-col gap-6">
-                {isManualInputMain && (
-                  <section className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
-                    <ActivitiesSection
-                      activities={selectedDateActivities}
-                      onEditActivity={setTrackTimeModalActivity}
-                      onDeleteActivity={onDeleteActivity}
-                      selectedDate={selectedDate}
-                      latestProjAndAct={latestProjAndAct}
-                      setSelectedDateReport={setSelectedDateReport}
-                      showAsMain={!isManualInputMain}
-                    />
-                  </section>
-                )}
-
-                {!isManualInputMain && (
-                  <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                    <ManualInputForm
-                      onSave={handleSave}
-                      selectedDateReport={selectedDateReport}
-                      selectedDate={selectedDate}
-                      setSelectedDateReport={setSelectedDateReport}
-                    />
-                  </section>
-                )}
-
-                <Totals selectedDate={selectedDate} />
-
-                {showBookings && <Bookings calendarDate={calendarDate} />}
-
-                {screenSizes.screenWidth < SCREENS.LG && (
-                  <section className="lg:col-span-2">
-                    <Calendar
-                      reportsFolder={reportsFolder}
-                      selectedDate={selectedDate}
-                      setSelectedDate={setSelectedDate}
-                      calendarDate={calendarDate}
-                      setCalendarDate={setCalendarDate}
-                    />
-                  </section>
-                )}
-
-                <section>
-                  <UpdateDescription />
-                </section>
-              </aside>
-            </>
-          ) : (
-            <SelectFolderPlaceholder setFolder={setReportsFolder} />
-          )}
-        </div>
+        <MainPage
+          selectedDate={selectedDate}
+          selectedDateActivities={selectedDateActivities}
+          setSelectedDateActivities={setSelectedDateActivities}
+          shouldAutosave={shouldAutosave}
+          setShouldAutosave={setShouldAutosave}
+          setSelectedDate={setSelectedDate}
+          latestProjAndAct={latestProjAndAct}
+          setTrackTimeModalActivity={setTrackTimeModalActivity}
+        />
         <Link
           href="/settings"
           className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold before:dark:text-gray-100"

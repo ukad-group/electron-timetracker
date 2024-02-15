@@ -144,3 +144,8 @@ export const trackConnections = (connectedName: string) => {
     localStorage.setItem(connectedName + "Connection", `${year}-${month}-${day}`);
   }
 };
+
+export function stringToMinutes(str: string) {
+  const [hours, minutes] = str.split(":");
+  return Number(hours) * 60 + Number(minutes);
+}

@@ -1,21 +1,15 @@
 import { Dispatch, SetStateAction } from "react";
 import { ReportActivity } from "@/helpers/utils/reports";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-
-export function stringToMinutes(str: string) {
-  const [hours, minutes] = str.split(":");
-  return Number(hours) * 60 + Number(minutes);
-}
+import { stringToMinutes } from "@/helpers/utils/utils";
 
 export const editActivity = (
   activity: ReportActivity,
   selectedDateActivities: Array<ReportActivity>,
   setSelectedDateActivities: Dispatch<SetStateAction<Array<ReportActivity>>>,
-  setShouldAutosave: Dispatch<SetStateAction<boolean>>
+  setShouldAutosave: Dispatch<SetStateAction<boolean>>,
 ) => {
-  const activityIndex = selectedDateActivities.findIndex(
-    (act) => act.id === activity.id
-  );
+  const activityIndex = selectedDateActivities.findIndex((act) => act.id === activity.id);
 
   if (activityIndex >= 0) {
     setSelectedDateActivities((activities) => {
@@ -48,7 +42,7 @@ export const editActivity = (
           IPC_MAIN_CHANNELS.FRONTEND_ERROR,
           "Activity editing error",
           "An error occurred while editing reports. ",
-          err
+          err,
         );
         return [...activities];
       }
@@ -65,22 +59,20 @@ export const addPastTime = (
   tempActivities: Array<ReportActivity>,
   selectedDateActivities: Array<ReportActivity>,
   setSelectedDateActivities: Dispatch<SetStateAction<Array<ReportActivity>>>,
-  isPastTime: boolean
 ) => {
   const newActFrom = stringToMinutes(activity.from);
+  let isPastTime = false;
+
   for (let i = 0; i < selectedDateActivities.length; i++) {
     try {
       const indexActFrom = stringToMinutes(selectedDateActivities[i].from);
-      const indexActTo = selectedDateActivities[i].to
-        ? stringToMinutes(selectedDateActivities[i].to)
-        : undefined;
+      const indexActTo = selectedDateActivities[i].to ? stringToMinutes(selectedDateActivities[i].to) : undefined;
 
       if (
         !isPastTime &&
         selectedDateActivities[i].isBreak &&
         i &&
-        (newActFrom <= indexActFrom ||
-          (i !== selectedDateActivities.length - 1 && newActFrom < indexActTo))
+        (newActFrom <= indexActFrom || (i !== selectedDateActivities.length - 1 && newActFrom < indexActTo))
       ) {
         tempActivities.push(activity);
         isPastTime = true;
@@ -98,7 +90,7 @@ export const addPastTime = (
         IPC_MAIN_CHANNELS.FRONTEND_ERROR,
         "Adding activity error",
         "An error occurred when adding a new activity to the report. ",
-        err
+        err,
       );
       console.log(activity);
     }
