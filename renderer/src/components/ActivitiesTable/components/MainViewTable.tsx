@@ -2,10 +2,7 @@ import { useState, useContext, useEffect, useRef } from "react";
 import clsx from "clsx";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { formatDuration } from "@/helpers/utils/reports";
-import {
-  PencilSquareIcon,
-  Square2StackIcon,
-} from "@heroicons/react/24/outline";
+import { PencilSquareIcon, Square2StackIcon, ArchiveBoxXMarkIcon } from "@heroicons/react/24/outline";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { ActivitiesTableContext } from "../context";
 import { Hint } from "@/shared/Hint";
@@ -26,6 +23,7 @@ const MainViewTable = () => {
     copyToClipboardHandle,
     copyActivityHandler,
     editActivityHandler,
+    onDeleteActivity,
   } = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
@@ -36,10 +34,7 @@ const MainViewTable = () => {
   const [dublicateIndex, setDublicateIndex] = useState(-1);
   const { screenSizes } = useScreenSizes();
 
-  const [progress, setProgress] = useTutorialProgressStore(
-    (state) => [state.progress, state.setProgress],
-    shallow
-  );
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
 
   useEffect(() => {
     changeHintConditions(progress, setProgress, [
@@ -64,8 +59,7 @@ const MainViewTable = () => {
   const prevTableActivities = usePrevious(tableActivities) || [];
 
   useEffect(() => {
-    const isNewActivity =
-      tableActivities?.length - prevTableActivities?.length === 1;
+    const isNewActivity = tableActivities?.length - prevTableActivities?.length === 1;
     if (
       prevTableActivities &&
       tableActivities &&
@@ -73,13 +67,9 @@ const MainViewTable = () => {
       progress[`${HINTS_GROUP_NAMES.COPY_BUTTON}Conditions`] &&
       progress[`${HINTS_GROUP_NAMES.COPY_BUTTON}Conditions`].includes(false)
     ) {
-      const description =
-        tableActivities[tableActivities.length - 1].description;
+      const description = tableActivities[tableActivities.length - 1].description;
       tableActivities.forEach((item, index) => {
-        if (
-          index !== tableActivities.length - 1 &&
-          item.description === description
-        ) {
+        if (index !== tableActivities.length - 1 && item.description === description) {
           setDublicateIndex(index);
           changeHintConditions(progress, setProgress, [
             {
@@ -195,28 +185,21 @@ const MainViewTable = () => {
           <tr
             key={i}
             ref={i === 0 ? firstRowRef : undefined}
-            className={clsx(
-              `border-b border-gray-200 dark:border-gray-300 transition-transform `,
-              {
-                "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
-                  (tableActivities[i + 1] && tableActivities[i + 1].isBreak) ||
-                  activity.isBreak,
-                "font-medium diagonalLines": activity.isBreak,
-                "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
-                "scale-105 ":
-                  (Number(firstKey) === i + 1 && !secondKey) ||
-                  (Number(firstKey + secondKey) === i + 1 && secondKey),
-              }
-            )}
+            className={clsx(`border-b border-gray-200 dark:border-gray-300 transition-transform `, {
+              "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
+                (tableActivities[i + 1] && tableActivities[i + 1].isBreak) || activity.isBreak,
+              "font-medium diagonalLines": activity.isBreak,
+              "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
+              "scale-105 ":
+                (Number(firstKey) === i + 1 && !secondKey) || (Number(firstKey + secondKey) === i + 1 && secondKey),
+            })}
           >
             <td
               className={`relative  pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0 ${
                 activity.calendarId ? "opacity-50" : ""
               }`}
             >
-              {ctrlPressed && (
-                <span className="absolute -left-4 text-blue-700">{i + 1}</span>
-              )}
+              {ctrlPressed && <span className="absolute -left-4 text-blue-700">{i + 1}</span>}
               {!activity.isValid && (
                 <Hint
                   learningMethod="buttonClick"
@@ -235,11 +218,7 @@ const MainViewTable = () => {
                 </Hint>
               )}
               <span
-                ref={
-                  activity.isValid !== undefined && !activity.isValid
-                    ? invalidTimeRef
-                    : undefined
-                }
+                ref={activity.isValid !== undefined && !activity.isValid ? invalidTimeRef : undefined}
                 className={clsx({
                   "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
                     activity.isValid !== undefined && !activity.isValid,
@@ -259,11 +238,7 @@ const MainViewTable = () => {
                 </p>
               </Tooltip>
             </td>
-            <td
-              className={`relative px-3  ${
-                activity.calendarId ? "opacity-50" : ""
-              }`}
-            >
+            <td className={`relative px-3  ${activity.calendarId ? "opacity-50" : ""}`}>
               <div className="flex items-center gap-1">
                 <Tooltip isClickable>
                   <p
@@ -281,20 +256,13 @@ const MainViewTable = () => {
               </div>
               {activity.activity && (
                 <Tooltip isClickable>
-                  <p
-                    className="block text-xs font-semibold mt-1 old-break-word "
-                    onClick={copyToClipboardHandle}
-                  >
+                  <p className="block text-xs font-semibold mt-1 old-break-word " onClick={copyToClipboardHandle}>
                     {activity.activity}
                   </p>
                 </Tooltip>
               )}
             </td>
-            <td
-              className={`px-3 text-sm ${
-                activity.calendarId ? "opacity-50" : ""
-              }`}
-            >
+            <td className={`px-3 text-sm ${activity.calendarId ? "opacity-50" : ""}`}>
               {activity.description && (
                 <Tooltip isClickable>
                   <p onClick={copyToClipboardHandle} className="old-break-word">
@@ -310,10 +278,23 @@ const MainViewTable = () => {
               {activity.mistakes && (
                 <p
                   onClick={copyToClipboardHandle}
-                  className="w-fit old-break-word py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20"
+                  className="w-fit old-break-word py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-gray-400 dark:bg-transparent dark:border-2 dark:border-yellow-400/50"
                 >
                   {activity.mistakes}
                 </p>
+              )}
+            </td>
+            <td className="relative text-sm font-medium text-right whitespace-nowrap">
+              {!activity.isBreak && (
+                <button
+                  className="group py-4 px-3"
+                  title="Delete"
+                  onClick={() => {
+                    onDeleteActivity(activity.id);
+                  }}
+                >
+                  <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                </button>
               )}
             </td>
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
@@ -327,11 +308,7 @@ const MainViewTable = () => {
                     }}
                   >
                     <Square2StackIcon
-                      ref={
-                        !activity.calendarId && dublicateIndex === i
-                          ? lastCopyButtonRef
-                          : undefined
-                      }
+                      ref={!activity.calendarId && dublicateIndex === i ? lastCopyButtonRef : undefined}
                       className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
                     />
                   </button>
@@ -353,25 +330,23 @@ const MainViewTable = () => {
                       className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
                     />
                   )}
-                  {activity.calendarId &&
-                    progress["editButton"] &&
-                    !progress["editButton"].includes(false) && (
-                      <Hint
-                        learningMethod="buttonClick"
-                        order={1}
-                        groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
-                        referenceRef={calendarEventRef}
-                        shiftY={200}
-                        shiftX={50}
-                        width={"medium"}
-                        position={{
-                          basePosition: "left",
-                          diagonalPosition: "bottom",
-                        }}
-                      >
-                        {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
-                      </Hint>
-                    )}
+                  {activity.calendarId && progress["editButton"] && !progress["editButton"].includes(false) && (
+                    <Hint
+                      learningMethod="buttonClick"
+                      order={1}
+                      groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
+                      referenceRef={calendarEventRef}
+                      shiftY={200}
+                      shiftX={50}
+                      width={"medium"}
+                      position={{
+                        basePosition: "left",
+                        diagonalPosition: "bottom",
+                      }}
+                    >
+                      {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
+                    </Hint>
+                  )}
                   {activity.calendarId && (
                     <PlusIcon
                       ref={activity.calendarId ? calendarEventRef : undefined}

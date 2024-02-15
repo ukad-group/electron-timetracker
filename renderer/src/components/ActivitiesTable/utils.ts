@@ -2,10 +2,13 @@ import { getTimeFromEventObj, padStringToMinutes } from "@/helpers/utils/datetim
 import { parseEventTitle } from "@/helpers/utils/utils";
 import { calcDurationBetweenTimes } from "@/helpers/utils/reports";
 
-export const getTotalDuration = (nonBreakActivities) => nonBreakActivities.reduce((value, activity) => value + (activity.duration ? activity.duration : 0), 0);
+export const getTotalDuration = (nonBreakActivities) =>
+  nonBreakActivities.reduce((value, activity) => value + (activity.duration ? activity.duration : 0), 0);
 
 export const formatEvents = (events, latestProjAndAct) => {
-  if (!events.length) { return []; }
+  if (!events.length) {
+    return [];
+  }
 
   return events.map((event) => {
     const { start, end } = event;
@@ -26,13 +29,15 @@ export const formatEvents = (events, latestProjAndAct) => {
       activity: event.activity || "",
       description: event.description || "",
       isValid: true,
-      calendarId: event.id
+      calendarId: event.id,
     };
   });
 };
 
 export const getActualEvents = (events, activities) => {
-  if (!events.length) { return []; }
+  if (!events.length) {
+    return [];
+  }
 
   return events.filter((event) => {
     const { end } = event;

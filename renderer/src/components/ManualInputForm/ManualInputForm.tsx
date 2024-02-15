@@ -19,10 +19,7 @@ export default function ManualInputForm({
   selectedDate,
   setSelectedDateReport,
 }: ManualInputFormProps) {
-  const [reportsFolder] = useMainStore(
-    (state) => [state.reportsFolder, state.setReportsFolder],
-    shallow
-  );
+  const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [report, setReport] = useState("");
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
   const textareaRef = useRef(null);
@@ -31,34 +28,16 @@ export default function ManualInputForm({
   const [isFileExist, setIsFileExist] = useState(false);
   const editingHistoryManager = useEditingHistoryManager(report);
 
-  const [progress, setProgress] = useTutorialProgressStore(
-    (state) => [state.progress, state.setProgress],
-    shallow
-  );
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
-    if (
-      (e.ctrlKey || e.metaKey) &&
-      e.code === "KeyS" &&
-      saveBtnStatus === "enabled"
-    ) {
+    if ((e.ctrlKey || e.metaKey) && e.code === "KeyS" && saveBtnStatus === "enabled") {
       saveReportHandler();
     }
   };
 
   useEffect(() => {
     setShowDeleteMessage(false);
-
-    (async () => {
-      const dayReport = await global.ipcRenderer.invoke(
-        "app:read-day-report",
-        reportsFolder,
-        selectedDate
-      );
-
-      setIsFileExist(dayReport !== null);
-      setShowDeleteButton(dayReport === "");
-    })();
   }, [selectedDate]);
 
   useEffect(() => {
@@ -66,6 +45,8 @@ export default function ManualInputForm({
   }, [selectedDateReport]);
 
   useEffect(() => {
+    readReport();
+
     editingHistoryManager.setValue(report);
     setReportHandler(report);
 
@@ -82,11 +63,23 @@ export default function ManualInputForm({
     };
   }, [report]);
 
+  const readReport = async () => {
+    const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.READ_DAY_REPORT, reportsFolder, selectedDate);
+
+    setIsFileExist(dayReport !== null);
+    setShowDeleteButton(dayReport === "");
+  };
+
   const saveReportHandler = () => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "manuall_save");
     onSave(report, true);
     setSaveBtnStatus("inprogress");
-    setIsFileExist(true);
+
+    if (isFileExist) {
+      setShowDeleteButton(!report.length);
+    } else {
+      setShowDeleteButton(false);
+    }
   };
 
   const setReportHandler = (report: string) => {
@@ -119,18 +112,12 @@ export default function ManualInputForm({
     }
   };
 
-  const getCurrentCursorLineValue = (
-    textarea: HTMLTextAreaElement,
-    report: string
-  ) => {
+  const getCurrentCursorLineValue = (textarea: HTMLTextAreaElement, report: string) => {
     const cursorPosition = textarea.selectionStart;
     const currentLineStart = report.lastIndexOf("\n", cursorPosition - 1) + 1;
     const currentLineEnd = report.indexOf("\n", cursorPosition);
 
-    return report.slice(
-      currentLineStart,
-      currentLineEnd !== -1 ? currentLineEnd : undefined
-    );
+    return report.slice(currentLineStart, currentLineEnd !== -1 ? currentLineEnd : undefined);
   };
 
   const copyCurrentLine = () => {
@@ -141,8 +128,7 @@ export default function ManualInputForm({
 
     if (textarea) {
       const currentLineValue = getCurrentCursorLineValue(textarea, report);
-      const isCursorOnRegistration =
-        parseReport(currentLineValue)[0]?.length !== 0;
+      const isCursorOnRegistration = parseReport(currentLineValue)[0]?.length !== 0;
 
       if (!isCursorOnRegistration) return;
       const currentLineItems = currentLineValue.split(" - ");
@@ -182,9 +168,7 @@ export default function ManualInputForm({
 
     const serializedReport =
       serializeReport(activities) +
-      (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined")
-        ? ""
-        : reportAndNotes[1]);
+      (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined") ? "" : reportAndNotes[1]);
 
     setReportHandler(serializedReport);
   };
@@ -227,10 +211,7 @@ export default function ManualInputForm({
         {HINTS_ALERTS.MANUAL_INPUT}
       </Hint>
 
-      <h2
-        id="manual-input-title"
-        className="text-lg font-medium text-gray-900 dark:text-dark-heading"
-      >
+      <h2 id="manual-input-title" className="text-lg font-medium text-gray-900 dark:text-dark-heading">
         Manual input
       </h2>
 
@@ -261,9 +242,7 @@ export default function ManualInputForm({
             disabled={saveBtnStatus === "disabled"}
             type={"button"}
           />
-          <span className="block text-xs text-gray-500 text-center">
-            or press ctrl/command + s
-          </span>
+          <span className="block text-xs text-gray-500 text-center">or press ctrl/command + s</span>
         </div>
         {showDeleteButton && (
           <button

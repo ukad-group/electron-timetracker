@@ -1,5 +1,5 @@
 import React from "react";
-import { RenderError } from './types';
+import { RenderError } from "./types";
 
 function ErrorPlaceholder({ errorTitle, errorMessage }: RenderError) {
   return (
@@ -16,12 +16,8 @@ function ErrorPlaceholder({ errorTitle, errorMessage }: RenderError) {
           clipRule="evenodd"
         ></path>
       </svg>
-      <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-dark-heading">
-        {errorTitle}
-      </h3>
-      <p className="mt-1 px-48 text-sm text-gray-500 dark:text-dark-main">
-        {errorMessage}
-      </p>
+      <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-dark-heading">{errorTitle}</h3>
+      <p className="mt-1 px-48 text-sm text-gray-500 dark:text-dark-main">{errorMessage}</p>
     </div>
   );
 }

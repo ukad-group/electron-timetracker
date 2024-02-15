@@ -15,18 +15,10 @@ import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
 export default function UpdateDescription() {
   const [release, setRelease] = useState<Release | null>();
-  const [currentVersion, setCurrentVersion] = useState(
-    global.app?.getVersion()
-  );
+  const [currentVersion, setCurrentVersion] = useState(global.app?.getVersion());
   const [isUpdate, setIsUpdate] = useState(false);
-  const [update, setUpdate] = useUpdateStore(
-    (state) => [state.update, state.setUpdate],
-    shallow
-  );
-  const [progress, setProgress] = useTutorialProgressStore(
-    (state) => [state.progress, state.setProgress],
-    shallow
-  );
+  const [update, setUpdate] = useUpdateStore((state) => [state.update, state.setUpdate], shallow);
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const [isOpen, setIsOpen] = useState(update?.age === "new");
   const { screenSizes } = useScreenSizes();
   const whatsNewRef = useRef(null);
@@ -103,12 +95,7 @@ export default function UpdateDescription() {
   };
 
   return (
-    <DisclosureSection
-      reference={whatsNewRef}
-      toggleFunction={isOpenToggle}
-      isOpen={isOpen}
-      title="What's new?"
-    >
+    <DisclosureSection reference={whatsNewRef} toggleFunction={isOpenToggle} isOpen={isOpen} title="What's new?">
       {screenSizes.screenWidth >= SCREENS.LG && (
         <Hint
           displayCondition
@@ -180,8 +167,7 @@ export default function UpdateDescription() {
         ></div>
       ) : (
         <div className="flex flex-col gap-2 mb-3 dark:text-dark-heading">
-          Here you will receive notifications about the app's content updates
-          after downloading the new version.
+          Here you will receive notifications about the app's content updates after downloading the new version.
         </div>
       )}
     </DisclosureSection>

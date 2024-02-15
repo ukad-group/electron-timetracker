@@ -1,9 +1,5 @@
 import { createWithEqualityFn } from "zustand/traditional";
-import {
-  createJSONStorage,
-  devtools,
-  persist,
-} from "zustand/middleware";
+import { createJSONStorage, devtools, persist } from "zustand/middleware";
 import { getStorage } from "./utils";
 import { BetaStore } from "./types";
 
@@ -17,8 +13,8 @@ export const useBetaStore = createWithEqualityFn<BetaStore>()(
       {
         name: "beta-storage",
         storage: createJSONStorage(() => getStorage()),
-      }
-    )
+      },
+    ),
   ),
-  Object.is
+  Object.is,
 );

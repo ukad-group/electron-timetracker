@@ -8,9 +8,7 @@ import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import isOnline from "is-online";
 
 const JiraConnection = () => {
-  const [users, setUsers] = useState(
-    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || []
-  );
+  const [users, setUsers] = useState(JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || []);
 
   const handleSignInButton = async () => {
     const online = await isOnline();
@@ -26,10 +24,7 @@ const JiraConnection = () => {
     const filteredUsers = users.filter((user: JiraUser) => user.userId !== id);
 
     if (filteredUsers.length > 0) {
-      localStorage.setItem(
-        LOCAL_STORAGE_VARIABLES.JIRA_USERS,
-        JSON.stringify(filteredUsers)
-      );
+      localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(filteredUsers));
     } else {
       localStorage.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS);
     }
@@ -38,29 +33,19 @@ const JiraConnection = () => {
   };
 
   const addUser = async () => {
-    const authorizationCode = localStorage.getItem(
-      LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE
-    );
+    const authorizationCode = localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE);
     localStorage.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE);
 
     if (!authorizationCode) return;
 
-    const { access_token, refresh_token } = await global.ipcRenderer.invoke(
-      "jira:get-tokens",
-      authorizationCode
-    );
+    const { access_token, refresh_token } = await global.ipcRenderer.invoke("jira:get-tokens", authorizationCode);
 
     if (!access_token) return;
 
-    const { account_id, email } = await global.ipcRenderer.invoke(
-      "jira:get-profile",
-      access_token
-    );
+    const { account_id, email } = await global.ipcRenderer.invoke("jira:get-profile", access_token);
 
     const username = email || "";
-    const isUserExists = users.some(
-      (user: JiraUser) => account_id === user.userId
-    );
+    const isUserExists = users.some((user: JiraUser) => account_id === user.userId);
 
     if (isUserExists) {
       alert(`Account ${username} has already logged`);
@@ -76,10 +61,7 @@ const JiraConnection = () => {
 
     const newUsers = [...users, user];
 
-    localStorage.setItem(
-      LOCAL_STORAGE_VARIABLES.JIRA_USERS,
-      JSON.stringify(newUsers)
-    );
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(newUsers));
     setUsers(newUsers);
   };
 
@@ -88,15 +70,10 @@ const JiraConnection = () => {
   };
 
   useEffect(() => {
-    global.ipcRenderer.on(
-      IPC_MAIN_CHANNELS.JIRA_SHOULD_RERENDER,
-      rerenderListener
-    );
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.JIRA_SHOULD_RERENDER, rerenderListener);
 
     return () => {
-      global.ipcRenderer.removeAllListeners(
-        IPC_MAIN_CHANNELS.JIRA_SHOULD_RERENDER
-      );
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.JIRA_SHOULD_RERENDER);
     };
   }, [users]);
 
@@ -104,13 +81,7 @@ const JiraConnection = () => {
     <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">
       <div className="flex justify-between items-center w-full ">
         <span className="font-medium dark:text-dark-heading">Jira</span>
-        {!users.length && (
-          <Button
-            text="Add account"
-            callback={handleSignInButton}
-            type="button"
-          />
-        )}
+        {!users.length && <Button text="Add account" callback={handleSignInButton} type="button" />}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">
         {!users.length && (
@@ -138,9 +109,8 @@ const JiraConnection = () => {
         )}
       </div>
       <p className="text-sm text-gray-500  dark:text-dark-main">
-        After connection, you will be able to fill in the Description field with
-        tasks from the drop-down list. Just begin typing and in the drop-down
-        list you will see Jira tasks that starting with "JI::".
+        After connection, you will be able to fill in the Description field with tasks from the drop-down list. Just
+        begin typing and in the drop-down list you will see Jira tasks that starting with "JI::".
         <br />
         You can see only those tasks, where you are an assignee
         <br />

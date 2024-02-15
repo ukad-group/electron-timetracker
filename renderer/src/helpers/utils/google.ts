@@ -1,15 +1,8 @@
-import {
-  getGoogleEvents,
-  updateGoogleCredentials,
-} from "@/API/googleCalendarAPI";
+import { getGoogleEvents, updateGoogleCredentials } from "@/API/googleCalendarAPI";
 import { trackConnections } from "./utils";
 import { TRACK_CONNECTIONS } from "../contstants";
 
-export const loadGoogleEvents = async (
-  accessToken: string,
-  refreshToken: string,
-  index: number
-) => {
+export const loadGoogleEvents = async (accessToken: string, refreshToken: string, index: number) => {
   try {
     const data = await getGoogleEvents(accessToken);
 
@@ -42,7 +35,7 @@ export const loadGoogleEventsFromAllUsers = async () => {
   trackConnections(TRACK_CONNECTIONS.GOOGLE_CALENDAR);
 
   const userPromises = storedUsers.map((user, i) =>
-    loadGoogleEvents(user.googleAccessToken, user.googleRefreshToken, i)
+    loadGoogleEvents(user.googleAccessToken, user.googleRefreshToken, i),
   );
   const userEvents = await Promise.all(userPromises);
 

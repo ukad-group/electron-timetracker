@@ -14,7 +14,7 @@ export const positioningTop = (
   hintWidth: number,
   hintHeight: number,
   HorizontalLine: HTMLElement,
-  VerticalLine: HTMLElement
+  VerticalLine: HTMLElement,
 ) => {
   Object.assign(floatingRef.current.style, {
     top: `${y - shiftY}px`,
@@ -41,7 +41,7 @@ export const positioningTop = (
       "points",
       `${0}, ${hintHeight - 10} 
                 ${5}, ${hintHeight} 
-                ${10},  ${hintHeight - 10} `
+                ${10},  ${hintHeight - 10} `,
     );
 
     Object.assign(floatingRef.current.style, {
@@ -62,7 +62,7 @@ export const positioningTop = (
       "points",
       `${shiftX + hintWidth / 2 - 5}, ${hintHeight - 10} 
                 ${shiftX + hintWidth / 2}, ${hintHeight} 
-                ${shiftX + hintWidth / 2 + 5},  ${hintHeight - 10} `
+                ${shiftX + hintWidth / 2 + 5},  ${hintHeight - 10} `,
     );
 
     Object.assign(floatingRef.current.style, {
@@ -86,7 +86,7 @@ export const positioningRight = (
   hintWidth: number,
   hintHeight: number,
   HorizontalLine: HTMLElement,
-  VerticalLine: HTMLElement
+  VerticalLine: HTMLElement,
 ) => {
   Object.assign(floatingRef.current.style, {
     left: `${x + shiftX}px`,
@@ -110,7 +110,7 @@ export const positioningRight = (
     "points",
     `${10}, ${hintHeight / 2 + shiftY - 5} 
               ${0}, ${hintHeight / 2 + shiftY} 
-              ${10},  ${hintHeight / 2 + shiftY + 5} `
+              ${10},  ${hintHeight / 2 + shiftY + 5} `,
   );
 
   if (position.diagonalPosition === PLACEMENTS.TOP) {
@@ -143,7 +143,7 @@ export const positioningBottom = (
   hintWidth: number,
   hintHeight: number,
   HorizontalLine: HTMLElement,
-  VerticalLine: HTMLElement
+  VerticalLine: HTMLElement,
 ) => {
   Object.assign(floatingRef.current.style, {
     top: `${y + shiftY}px`,
@@ -170,7 +170,7 @@ export const positioningBottom = (
       "points",
       `${0}, ${10} 
                   ${5}, ${0} 
-                  ${10},  ${10} `
+                  ${10},  ${10} `,
     );
 
     Object.assign(floatingRef.current.style, {
@@ -190,7 +190,7 @@ export const positioningBottom = (
       "points",
       `${hintWidth / 2 + shiftX - 5}, ${10} 
                   ${hintWidth / 2 + shiftX}, ${0} 
-                  ${hintWidth / 2 + shiftX + 5},  ${10} `
+                  ${hintWidth / 2 + shiftX + 5},  ${10} `,
     );
 
     Object.assign(floatingRef.current.style, {
@@ -214,7 +214,7 @@ export const positioningLeft = (
   hintWidth: number,
   hintHeight: number,
   HorizontalLine: HTMLElement,
-  VerticalLine: HTMLElement
+  VerticalLine: HTMLElement,
 ) => {
   Object.assign(floatingRef.current.style, {
     left: `${x - shiftX}px`,
@@ -239,7 +239,7 @@ export const positioningLeft = (
     "points",
     `${hintWidth + shiftX - 10}, ${hintHeight / 2 + shiftY - 5} 
               ${hintWidth + shiftX}, ${hintHeight / 2 + shiftY} 
-              ${hintWidth + shiftX - 10},  ${hintHeight / 2 + shiftY + 5} `
+              ${hintWidth + shiftX - 10},  ${hintHeight / 2 + shiftY + 5} `,
   );
 
   if (position.diagonalPosition === PLACEMENTS.TOP) {

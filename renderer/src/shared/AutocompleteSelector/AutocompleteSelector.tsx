@@ -27,20 +27,17 @@ export default function AutocompleteSelector({
   const [isNew, setIsNew] = useState(false);
   const inputRef = useRef(null);
   const allItems = useMemo(() => {
-    return additionalItems
-      ? availableItems?.concat(additionalItems)
-      : availableItems;
+    return additionalItems ? availableItems?.concat(additionalItems) : availableItems;
   }, [availableItems, additionalItems]);
   const editingHistoryManager = useEditingHistoryManager(selectedItem);
 
-  const filteredList = useMemo(() =>
-    filterList({ selectedItem, availableItems, additionalItems, showedSuggestionsNumber }),
-    [selectedItem, availableItems, additionalItems]);
+  const filteredList = useMemo(
+    () => filterList({ selectedItem, availableItems, additionalItems, showedSuggestionsNumber }),
+    [selectedItem, availableItems, additionalItems],
+  );
 
   const fullSuggestionsList = useMemo(() => {
-    return selectedItem.trim() === ""
-      ? filteredList
-      : [selectedItem, ...filteredList];
+    return selectedItem.trim() === "" ? filteredList : [selectedItem, ...filteredList];
   }, [selectedItem, filteredList]);
 
   const handleKey = (e) => {
@@ -109,12 +106,7 @@ export default function AutocompleteSelector({
   }, [selectedItem, allItems]);
 
   return (
-    <Combobox
-      className={className}
-      as="div"
-      value={selectedItem}
-      onChange={onChangeHandler}
-    >
+    <Combobox className={className} as="div" value={selectedItem} onChange={onChangeHandler}>
       <Combobox.Label className="flex items-center gap-1 text-sm font-medium text-gray-700 dark:text-dark-main ">
         {title}{" "}
         {title === "Activity" && (
@@ -140,26 +132,20 @@ export default function AutocompleteSelector({
           className={clsx(
             "w-full py-2 pl-3 pr-10 bg-white border border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 sm:text-sm dark:border-slate-600 dark:text-dark-heading dark:bg-dark-form-back focus:dark:border-focus-border focus:dark:ring-focus-border",
             {
-              "border-red-300 text-red-900 placeholder-red-300":
-                required && isValidationEnabled && !selectedItem,
-            }
+              "border-red-300 text-red-900 placeholder-red-300": required && isValidationEnabled && !selectedItem,
+            },
           )}
           onChange={(e) => onChangeHandler(e.target.value)}
           tabIndex={tabIndex}
           onBlur={onBlurHandler}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center px-2 rounded-r-md focus:outline-none">
-          <ChevronUpDownIcon
-            className="w-5 h-5 text-gray-400"
-            aria-hidden="true"
-          />
+          <ChevronUpDownIcon className="w-5 h-5 text-gray-400" aria-hidden="true" />
         </Combobox.Button>
 
         {fullSuggestionsList?.length > 0 && (
           <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm dark:bg-dark-container dark:shadow-lg dark:shadow-slate-900">
-            <div className="block text-xs text-gray-500 text-center">
-              tab to choose
-            </div>
+            <div className="block text-xs text-gray-500 text-center">tab to choose</div>
             <SuggestionsList list={fullSuggestionsList} />
           </Combobox.Options>
         )}

@@ -10,19 +10,14 @@ import isOnline from "is-online";
 
 const TimetrackerWebsiteConnection = () => {
   const router = useRouter();
-  const [loggedUser, setLoggedUser] = useState(
-    JSON.parse(localStorage.getItem("timetracker-user"))
-  );
+  const [loggedUser, setLoggedUser] = useState(JSON.parse(localStorage.getItem("timetracker-user")));
   const [loading, setLoading] = useState(false);
 
   const handleSignInButton = async () => {
     const online = await isOnline();
 
     if (online) {
-      global.ipcRenderer.send(
-        IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW,
-        "timetracker-website"
-      );
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "timetracker-website");
     } else {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
     }
@@ -37,9 +32,7 @@ const TimetrackerWebsiteConnection = () => {
     setLoading(true);
     document.body.style.overflow = "hidden"; // remove scrolling
 
-    const authorizationCode = localStorage.getItem(
-      LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE
-    );
+    const authorizationCode = localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE);
     localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE);
 
     if (!authorizationCode) return;
@@ -47,20 +40,11 @@ const TimetrackerWebsiteConnection = () => {
     const userPromises = [];
 
     try {
-      const userCreds = await global.ipcRenderer.invoke(
-        "timetracker:get-user-info-token",
-        authorizationCode
-      );
+      const userCreds = await global.ipcRenderer.invoke("timetracker:get-user-info-token", authorizationCode);
 
-      const profilePromise = global.ipcRenderer.invoke(
-        "office365:get-profile-info",
-        userCreds.access_token
-      );
+      const profilePromise = global.ipcRenderer.invoke("office365:get-profile-info", userCreds.access_token);
 
-      const TTCookiePromise = global.ipcRenderer.invoke(
-        "timetracker:login",
-        userCreds?.id_token
-      );
+      const TTCookiePromise = global.ipcRenderer.invoke("timetracker:login", userCreds?.id_token);
 
       userPromises.push(profilePromise, TTCookiePromise);
 
@@ -76,10 +60,7 @@ const TimetrackerWebsiteConnection = () => {
         TTCookie: timetrackerCookie,
       };
 
-      localStorage.setItem(
-        "timetracker-user",
-        JSON.stringify(timetrackerUserInfo)
-      );
+      localStorage.setItem("timetracker-user", JSON.stringify(timetrackerUserInfo));
 
       global.ipcRenderer.send("azure:login-additional");
     } catch (error) {
@@ -99,48 +80,28 @@ const TimetrackerWebsiteConnection = () => {
     const userPromises = [];
 
     try {
-      const plannerCreds = await global.ipcRenderer.invoke(
-        "timetracker:get-planner-token",
-        authorizationCode
-      );
+      const plannerCreds = await global.ipcRenderer.invoke("timetracker:get-planner-token", authorizationCode);
 
-      const userInfo: TTUserInfo = JSON.parse(
-        localStorage.getItem("timetracker-user")
-      );
+      const userInfo: TTUserInfo = JSON.parse(localStorage.getItem("timetracker-user"));
       userInfo.plannerAccessToken = plannerCreds?.access_token;
       userInfo.plannerRefreshToken = plannerCreds?.refresh_token;
 
-      const holidaysPromise = global.ipcRenderer.invoke(
-        "timetracker:get-holidays",
-        plannerCreds?.access_token
-      );
+      const holidaysPromise = global.ipcRenderer.invoke("timetracker:get-holidays", plannerCreds?.access_token);
 
       const userEmail = userInfo.email;
       const vacationsPromise = global.ipcRenderer.invoke(
         "timetracker:get-vacations",
         plannerCreds?.access_token,
-        userEmail
+        userEmail,
       );
 
       const timetrackerCookie = userInfo.TTCookie;
-      const timtrackerProjectsPromise = global.ipcRenderer.invoke(
-        "timetracker:get-projects",
-        timetrackerCookie
-      );
+      const timtrackerProjectsPromise = global.ipcRenderer.invoke("timetracker:get-projects", timetrackerCookie);
 
       const userName = userInfo.name;
-      const bookingsPromise = global.ipcRenderer.invoke(
-        "timetracker:get-bookings",
-        timetrackerCookie,
-        userName
-      );
+      const bookingsPromise = global.ipcRenderer.invoke("timetracker:get-bookings", timetrackerCookie, userName);
 
-      userPromises.push(
-        holidaysPromise,
-        vacationsPromise,
-        timtrackerProjectsPromise,
-        bookingsPromise
-      );
+      userPromises.push(holidaysPromise, vacationsPromise, timtrackerProjectsPromise, bookingsPromise);
 
       const userFetchedData = await Promise.all(userPromises);
 
@@ -177,22 +138,14 @@ const TimetrackerWebsiteConnection = () => {
       return;
     }
 
-    if (
-      searchParams.includes("code") &&
-      searchParams.includes("state=azure-additional")
-    ) {
+    if (searchParams.includes("code") && searchParams.includes("state=azure-additional")) {
       loadPlannerInfo();
     }
 
-    global.ipcRenderer.on(
-      IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER,
-      rerenderListener
-    );
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER, rerenderListener);
 
     return () => {
-      global.ipcRenderer.removeAllListeners(
-        IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER
-      );
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.TIMETRACKER_SHOULD_RERENDER);
     };
   }, []);
 
@@ -209,16 +162,8 @@ const TimetrackerWebsiteConnection = () => {
   return (
     <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">
       <div className="flex justify-between items-center w-full ">
-        <span className="font-medium dark:text-dark-heading">
-          Timetracker website
-        </span>
-        {!loggedUser && (
-          <Button
-            text="Add account"
-            callback={handleSignInButton}
-            type="button"
-          />
-        )}
+        <span className="font-medium dark:text-dark-heading">Timetracker website</span>
+        {!loggedUser && <Button text="Add account" callback={handleSignInButton} type="button" />}
       </div>
       <div className="flex items-center justify-between gap-4 w-full">
         {!loggedUser && (
@@ -245,10 +190,9 @@ const TimetrackerWebsiteConnection = () => {
         )}
       </div>
       <p className="text-sm text-gray-500 dark:text-dark-main">
-        After connection, you will be able to see a company holidays, your
-        vacations, sickdays and the required amount of time you need to work in
-        a month in calendar. Also active projects of the company will be added
-        to the project selector.
+        After connection, you will be able to see a company holidays, your vacations, sickdays and the required amount
+        of time you need to work in a month in calendar. Also active projects of the company will be added to the
+        project selector.
       </p>
     </div>
   );

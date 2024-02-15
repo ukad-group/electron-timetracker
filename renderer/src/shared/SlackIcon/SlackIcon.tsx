@@ -1,12 +1,6 @@
 export default function SlackIcon() {
   return (
-    <svg
-      fill="#4b5563"
-      width="24px"
-      height="24px"
-      viewBox="0 0 512 512"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg fill="#4b5563" width="24px" height="24px" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
       <title>ionicons-v5_logos</title>
       <path d="M126.12,315.1A47.06,47.06,0,1,1,79.06,268h47.06Z" />
       <path d="M149.84,315.1a47.06,47.06,0,0,1,94.12,0V432.94a47.06,47.06,0,1,1-94.12,0Z" />

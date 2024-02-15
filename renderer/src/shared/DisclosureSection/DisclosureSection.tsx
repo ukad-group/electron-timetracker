@@ -15,23 +15,18 @@ export default function DisclosureSection(props: DisclosureSectionProps) {
               "max-h-20 px-4 py-4 bg-white shadow overflow-hidden transition-[max-height] ease-linear duration-300 sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border",
               {
                 "max-h-80 overflow-y-auto ": open,
-              }
+              },
             )}
           >
-            <Disclosure.Button
-              className=" w-full"
-              onClick={props.toggleFunction}
-            >
+            <Disclosure.Button className=" w-full" onClick={props.toggleFunction}>
               <div className="flex justify-between cursor-pointer">
-                <h2 className="text-lg font-medium text-gray-900 dark:text-dark-heading">
-                  {props.title}
-                </h2>
+                <h2 className="text-lg font-medium text-gray-900 dark:text-dark-heading">{props.title}</h2>
                 <ChevronDownIcon
                   className={clsx(
                     "transform transition-transform ease-linear duration-300 w-6 h-7 dark:text-gray-200",
                     {
                       "rotate-180": open,
-                    }
+                    },
                   )}
                   aria-hidden="true"
                 />

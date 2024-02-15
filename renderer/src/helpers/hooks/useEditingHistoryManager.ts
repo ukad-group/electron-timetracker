@@ -16,7 +16,7 @@ interface EditingHistoryState {
 
 export const EditingHistoryReducer = <T>(
   state: EditingHistoryState,
-  action: EditingHistoryAction
+  action: EditingHistoryAction,
 ): EditingHistoryState => {
   switch (action.type) {
     case SET_VALUE:
@@ -33,10 +33,7 @@ export const EditingHistoryReducer = <T>(
       if (state.undoStack.length > 1) {
         return {
           undoStack: state.undoStack.slice(0, -1),
-          redoStack: [
-            ...state.redoStack,
-            state.undoStack[state.undoStack.length - 1],
-          ],
+          redoStack: [...state.redoStack, state.undoStack[state.undoStack.length - 1]],
         };
       }
 
@@ -45,10 +42,7 @@ export const EditingHistoryReducer = <T>(
     case REDO:
       if (state.redoStack.length > 0) {
         return {
-          undoStack: [
-            ...state.undoStack,
-            state.redoStack[state.redoStack.length - 1],
-          ],
+          undoStack: [...state.undoStack, state.redoStack[state.redoStack.length - 1]],
           redoStack: state.redoStack.slice(0, -1),
         };
       }
@@ -65,15 +59,9 @@ const useEditingHistoryManager = (initialValue: string) => {
     undoStack: [initialValue],
     redoStack: [],
   };
-  const [state, dispatch] = useReducer(
-    EditingHistoryReducer,
-    editingHistoryState
-  );
+  const [state, dispatch] = useReducer(EditingHistoryReducer, editingHistoryState);
 
-  const handleSetValue = useCallback(
-    (value: string) => dispatch(setValue(value)),
-    [dispatch]
-  );
+  const handleSetValue = useCallback((value: string) => dispatch(setValue(value)), [dispatch]);
   const handleUndoEditing = useCallback(() => {
     dispatch(undoEditing());
 

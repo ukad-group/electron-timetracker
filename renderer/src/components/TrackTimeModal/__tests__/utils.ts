@@ -1,7 +1,4 @@
-import {
-  changeHours,
-  changeMinutesAndHours
-} from "../utils";
+import { changeHours, changeMinutesAndHours } from "../utils";
 import { KEY_CODES } from "@/helpers/contstants";
 
 describe("GIVEN changeHours", () => {

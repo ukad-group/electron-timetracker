@@ -1,9 +1,6 @@
-import { ButtonTransparentProps } from './types';
+import { ButtonTransparentProps } from "./types";
 
-export default function ButtonTransparent({
-  children,
-  callback,
-}: ButtonTransparentProps) {
+export default function ButtonTransparent({ children, callback }: ButtonTransparentProps) {
   return (
     <button
       onClick={callback}

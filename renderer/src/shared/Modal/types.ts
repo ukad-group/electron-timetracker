@@ -4,4 +4,4 @@ export type ModalProps = {
   onSubmit: (e: React.FormEvent) => void;
   title: string;
   onClose: () => void;
-}
+};

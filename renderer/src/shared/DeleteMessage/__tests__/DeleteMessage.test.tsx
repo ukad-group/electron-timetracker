@@ -19,9 +19,9 @@ describe("GIVEN DeleteMessage", () => {
       <DeleteMessage
         setShowDeleteButton={() => {}}
         setShowDeleteMessage={() => {}}
-        selectedDate={new Date}
+        selectedDate={new Date()}
         setSelectedDateReport={() => {}}
-      />
+      />,
     );
   });
 
@@ -34,9 +34,9 @@ describe("GIVEN DeleteMessage", () => {
       <DeleteMessage
         setShowDeleteButton={() => {}}
         setShowDeleteMessage={setShowDeleteMessageMock}
-        selectedDate={new Date}
+        selectedDate={new Date()}
         setSelectedDateReport={() => {}}
-      />
+      />,
     );
 
     const cancelButton = screen.getByText("Cancel");

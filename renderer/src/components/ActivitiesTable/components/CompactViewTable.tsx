@@ -2,10 +2,7 @@ import { Fragment, useState, useContext, useEffect, useRef } from "react";
 import clsx from "clsx";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { checkIsToday, getCeiledTime } from "@/helpers/utils/datetime-ui";
-import {
-  PencilSquareIcon,
-  Square2StackIcon,
-} from "@heroicons/react/24/outline";
+import { PencilSquareIcon, Square2StackIcon, ArchiveBoxXMarkIcon } from "@heroicons/react/24/outline";
 import { formatDuration } from "@/helpers/utils/reports";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { ActivitiesTableContext } from "../context";
@@ -27,6 +24,7 @@ const CompactViewTable = () => {
     firstKey,
     secondKey,
     editActivityHandler,
+    onDeleteActivity,
   } = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
@@ -36,10 +34,7 @@ const CompactViewTable = () => {
   const calendarEventRef = useRef(null);
   const [dublicateIndex, setDublicateIndex] = useState(-1);
 
-  const [progress, setProgress] = useTutorialProgressStore(
-    (state) => [state.progress, state.setProgress],
-    shallow
-  );
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   useEffect(() => {
     changeHintConditions(progress, setProgress, [
       {
@@ -63,8 +58,7 @@ const CompactViewTable = () => {
   const prevTableActivities = usePrevious(tableActivities) || [];
 
   useEffect(() => {
-    const isNewActivity =
-      tableActivities?.length - prevTableActivities?.length === 1;
+    const isNewActivity = tableActivities?.length - prevTableActivities?.length === 1;
     if (
       prevTableActivities &&
       tableActivities &&
@@ -72,13 +66,9 @@ const CompactViewTable = () => {
       progress[`${HINTS_GROUP_NAMES.COPY_BUTTON}Conditions`] &&
       progress[`${HINTS_GROUP_NAMES.COPY_BUTTON}Conditions`].includes(false)
     ) {
-      const description =
-        tableActivities[tableActivities.length - 1].description;
+      const description = tableActivities[tableActivities.length - 1].description;
       tableActivities.forEach((item, index) => {
-        if (
-          index !== tableActivities.length - 1 &&
-          item.description === description
-        ) {
+        if (index !== tableActivities.length - 1 && item.description === description) {
           setDublicateIndex(index);
           changeHintConditions(progress, setProgress, [
             {
@@ -180,11 +170,7 @@ const CompactViewTable = () => {
                   activity.calendarId ? "opacity-50" : ""
                 }`}
               >
-                {ctrlPressed && (
-                  <span className="absolute -left-4 text-blue-700">
-                    {i + 1}
-                  </span>
-                )}
+                {ctrlPressed && <span className="absolute -left-4 text-blue-700">{i + 1}</span>}
                 {!activity.isValid && (
                   <Hint
                     learningMethod="buttonClick"
@@ -203,11 +189,7 @@ const CompactViewTable = () => {
                   </Hint>
                 )}
                 <span
-                  ref={
-                    activity.isValid !== undefined && !activity.isValid
-                      ? invalidTimeRef
-                      : undefined
-                  }
+                  ref={activity.isValid !== undefined && !activity.isValid ? invalidTimeRef : undefined}
                   className={clsx("flex gap-1", {
                     "py-1 px-1 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
                       !activity.isValid,
@@ -217,11 +199,7 @@ const CompactViewTable = () => {
                 </span>
               </td>
 
-              <td
-                className={`relative px-1 pt-4 ${
-                  activity.calendarId ? "opacity-50" : ""
-                }`}
-              >
+              <td className={`relative px-1 pt-4 ${activity.calendarId ? "opacity-50" : ""}`}>
                 <div className="flex flex-wrap gap-x-2 items-center">
                   <div className="flex gap-1">
                     {activity.isNewProject && !activity.isBreak && (
@@ -229,7 +207,7 @@ const CompactViewTable = () => {
                         new
                       </p>
                     )}
-                    <Tooltip>
+                    <Tooltip isClickable>
                       <p
                         className="text-sm font-medium text-gray-900 dark:text-dark-heading old-break-word"
                         onClick={copyToClipboardHandle}
@@ -240,7 +218,7 @@ const CompactViewTable = () => {
                   </div>
 
                   {activity.activity && (
-                    <Tooltip>
+                    <Tooltip isClickable>
                       <p
                         className="block text-xs font-semibold old-break-word text-gray-500 dark:text-slate-400"
                         onClick={copyToClipboardHandle}
@@ -251,7 +229,19 @@ const CompactViewTable = () => {
                   )}
                 </div>
               </td>
-
+              <td className="relative text-sm font-medium text-right whitespace-nowrap">
+                {!activity.isBreak && (
+                  <button
+                    className="group pt-4 px-1"
+                    title="Delete"
+                    onClick={() => {
+                      onDeleteActivity(activity.id);
+                    }}
+                  >
+                    <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                  </button>
+                )}
+              </td>
               <td className="relative text-sm font-medium text-right whitespace-nowrap">
                 <div className={`${activity.calendarId ? "invisible" : ""}`}>
                   <button
@@ -262,11 +252,7 @@ const CompactViewTable = () => {
                     }}
                   >
                     <Square2StackIcon
-                      ref={
-                        !activity.calendarId && dublicateIndex === i
-                          ? lastCopyButtonRef
-                          : undefined
-                      }
+                      ref={!activity.calendarId && dublicateIndex === i ? lastCopyButtonRef : undefined}
                       className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
                     />
                   </button>
@@ -275,29 +261,21 @@ const CompactViewTable = () => {
             </tr>
             <tr
               ref={i === 0 ? firstRowRef : undefined}
-              className={clsx(
-                `border-b border-gray-200 dark:border-gray-300 transition-transform `,
-                {
-                  "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
-                    (tableActivities[i + 1] &&
-                      tableActivities[i + 1].isBreak) ||
-                    activity.isBreak,
-                  "font-medium diagonalLines": activity.isBreak,
-                  "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
-                  "scale-105 ":
-                    (Number(firstKey) === i + 1 && !secondKey) ||
-                    (Number(firstKey + secondKey) === i + 1 && secondKey),
-                }
-              )}
+              className={clsx(`border-b border-gray-200 dark:border-gray-300 transition-transform `, {
+                "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
+                  (tableActivities[i + 1] && tableActivities[i + 1].isBreak) || activity.isBreak,
+                "font-medium diagonalLines": activity.isBreak,
+                "dark:border-b-2 dark:border-zinc-800": activity.calendarId,
+                "scale-105 ":
+                  (Number(firstKey) === i + 1 && !secondKey) || (Number(firstKey + secondKey) === i + 1 && secondKey),
+              })}
             >
               <td
-                colSpan={2}
-                className={`relative pb-4 pl-1 pr-1 text-sm sm:pl-6 md:pl-0 ${
-                  activity.calendarId ? "opacity-50" : ""
-                }`}
+                colSpan={3}
+                className={`relative pb-4 pl-1 pr-1 text-sm sm:pl-6 md:pl-0 ${activity.calendarId ? "opacity-50" : ""}`}
               >
                 <div className="flex flex-nowrap gap-1 items-center">
-                  <Tooltip>
+                  <Tooltip isClickable>
                     <p
                       data-column="duration"
                       onClick={copyToClipboardHandle}
@@ -308,27 +286,25 @@ const CompactViewTable = () => {
                       {`${formatDuration(activity.duration)}`}
                     </p>
                   </Tooltip>
-                  <Tooltip>
-                    <p
-                      onClick={copyToClipboardHandle}
-                      className={clsx("old-break-word", {
-                        "py-1 px-2 -mx-2 rounded-full font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20":
-                          activity.mistakes?.includes("startsWith!"),
-                      })}
-                    >
-                      {activity.isBreak
-                        ? activity.project
-                        : activity.description}
+                  {activity.description && (
+                    <Tooltip isClickable>
+                      <p onClick={copyToClipboardHandle} className="old-break-word">
+                        {activity.description}
+                      </p>
+                    </Tooltip>
+                  )}
+                  {activity.isBreak && (
+                    <p onClick={copyToClipboardHandle} className="old-break-word">
+                      {activity.project}
                     </p>
-                    {activity.mistakes?.includes("startsWith!") && (
-                      <span className="block text-xs mt-1">
-                        Perhaps you wanted to report a break
-                      </span>
-                    )}
-                  </Tooltip>
+                  )}
+                  {activity.mistakes && (
+                    <p className="w-fit old-break-word px-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-gray-400 dark:bg-transparent dark:border-2 dark:border-yellow-400/50">
+                      {activity.mistakes}
+                    </p>
+                  )}
                 </div>
               </td>
-
               <td className="relative text-sm font-medium text-right whitespace-nowrap">
                 <button
                   className="group pb-4 px-1"
@@ -343,25 +319,23 @@ const CompactViewTable = () => {
                       className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
                     />
                   )}
-                  {activity.calendarId &&
-                    progress["editButton"] &&
-                    !progress["editButton"].includes(false) && (
-                      <Hint
-                        learningMethod="buttonClick"
-                        order={1}
-                        groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
-                        referenceRef={calendarEventRef}
-                        shiftY={200}
-                        shiftX={50}
-                        width={"medium"}
-                        position={{
-                          basePosition: "left",
-                          diagonalPosition: "bottom",
-                        }}
-                      >
-                        {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
-                      </Hint>
-                    )}
+                  {activity.calendarId && progress["editButton"] && !progress["editButton"].includes(false) && (
+                    <Hint
+                      learningMethod="buttonClick"
+                      order={1}
+                      groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
+                      referenceRef={calendarEventRef}
+                      shiftY={200}
+                      shiftX={50}
+                      width={"medium"}
+                      position={{
+                        basePosition: "left",
+                        diagonalPosition: "bottom",
+                      }}
+                    >
+                      {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
+                    </Hint>
+                  )}
 
                   {activity.calendarId && (
                     <PlusIcon

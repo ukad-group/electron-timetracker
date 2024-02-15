@@ -4,10 +4,7 @@ import { useBetaStore } from "@/store/betaUpdatesStore";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export default function BetaToggle() {
-  const [isBeta, setIsBeta] = useBetaStore(
-    (state) => [state.isBeta, state.setIsBeta],
-    shallow
-  );
+  const [isBeta, setIsBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
 
   useEffect(() => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);

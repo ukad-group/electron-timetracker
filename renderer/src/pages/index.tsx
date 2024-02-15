@@ -1,12 +1,7 @@
 import { useEffect, useState } from "react";
 import { shallow } from "zustand/shallow";
 import { DateSelector } from "@/components/DateSelector";
-import {
-  ReportActivity,
-  parseReport,
-  serializeReport,
-  ReportAndNotes,
-} from "@/helpers/utils/reports";
+import { ReportActivity, parseReport, serializeReport, ReportAndNotes } from "@/helpers/utils/reports";
 import { addPastTime, editActivity } from "./utils";
 import TrackTimeModal from "@/components/TrackTimeModal/TrackTimeModal";
 import { ManualInputForm } from "@/components/ManualInputForm";
@@ -29,43 +24,26 @@ import useColorTheme from "@/helpers/hooks/useTheme";
 export default function Home() {
   const [reportsFolder, setReportsFolder] = useMainStore(
     (state) => [state.reportsFolder, state.setReportsFolder],
-    shallow
+    shallow,
   );
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedDateReport, setSelectedDateReport] = useState("");
-  const [selectedDateActivities, setSelectedDateActivities] =
-    useState<Array<ReportActivity> | null>([]);
+  const [selectedDateActivities, setSelectedDateActivities] = useState<Array<ReportActivity> | null>([]);
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [shouldAutosave, setShouldAutosave] = useState(false);
-  const [trackTimeModalActivity, setTrackTimeModalActivity] = useState<
-    ReportActivity | "new"
-  >(null);
-  const [latestProjAndAct, setLatestProjAndAct] = useState<
-    Record<string, [string]>
-  >({});
-  const [latestProjAndDesc, setLatestProjAndDesc] = useState<
-    Record<string, [string]>
-  >({});
-  const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>(
-    []
-  );
+  const [trackTimeModalActivity, setTrackTimeModalActivity] = useState<ReportActivity | "new">(null);
+  const [latestProjAndAct, setLatestProjAndAct] = useState<Record<string, [string]>>({});
+  const [latestProjAndDesc, setLatestProjAndDesc] = useState<Record<string, [string]>>({});
+  const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>([]);
   const [lastRenderedDay, setLastRenderedDay] = useState(new Date().getDate());
   const [isDropboxConnected, setIsDropboxConnected] = useState(true);
   const { screenSizes } = useScreenSizes();
-  const isManualInputMain =
-    localStorage.getItem("is-manual-input-main-section") === "true";
-
-  const [isBeta] = useBetaStore(
-    (state) => [state.isBeta, state.setIsBeta],
-    shallow
-  );
+  const isManualInputMain = localStorage.getItem("is-manual-input-main-section") === "true";
+  const [isBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
   const showBookings = !!JSON.parse(localStorage.getItem("timetracker-user"));
 
   useEffect(() => {
-    global.ipcRenderer.send(
-      IPC_MAIN_CHANNELS.START_FOLDER_WATCHER,
-      reportsFolder
-    );
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FOLDER_WATCHER, reportsFolder);
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
     global.ipcRenderer.on("dropbox-connection", (event, data) => {
       setIsDropboxConnected(!reportsFolder.includes("Dropbox") || data);
@@ -74,10 +52,7 @@ export default function Home() {
 
     return () => {
       global.ipcRenderer.removeAllListeners("dropbox-connection");
-      global.ipcRenderer.send(
-        IPC_MAIN_CHANNELS.STOP_PATH_WATCHER,
-        reportsFolder
-      );
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.STOP_PATH_WATCHER, reportsFolder);
     };
   }, []);
 
@@ -99,9 +74,9 @@ export default function Home() {
     try {
       (async () => {
         const dayReport = await global.ipcRenderer.invoke(
-          "app:read-day-report",
+          IPC_MAIN_CHANNELS.READ_DAY_REPORT,
           reportsFolder,
-          selectedDate
+          selectedDate,
         );
 
         setSelectedDateReport(dayReport || "");
@@ -109,7 +84,7 @@ export default function Home() {
         const sortedActAndDesc = await global.ipcRenderer.invoke(
           "app:find-latest-projects",
           reportsFolder,
-          selectedDate
+          selectedDate,
         );
 
         setLatestProjAndAct(sortedActAndDesc.sortedProjAndAct || {});
@@ -120,14 +95,10 @@ export default function Home() {
         IPC_MAIN_CHANNELS.FRONTEND_ERROR,
         "Reports reading error",
         "An error occurred while reading reports. ",
-        err
+        err,
       );
     }
-    global.ipcRenderer.send(
-      IPC_MAIN_CHANNELS.START_FILE_WATCHER,
-      reportsFolder,
-      selectedDate
-    );
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FILE_WATCHER, reportsFolder, selectedDate);
     global.ipcRenderer.on("file-changed", (event, data) => {
       if (selectedDateReport != data) {
         setSelectedDateReport(data || "");
@@ -141,11 +112,7 @@ export default function Home() {
     return () => {
       global.ipcRenderer.removeAllListeners("file-changed");
       global.ipcRenderer.removeAllListeners("errorMes");
-      global.ipcRenderer.send(
-        IPC_MAIN_CHANNELS.STOP_PATH_WATCHER,
-        reportsFolder,
-        selectedDate
-      );
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.STOP_PATH_WATCHER, reportsFolder, selectedDate);
     };
   }, [selectedDate, reportsFolder, lastRenderedDay]);
 
@@ -169,9 +136,7 @@ export default function Home() {
       if (shouldAutosave) {
         const serializedReport =
           serializeReport(selectedDateActivities) +
-          (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined")
-            ? ""
-            : reportAndNotes[1]);
+          (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined") ? "" : reportAndNotes[1]);
 
         saveSerializedReport(serializedReport);
         setShouldAutosave(false);
@@ -181,25 +146,21 @@ export default function Home() {
         IPC_MAIN_CHANNELS.FRONTEND_ERROR,
         "Reports saving error",
         "An error occurred while saving reports. ",
-        err
+        err,
       );
     }
   }, [selectedDateActivities]);
 
   const saveSerializedReport = (serializedReport: string) => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
-    global.ipcRenderer.invoke(
-      "app:write-day-report",
-      reportsFolder,
-      selectedDate,
-      serializedReport
-    );
+    global.ipcRenderer.invoke("app:write-day-report", reportsFolder, selectedDate, serializedReport);
     setSelectedDateReport(serializedReport);
   };
 
   const submitActivity = (activity: ReportActivity) => {
     let isEdit = false;
     let isPastTime = false;
+    const activityIndex = selectedDateActivities.findIndex((act) => act.id === activity.id);
 
     const tempActivities: Array<ReportActivity> = [];
 
@@ -211,28 +172,13 @@ export default function Home() {
       return;
     }
 
-    isEdit = editActivity(
-      activity,
-      selectedDateActivities,
-      setSelectedDateActivities,
-      setShouldAutosave
-    );
+    isEdit = editActivity(activity, selectedDateActivities, setSelectedDateActivities, setShouldAutosave);
 
     if (isEdit) return;
 
-    isPastTime = addPastTime(
-      activity,
-      tempActivities,
-      selectedDateActivities,
-      setSelectedDateActivities,
-      isPastTime
-    );
+    isPastTime = addPastTime(activity, tempActivities, selectedDateActivities, setSelectedDateActivities, isPastTime);
 
-    tempActivities.forEach(
-      (act, i) => (
-        (act.id = i), act.isBreak ? (act.to = "") : (act.to = act.to)
-      )
-    );
+    tempActivities.forEach((act, i) => ((act.id = i), act.isBreak ? (act.to = "") : (act.to = act.to)));
 
     if (tempActivities.length === selectedDateActivities.length) {
       !isPastTime && tempActivities.push(activity);
@@ -243,13 +189,19 @@ export default function Home() {
   };
 
   const onDeleteActivity = (id: number) => {
-    submitActivity({
-      id: id,
-      from: "",
-      to: "",
-      duration: 0,
-      project: "delete",
+    setSelectedDateActivities((activities) => {
+      const newActivities = activities.map((activity) => {
+        if (activity.id === id) {
+          activity.isBreak = true;
+          activity.description = "";
+          activity.activity = "";
+          activity.project = "!removed";
+        }
+        return activity;
+      });
+      return newActivities;
     });
+    setShouldAutosave(true);
   };
 
   const handleSave = (report: string, shouldAutosave: boolean) => {

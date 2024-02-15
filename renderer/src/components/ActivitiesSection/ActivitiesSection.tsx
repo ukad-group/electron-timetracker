@@ -32,12 +32,8 @@ const ActivitiesSection = ({
   });
   const [errorType, setErrorType] = useState<null | "updater">(null);
   const [isErrorShown, setIsErrorShown] = useState<boolean>(true);
-  const isGoogleEventsShown = JSON.parse(
-    localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS)
-  );
-  const isOffice365EventsShown = JSON.parse(
-    localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS)
-  );
+  const isGoogleEventsShown = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS));
+  const isOffice365EventsShown = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS));
   const nonBreakActivities = useMemo(() => {
     return validation(activities.filter((activity) => activity.to));
   }, [activities]);
@@ -52,12 +48,8 @@ const ActivitiesSection = ({
     if (checkIsToday(selectedDate)) {
       setIsLoading(true);
 
-      const googleEvents = isGoogleEventsShown
-        ? await loadGoogleEventsFromAllUsers()
-        : [];
-      const office365Events = isOffice365EventsShown
-        ? await getOffice365Events()
-        : [];
+      const googleEvents = isGoogleEventsShown ? await loadGoogleEventsFromAllUsers() : [];
+      const office365Events = isOffice365EventsShown ? await getOffice365Events() : [];
 
       const allEvents = [...googleEvents, ...office365Events];
 
@@ -86,26 +78,20 @@ const ActivitiesSection = ({
 
   useEffect(() => {
     document.addEventListener("keyup", handleCtrlSpace);
-    global.ipcRenderer.on(
-      IPC_MAIN_CHANNELS.BACKEND_ERROR,
-      (_, errorMessage, data) => {
-        setBackgroundError(errorMessage);
-        console.log("Error data ", data);
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.BACKEND_ERROR, (_, errorMessage, data) => {
+      setBackgroundError(errorMessage);
+      console.log("Error data ", data);
 
-        const errorMessageArray = errorMessage ? errorMessage.split(" ") : [];
-        if (errorMessageArray.includes("Updater")) {
-          setErrorType("updater");
-        }
+      const errorMessageArray = errorMessage ? errorMessage.split(" ") : [];
+      if (errorMessageArray.includes("Updater")) {
+        setErrorType("updater");
       }
-    );
+    });
 
-    global.ipcRenderer.on(
-      IPC_MAIN_CHANNELS.RENDER_ERROR,
-      (_, errorTitle, errorMessage, data) => {
-        setRenderError({ errorTitle, errorMessage });
-        console.log("Error data ", data);
-      }
-    );
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.RENDER_ERROR, (_, errorTitle, errorMessage, data) => {
+      setRenderError({ errorTitle, errorMessage });
+      console.log("Error data ", data);
+    });
 
     return () => {
       document.removeEventListener("keyup", handleCtrlSpace);
@@ -143,15 +129,11 @@ const ActivitiesSection = ({
         {backgroundError && isErrorShown && (
           <div className="relative border-t-4 border-red-700 mx-3 mb-6 p-5 shadow-lg text-gray-700 text-left dark:text-slate-400">
             <div className="flex justify-start gap-2 w-full text-gray-900 font-bold dark:text-white">
-              <ExclamationCircleIcon
-                className="w-7 h-7 text-red-700"
-                aria-hidden="true"
-              />
+              <ExclamationCircleIcon className="w-7 h-7 text-red-700" aria-hidden="true" />
               <p>Noncritical error</p>
             </div>
             <div className="pl-9 pr-8">
-              {backgroundError} Refer to the console for specific error
-              information.{" "}
+              {backgroundError} Refer to the console for specific error information.{" "}
               {errorType === "updater" && (
                 <button
                   className="text-dark-button-back hover:text-dark-button-hover"
@@ -181,10 +163,7 @@ const ActivitiesSection = ({
           />
         </div>
         <div>
-          <TrackTimeButton
-            isLoading={isLoading}
-            onEditActivity={onEditActivity}
-          />
+          <TrackTimeButton isLoading={isLoading} onEditActivity={onEditActivity} />
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { getMonthDates, getWeekDates } from "@/helpers/utils/datetime-ui";
 import { Activity, Total } from "@/components/Totals/types";
 import { parseReport, ReportActivity } from "@/helpers/utils/reports";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export const getDates = (period, selectedDate) => {
   switch (period) {
@@ -17,11 +18,7 @@ export const getDates = (period, selectedDate) => {
 };
 
 const getParsedActivities = async (day: Date, reportsFolder) => {
-  const dayReport = await global.ipcRenderer.invoke(
-    "app:read-day-report",
-    reportsFolder,
-    day
-  );
+  const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.READ_DAY_REPORT, reportsFolder, day);
 
   const parsedReportsAndNotes = parseReport(dayReport);
 
@@ -33,9 +30,7 @@ const getProjectTotals = (activities: ReportActivity[]) =>
     if (!curr?.project || curr?.project.startsWith("!")) return acc;
 
     const existingTotal = acc.find((item) => item.name === curr.project);
-    const name = curr.activity
-      ? `${curr.activity} - ${curr.description}`
-      : curr.description;
+    const name = curr.activity ? `${curr.activity} - ${curr.description}` : curr.description;
 
     if (!existingTotal) {
       acc.push({
@@ -54,9 +49,7 @@ const getProjectTotals = (activities: ReportActivity[]) =>
     } else {
       existingTotal.duration += curr.duration ? curr.duration : 0;
 
-      const existingDescription = existingTotal.descriptions.find(
-        (desc) => desc.name === name
-      );
+      const existingDescription = existingTotal.descriptions.find((desc) => desc.name === name);
 
       if (existingDescription) {
         existingDescription.duration += curr.duration;
@@ -73,18 +66,11 @@ const getProjectTotals = (activities: ReportActivity[]) =>
   }, []);
 
 const sortTotals = (totals) => {
-  return totals.sort((totalA, totalB) =>
-    totalA.name.localeCompare(totalB.name)
-  );
+  return totals.sort((totalA, totalB) => totalA.name.localeCompare(totalB.name));
 };
 
-const getActivityTotals = (
-  projectName: string,
-  activities: ReportActivity[]
-) => {
-  const filteredActivities = activities.filter(
-    (activity: ReportActivity) => activity.project === projectName
-  );
+const getActivityTotals = (projectName: string, activities: ReportActivity[]) => {
+  const filteredActivities = activities.filter((activity: ReportActivity) => activity.project === projectName);
 
   return filteredActivities.reduce((acc: Activity[], curr: ReportActivity) => {
     const existingTotal = acc.find((item) => item.name === curr.activity);
@@ -105,9 +91,7 @@ const getActivityTotals = (
     } else {
       existingTotal.duration += curr.duration;
 
-      const existingDescription = existingTotal.descriptions.find(
-        (desc) => desc.name === curr.description
-      );
+      const existingDescription = existingTotal.descriptions.find((desc) => desc.name === curr.description);
 
       if (existingDescription) {
         existingDescription.duration += curr.duration;
@@ -124,17 +108,10 @@ const getActivityTotals = (
   }, []);
 };
 
-export const getTotals = async ({
-  period,
-  selectedDate,
-  reportsFolder,
-  setTotals,
-}) => {
+export const getTotals = async ({ period, selectedDate, reportsFolder, setTotals }) => {
   const dates = getDates(period, selectedDate);
 
-  const parsedActivities = await Promise.all(
-    dates.map((date) => getParsedActivities(date, reportsFolder))
-  );
+  const parsedActivities = await Promise.all(dates.map((date) => getParsedActivities(date, reportsFolder)));
 
   const combinedActivities = parsedActivities.reduce((acc, act) => {
     if (act) {

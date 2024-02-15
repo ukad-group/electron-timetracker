@@ -1,8 +1,4 @@
-import {
-  FormattedReport,
-  DayOff,
-  ApiDayOff,
-} from "@/components/Calendar/types";
+import { FormattedReport, DayOff, ApiDayOff } from "@/components/Calendar/types";
 
 export const DAY = 60 * 60 * 24 * 1000;
 export const MS_PER_HOUR = 60 * 60 * 1000;
@@ -39,9 +35,7 @@ export function isTheSameDates(date1: Date, date2: Date): boolean {
 export function getWeekNumber(dateString: string) {
   const dateObj = getDateFromString(dateString);
   const startOfYear = new Date(dateObj.getFullYear(), 0, 1);
-  const days = Math.floor(
-    (dateObj.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000)
-  );
+  const days = Math.floor((dateObj.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
 
   return Math.ceil((days + startOfYear.getDay()) / 7);
 }
@@ -54,14 +48,9 @@ export function getDateFromString(dateString: string) {
   return new Date(year, month, day);
 }
 
-export function getMonthWorkHours(
-  monthReports: FormattedReport[],
-  calendarDate: Date
-) {
+export function getMonthWorkHours(monthReports: FormattedReport[], calendarDate: Date) {
   const currentYear = calendarDate.getFullYear();
-  const currentMonth = (calendarDate.getMonth() + 1)
-    .toString()
-    .padStart(2, "0");
+  const currentMonth = (calendarDate.getMonth() + 1).toString().padStart(2, "0");
 
   const query = currentYear + currentMonth;
 
@@ -71,21 +60,13 @@ export function getMonthWorkHours(
   }, 0);
 }
 
-export function getRequiredHours(
-  calendarDate: Date,
-  daysOff: DayOff[],
-  lastDay: Date
-) {
+export function getRequiredHours(calendarDate: Date, daysOff: DayOff[], lastDay: Date) {
   if (!daysOff) return;
 
   let totalWorkHours = 0;
 
   for (let i = 1; i <= lastDay.getDate(); i++) {
-    const monthDay = new Date(
-      calendarDate.getFullYear(),
-      calendarDate.getMonth(),
-      i
-    );
+    const monthDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), i);
 
     const isWeekend = monthDay.getDay() === 0 || monthDay.getDay() === 6;
     const dayOff = daysOff.find((day) => isTheSameDates(monthDay, day.date));
@@ -104,12 +85,9 @@ export function mathOvertimeUndertime(
   formattedQuarterReports: FormattedReport[],
   calendarDate: Date,
   daysOff: DayOff[],
-  selectedDate: Date
+  selectedDate: Date,
 ) {
-  const monthWorkHours = getMonthWorkHours(
-    formattedQuarterReports,
-    selectedDate
-  );
+  const monthWorkHours = getMonthWorkHours(formattedQuarterReports, selectedDate);
   const requiredHours = getRequiredHours(calendarDate, daysOff, selectedDate);
 
   if (monthWorkHours - requiredHours === 0) {
@@ -129,18 +107,14 @@ export function mathOvertimeUndertime(
 }
 
 export function extractDatesFromPeriod(period: ApiDayOff, holidays: DayOff[]) {
-  const dateStart = new Date(
-    new Date(period?.dateFrom).toISOString().slice(0, -1)
-  );
+  const dateStart = new Date(new Date(period?.dateFrom).toISOString().slice(0, -1));
   const dateEnd = new Date(new Date(period?.dateTo).toISOString().slice(0, -1));
   const vacationRange = generateDateRange(dateStart, dateEnd);
 
   return vacationRange
     .filter((date) => {
       return (
-        date.getDay() >= 1 &&
-        date.getDay() <= 5 &&
-        holidays.some((holiday) => !isTheSameDates(holiday.date, date))
+        date.getDay() >= 1 && date.getDay() <= 5 && holidays.some((holiday) => !isTheSameDates(holiday.date, date))
       );
     })
     .map((date) => {
@@ -174,9 +148,7 @@ export function getCeiledTime() {
     .toString()
     .padStart(2, "0");
 
-  const ceilMinutes = (Math.ceil(minutes / 15 > 3 ? 0 : minutes / 15) * 15)
-    .toString()
-    .padStart(2, "0");
+  const ceilMinutes = (Math.ceil(minutes / 15 > 3 ? 0 : minutes / 15) * 15).toString().padStart(2, "0");
 
   return `${ceilHours}:${ceilMinutes}`;
 }
@@ -216,11 +188,7 @@ export const convertMillisecondsToTime = (milliseconds) => {
 
 export const getWeekDates = (inputDate: Date) => {
   const startDate = new Date(inputDate);
-  startDate.setDate(
-    inputDate.getDate() -
-      inputDate.getDay() +
-      (inputDate.getDay() === 0 ? -6 : 1)
-  );
+  startDate.setDate(inputDate.getDate() - inputDate.getDay() + (inputDate.getDay() === 0 ? -6 : 1));
 
   const weekDays = [];
 
@@ -236,19 +204,11 @@ export const getWeekDates = (inputDate: Date) => {
 export const getMonthDates = (inputDate: Date) => {
   const firstDay = new Date(inputDate.getFullYear(), inputDate.getMonth(), 1);
 
-  const lastDay = new Date(
-    inputDate.getFullYear(),
-    inputDate.getMonth() + 1,
-    0
-  );
+  const lastDay = new Date(inputDate.getFullYear(), inputDate.getMonth() + 1, 0);
 
   const monthDates = [];
   for (let i = firstDay.getDate(); i <= lastDay.getDate(); i++) {
-    const currentDate = new Date(
-      inputDate.getFullYear(),
-      inputDate.getMonth(),
-      i
-    );
+    const currentDate = new Date(inputDate.getFullYear(), inputDate.getMonth(), i);
     monthDates.push(currentDate);
   }
 
@@ -280,19 +240,11 @@ export const getDateTimeData = (selectedDate: Date) => {
   const now = new Date();
   const hours = now.getHours().toString().padStart(2, "0");
   const minutes = now.getMinutes().toString().padStart(2, "0");
-  const floorMinutes = (Math.floor(Number(minutes) / 15) * 15)
+  const floorMinutes = (Math.floor(Number(minutes) / 15) * 15).toString().padStart(2, "0");
+  const ceilHours = Math.ceil(Number(minutes) / 15 > 3 ? Number(hours) + 1 : Number(hours))
     .toString()
     .padStart(2, "0");
-  const ceilHours = Math.ceil(
-    Number(minutes) / 15 > 3 ? Number(hours) + 1 : Number(hours)
-  )
-    .toString()
-    .padStart(2, "0");
-  const ceilMinutes = (
-    Math.ceil(Number(minutes) / 15 > 3 ? 0 : Number(minutes) / 15) * 15
-  )
-    .toString()
-    .padStart(2, "0");
+  const ceilMinutes = (Math.ceil(Number(minutes) / 15 > 3 ? 0 : Number(minutes) / 15) * 15).toString().padStart(2, "0");
   const isToday = checkIsToday(selectedDate);
 
   return {

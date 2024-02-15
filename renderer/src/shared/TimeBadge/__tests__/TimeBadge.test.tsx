@@ -1,5 +1,5 @@
 import TimeBadge from "../TimeBadge";
-import { TimeBadgeProps } from '../types';
+import { TimeBadgeProps } from "../types";
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 

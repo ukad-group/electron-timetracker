@@ -1,12 +1,8 @@
 import React from "react";
 import { stringToMinutes } from "@/helpers/utils/reports";
-import { TimeBadgeProps } from './types';
+import { TimeBadgeProps } from "./types";
 
-export default function TimeBadge({
-  hours,
-  startTime,
-  selectedDate,
-}: TimeBadgeProps) {
+export default function TimeBadge({ hours, startTime, selectedDate }: TimeBadgeProps) {
   const curDate = new Date();
   const curTime = curDate.getHours() * 60 + curDate.getMinutes();
 
@@ -24,8 +20,7 @@ export default function TimeBadge({
     );
   }
   if (
-    (hours < 8 &&
-      selectedDate.toLocaleDateString() !== curDate.toLocaleDateString()) ||
+    (hours < 8 && selectedDate.toLocaleDateString() !== curDate.toLocaleDateString()) ||
     (hours < 8 && curTime - stringToMinutes(startTime) > 480)
   ) {
     return (

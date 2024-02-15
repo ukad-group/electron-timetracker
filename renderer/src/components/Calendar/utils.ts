@@ -1,7 +1,4 @@
-import {
-  extractDatesFromPeriod,
-  isTheSameDates,
-} from "@/helpers/utils/datetime-ui";
+import { extractDatesFromPeriod, isTheSameDates } from "@/helpers/utils/datetime-ui";
 import { DayOff, ApiDayOff, TTUserInfo } from "./types";
 
 type VacationSickDaysData = {
@@ -10,9 +7,7 @@ type VacationSickDaysData = {
 
 export const loadHolidaysAndVacations = async (calendarDate: Date) => {
   try {
-    const timetrackerUserInfo: TTUserInfo = JSON.parse(
-      localStorage.getItem("timetracker-user")
-    );
+    const timetrackerUserInfo: TTUserInfo = JSON.parse(localStorage.getItem("timetracker-user"));
 
     if (!timetrackerUserInfo) return;
 
@@ -22,41 +17,36 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
     let nextYearVacationsPromise: Promise<VacationSickDaysData> | undefined;
     let prevYearVacationsPromise: Promise<VacationSickDaysData> | undefined;
 
-    const vacationsPromise: Promise<VacationSickDaysData> =
-      global.ipcRenderer.invoke(
-        "timetracker:get-vacations",
-        plannerToken,
-        userEmail,
-        calendarDate
-      );
+    const vacationsPromise: Promise<VacationSickDaysData> = global.ipcRenderer.invoke(
+      "timetracker:get-vacations",
+      plannerToken,
+      userEmail,
+      calendarDate,
+    );
 
     // if calendar is in december - get next year info
     if (calendarDate.getMonth() === 11) {
       const currentDate = new Date(calendarDate);
-      const nextYear = new Date(
-        currentDate.setFullYear(currentDate.getFullYear() + 1)
-      );
+      const nextYear = new Date(currentDate.setFullYear(currentDate.getFullYear() + 1));
 
       nextYearVacationsPromise = global.ipcRenderer.invoke(
         "timetracker:get-vacations",
         plannerToken,
         userEmail,
-        nextYear
+        nextYear,
       );
     }
 
     // if calendar is in january - get previous year info
     if (calendarDate.getMonth() === 0) {
       const currentDate = new Date(calendarDate);
-      const prevYear = new Date(
-        currentDate.setFullYear(currentDate.getFullYear() - 1)
-      );
+      const prevYear = new Date(currentDate.setFullYear(currentDate.getFullYear() - 1));
 
       prevYearVacationsPromise = global.ipcRenderer.invoke(
         "timetracker:get-vacations",
         plannerToken,
         userEmail,
-        prevYear
+        prevYear,
       );
     }
 
@@ -69,37 +59,26 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
     if (userFetchedData.includes("invalid_token")) {
       const refreshToken = timetrackerUserInfo?.plannerRefreshToken;
 
-      const refreshedPlannerCreds = await global.ipcRenderer.invoke(
-        "timetracker:refresh-planner-token",
-        refreshToken
-      );
+      const refreshedPlannerCreds = await global.ipcRenderer.invoke("timetracker:refresh-planner-token", refreshToken);
 
       const refreshedUserInfo = {
         ...timetrackerUserInfo,
         plannerAccessToken: refreshedPlannerCreds?.access_token,
       };
 
-      localStorage.setItem(
-        "timetracker-user",
-        JSON.stringify(refreshedUserInfo)
-      );
+      localStorage.setItem("timetracker-user", JSON.stringify(refreshedUserInfo));
 
       return await loadHolidaysAndVacations(calendarDate);
     }
 
     const vacationsAndSickdays: ApiDayOff[] = [];
 
-    userFetchedData.forEach((data) =>
-      data.periods.forEach((period) => vacationsAndSickdays.push(period))
-    );
+    userFetchedData.forEach((data) => data.periods.forEach((period) => vacationsAndSickdays.push(period)));
 
     const userDaysOff: DayOff[] = [];
 
     vacationsAndSickdays.forEach((item) => {
-      const singleDayOff = isTheSameDates(
-        new Date(item.dateFrom),
-        new Date(item.dateTo)
-      );
+      const singleDayOff = isTheSameDates(new Date(item.dateFrom), new Date(item.dateTo));
 
       if (singleDayOff) {
         userDaysOff.push({
@@ -112,10 +91,7 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
     });
 
     vacationsAndSickdays.forEach((item) => {
-      const periodDayOff = !isTheSameDates(
-        new Date(item.dateFrom),
-        new Date(item.dateTo)
-      );
+      const periodDayOff = !isTheSameDates(new Date(item.dateFrom), new Date(item.dateTo));
 
       if (periodDayOff) {
         const formattedPeriodDates = extractDatesFromPeriod(item, userDaysOff);

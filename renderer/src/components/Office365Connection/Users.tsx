@@ -5,8 +5,7 @@ const Users = ({ users, onSignOutButton }) => (
   <div className="flex flex-col gap-2 w-full">
     {users.map((user) => (
       <div key={user.userId} className="flex gap-4 items-center">
-        <div
-          className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-blue-900 dark:text-blue-400 dark:bg-blue-400/20">
+        <div className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-300 text-blue-900 dark:text-blue-400 dark:bg-blue-400/20">
           {user.username}
         </div>
         <div

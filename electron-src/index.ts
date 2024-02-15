@@ -632,7 +632,7 @@ ipcMain.handle(
 );
 
 ipcMain.handle(
-  "app:read-day-report",
+  IPC_MAIN_CHANNELS.READ_DAY_REPORT,
   (_, reportsFolder: string, selectedDate: Date) => {
     if (!reportsFolder || !selectedDate) return null;
 

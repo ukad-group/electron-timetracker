@@ -1,26 +1,10 @@
-import {
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
-  cloneElement,
-  ReactElement,
-} from "react";
+import { useState, useEffect, useRef, useMemo, cloneElement, ReactElement } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { ExclamationCircleIcon } from "@heroicons/react/24/solid";
-import {
-  CalendarDaysIcon,
-  FaceFrownIcon,
-  GlobeAltIcon,
-} from "@heroicons/react/24/outline";
-import {
-  formatDuration,
-  parseReport,
-  validation,
-  ReportActivity,
-} from "@/helpers/utils/reports";
+import { CalendarDaysIcon, FaceFrownIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
+import { formatDuration, parseReport, validation, ReportActivity } from "@/helpers/utils/reports";
 import { NavButtons } from "@/shared/NavButtons";
 import { Button } from "@/shared/Button";
 import { ErrorPlaceholder, RenderError } from "../../shared/ErrorPlaceholder";
@@ -33,16 +17,8 @@ import {
   mathOvertimeUndertime,
 } from "@/helpers/utils/datetime-ui";
 import { loadHolidaysAndVacations } from "./utils";
-import {
-  CalendarProps,
-  ParsedReport,
-  FormattedReport,
-  TTUserInfo,
-} from "./types";
-import {
-  LOCAL_STORAGE_VARIABLES,
-  TRACK_CONNECTIONS,
-} from "@/helpers/contstants";
+import { CalendarProps, ParsedReport, FormattedReport, TTUserInfo } from "./types";
+import { LOCAL_STORAGE_VARIABLES, TRACK_CONNECTIONS } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
@@ -60,12 +36,8 @@ export function Calendar({
   calendarDate,
   setCalendarDate,
 }: CalendarProps) {
-  const [parsedQuarterReports, setParsedQuarterReports] = useState<
-    ParsedReport[]
-  >([]);
-  const [formattedQuarterReports, setFormattedQuarterReports] = useState<
-    FormattedReport[]
-  >([]);
+  const [parsedQuarterReports, setParsedQuarterReports] = useState<ParsedReport[]>([]);
+  const [formattedQuarterReports, setFormattedQuarterReports] = useState<FormattedReport[]>([]);
   const calendarRef = useRef(null);
   const allCalendarRef = useRef(null);
   const totalTimeRef = useRef(null);
@@ -78,25 +50,15 @@ export function Calendar({
     errorMessage: "",
   });
   const { screenSizes } = useScreenSizes();
-  const timetrackerUserInfo: TTUserInfo = JSON.parse(
-    localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)
-  );
+  const timetrackerUserInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
   const monthWorkedHours = useMemo(() => {
-    return formatDuration(
-      getMonthWorkHours(formattedQuarterReports, calendarDate)
-    );
+    return formatDuration(getMonthWorkHours(formattedQuarterReports, calendarDate));
   }, [formattedQuarterReports, calendarDate]);
 
   const monthRequiredHours = useMemo(() => {
-    const lastDayOfMonth = new Date(
-      calendarDate.getFullYear(),
-      calendarDate.getMonth() + 1,
-      0
-    );
-    return formatDuration(
-      getRequiredHours(calendarDate, daysOff, lastDayOfMonth)
-    );
+    const lastDayOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
+    return formatDuration(getRequiredHours(calendarDate, daysOff, lastDayOfMonth));
   }, [daysOff, calendarDate]);
 
   const workRequiredHours = useMemo(() => {
@@ -104,12 +66,10 @@ export function Calendar({
       formattedQuarterReports,
       calendarDate,
       daysOff,
-      selectedDate
+      selectedDate,
     );
 
-    const daysRequiredHours = formatDuration(
-      getRequiredHours(calendarDate, daysOff, selectedDate)
-    );
+    const daysRequiredHours = formatDuration(getRequiredHours(calendarDate, daysOff, selectedDate));
 
     if (!getRequiredHours(calendarDate, daysOff, selectedDate)) return;
 
@@ -129,49 +89,34 @@ export function Calendar({
         )}
       </p>
     );
-  }, [formattedQuarterReports, calendarDate, selectedDate]);
+  }, [formattedQuarterReports, calendarDate, daysOff, selectedDate]);
 
   useEffect(() => {
     try {
       (async () => {
         setParsedQuarterReports(
-          await global.ipcRenderer.invoke(
-            IPC_MAIN_CHANNELS.APP_FIND_QUARTER_PROJECTS,
-            reportsFolder,
-            calendarDate
-          )
+          await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_FIND_QUARTER_PROJECTS, reportsFolder, calendarDate),
         );
       })();
 
       const fileChangeListener = () => {
         (async () => {
           setParsedQuarterReports(
-            await global.ipcRenderer.invoke(
-              IPC_MAIN_CHANNELS.APP_FIND_QUARTER_PROJECTS,
-              reportsFolder,
-              calendarDate
-            )
+            await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_FIND_QUARTER_PROJECTS, reportsFolder, calendarDate),
           );
         })();
       };
 
-      global.ipcRenderer.on(
-        IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
-        fileChangeListener
-      );
+      global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
 
       return () => {
-        global.ipcRenderer.removeListener(
-          IPC_MAIN_CHANNELS.ANY_FILE_CHANGED,
-          fileChangeListener
-        );
+        global.ipcRenderer.removeListener(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
       };
     } catch (err) {
       console.log("Error details ", err);
       setRenderError({
         errorTitle: "Calendar error",
-        errorMessage:
-          "An error occurred when validating reports for the last month. ",
+        errorMessage: "An error occurred when validating reports for the last month. ",
       });
     }
   }, [calendarDate, reportsFolder]);
@@ -277,7 +222,7 @@ export function Calendar({
           acc += report.workDurationMs;
         }
         return acc;
-      }, 0)
+      }, 0),
     );
 
     return (
@@ -293,35 +238,24 @@ export function Calendar({
       return info.dayNumberText;
     }
 
-    const userDayOff = daysOff?.find((day) =>
-      isTheSameDates(info.date, day.date)
-    );
+    const userDayOff = daysOff?.find((day) => isTheSameDates(info.date, day.date));
 
     if (userDayOff) {
-      const duration =
-        userDayOff?.duration === 8 ? "all day" : userDayOff?.duration + "h";
+      const duration = userDayOff?.duration === 8 ? "all day" : userDayOff?.duration + "h";
       let icon: ReactElement | undefined;
       let title: string | undefined;
 
       switch (userDayOff?.type) {
         case 2:
-          icon = (
-            <GlobeAltIcon className="absolute top-[30px] right-[2px] w-5 h-5" />
-          );
-          title = userDayOff?.description
-            ? `${userDayOff?.description}, ${duration}`
-            : "Holiday";
+          icon = <GlobeAltIcon className="absolute top-[30px] right-[2px] w-5 h-5" />;
+          title = userDayOff?.description ? `${userDayOff?.description}, ${duration}` : "Holiday";
           break;
         case 0:
-          icon = (
-            <CalendarDaysIcon className="absolute top-[30px] right-[2px] w-5 h-5" />
-          );
+          icon = <CalendarDaysIcon className="absolute top-[30px] right-[2px] w-5 h-5" />;
           title = `Vacation, ${duration}`;
           break;
         case 1:
-          icon = (
-            <FaceFrownIcon className="absolute top-[30px] right-[2px] w-5 h-5" />
-          );
+          icon = <FaceFrownIcon className="absolute top-[30px] right-[2px] w-5 h-5" />;
           title = `Sickday, ${duration}`;
           break;
         default:
@@ -339,10 +273,7 @@ export function Calendar({
     }
   };
 
-  const [progress, setProgress] = useTutorialProgressStore(
-    (state) => [state.progress, state.setProgress],
-    shallow
-  );
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
 
   useEffect(() => {
     changeHintConditions(progress, setProgress, [
@@ -354,8 +285,7 @@ export function Calendar({
     ]);
 
     const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } =
-        document.documentElement;
+      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
 
       if (scrollTop + clientHeight + 50 >= scrollHeight) {
         changeHintConditions(progress, setProgress, [
@@ -391,23 +321,14 @@ export function Calendar({
             Total: {monthWorkedHours} {workRequiredHours}
           </div>
           {timetrackerUserInfo && (
-            <p className="text-xs text-gray-500 dark:text-dark-main">
-              Required: {monthRequiredHours}
-            </p>
+            <p className="text-xs text-gray-500 dark:text-dark-main">Required: {monthRequiredHours}</p>
           )}
         </div>
         <div className="flex gap-4">
           {calendarDate.getMonth() !== new Date().getMonth() && (
-            <Button
-              text="Go to current month"
-              callback={todayButtonHandle}
-              type={"button"}
-            />
+            <Button text="Go to current month" callback={todayButtonHandle} type={"button"} />
           )}
-          <NavButtons
-            prevCallback={prevButtonHandle}
-            nextCallback={nextButtonHandle}
-          />
+          <NavButtons prevCallback={prevButtonHandle} nextCallback={nextButtonHandle} />
         </div>
         {screenSizes.screenWidth >= SCREENS.LG && (
           <Hint
@@ -502,9 +423,7 @@ function renderEventContent(eventInfo) {
         <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-[25px] -left-[1px] dark:fill-red-500/70" />
       )}
       {eventInfo.event.extendedProps.workDurationMs ? (
-        <p className="whitespace-normal">
-          Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}
-        </p>
+        <p className="whitespace-normal">Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}</p>
       ) : (
         <p className="whitespace-normal">File is empty</p>
       )}
