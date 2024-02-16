@@ -36,7 +36,6 @@ const localStorageMock = {
   ...global.localStorage,
 };
 global.localStorage = localStorageMock;
-
 describe("GIVEN utils/replaceHyphensWithSpaces", () => {
   it("should replace hyphens with spaces in a given string", () => {
     const inputString = "hello - world - test";
@@ -118,22 +117,14 @@ describe("GIVEN utils/parseEventTitle", () => {
     const event = { summary: "Project1" };
     // @ts-ignore
     const result = parseEventTitle(event, latestProjAndAct);
-    expect(result).toEqual({
-      project: "project1",
-      description: "Project1",
-      summary: "Project1",
-    });
+    expect(result).toEqual({ project: "project1", description: "Project1", summary: "Project1" });
   });
 
   it("should parse event with two-word title", () => {
     const event = { summary: "Project1 - Activity1" };
     // @ts-ignore
     const result = parseEventTitle(event, latestProjAndAct);
-    expect(result).toEqual({
-      summary: "Project1 - Activity1",
-      activity: "Project1",
-      description: "Activity1",
-    });
+    expect(result).toEqual({ summary: "Project1 - Activity1", activity: "Project1", description: "Activity1" });
   });
 
   it("should parse event with three-word title", () => {

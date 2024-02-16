@@ -77,6 +77,11 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         reportsFolder,
         calendarDate,
       );
+      const oneMonthLocalReports = monthLocalReports.filter((report) => {
+        return (
+          report.reportDate.split("").slice(4, 6).join("") === (calendarDate.getMonth() + 1).toString().padStart(2, "0")
+        );
+      });
 
       const monthParsedActivities = monthLocalReports.map((report: ParsedReport) => {
         return (parseReport(report?.data)[0] || []).filter((activity: ReportActivity) => !activity.isBreak);
@@ -152,6 +157,10 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
     return () => {
       global.ipcRenderer.removeListener(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
     };
+  }, []);
+
+  useEffect(() => {
+    getBookedStatistic();
   }, [calendarDate]);
 
   const renderProjectsHours = () =>

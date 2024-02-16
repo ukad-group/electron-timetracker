@@ -63,6 +63,8 @@ export function getMonthWorkHours(monthReports: FormattedReport[], calendarDate:
 export function getRequiredHours(calendarDate: Date, daysOff: DayOff[], lastDay: Date) {
   if (!daysOff) return;
 
+  const lastDayOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
+
   let totalWorkHours = 0;
 
   for (let i = 1; i <= lastDay.getDate(); i++) {

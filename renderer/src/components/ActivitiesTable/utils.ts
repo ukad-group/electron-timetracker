@@ -22,8 +22,8 @@ export const formatEvents = (events, latestProjAndAct) => {
     event = parseEventTitle(event, latestProjAndAct);
 
     return {
-      from,
-      to,
+      from: from,
+      to: to,
       duration: calcDurationBetweenTimes(from, to),
       project: event.project || "",
       activity: event.activity || "",
@@ -35,15 +35,15 @@ export const formatEvents = (events, latestProjAndAct) => {
 };
 
 export const getActualEvents = (events, activities) => {
-  if (!events.length) {
-    return [];
-  }
+  if (!events.length) return [];
 
   return events.filter((event) => {
     const { end } = event;
     const endDateTime = end?.timeZone === "UTC" ? `${end?.dateTime}Z` : end?.dateTime;
     const to = getTimeFromEventObj(endDateTime);
-    const isOverlapped = activities.some((activity) => padStringToMinutes(activity.to) >= padStringToMinutes(to));
+    const isOverlapped = activities.some((activity) => {
+      return padStringToMinutes(activity.to) >= padStringToMinutes(to);
+    });
 
     if (event?.start?.dateTime && event?.end?.dateTime && !isOverlapped) {
       return event;
