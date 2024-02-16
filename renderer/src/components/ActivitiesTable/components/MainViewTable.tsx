@@ -339,7 +339,7 @@ const MainViewTable = () => {
               )}
               {activity.isBreak && (
                 <p onClick={copyToClipboardHandle} className="old-break-word">
-                  {activity.project}
+                  {activity.project.split("").slice(1).join("")}
                 </p>
               )}
               {activity.mistakes && (
