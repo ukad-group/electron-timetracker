@@ -295,15 +295,26 @@ export default function Home() {
 
   const onDeleteActivity = (id: number) => {
     setSelectedDateActivities((activities) => {
-      const newActivities = activities.map((activity) => {
+      let deleteActivityNum = 0;
+      const newActivities = activities.map((activity, i) => {
         if (activity.id === id) {
-          activity.isBreak = true;
-          activity.description = "";
-          activity.activity = "";
-          activity.project = "!removed";
+          if (activity.isBreak) {
+            activities[i - 1].to = activities[i + 1].from;
+            deleteActivityNum = i;
+          } else {
+            activity.isBreak = true;
+            activity.description = "";
+            activity.activity = "";
+            activity.project = "!removed";
+          }
         }
         return activity;
       });
+
+      if (deleteActivityNum) {
+        newActivities.splice(deleteActivityNum, 1);
+      }
+
       return newActivities;
     });
     setShouldAutosave(true);
