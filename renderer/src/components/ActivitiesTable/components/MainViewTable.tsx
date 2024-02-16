@@ -374,66 +374,64 @@ const MainViewTable = () => {
               )}
             </td>
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              {!activity.isBreak && (
-                <button
-                  className="group py-4 px-3"
-                  title={activity.calendarId ? "Add" : "Edit"}
-                  onClick={() => {
-                    handleEditClick(activity);
-                  }}
-                >
-                  {!activity.calendarId && (
-                    <>
-                      <Hint
-                        displayCondition
-                        learningMethod="buttonClick"
-                        order={1}
-                        groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
-                        referenceRef={firstEditButtonRef}
-                        shiftY={30}
-                        shiftX={200}
-                        width={"small"}
-                        position={{
-                          basePosition: "bottom",
-                          diagonalPosition: "left",
-                        }}
-                      >
-                        {HINTS_ALERTS.EDITING_BUTTON}
-                      </Hint>
-                      <PencilSquareIcon
-                        ref={firstEditButtonRef}
-                        className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
-                      />
-                    </>
-                  )}
-                  {activity.calendarId &&
-                    progress["editButton"] &&
-                    !progress["editButton"].includes(false) && (
-                      <Hint
-                        displayCondition
-                        learningMethod="buttonClick"
-                        order={1}
-                        groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
-                        referenceRef={calendarEventRef}
-                        shiftY={200}
-                        shiftX={50}
-                        width={"medium"}
-                        position={{
-                          basePosition: "left",
-                          diagonalPosition: "bottom",
-                        }}
-                      >
-                        {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
-                      </Hint>
-                    )}
-                  {activity.calendarId && (
-                    <PlusIcon
-                      ref={activity.calendarId ? calendarEventRef : undefined}
+              <button
+                className="group py-4 px-3"
+                title={activity.calendarId ? "Add" : "Edit"}
+                onClick={() => {
+                  handleEditClick(activity);
+                }}
+              >
+                {!activity.calendarId && (
+                  <>
+                    <Hint
+                      displayCondition
+                      learningMethod="buttonClick"
+                      order={1}
+                      groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
+                      referenceRef={firstEditButtonRef}
+                      shiftY={30}
+                      shiftX={200}
+                      width={"small"}
+                      position={{
+                        basePosition: "bottom",
+                        diagonalPosition: "left",
+                      }}
+                    >
+                      {HINTS_ALERTS.EDITING_BUTTON}
+                    </Hint>
+                    <PencilSquareIcon
+                      ref={firstEditButtonRef}
                       className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
                     />
+                  </>
+                )}
+                {activity.calendarId &&
+                  progress["editButton"] &&
+                  !progress["editButton"].includes(false) && (
+                    <Hint
+                      displayCondition
+                      learningMethod="buttonClick"
+                      order={1}
+                      groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
+                      referenceRef={calendarEventRef}
+                      shiftY={200}
+                      shiftX={50}
+                      width={"medium"}
+                      position={{
+                        basePosition: "left",
+                        diagonalPosition: "bottom",
+                      }}
+                    >
+                      {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
+                    </Hint>
                   )}
-                </button>
-              )}
+                {activity.calendarId && (
+                  <PlusIcon
+                    ref={activity.calendarId ? calendarEventRef : undefined}
+                    className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
+                  />
+                )}
+              </button>
             </td>
           </tr>
         ))}
