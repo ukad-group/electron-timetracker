@@ -24,6 +24,7 @@ const MainViewTable = () => {
     copyActivityHandler,
     editActivityHandler,
     onDeleteActivity,
+    isLoading,
   } = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
@@ -52,6 +53,16 @@ const MainViewTable = () => {
         groupName: HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT,
         newConditions: [false],
         existingConditions: [false],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.EDITING_BUTTON,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.TRACK_TIME_MODAL,
+        newConditions: [false, false, false, false, false, false, false, false, false, false],
+        existingConditions: ["same", "same", "same", "same", "same", "same", "same", "same", "same", "same"],
       },
     ]);
   }, []);
@@ -82,6 +93,22 @@ const MainViewTable = () => {
         }
       });
     }
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.EDITING_BUTTON,
+        newConditions: [!isLoading],
+        existingConditions: [!isLoading],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT,
+        newConditions: progress[HINTS_GROUP_NAMES.EDITING_BUTTON]
+          ? [progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading]
+          : [false],
+        existingConditions: progress[HINTS_GROUP_NAMES.EDITING_BUTTON]
+          ? [progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading]
+          : [false],
+      },
+    ]);
   }, [tableActivities]);
 
   useEffect(() => {
@@ -129,21 +156,7 @@ const MainViewTable = () => {
         >
           {HINTS_ALERTS.SHORTCUTS_EDITING}
         </Hint>
-        <Hint
-          learningMethod="buttonClick"
-          order={1}
-          groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
-          referenceRef={firstEditButtonRef}
-          shiftY={30}
-          shiftX={200}
-          width={"small"}
-          position={{
-            basePosition: "bottom",
-            diagonalPosition: "left",
-          }}
-        >
-          {HINTS_ALERTS.EDITING_BUTTON}
-        </Hint>
+
         {screenSizes.screenWidth >= SCREENS.LG && (
           <Hint
             displayCondition
@@ -184,7 +197,7 @@ const MainViewTable = () => {
         {tableActivities?.map((activity, i) => (
           <tr
             key={i}
-            ref={i === 0 ? firstRowRef : undefined}
+            ref={!activity.calendarId ? firstRowRef : undefined}
             className={clsx(`border-b border-gray-200 dark:border-gray-300 transition-transform `, {
               "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
                 (tableActivities[i + 1] && tableActivities[i + 1].isBreak) || activity.isBreak,
@@ -333,13 +346,13 @@ const MainViewTable = () => {
               )}
               {activity.isBreak && (
                 <p onClick={copyToClipboardHandle} className="old-break-word">
-                  {activity.project}
+                  {activity.project.split("").slice(1).join("")}
                 </p>
               )}
               {activity.mistakes && (
                 <p
                   onClick={copyToClipboardHandle}
-                  className="w-fit old-break-word py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-400/20"
+                  className="w-fit old-break-word py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-gray-400 dark:bg-transparent dark:border-2 dark:border-yellow-400/50"
                 >
                   {activity.mistakes}
                 </p>
@@ -377,45 +390,63 @@ const MainViewTable = () => {
               )}
             </td>
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              {!activity.isBreak && (
-                <button
-                  className="group py-4 px-3"
-                  title={activity.calendarId ? "Add" : "Edit"}
-                  onClick={() => {
-                    handleEditClick(activity);
-                  }}
-                >
-                  {!activity.calendarId && (
-                    <PencilSquareIcon
-                      ref={i === 0 ? firstEditButtonRef : undefined}
-                      className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
-                    />
-                  )}
-                  {activity.calendarId && progress["editButton"] && !progress["editButton"].includes(false) && (
+              <button
+                className="group py-1 px-3"
+                title={activity.calendarId ? "Add" : "Edit"}
+                onClick={() => {
+                  handleEditClick(activity);
+                }}
+              >
+                {!activity.calendarId && (
+                  <>
                     <Hint
+                      displayCondition
                       learningMethod="buttonClick"
                       order={1}
-                      groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
-                      referenceRef={calendarEventRef}
-                      shiftY={200}
-                      shiftX={50}
-                      width={"medium"}
+                      groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
+                      referenceRef={firstEditButtonRef}
+                      shiftY={30}
+                      shiftX={200}
+                      width={"small"}
                       position={{
-                        basePosition: "left",
-                        diagonalPosition: "bottom",
+                        basePosition: "bottom",
+                        diagonalPosition: "left",
                       }}
                     >
-                      {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
+                      {HINTS_ALERTS.EDITING_BUTTON}
                     </Hint>
-                  )}
-                  {activity.calendarId && (
-                    <PlusIcon
-                      ref={activity.calendarId ? calendarEventRef : undefined}
+                    <PencilSquareIcon
+                      ref={firstEditButtonRef}
                       className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
                     />
-                  )}
-                </button>
-              )}
+                  </>
+                )}
+                {activity.calendarId && progress["editButton"] && !progress["editButton"].includes(false) && (
+                  <Hint
+                    displayCondition
+                    learningMethod="buttonClick"
+                    order={1}
+                    groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
+                    referenceRef={calendarEventRef}
+                    shiftY={200}
+                    shiftX={50}
+                    width={"medium"}
+                    position={{
+                      basePosition: "left",
+                      diagonalPosition: "bottom",
+                    }}
+                  >
+                    {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
+                  </Hint>
+                )}
+
+                {activity.calendarId && (
+                  <PlusIcon
+                    ref={activity.calendarId ? calendarEventRef : undefined}
+                    className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
+                  />
+                )}
+              </button>
             </td>
           </tr>
         ))}

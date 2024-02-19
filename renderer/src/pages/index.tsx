@@ -96,7 +96,11 @@ export default function Home() {
   useEffect(() => {
     try {
       (async () => {
-        const dayReport = await global.ipcRenderer.invoke("app:read-day-report", reportsFolder, selectedDate);
+        const dayReport = await global.ipcRenderer.invoke(
+          IPC_MAIN_CHANNELS.READ_DAY_REPORT,
+          reportsFolder,
+          selectedDate,
+        );
 
         setSelectedDateReport(dayReport || "");
 

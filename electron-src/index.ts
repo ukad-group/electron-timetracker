@@ -81,6 +81,7 @@ autoUpdater.autoInstallOnAppQuit = true;
 
 ipcMain.on(IPC_MAIN_CHANNELS.BETA_CHANNEL, (event: any, isBeta: boolean) => {
   autoUpdater.allowPrerelease = isBeta;
+  autoUpdater.checkForUpdates();
 });
 
 function setUpdateStatus(status: "available" | "downloaded", version: string) {
@@ -190,7 +191,6 @@ const generateTray = () => {
         } else {
           mainWindow?.show();
         }
-        autoUpdater.checkForUpdates();
       },
     },
     {
@@ -215,7 +215,6 @@ const generateTray = () => {
     } else {
       mainWindow?.show();
     }
-    autoUpdater.checkForUpdates();
   });
 };
 
@@ -296,7 +295,6 @@ app.on("ready", async () => {
 
   if (mainWindow) {
     app.whenReady().then(() => {
-      autoUpdater.checkForUpdates();
       if (process.platform === "darwin") return;
 
       try {
@@ -632,7 +630,7 @@ ipcMain.handle(
 );
 
 ipcMain.handle(
-  "app:read-day-report",
+  IPC_MAIN_CHANNELS.READ_DAY_REPORT,
   (_, reportsFolder: string, selectedDate: Date) => {
     if (!reportsFolder || !selectedDate) return null;
 

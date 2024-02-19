@@ -1,6 +1,7 @@
 import { getMonthDates, getWeekDates } from "@/helpers/utils/datetime-ui";
 import { Activity, Total } from "@/components/Totals/types";
 import { parseReport, ReportActivity } from "@/helpers/utils/reports";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export const getDates = (period, selectedDate) => {
   switch (period) {
@@ -17,7 +18,7 @@ export const getDates = (period, selectedDate) => {
 };
 
 const getParsedActivities = async (day: Date, reportsFolder) => {
-  const dayReport = await global.ipcRenderer.invoke("app:read-day-report", reportsFolder, day);
+  const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.READ_DAY_REPORT, reportsFolder, day);
 
   const parsedReportsAndNotes = parseReport(dayReport);
 

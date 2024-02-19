@@ -21,6 +21,7 @@ export const IPC_MAIN_CHANNELS = {
   TIMETRACKER_GET_BOOKINGS: "timetracker:get-bookings",
   APP_FIND_MONTH_PROJECTS: "app:find-month-projects",
   ANY_FILE_CHANGED: "any-file-changed",
+  READ_DAY_REPORT: "app:read-day-report",
   APP_FIND_QUARTER_PROJECTS: "app:find-quarter-projects",
   APP_SELECT_FOLDER: "app:select-folder",
   TIMETRACKER_GET_PROJECTS: "timetracker:get-projects",
