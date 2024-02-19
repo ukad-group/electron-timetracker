@@ -87,12 +87,7 @@ const MainPage = ({
   }, [selectedDateReport]);
 
   useEffect(() => {
-    (async () => {
-      const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.READ_DAY_REPORT, reportsFolder, selectedDate);
-
-      setSelectedDateReport(dayReport || "");
-    })();
-
+    readDayReport();
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FILE_WATCHER, reportsFolder, selectedDate);
     global.ipcRenderer.on("file-changed", (event, data) => {
       if (selectedDateReport != data) {
@@ -110,6 +105,12 @@ const MainPage = ({
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.STOP_PATH_WATCHER, reportsFolder, selectedDate);
     };
   }, [selectedDate, reportsFolder]);
+
+  const readDayReport = async () => {
+    const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.READ_DAY_REPORT, reportsFolder, selectedDate);
+
+    setSelectedDateReport(dayReport || "");
+  };
 
   const handleSave = (report: string, shouldAutosave: boolean) => {
     setSelectedDateReport(report);
