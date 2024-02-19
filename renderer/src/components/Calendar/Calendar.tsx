@@ -2,40 +2,38 @@ import { useState, useEffect, useRef, useMemo, cloneElement, ReactElement } from
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { DayCellContentArg, WeekNumberContentArg, EventContentArg, DatePointApi } from "@fullcalendar/core";
 import { ExclamationCircleIcon } from "@heroicons/react/24/solid";
 import { CalendarDaysIcon, FaceFrownIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
-import { formatDuration, parseReport, validation, ReportActivity } from "@/helpers/utils/reports";
+import { formatDuration } from "@/helpers/utils/reports";
 import { NavButtons } from "@/shared/NavButtons";
 import { Button } from "@/shared/Button";
-import { ErrorPlaceholder, RenderError } from "../../shared/ErrorPlaceholder";
+import { ErrorPlaceholder, RenderError } from "@/shared/ErrorPlaceholder";
 import {
   getMonthWorkHours,
   getRequiredHours,
-  getWeekNumber,
   isTheSameDates,
   MONTHS,
   mathOvertimeUndertime,
 } from "@/helpers/utils/datetime-ui";
-import { loadHolidaysAndVacations } from "./utils";
+import { getFormattedReports, loadHolidaysAndVacations } from "./utils";
 import { CalendarProps, ParsedReport, FormattedReport, TTUserInfo } from "./types";
-import { LOCAL_STORAGE_VARIABLES, TRACK_CONNECTIONS } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES, TRACK_CONNECTIONS, HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { Hint } from "@/shared/Hint";
 import { SCREENS } from "@/constants";
-import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
-import { changeHintConditions } from "@/helpers/utils/utils";
+import { changeHintConditions, trackConnections } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
-import { trackConnections } from "@/helpers/utils/utils";
 
-export function Calendar({
+export const Calendar = ({
   reportsFolder,
   selectedDate,
   setSelectedDate,
   calendarDate,
   setCalendarDate,
-}: CalendarProps) {
+}: CalendarProps) => {
   const [parsedQuarterReports, setParsedQuarterReports] = useState<ParsedReport[]>([]);
   const [formattedQuarterReports, setFormattedQuarterReports] = useState<FormattedReport[]>([]);
   const calendarRef = useRef(null);
@@ -50,7 +48,9 @@ export function Calendar({
     errorMessage: "",
   });
   const { screenSizes } = useScreenSizes();
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const timetrackerUserInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+  const getCalendarApi = () => calendarRef.current.getApi();
 
   const monthWorkedHours = useMemo(() => {
     return formatDuration(getMonthWorkHours(formattedQuarterReports, calendarDate));
@@ -58,6 +58,7 @@ export function Calendar({
 
   const monthRequiredHours = useMemo(() => {
     const lastDayOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
+
     return formatDuration(getRequiredHours(calendarDate, daysOff, lastDayOfMonth));
   }, [daysOff, calendarDate]);
 
@@ -91,7 +92,7 @@ export function Calendar({
     );
   }, [formattedQuarterReports, calendarDate, daysOff, selectedDate]);
 
-  useEffect(() => {
+  const getQuarterReports = async () => {
     try {
       (async () => {
         setParsedQuarterReports(
@@ -119,27 +120,54 @@ export function Calendar({
         errorMessage: "An error occurred when validating reports for the last month. ",
       });
     }
+  };
+
+  const handleHintsBehaviour = () => {
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.CALENDAR,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+    ]);
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+      if (scrollTop + clientHeight + 50 >= scrollHeight) {
+        changeHintConditions(progress, setProgress, [
+          {
+            groupName: HINTS_GROUP_NAMES.CALENDAR,
+            newConditions: [true],
+            existingConditions: [true],
+          },
+        ]);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  };
+
+  useEffect(() => {
+    if (timetrackerUserInfo) {
+      trackConnections(TRACK_CONNECTIONS.TIMETRACKER_WEB);
+    }
+
+    handleHintsBehaviour();
+  }, []);
+
+  useEffect(() => {
+    getQuarterReports();
   }, [calendarDate, reportsFolder]);
 
   // prettier-ignore
   useEffect(() => { 
     try{
-      const fromattedReports = parsedQuarterReports.map((report) => {
-        const { reportDate, data } = report;
-        const activities: ReportActivity[] = validation((parseReport(data)[0] || []).filter(
-          (activity: ReportActivity) => !activity.isBreak
-        ));
-        const workDurationMs = activities.reduce((acc, { duration }) => acc + (duration || 0), 0);
-
-        return {
-          date: reportDate,
-          week: getWeekNumber(reportDate),
-          workDurationMs: workDurationMs,
-          isValid: activities.every((report: ReportActivity) => report.validation.isValid ),
-        };
-      });
-
-      setFormattedQuarterReports(fromattedReports);
+      setFormattedQuarterReports(getFormattedReports(parsedQuarterReports));
     } catch (err) {
       console.log("Error details ", err)
       setRenderError({errorTitle:"Calendar error", errorMessage:"An error occurred when validating reports for the last month. "})
@@ -151,22 +179,20 @@ export function Calendar({
       setDaysOff(await loadHolidaysAndVacations(calendarDate));
     })();
 
-    global.ipcRenderer.on("window-focused", () => {
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.WINDOW_FOCUSED, () => {
       (async () => {
         setDaysOff(await loadHolidaysAndVacations(calendarDate));
       })();
     });
 
     return () => {
-      global.ipcRenderer.removeAllListeners("window-focused");
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.WINDOW_FOCUSED);
     };
   }, [calendarDate, selectedDate]);
 
   useEffect(() => {
     setProgress(progress);
   }, [screenSizes]);
-
-  const getCalendarApi = () => calendarRef.current.getApi();
 
   useEffect(() => {
     if (
@@ -182,11 +208,6 @@ export function Calendar({
     });
   }, [selectedDate]);
 
-  useEffect(() => {
-    if (timetrackerUserInfo) {
-      trackConnections(TRACK_CONNECTIONS.TIMETRACKER_WEB);
-    }
-  }, []);
   const prevButtonHandle = () => {
     getCalendarApi().prev();
     setCalendarDate((date) => new Date(date.setMonth(date.getMonth() - 1, 1)));
@@ -202,20 +223,21 @@ export function Calendar({
     setCalendarDate(new Date());
   };
 
-  const dateClickHandle = (info) => {
+  const dateClickHandle = (info: DatePointApi) => {
     info.date.setHours(1); // by default info.date is 00:00, sometimes it can cause a bug, considering the date as the previous day
     setSelectedDate(info.date);
   };
 
-  const addCellClassNameHandle = (info) => {
+  const addCellClassNameHandle = (info: DayCellContentArg) => {
     const isToday = isTheSameDates(info.date, selectedDate);
+
     if (isToday) {
       return "fc-custom-today-date";
     }
     return "";
   };
 
-  const renderWeekNumberContent = (options) => {
+  const renderWeekNumberContent = (options: WeekNumberContentArg) => {
     const weekTotalHours = formatDuration(
       formattedQuarterReports.reduce((acc, report) => {
         if (report.week === options.num) {
@@ -233,7 +255,7 @@ export function Calendar({
     );
   };
 
-  const getDayCellContent = (info) => {
+  const getDayCellContent = (info: DayCellContentArg) => {
     if (!daysOff || daysOff?.length === 0) {
       return info.dayNumberText;
     }
@@ -273,37 +295,20 @@ export function Calendar({
     }
   };
 
-  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
-
-  useEffect(() => {
-    changeHintConditions(progress, setProgress, [
-      {
-        groupName: HINTS_GROUP_NAMES.CALENDAR,
-        newConditions: [false],
-        existingConditions: [false],
-      },
-    ]);
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-      if (scrollTop + clientHeight + 50 >= scrollHeight) {
-        changeHintConditions(progress, setProgress, [
-          {
-            groupName: HINTS_GROUP_NAMES.CALENDAR,
-            newConditions: [true],
-            existingConditions: [true],
-          },
-        ]);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+  const renderEventContent = (eventInfo: EventContentArg) => {
+    return (
+      <>
+        {eventInfo.event.extendedProps.isValid === false && (
+          <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-[25px] -left-[1px] dark:fill-red-500/70" />
+        )}
+        {eventInfo.event.extendedProps.workDurationMs ? (
+          <p className="whitespace-normal">Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}</p>
+        ) : (
+          <p className="whitespace-normal">File is empty</p>
+        )}
+      </>
+    );
+  };
 
   if (renderError.errorMessage && renderError.errorTitle) {
     return <ErrorPlaceholder {...renderError} />;
@@ -414,19 +419,4 @@ export function Calendar({
       />
     </div>
   );
-}
-
-function renderEventContent(eventInfo) {
-  return (
-    <>
-      {eventInfo.event.extendedProps.isValid === false && (
-        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-[25px] -left-[1px] dark:fill-red-500/70" />
-      )}
-      {eventInfo.event.extendedProps.workDurationMs ? (
-        <p className="whitespace-normal">Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}</p>
-      ) : (
-        <p className="whitespace-normal">File is empty</p>
-      )}
-    </>
-  );
-}
+};
