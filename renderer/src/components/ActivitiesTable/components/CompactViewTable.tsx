@@ -346,8 +346,13 @@ const CompactViewTable = () => {
                       >
                         {activity.isBreak ? activity.project : activity.description}
                       </p>
-                      {activity.mistakes?.includes("startsWith!") && (
-                        <span className="block text-xs mt-1">Perhaps you wanted to report a break</span>
+                      {activity.mistakes && (
+                        <p
+                          onClick={copyToClipboardHandle}
+                          className="w-fit old-break-word py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-gray-400 dark:bg-transparent dark:border-2 dark:border-yellow-400/50"
+                        >
+                          {activity.mistakes}
+                        </p>
                       )}
                     </Tooltip>
                   </div>
