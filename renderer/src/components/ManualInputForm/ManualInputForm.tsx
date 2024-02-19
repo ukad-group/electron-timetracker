@@ -27,6 +27,7 @@ export default function ManualInputForm({
   const [showDeleteButton, setShowDeleteButton] = useState(false);
   const [isFileExist, setIsFileExist] = useState(false);
   const editingHistoryManager = useEditingHistoryManager(report);
+  const [cursorPosition, setCursorPosition] = useState(0);
 
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
 
@@ -55,6 +56,11 @@ export default function ManualInputForm({
     } else {
       setShowDeleteButton(false);
     }
+
+    if (cursorPosition) {
+      textareaRef.current.setSelectionRange(cursorPosition, cursorPosition);
+    }
+    setCursorPosition(0);
 
     document.addEventListener("keydown", saveOnPressHandler);
 
@@ -95,19 +101,21 @@ export default function ManualInputForm({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
-      const currentValue = editingHistoryManager.undoEditing();
+      const [currentValue, changePlace] = editingHistoryManager.undoEditing();
 
       if (typeof currentValue === "string") {
         setReport(currentValue);
+        setCursorPosition(typeof changePlace === "number" ? changePlace : 0);
       }
     }
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
-      const currentValue = editingHistoryManager.redoEditing();
+      const [currentValue, changePlace] = editingHistoryManager.redoEditing();
 
       if (typeof currentValue === "string") {
         setReport(currentValue);
+        setCursorPosition(typeof changePlace === "number" ? changePlace : 0);
       }
     }
   };
