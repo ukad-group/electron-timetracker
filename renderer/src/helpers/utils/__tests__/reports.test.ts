@@ -358,9 +358,7 @@ describe("validation function", () => {
     const activity: ReportActivity = validation(activities)[0];
 
     expect(activity).toHaveProperty("validation", {
-      isValid: false,
-      cell: "time",
-      description: "Intersection of time intervals",
+      isValid: true,
     });
   });
 

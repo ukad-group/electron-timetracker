@@ -281,7 +281,7 @@ export function checkIntersection(previousTo: string, currentFrom: string) {
   const [hoursFrom, minutesFrom] = currentFrom.split(":");
   const toInMinutes = Number(hoursTo) * 60 + Number(minutesTo);
   const fromInMinutes = Number(hoursFrom) * 60 + Number(minutesFrom);
-  return fromInMinutes < toInMinutes;
+  return fromInMinutes <= toInMinutes;
 }
 
 export function validation(activities: Array<ReportActivity>) {
