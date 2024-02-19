@@ -12,7 +12,6 @@ import { TutorialProgress } from "@/store/types";
 import { globalIpcRendererMock } from "@/tests/mocks/electron";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
-const mockSend = jest.fn();
 jest.mock("electron", () => ({
   ipcRenderer: {
     send: jest.fn(),
