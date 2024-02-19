@@ -182,22 +182,34 @@ const CompactViewTable = () => {
               <td className={`relative  pl-4 pr-3 text-sm  whitespace-nowrap sm:pl-6 md:pl-0`}>
                 {ctrlPressed && <span className="absolute -left-4 text-blue-700">{i + 1}</span>}
 
-                <span
-                  ref={activity.isValid !== undefined && !activity.isValid ? invalidTimeRef : undefined}
-                  className={clsx({
-                    "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
-                      activity.isValid !== undefined && !activity.isValid,
-                  })}
+                <Tooltip
+                  tooltipText={
+                    !activity.validation.isValid &&
+                    activity.validation.cell === "time" &&
+                    activity.validation.description
+                  }
+                  disabled={activity.validation.isValid || activity.validation.cell !== "time"}
                 >
-                  {activity.from} - {activity.to}{" "}
                   <span
-                    className={` pl-2 pr-8 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
-                      activity.calendarId ? "opacity-50" : ""
-                    }`}
+                    ref={
+                      !activity.validation.isValid && activity.validation.cell === "time" ? invalidTimeRef : undefined
+                    }
+                    className={clsx("flex gap-1", {
+                      "py-1 px-1 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
+                        !activity.validation.isValid && activity.validation.cell === "time",
+                    })}
                   >
-                    {`${formatDuration(activity.duration)}`}
+                    {activity.from} - {activity.to}
+                    {activity.from} - {activity.to}{" "}
+                    <span
+                      className={` pl-2 pr-8 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
+                        activity.calendarId ? "opacity-50" : ""
+                      }`}
+                    >
+                      {`${formatDuration(activity.duration)}`}
+                    </span>
                   </span>
-                </span>
+                </Tooltip>
               </td>
 
               <td className={`pr-3 text-sm `}>
@@ -248,37 +260,76 @@ const CompactViewTable = () => {
                       {HINTS_ALERTS.VALIDATION}
                     </Hint>
                   )}
-                  <span
-                    ref={activity.isValid !== undefined && !activity.isValid ? invalidTimeRef : undefined}
-                    className={clsx("flex gap-1", {
-                      "py-1 px-1 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
-                        !activity.isValid,
-                    })}
+                  <Tooltip
+                    tooltipText={
+                      !activity.validation.isValid &&
+                      activity.validation.cell === "time" &&
+                      activity.validation.description
+                    }
+                    disabled={activity.validation.isValid || activity.validation.cell !== "time"}
                   >
-                    {activity.from} - {activity.to}
-                  </span>
+                    <span
+                      ref={
+                        !activity.validation.isValid && activity.validation.cell === "time" ? invalidTimeRef : undefined
+                      }
+                      className={clsx("flex gap-1", {
+                        "py-1 px-1 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
+                          !activity.validation.isValid && activity.validation.cell === "time",
+                      })}
+                    >
+                      {activity.from} - {activity.to}
+                    </span>
+                  </Tooltip>
                 </td>
 
                 <td className={`relative px-1 pt-4 ${activity.calendarId ? "opacity-50" : ""}`}>
                   <div className="flex flex-wrap gap-x-2 items-center">
                     <div className="flex gap-1">
-                      {activity.isNewProject && !activity.isBreak && (
+                      {activity.isNewProject && !activity.isBreak && activity.project != "" && (
                         <p className="flex items-center shrink-0 w-fit h-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
                           new
                         </p>
                       )}
-                      <Tooltip isClickable>
-                        <p
-                          className="text-sm font-medium text-gray-900 dark:text-dark-heading old-break-word"
-                          onClick={copyToClipboardHandle}
+                      <Tooltip
+                        isClickable={activity.validation.isValid}
+                        tooltipText={
+                          !activity.validation.isValid &&
+                          activity.validation.cell === "project" &&
+                          activity.validation.description
+                        }
+                        disabled={activity.validation.isValid || activity.validation.cell !== "project"}
+                      >
+                        <span
+                          ref={
+                            !activity.validation.isValid && activity.validation.cell === "project"
+                              ? invalidTimeRef
+                              : undefined
+                          }
+                          className={clsx("flex gap-1", {
+                            "py-1 px-1 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
+                              !activity.validation.isValid && activity.validation.cell === "project",
+                          })}
                         >
-                          {!activity.isBreak && activity.project}
-                        </p>
+                          <p
+                            className={`text-sm font-medium text-gray-900 dark:text-dark-heading old-break-word ${!activity.validation.isValid && activity.validation.cell === "project" && "w-8 h-3"}`}
+                            onClick={copyToClipboardHandle}
+                          >
+                            {!activity.isBreak && activity.project}
+                          </p>
+                        </span>
                       </Tooltip>
                     </div>
 
                     {activity.activity && (
-                      <Tooltip isClickable>
+                      <Tooltip
+                        isClickable={activity.validation.isValid}
+                        tooltipText={
+                          !activity.validation.isValid &&
+                          activity.validation.cell === "activity" &&
+                          activity.validation.description
+                        }
+                        disabled={activity.validation.isValid || activity.validation.cell !== "activity"}
+                      >
                         <p
                           className="block text-xs font-semibold old-break-word text-gray-500 dark:text-slate-400"
                           onClick={copyToClipboardHandle}
@@ -289,8 +340,20 @@ const CompactViewTable = () => {
                     )}
                   </div>
                 </td>
-
                 <td className="relative text-sm font-medium text-right whitespace-nowrap">
+                  {!activity.isBreak && (
+                    <button
+                      className="group pt-4 px-1"
+                      title="Delete"
+                      onClick={() => {
+                        onDeleteActivity(activity.id);
+                      }}
+                    >
+                      <ArchiveBoxXMarkIcon className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading" />
+                    </button>
+                  )}
+                </td>
+                <td className="relative text-sm font-medium text-right whitespace-nowrap w-6">
                   <div className={`${activity.calendarId ? "invisible" : ""}`}>
                     <button
                       className="group pt-4 px-1"
@@ -319,24 +382,52 @@ const CompactViewTable = () => {
                 })}
               >
                 <td
-                  colSpan={2}
+                  colSpan={3}
                   className={`relative pb-4 pl-1 pr-1 text-sm sm:pl-6 md:pl-0 ${
                     activity.calendarId ? "opacity-50" : ""
                   }`}
                 >
                   <div className="flex flex-nowrap gap-1 items-center">
-                    <Tooltip isClickable>
-                      <p
-                        data-column="duration"
-                        onClick={copyToClipboardHandle}
-                        className={`w-12 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
-                          activity.calendarId ? "opacity-50" : ""
-                        }`}
+                    <Tooltip
+                      isClickable={activity.validation.isValid}
+                      tooltipText={
+                        !activity.validation.isValid &&
+                        activity.validation.cell === "duration" &&
+                        activity.validation.description
+                      }
+                      disabled={activity.validation.isValid || activity.validation.cell !== "duration"}
+                    >
+                      <span
+                        ref={
+                          !activity.validation.isValid && activity.validation.cell === "duration"
+                            ? invalidTimeRef
+                            : undefined
+                        }
+                        className={clsx("flex gap-1", {
+                          "py-1 px-1 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
+                            !activity.validation.isValid && activity.validation.cell === "duration",
+                        })}
                       >
-                        {`${formatDuration(activity.duration)}`}
-                      </p>
+                        <p
+                          data-column="duration"
+                          onClick={copyToClipboardHandle}
+                          className={`w-12 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
+                            activity.calendarId ? "opacity-50" : ""
+                          }`}
+                        >
+                          {formatDuration(activity.duration)}
+                        </p>
+                      </span>
                     </Tooltip>
-                    <Tooltip isClickable>
+                    <Tooltip
+                      isClickable={activity.validation.isValid}
+                      tooltipText={
+                        !activity.validation.isValid &&
+                        activity.validation.cell === "description" &&
+                        activity.validation.description
+                      }
+                      disabled={activity.validation.isValid || activity.validation.cell !== "description"}
+                    >
                       <p
                         onClick={copyToClipboardHandle}
                         className={clsx("old-break-word", {
