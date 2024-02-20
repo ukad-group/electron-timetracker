@@ -1,12 +1,8 @@
 import { extractDatesFromPeriod, getWeekNumber, isTheSameDates } from "@/helpers/utils/datetime-ui";
-import { DayOff, ApiDayOff, TTUserInfo, ParsedReport } from "./types";
+import { DayOff, ApiDayOff, TTUserInfo, ParsedReport, VacationSickDaysData } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { ReportActivity, parseReport, validation } from "@/helpers/utils/reports";
-
-type VacationSickDaysData = {
-  periods: ApiDayOff[];
-};
 
 export const loadHolidaysAndVacations = async (calendarDate: Date) => {
   try {
@@ -54,6 +50,7 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
     }
 
     userPromises.push(vacationsPromise);
+
     if (nextYearVacationsPromise) userPromises.push(nextYearVacationsPromise);
     if (prevYearVacationsPromise) userPromises.push(prevYearVacationsPromise);
 
@@ -79,7 +76,7 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
 
     const vacationsAndSickdays: ApiDayOff[] = [];
 
-    userFetchedData.forEach((data) => data.periods.forEach((period) => vacationsAndSickdays.push(period)));
+    userFetchedData.forEach((data) => data.periods.forEach((period: ApiDayOff) => vacationsAndSickdays.push(period)));
 
     const userDaysOff: DayOff[] = [];
 
