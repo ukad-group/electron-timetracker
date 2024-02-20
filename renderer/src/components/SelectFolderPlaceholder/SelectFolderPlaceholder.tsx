@@ -2,6 +2,7 @@ import React from "react";
 import { PlusIcon } from "@heroicons/react/24/solid";
 import { shallow } from "zustand/shallow";
 import { useMainStore } from "@/store/mainStore";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const SelectFolderPlaceholder = () => {
   const [reportsFolder, setReportsFolder] = useMainStore(
@@ -9,7 +10,7 @@ const SelectFolderPlaceholder = () => {
     shallow,
   );
   const handleButtonClick = () => {
-    global.ipcRenderer.invoke("app:select-folder").then((folder: string | null) => {
+    global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_SELECT_FOLDER).then((folder: string | null) => {
       if (folder) {
         setReportsFolder(folder);
       }

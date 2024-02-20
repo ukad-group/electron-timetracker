@@ -36,6 +36,7 @@ export const LOCAL_STORAGE_VARIABLES = {
   OFFICE_365_AUTH_CODE: "office365-auth-code",
   TRELLO_USER: "trello-user",
   TRELLO_AUTH_TOKEN: "trello-auth-token",
+  IS_MANUAL_INPUT_MAIN: "is-manual-input-main-section",
   // ...Add more local storage variables as needed
 };
 

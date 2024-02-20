@@ -32,7 +32,7 @@ const MainPage = ({
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>([]);
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const { screenSizes } = useScreenSizes();
-  const isManualInputMain = localStorage.getItem("is-manual-input-main-section") === "true";
+  const isManualInputMain = localStorage.getItem(LOCAL_STORAGE_VARIABLES.IS_MANUAL_INPUT_MAIN) === "true";
   const showBookings = !!JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [isBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
@@ -116,7 +116,7 @@ const MainPage = ({
 
   const saveSerializedReport = (serializedReport: string) => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
-    global.ipcRenderer.invoke("app:write-day-report", reportsFolder, selectedDate, serializedReport);
+    global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.WRITE_REPORT, reportsFolder, selectedDate, serializedReport);
     setSelectedDateReport(serializedReport);
   };
   const onDeleteActivity = (id: number) => {
