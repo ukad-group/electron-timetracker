@@ -24,6 +24,8 @@ export const IPC_MAIN_CHANNELS = {
   READ_DAY_REPORT: "app:read-day-report",
   APP_FIND_QUARTER_PROJECTS: "app:find-quarter-projects",
   APP_SELECT_FOLDER: "app:select-folder",
+  APP_WRITE_DAY_REPORT: "app:write-day-report",
+  APP_CHECK_EXIST_REPORT: "app:check-exist-report",
   TIMETRACKER_GET_PROJECTS: "timetracker:get-projects",
   TIMETRACKER_REFRESH_USER_INFO_TOKEN: "timetracker:refresh-user-info-token",
   TIMETRACKER_LOGIN: "timetracker:login",

@@ -45,6 +45,7 @@ export const KEY_CODES = {
   ARROW_DOWN: "ArrowDown",
   META: "Meta",
   CONTROL: "Control",
+  TAB: "Tab",
   // ...Add more key codes as needed
 };
 
