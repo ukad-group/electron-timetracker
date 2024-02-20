@@ -1,9 +1,8 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import TimetrackerWebsiteConnection from "../TimetrackerWebsiteConncetion";
 import { globalIpcRendererMock } from "@/tests/mocks/electron";
-import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 jest.mock("next/router", () => ({
   useRouter: jest.fn(() => ({ push: jest.fn() })),
