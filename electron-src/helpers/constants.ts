@@ -34,4 +34,5 @@ export const IPC_MAIN_CHANNELS = {
   TIMETRACKER_SHOULD_RERENDER: "timetracker:should-rerender",
   JIRA_SHOULD_RERENDER: "jira:should-rerender",
   CHILD_WINDOW_CLOSED: "child-window-closed",
+  FILE_CHANGED: "file-changed",
 };

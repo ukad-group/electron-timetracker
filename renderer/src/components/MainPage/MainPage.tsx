@@ -13,6 +13,7 @@ import { shallow } from "zustand/shallow";
 import { parseReport, serializeReport, ReportAndNotes } from "@/helpers/utils/reports";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { SCREENS } from "@/constants";
 import { MainPageProps } from "./types";
 
@@ -32,7 +33,7 @@ const MainPage = ({
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const { screenSizes } = useScreenSizes();
   const isManualInputMain = localStorage.getItem("is-manual-input-main-section") === "true";
-  const showBookings = !!JSON.parse(localStorage.getItem("timetracker-user"));
+  const showBookings = !!JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [isBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
 
@@ -89,19 +90,15 @@ const MainPage = ({
   useEffect(() => {
     readDayReport();
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FILE_WATCHER, reportsFolder, selectedDate);
-    global.ipcRenderer.on("file-changed", (event, data) => {
+
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.FILE_CHANGED, (event, data) => {
       if (selectedDateReport != data) {
         setSelectedDateReport(data || "");
       }
     });
-    global.ipcRenderer.on("errorMes", (event, data) => {
-      console.log("event ", event);
-      console.log("data ", data);
-    });
 
     return () => {
-      global.ipcRenderer.removeAllListeners("file-changed");
-      global.ipcRenderer.removeAllListeners("errorMes");
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.FILE_CHANGED);
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.STOP_PATH_WATCHER, reportsFolder, selectedDate);
     };
   }, [selectedDate, reportsFolder]);
