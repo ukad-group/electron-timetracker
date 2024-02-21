@@ -8,6 +8,7 @@ import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import { DAY as day, formatDate } from "@/helpers/utils/datetime-ui";
 import { DateSelectorProps } from "./types";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export default function DateSelector({
   isDropboxConnected,
@@ -42,7 +43,7 @@ export default function DateSelector({
   };
 
   const writeTodayReport = () => {
-    global.ipcRenderer.invoke("app:write-day-report", reportsFolder, today, selectedDateReport);
+    global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.WRITE_REPORT, reportsFolder, today, selectedDateReport);
   };
 
   const copyCurrentReport = async () => {

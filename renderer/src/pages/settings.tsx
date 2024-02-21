@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { shallow } from "zustand/shallow";
-import { useThemeStore } from "@/store/themeStore";
 import { MenuItem } from "@/shared/MenuItem";
 import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
@@ -9,31 +7,12 @@ import { SidebarNavItem, SETTING_SECTIONS } from "@/helpers/contstants";
 import { closeWindowIfNeeded } from "@/helpers/utils/utils";
 
 const SettingsPage = () => {
-  const { theme } = useThemeStore((state) => ({ theme: state.theme, setTheme: state.setTheme }), shallow);
-  const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const [currentMenuItem, setCurrentMenuItem] = useState<SidebarNavItem>(SidebarNavItem.Connections);
-
   const settingSection = SETTING_SECTIONS[currentMenuItem];
-
-  const handleThemeChange = (e) => setIsOSDarkTheme(Boolean(e.matches));
 
   useEffect(() => {
     closeWindowIfNeeded();
   }, []);
-
-  useEffect(() => {
-    const mediaQueryList = window.matchMedia("(prefers-color-scheme: dark)");
-
-    mediaQueryList.addListener(handleThemeChange);
-    setIsOSDarkTheme(mediaQueryList.matches);
-
-    document.body.className =
-      (theme.os && isOSDarkTheme) || (!theme.os && theme.custom === "dark") ? "dark bg-dark-back" : "light bg-grey-100";
-
-    return () => {
-      mediaQueryList.removeListener(handleThemeChange);
-    };
-  }, [theme, isOSDarkTheme]);
 
   const renderSidebarNavItems = () =>
     Object.values(SidebarNavItem).map((value) => (

@@ -146,6 +146,11 @@ export const trackConnections = (connectedName: string) => {
   }
 };
 
+export function stringToMinutes(str: string) {
+  const [hours, minutes] = str.split(":");
+  return Number(hours) * 60 + Number(minutes);
+}
+
 export const closeWindowIfNeeded = () => {
   const urlParams = new URLSearchParams(window.location.search);
 

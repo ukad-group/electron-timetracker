@@ -24,6 +24,7 @@ export const IPC_MAIN_CHANNELS = {
   READ_DAY_REPORT: "app:read-day-report",
   APP_FIND_QUARTER_PROJECTS: "app:find-quarter-projects",
   APP_SELECT_FOLDER: "app:select-folder",
+  WRITE_REPORT: "app:write-day-report",
   TIMETRACKER_GET_PROJECTS: "timetracker:get-projects",
   TIMETRACKER_REFRESH_USER_INFO_TOKEN: "timetracker:refresh-user-info-token",
   TIMETRACKER_LOGIN: "timetracker:login",
@@ -34,4 +35,5 @@ export const IPC_MAIN_CHANNELS = {
   TIMETRACKER_SHOULD_RERENDER: "timetracker:should-rerender",
   JIRA_SHOULD_RERENDER: "jira:should-rerender",
   CHILD_WINDOW_CLOSED: "child-window-closed",
+  FILE_CHANGED: "file-changed",
 };
