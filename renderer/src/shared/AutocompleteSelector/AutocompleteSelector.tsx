@@ -25,6 +25,7 @@ export default function AutocompleteSelector({
   spellCheck = false,
 }: AutocompleteProps) {
   const [isNew, setIsNew] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
   const inputRef = useRef(null);
   const allItems = useMemo(() => {
     return additionalItems ? availableItems?.concat(additionalItems) : availableItems;
@@ -62,19 +63,21 @@ export default function AutocompleteSelector({
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
       e.preventDefault();
-      const currentValue = editingHistoryManager.undoEditing();
+      const [currentValue, changePlace] = editingHistoryManager.undoEditing();
 
       if (currentValue !== undefined) {
         setSelectedItem(currentValue as string);
+        setCursorPosition(typeof changePlace === "number" ? changePlace : 0);
       }
     }
 
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
       e.preventDefault();
-      const currentValue = editingHistoryManager.redoEditing();
+      const [currentValue, changePlace] = editingHistoryManager.redoEditing();
 
       if (currentValue !== undefined) {
         setSelectedItem(currentValue as string);
+        setCursorPosition(typeof changePlace === "number" ? changePlace : 0);
       }
     }
   };
@@ -103,6 +106,11 @@ export default function AutocompleteSelector({
     if (isNewCheck && allItems?.includes(selectedItem)) {
       setIsNew(false);
     }
+
+    if (cursorPosition) {
+      inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+    }
+    setCursorPosition(0);
   }, [selectedItem, allItems]);
 
   return (
