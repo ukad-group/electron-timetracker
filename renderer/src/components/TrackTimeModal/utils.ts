@@ -1,6 +1,15 @@
+import { Dispatch, SetStateAction } from "react";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { KEY_CODES } from "@/helpers/contstants";
+import { ReportActivity } from "@/helpers/utils/reports";
+import { getDateTimeData } from "@/helpers/utils/datetime-ui";
+import { changeHintConditions } from "@/helpers/utils/utils";
+import { padStringToMinutes } from "@/helpers/utils/datetime-ui";
+import { formatDurationAsDecimals } from "@/helpers/utils/reports";
+import { HINTS_GROUP_NAMES } from "@/helpers/contstants";
+import { TutorialProgress } from "@/store/types";
+import { ScheduledEvents } from "@/store/types";
 
 export const changeHours = (eventKey: string, hours: number) => {
   let newHours = hours;
@@ -41,7 +50,7 @@ export const changeMinutesAndHours = (eventKey: string, minutes: number, hours: 
   return [newMinutes, newHours];
 };
 
-export const getTimetrackerYearProjects = async (setWebTrackerProjects) => {
+export const getTimetrackerYearProjects = async (setWebTrackerProjects: Dispatch<SetStateAction<string[]>>) => {
   const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
   if (!userInfo) return;
@@ -88,3 +97,209 @@ export const getTimetrackerYearProjects = async (setWebTrackerProjects) => {
     setWebTrackerProjects(userInfo.yearProjects);
   }
 };
+
+export function addSuggestions(
+  activities: Array<ReportActivity> | null,
+  latestProjAndDesc: Record<string, [string]>,
+  latestProjAndAct: Record<string, [string]>,
+  webTrackerProjects: string[],
+  setUniqueWebTrackerProjects: Dispatch<SetStateAction<string[]>>,
+  setLatestProjects: Dispatch<SetStateAction<string[]>>,
+) {
+  try {
+    for (let i = 0; i < activities.length; i++) {
+      if (!Object.keys(latestProjAndDesc).length) break;
+
+      if (
+        !activities[i].project ||
+        activities[i].project?.startsWith("!") ||
+        (!activities[i].description && !activities[i].activity)
+      ) {
+        continue;
+      }
+
+      const projectKey = activities[i].project.trim();
+
+      if (!latestProjAndDesc.hasOwnProperty(projectKey) || !latestProjAndAct.hasOwnProperty(projectKey)) {
+        latestProjAndDesc[projectKey] = [activities[i].description];
+        latestProjAndAct[projectKey] = [activities[i].activity];
+        continue;
+      }
+
+      if (activities[i].description) {
+        if (!latestProjAndDesc[projectKey].includes(activities[i].description)) {
+          latestProjAndDesc[projectKey].unshift(activities[i].description);
+        } else {
+          latestProjAndDesc[projectKey]?.splice(latestProjAndDesc[projectKey].indexOf(activities[i].description), 1);
+          latestProjAndDesc[projectKey]?.unshift(activities[i].description);
+        }
+      }
+
+      if (activities[i].activity) {
+        if (!latestProjAndAct[projectKey].includes(activities[i].activity)) {
+          latestProjAndAct[projectKey].unshift(activities[i].activity);
+        } else {
+          latestProjAndAct[projectKey]?.splice(latestProjAndAct[projectKey].indexOf(activities[i].activity), 1);
+          latestProjAndAct[projectKey]?.unshift(activities[i].activity);
+        }
+      }
+    }
+    const tempLatestProj = Object.keys(latestProjAndAct);
+
+    if (webTrackerProjects) {
+      const tempWebTrackerProjects = [];
+      for (let i = 0; i < webTrackerProjects.length; i++) {
+        if (!tempLatestProj.includes(webTrackerProjects[i])) {
+          tempWebTrackerProjects.push(webTrackerProjects[i]);
+          global.ipcRenderer.send(IPC_MAIN_CHANNELS.DICTIONATY_UPDATE, webTrackerProjects[i]);
+        }
+      }
+      setUniqueWebTrackerProjects(tempWebTrackerProjects);
+    }
+
+    setLatestProjects(tempLatestProj);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+export function setTimeOnOpen(
+  activities: Array<ReportActivity> | null,
+  selectedDate: Date,
+  setFrom: Dispatch<SetStateAction<string>>,
+  setTo: Dispatch<SetStateAction<string>>,
+) {
+  const { hours, floorMinutes, isToday, ceilHours, ceilMinutes } = getDateTimeData(selectedDate);
+  // const prevActivity = activities[activities?.length - 1];
+
+  if (activities?.length && activities[activities?.length - 1].to) {
+    setFrom(activities[activities?.length - 1].to);
+  } else if (activities?.length && !activities[activities?.length - 1].to) {
+    setFrom(activities[activities?.length - 1].from);
+  } else {
+    setFrom(`${hours}:${floorMinutes}`);
+  }
+
+  isToday ? setTo(`${ceilHours}:${ceilMinutes}`) : setTo("");
+}
+
+export function saveSheduledEvents(
+  scheduledEvents: ScheduledEvents,
+  setScheduledEvents: (e: ScheduledEvents) => void,
+  dashedDescription: string,
+  editedActivity: ReportActivity | "new",
+  project: string,
+  activity: string,
+) {
+  if (!scheduledEvents[dashedDescription] && editedActivity !== "new" && editedActivity.calendarId?.length > 0) {
+    scheduledEvents[dashedDescription] = { project: "", activity: "" };
+  }
+
+  if (scheduledEvents[dashedDescription] && !scheduledEvents[dashedDescription].project) {
+    scheduledEvents[dashedDescription].project = project;
+  }
+
+  if (scheduledEvents[dashedDescription] && scheduledEvents[dashedDescription].activity !== activity) {
+    scheduledEvents[dashedDescription].activity = activity || "";
+  }
+
+  setScheduledEvents(scheduledEvents);
+}
+
+export function replaceDashes(description: string, setDescription: Dispatch<SetStateAction<string>>) {
+  if (description.includes(" - ")) {
+    setDescription(description.replace(/ - /g, " -- "));
+    return description.replace(/ - /g, " -- ");
+  }
+  return description;
+}
+
+export function handleKey(
+  e: React.KeyboardEvent<HTMLInputElement>,
+  callback: (value: string) => void | undefined = undefined,
+) {
+  if (e.key === KEY_CODES.ARROW_UP || e.key === KEY_CODES.ARROW_DOWN) {
+    e.preventDefault();
+
+    if (!callback) return;
+
+    const input = e.target as HTMLInputElement;
+    const value = input.value;
+
+    if (value.length < 5) return;
+
+    if (input.selectionStart === 0 && input.selectionEnd === value.length) {
+      input.selectionStart = value.length;
+      input.selectionEnd = value.length;
+    }
+
+    const cursorPosition = input.selectionStart;
+    let [hours, minutes] = value.split(":").map(Number);
+
+    if (cursorPosition > 2) {
+      const [newMinutes, newHours] = changeMinutesAndHours(e.key, minutes, hours);
+      minutes = newMinutes;
+      hours = newHours;
+    } else {
+      hours = changeHours(e.key, hours);
+    }
+
+    const adjustedTime = hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
+
+    input.value = adjustedTime;
+    input.selectionStart = cursorPosition;
+    input.selectionEnd = cursorPosition;
+    callback(adjustedTime);
+  }
+}
+
+export function addNewActivity(
+  progress: TutorialProgress,
+  setProgress: (event: TutorialProgress) => void,
+  editedActivity: ReportActivity | "new",
+  activities: Array<ReportActivity> | null,
+  setFrom: Dispatch<SetStateAction<string>>,
+  setTo: Dispatch<SetStateAction<string>>,
+  setFormattedDuration: Dispatch<SetStateAction<string>>,
+  setProject: Dispatch<SetStateAction<string>>,
+  setActivity: Dispatch<SetStateAction<string>>,
+  setDescription: Dispatch<SetStateAction<string>>,
+  resetModal: () => void,
+) {
+  if (!editedActivity || editedActivity === "new") {
+    let trackingConditions = [];
+    if (
+      progress[HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"] &&
+      progress[HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"].includes(false)
+    ) {
+      const lastFalse = progress[HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"].lastIndexOf(false);
+      trackingConditions = progress[HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"];
+      trackingConditions[lastFalse] = true;
+    }
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.TRACK_TIME_MODAL,
+        newConditions: trackingConditions,
+        existingConditions: ["same", "same", "same", "same", "same", "same", "same", "same", "same", "same"],
+      },
+    ]);
+    resetModal();
+    return;
+  }
+
+  if (editedActivity?.calendarId) {
+    const lastRegistrationTo = activities[activities?.length - 2]?.to;
+
+    padStringToMinutes(lastRegistrationTo) > padStringToMinutes(editedActivity?.from)
+      ? setFrom(lastRegistrationTo || "")
+      : setFrom(editedActivity?.from || "");
+  } else {
+    setFrom(editedActivity?.from || "");
+  }
+
+  setTo(editedActivity.to || "");
+  setFormattedDuration(formatDurationAsDecimals(editedActivity.duration) || "");
+  setProject(editedActivity.project || "");
+  setActivity(editedActivity.activity || "");
+  setDescription(editedActivity.description || "");
+}

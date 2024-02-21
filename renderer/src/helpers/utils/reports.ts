@@ -352,54 +352,6 @@ export function validation(activities: Array<ReportActivity>) {
   }
 }
 
-export function addSuggestions(
-  activities: Array<ReportActivity> | null,
-  latestProjAndDesc: Record<string, [string]>,
-  latestProjAndAct: Record<string, [string]>,
-) {
-  try {
-    for (let i = 0; i < activities.length; i++) {
-      if (!Object.keys(latestProjAndDesc).length) break;
-
-      if (
-        !activities[i].project ||
-        activities[i].project?.startsWith("!") ||
-        (!activities[i].description && !activities[i].activity)
-      ) {
-        continue;
-      }
-
-      const projectKey = activities[i].project.trim();
-
-      if (!latestProjAndDesc.hasOwnProperty(projectKey) || !latestProjAndAct.hasOwnProperty(projectKey)) {
-        latestProjAndDesc[projectKey] = [activities[i].description];
-        latestProjAndAct[projectKey] = [activities[i].activity];
-        continue;
-      }
-
-      if (activities[i].description) {
-        if (!latestProjAndDesc[projectKey].includes(activities[i].description)) {
-          latestProjAndDesc[projectKey].unshift(activities[i].description);
-        } else {
-          latestProjAndDesc[projectKey]?.splice(latestProjAndDesc[projectKey].indexOf(activities[i].description), 1);
-          latestProjAndDesc[projectKey]?.unshift(activities[i].description);
-        }
-      }
-
-      if (activities[i].activity) {
-        if (!latestProjAndAct[projectKey].includes(activities[i].activity)) {
-          latestProjAndAct[projectKey].unshift(activities[i].activity);
-        } else {
-          latestProjAndAct[projectKey]?.splice(latestProjAndAct[projectKey].indexOf(activities[i].activity), 1);
-          latestProjAndAct[projectKey]?.unshift(activities[i].activity);
-        }
-      }
-    }
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 export function stringToMinutes(str: string) {
   const [hours, minutes] = str.split(":");
   return Number(hours) * 60 + Number(minutes);
