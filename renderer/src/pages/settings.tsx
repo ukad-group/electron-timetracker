@@ -3,65 +3,12 @@ import Link from "next/link";
 import { MenuItem } from "@/shared/MenuItem";
 import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
-import { SidebarNavItem, SETTING_SECTIONS, LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
-import { extractTokenFromString } from "@/helpers/utils/utils";
-import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { SidebarNavItem, SETTING_SECTIONS } from "@/helpers/contstants";
+import { closeWindowIfNeeded } from "@/helpers/utils/utils";
 
 const SettingsPage = () => {
   const [currentMenuItem, setCurrentMenuItem] = useState<SidebarNavItem>(SidebarNavItem.Connections);
-
   const settingSection = SETTING_SECTIONS[currentMenuItem];
-
-  const closeWindowIfNeeded = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-
-    if (window.location.hash || window.location.search) {
-      if (
-        window.location.search.includes("code") &&
-        window.location.search.includes("state=office365code") &&
-        !window.location.search.includes("error")
-      ) {
-        localStorage.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE, urlParams.get("code"));
-        global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, "office365");
-      }
-
-      if (
-        window.location.search.includes("code") &&
-        window.location.search.includes("state=jiracode") &&
-        !window.location.search.includes("error")
-      ) {
-        localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE, urlParams.get("code"));
-        global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, "jira");
-      }
-
-      if (
-        window.location.search.includes("code") &&
-        window.location.search.includes("state=googlecalendarcode") &&
-        !window.location.search.includes("error")
-      ) {
-        localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_AUTH_CODE, urlParams.get("code"));
-        global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, "google");
-      }
-
-      if (window.location.hash.includes("token") && !window.location.hash.includes("error")) {
-        const tokenFromUrl = extractTokenFromString(window.location.hash);
-
-        localStorage.setItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN, tokenFromUrl);
-        global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, "trello");
-      }
-
-      if (window.location.search.includes("code") && window.location.search.includes("state=azure-base")) {
-        localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE, urlParams.get("code"));
-        global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, "timetracker-website");
-      }
-
-      if (window.location.search.includes("code") && window.location.search.includes("state=azure-additional")) {
-        return;
-      }
-
-      window.close();
-    }
-  };
 
   useEffect(() => {
     closeWindowIfNeeded();

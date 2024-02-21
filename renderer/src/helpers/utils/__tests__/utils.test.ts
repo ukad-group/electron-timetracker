@@ -12,7 +12,6 @@ import { TutorialProgress } from "@/store/types";
 import { globalIpcRendererMock } from "@/tests/mocks/electron";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
-const mockSend = jest.fn();
 jest.mock("electron", () => ({
   ipcRenderer: {
     send: jest.fn(),
@@ -36,7 +35,6 @@ const localStorageMock = {
   ...global.localStorage,
 };
 global.localStorage = localStorageMock;
-
 describe("GIVEN utils/replaceHyphensWithSpaces", () => {
   it("should replace hyphens with spaces in a given string", () => {
     const inputString = "hello - world - test";
@@ -78,22 +76,22 @@ describe("GIVEN utils/replaceHyphensWithSpaces", () => {
 describe("GIVEN utils/concatSortArrays", () => {
   it('should concatenate and sort arrays based on the "from" property', () => {
     const firstArr: ReportActivity[] = [
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
     ];
 
     const secondArr: ReportActivity[] = [
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
     ];
 
     const result = concatSortArrays(firstArr, secondArr);
 
     const expectedResult: ReportActivity[] = [
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
-      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello" },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
+      { from: "12:30", id: 1, to: "13:30", duration: 12, project: "Hello", validation: { isValid: true } },
     ];
 
     expect(result).toEqual(expectedResult);
@@ -118,22 +116,14 @@ describe("GIVEN utils/parseEventTitle", () => {
     const event = { summary: "Project1" };
     // @ts-ignore
     const result = parseEventTitle(event, latestProjAndAct);
-    expect(result).toEqual({
-      project: "project1",
-      description: "Project1",
-      summary: "Project1",
-    });
+    expect(result).toEqual({ project: "project1", description: "Project1", summary: "Project1" });
   });
 
   it("should parse event with two-word title", () => {
     const event = { summary: "Project1 - Activity1" };
     // @ts-ignore
     const result = parseEventTitle(event, latestProjAndAct);
-    expect(result).toEqual({
-      summary: "Project1 - Activity1",
-      activity: "Project1",
-      description: "Activity1",
-    });
+    expect(result).toEqual({ summary: "Project1 - Activity1", activity: "Project1", description: "Activity1" });
   });
 
   it("should parse event with three-word title", () => {

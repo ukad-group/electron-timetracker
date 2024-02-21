@@ -24,15 +24,10 @@ export const filterList = ({ selectedItem, availableItems, additionalItems, show
               current.toLowerCase().includes((selectedItem || "").toLowerCase()) &&
               current.toLowerCase() !== selectedItem.toLowerCase()
             ) {
-              if (current.toLowerCase().split("").slice(0, selectedItem.length).join("") == selectedItem) {
-                mostRelevantItems.unshift(current);
-              } else {
-                accumulator.push(current);
-              }
+              accumulator.push(current);
             }
             return accumulator;
           }, [])
           .slice(0, 15);
-
   return mostRelevantItems.reverse().concat(relevantItems);
 };

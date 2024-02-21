@@ -135,7 +135,7 @@ export function Calendar({
           date: reportDate,
           week: getWeekNumber(reportDate),
           workDurationMs: workDurationMs,
-          isValid: activities.every((report: ReportActivity) => report.isValid === true),
+          isValid: activities.every((report: ReportActivity) => report.validation.isValid ),
         };
       });
 

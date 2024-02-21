@@ -218,6 +218,7 @@ describe("serializeReport function", () => {
         from: "11:30",
         project: "timetracker",
         to: "12:00",
+        validation: { isValid: true },
       },
     ];
 
@@ -235,6 +236,7 @@ describe("serializeReport function", () => {
         from: "11:30",
         project: "timetracker",
         to: "",
+        validation: { isValid: true },
       },
     ];
 
@@ -252,6 +254,7 @@ describe("serializeReport function", () => {
         from: "11:30",
         project: "timetracker",
         to: "12:30",
+        validation: { isValid: true },
       },
     ];
 
@@ -339,6 +342,7 @@ describe("validation function", () => {
         from: "12:00",
         project: "timetracker",
         to: "13:00",
+        validation: { isValid: true },
       },
       {
         id: 2,
@@ -348,11 +352,14 @@ describe("validation function", () => {
         from: "12:00",
         project: "timetracker",
         to: "13:00",
+        validation: { isValid: true },
       },
     ];
     const activity: ReportActivity = validation(activities)[0];
 
-    expect(activity).toHaveProperty("isValid", false);
+    expect(activity).toHaveProperty("validation", {
+      isValid: true,
+    });
   });
 
   test("should fail validation when [duration] = 0", () => {
@@ -365,11 +372,16 @@ describe("validation function", () => {
         from: "12:00",
         project: "timetracker",
         to: "13:00",
+        validation: { isValid: true },
       },
     ];
     const activity: ReportActivity = validation(activities)[0];
 
-    expect(activity).toHaveProperty("isValid", false);
+    expect(activity).toHaveProperty("validation", {
+      isValid: false,
+      cell: "duration",
+      description: "Negative or zero duration of the time interval",
+    });
   });
 
   test("should fail validation when [duration] < 0", () => {
@@ -382,11 +394,16 @@ describe("validation function", () => {
         from: "12:00",
         project: "timetracker",
         to: "13:00",
+        validation: { isValid: true },
       },
     ];
     const activity: ReportActivity = validation(activities)[0];
 
-    expect(activity).toHaveProperty("isValid", false);
+    expect(activity).toHaveProperty("validation", {
+      isValid: false,
+      cell: "duration",
+      description: "Negative or zero duration of the time interval",
+    });
   });
 
   test("should fail validation when is [project] and no [to] property", () => {
@@ -399,11 +416,16 @@ describe("validation function", () => {
         from: "12:00",
         project: "timetracker",
         to: "",
+        validation: { isValid: true },
       },
     ];
     const activity: ReportActivity = validation(activities)[0];
 
-    expect(activity).toHaveProperty("isValid", false);
+    expect(activity).toHaveProperty("validation", {
+      isValid: false,
+      cell: "time",
+      description: "The event has no end time",
+    });
   });
 
   test('should add mistake when [description] starts with "!"', () => {
@@ -416,6 +438,7 @@ describe("validation function", () => {
         from: "12:00",
         project: "timetracker",
         to: "13:00",
+        validation: { isValid: true },
       },
       {
         id: 2,
@@ -426,6 +449,7 @@ describe("validation function", () => {
         project: "timetracker",
         to: "14:00",
         mistakes: "",
+        validation: { isValid: true },
       },
     ];
     const activity: ReportActivity = validation(activities)[1];
@@ -443,6 +467,7 @@ describe("validation function", () => {
         from: "12:00",
         project: "timetracker",
         to: "13:00",
+        validation: { isValid: true },
       },
       {
         id: 2,
@@ -452,10 +477,15 @@ describe("validation function", () => {
         from: "12:00",
         project: "",
         to: "13:00",
+        validation: { isValid: true },
       },
     ];
     const activity: ReportActivity = validation(activities)[1];
 
-    expect(activity).toHaveProperty("isValid", false);
+    expect(activity).toHaveProperty("validation", {
+      isValid: false,
+      cell: "project",
+      description: "The project must be specified in the activity",
+    });
   });
 });

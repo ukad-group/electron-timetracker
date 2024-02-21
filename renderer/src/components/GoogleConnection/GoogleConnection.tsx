@@ -117,13 +117,11 @@ const GoogleConnection = () => {
     <div className="p-4 flex flex-col items-start justify-between gap-2 border rounded-lg shadow dark:border-dark-form-border">
       <div className="flex justify-between items-center w-full">
         <span className="font-medium dark:text-dark-heading">Google</span>
-        {!loggedUsers.length && (
-          <Button
-            text={!loggedUsers.length ? "Add account" : "Add another account"}
-            callback={signInHandler}
-            type="button"
-          />
-        )}
+        <Button
+          text={!loggedUsers.length ? "Add account" : "Add another account"}
+          callback={signInHandler}
+          type="button"
+        />
       </div>
       <div className="flex items-center justify-between gap-4 w-full">
         {!loggedUsers.length && (

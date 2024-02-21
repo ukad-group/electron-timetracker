@@ -85,7 +85,7 @@ export const HINTS_ALERTS = {
     "This widget facilitates the seamless transfer of your reports to the customer's tracker. You can easily copy all your actions for the day onto the project collectively or individually in the 'activity - description' format (if there is activity) or simply the 'description' format (if there is no activity). Just click on the file icon to initiate this process. If you require the time spent on each activity, click on the plus file icon, and the log will be copied in the format 'description (hh:mm).'",
   TOTALS_PERIOD: "You can get data for the day, week and month by selecting the appropriate item in the selector",
   MODAL_TIME_FIELD:
-    "Upon form opening, the 'from' time defaults to the prior entry's end time (if exists) or the current time, rounded to the nearest 15 minutes.. The 'to' time is set to the current time, rounded to the nearest 15 minutes. You can manually modify the time by 15-minute increments using the arrow keys. Alternatively, entering the desired duration will automatically adjust the 'to' field accordingly.",
+    "You can manually modify the time by 15-minute increments using the arrow keys. Alternatively, entering the desired duration will automatically adjust the 'to' field accordingly.",
   MODAL_TEXT_FIELD:
     "In the text fields, you'll find suggestions for projects, activities, and descriptions based on your usage in the past month. Upon linking the timetracker website, all company projects become available for selection. After connecting Trello and Jira, you'll be prompted to choose tasks from your boards in the description field, prioritizing those assigned to you.",
   WHATS_NEW:

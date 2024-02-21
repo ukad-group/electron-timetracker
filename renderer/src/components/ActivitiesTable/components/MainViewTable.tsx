@@ -24,6 +24,7 @@ const MainViewTable = () => {
     copyActivityHandler,
     editActivityHandler,
     onDeleteActivity,
+    isLoading,
   } = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
@@ -52,6 +53,16 @@ const MainViewTable = () => {
         groupName: HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT,
         newConditions: [false],
         existingConditions: [false],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.EDITING_BUTTON,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.TRACK_TIME_MODAL,
+        newConditions: [false, false, false, false, false, false, false, false, false, false],
+        existingConditions: ["same", "same", "same", "same", "same", "same", "same", "same", "same", "same"],
       },
     ]);
   }, []);
@@ -82,6 +93,22 @@ const MainViewTable = () => {
         }
       });
     }
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.EDITING_BUTTON,
+        newConditions: [!isLoading],
+        existingConditions: [!isLoading],
+      },
+      {
+        groupName: HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT,
+        newConditions: progress[HINTS_GROUP_NAMES.EDITING_BUTTON]
+          ? [progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading]
+          : [false],
+        existingConditions: progress[HINTS_GROUP_NAMES.EDITING_BUTTON]
+          ? [progress[HINTS_GROUP_NAMES.EDITING_BUTTON][0] && !isLoading]
+          : [false],
+      },
+    ]);
   }, [tableActivities]);
 
   useEffect(() => {
@@ -129,21 +156,7 @@ const MainViewTable = () => {
         >
           {HINTS_ALERTS.SHORTCUTS_EDITING}
         </Hint>
-        <Hint
-          learningMethod="buttonClick"
-          order={1}
-          groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
-          referenceRef={firstEditButtonRef}
-          shiftY={30}
-          shiftX={200}
-          width={"small"}
-          position={{
-            basePosition: "bottom",
-            diagonalPosition: "left",
-          }}
-        >
-          {HINTS_ALERTS.EDITING_BUTTON}
-        </Hint>
+
         {screenSizes.screenWidth >= SCREENS.LG && (
           <Hint
             displayCondition
@@ -184,7 +197,7 @@ const MainViewTable = () => {
         {tableActivities?.map((activity, i) => (
           <tr
             key={i}
-            ref={i === 0 ? firstRowRef : undefined}
+            ref={!activity.calendarId ? firstRowRef : undefined}
             className={clsx(`border-b border-gray-200 dark:border-gray-300 transition-transform `, {
               "border-dashed border-b-2 border-gray-200 dark:border-gray-400":
                 (tableActivities[i + 1] && tableActivities[i + 1].isBreak) || activity.isBreak,
@@ -200,7 +213,7 @@ const MainViewTable = () => {
               }`}
             >
               {ctrlPressed && <span className="absolute -left-4 text-blue-700">{i + 1}</span>}
-              {!activity.isValid && (
+              {!activity.validation.isValid && (
                 <Hint
                   learningMethod="buttonClick"
                   order={1}
@@ -217,45 +230,98 @@ const MainViewTable = () => {
                   {HINTS_ALERTS.VALIDATION}
                 </Hint>
               )}
-              <span
-                ref={activity.isValid !== undefined && !activity.isValid ? invalidTimeRef : undefined}
-                className={clsx({
-                  "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
-                    activity.isValid !== undefined && !activity.isValid,
-                })}
+              <Tooltip
+                tooltipText={
+                  !activity.validation.isValid && activity.validation.cell === "time" && activity.validation.description
+                }
+                disabled={activity.validation.isValid || activity.validation.cell !== "time"}
               >
-                {activity.from} - {activity.to}
-              </span>
+                <span
+                  ref={!activity.validation.isValid && activity.validation.cell === "time" ? invalidTimeRef : undefined}
+                  className={clsx({
+                    "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
+                      !activity.validation.isValid && activity.validation.cell === "time",
+                  })}
+                >
+                  {activity.from} - {activity.to}
+                </span>
+              </Tooltip>
             </td>
             <td
               className={`px-3  text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
                 activity.calendarId ? "opacity-50" : ""
               }`}
             >
-              <Tooltip isClickable>
-                <p data-column="duration" onClick={copyToClipboardHandle}>
-                  {formatDuration(activity.duration)}
-                </p>
+              <Tooltip
+                isClickable={activity.validation.isValid}
+                tooltipText={
+                  !activity.validation.isValid &&
+                  activity.validation.cell === "duration" &&
+                  activity.validation.description
+                }
+                disabled={activity.validation.isValid || activity.validation.cell !== "duration"}
+              >
+                <span
+                  ref={
+                    !activity.validation.isValid && activity.validation.cell === "duration" ? invalidTimeRef : undefined
+                  }
+                  className={clsx({
+                    "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
+                      !activity.validation.isValid && activity.validation.cell === "duration",
+                  })}
+                >
+                  <p data-column="duration" onClick={copyToClipboardHandle}>
+                    {formatDuration(activity.duration)}
+                  </p>
+                </span>
               </Tooltip>
             </td>
             <td className={`relative px-3  ${activity.calendarId ? "opacity-50" : ""}`}>
               <div className="flex items-center gap-1">
-                <Tooltip isClickable>
-                  <p
-                    className="text-sm font-medium text-gray-900 dark:text-dark-heading"
-                    onClick={copyToClipboardHandle}
+                <Tooltip
+                  isClickable={activity.validation.isValid}
+                  tooltipText={
+                    !activity.validation.isValid &&
+                    activity.validation.cell === "project" &&
+                    activity.validation.description
+                  }
+                  disabled={activity.validation.isValid || activity.validation.cell !== "project"}
+                >
+                  <span
+                    ref={
+                      !activity.validation.isValid && activity.validation.cell === "project"
+                        ? invalidTimeRef
+                        : undefined
+                    }
+                    className={clsx({
+                      "py-1 px-2 -mx-2 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
+                        !activity.validation.isValid && activity.validation.cell === "project",
+                    })}
                   >
-                    {!activity.isBreak && activity.project}
-                  </p>
+                    <p
+                      className={`text-sm font-medium text-gray-900 dark:text-dark-heading ${!activity.validation.isValid && activity.validation.cell === "project" && "w-8 h-3"}`}
+                      onClick={copyToClipboardHandle}
+                    >
+                      {!activity.isBreak && activity.project}
+                    </p>
+                  </span>
                 </Tooltip>
-                {activity.isNewProject && !activity.isBreak && (
+                {activity.isNewProject && !activity.isBreak && activity.project != "" && (
                   <p className="flex items-center h-fit w-fit text-xs px-1.5 py-0.5 rounded-full bg-green-100 text-green-800 dark:text-green-400 dark:bg-green-400/20 ">
                     new
                   </p>
                 )}
               </div>
               {activity.activity && (
-                <Tooltip isClickable>
+                <Tooltip
+                  isClickable={activity.validation.isValid}
+                  tooltipText={
+                    !activity.validation.isValid &&
+                    activity.validation.cell === "activity" &&
+                    activity.validation.description
+                  }
+                  disabled={activity.validation.isValid || activity.validation.cell !== "activity"}
+                >
                   <p className="block text-xs font-semibold mt-1 old-break-word " onClick={copyToClipboardHandle}>
                     {activity.activity}
                   </p>
@@ -264,7 +330,15 @@ const MainViewTable = () => {
             </td>
             <td className={`px-3 text-sm ${activity.calendarId ? "opacity-50" : ""}`}>
               {activity.description && (
-                <Tooltip isClickable>
+                <Tooltip
+                  isClickable={activity.validation.isValid}
+                  tooltipText={
+                    !activity.validation.isValid &&
+                    activity.validation.cell === "description" &&
+                    activity.validation.description
+                  }
+                  disabled={activity.validation.isValid || activity.validation.cell !== "description"}
+                >
                   <p onClick={copyToClipboardHandle} className="old-break-word">
                     {activity.description}
                   </p>
@@ -272,7 +346,7 @@ const MainViewTable = () => {
               )}
               {activity.isBreak && (
                 <p onClick={copyToClipboardHandle} className="old-break-word">
-                  {activity.project}
+                  {activity.project.split("").slice(1).join("")}
                 </p>
               )}
               {activity.mistakes && (
@@ -316,45 +390,63 @@ const MainViewTable = () => {
               )}
             </td>
             <td className="relative text-sm font-medium text-right whitespace-nowrap">
-              {!activity.isBreak && (
-                <button
-                  className="group py-4 px-3"
-                  title={activity.calendarId ? "Add" : "Edit"}
-                  onClick={() => {
-                    handleEditClick(activity);
-                  }}
-                >
-                  {!activity.calendarId && (
-                    <PencilSquareIcon
-                      ref={i === 0 ? firstEditButtonRef : undefined}
-                      className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
-                    />
-                  )}
-                  {activity.calendarId && progress["editButton"] && !progress["editButton"].includes(false) && (
+              <button
+                className="group py-1 px-3"
+                title={activity.calendarId ? "Add" : "Edit"}
+                onClick={() => {
+                  handleEditClick(activity);
+                }}
+              >
+                {!activity.calendarId && (
+                  <>
                     <Hint
+                      displayCondition
                       learningMethod="buttonClick"
                       order={1}
-                      groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
-                      referenceRef={calendarEventRef}
-                      shiftY={200}
-                      shiftX={50}
-                      width={"medium"}
+                      groupName={HINTS_GROUP_NAMES.EDITING_BUTTON}
+                      referenceRef={firstEditButtonRef}
+                      shiftY={30}
+                      shiftX={200}
+                      width={"small"}
                       position={{
-                        basePosition: "left",
-                        diagonalPosition: "bottom",
+                        basePosition: "bottom",
+                        diagonalPosition: "left",
                       }}
                     >
-                      {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
+                      {HINTS_ALERTS.EDITING_BUTTON}
                     </Hint>
-                  )}
-                  {activity.calendarId && (
-                    <PlusIcon
-                      ref={activity.calendarId ? calendarEventRef : undefined}
+                    <PencilSquareIcon
+                      ref={firstEditButtonRef}
                       className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
                     />
-                  )}
-                </button>
-              )}
+                  </>
+                )}
+                {activity.calendarId && progress["editButton"] && !progress["editButton"].includes(false) && (
+                  <Hint
+                    displayCondition
+                    learningMethod="buttonClick"
+                    order={1}
+                    groupName={HINTS_GROUP_NAMES.ONLINE_CALENDAR_EVENT}
+                    referenceRef={calendarEventRef}
+                    shiftY={200}
+                    shiftX={50}
+                    width={"medium"}
+                    position={{
+                      basePosition: "left",
+                      diagonalPosition: "bottom",
+                    }}
+                  >
+                    {HINTS_ALERTS.ONLINE_CALENDAR_EVENT}
+                  </Hint>
+                )}
+
+                {activity.calendarId && (
+                  <PlusIcon
+                    ref={activity.calendarId ? calendarEventRef : undefined}
+                    className="w-[18px] h-[18px] text-gray-600 group-hover:text-gray-900 group-hover:dark:text-dark-heading"
+                  />
+                )}
+              </button>
             </td>
           </tr>
         ))}

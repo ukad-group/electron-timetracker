@@ -9,9 +9,13 @@ const HelpSection = () => {
   const restartTutorial = () => {
     for (let key in progress) {
       if (!progress.hasOwnProperty(key) || key === "skipAll") continue;
-      const array = progress[key];
-
-      array[0] = false;
+      const hintArray = progress[key];
+      if (key.split("").slice(-10).join("") === "Conditions") {
+        for (let i = 0; i < hintArray.length; i++) {
+          hintArray[i] = false;
+        }
+      }
+      hintArray[0] = false;
     }
     setDisabled(true);
     setProgress(progress);

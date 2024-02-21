@@ -9,7 +9,11 @@ export type ReportActivity = {
   activity?: string;
   description?: string;
   isBreak?: boolean;
-  isValid?: boolean;
+  validation: {
+    isValid: boolean;
+    cell?: "time" | "duration" | "project" | "activity" | "description";
+    description?: string;
+  };
   mistakes?: string;
   calendarId?: string;
   isNewProject?: boolean;
@@ -43,7 +47,7 @@ export function parseReport(fileContent: string) {
         activity: "",
         description: "",
         isBreak: false,
-        isValid: true,
+        validation: { isValid: true },
         mistakes: "",
         isNewProject: false,
       };
@@ -277,7 +281,7 @@ export function checkIntersection(previousTo: string, currentFrom: string) {
   const [hoursFrom, minutesFrom] = currentFrom.split(":");
   const toInMinutes = Number(hoursTo) * 60 + Number(minutesTo);
   const fromInMinutes = Number(hoursFrom) * 60 + Number(minutesFrom);
-  return fromInMinutes < toInMinutes;
+  return fromInMinutes <= toInMinutes;
 }
 
 export function validation(activities: Array<ReportActivity>) {
@@ -287,21 +291,35 @@ export function validation(activities: Array<ReportActivity>) {
       const [fromHours, fromMinutes] = activities[i].from
         ? activities[i].from?.split(":")?.map((item) => Number(item))
         : [];
+      activities[i].validation = { isValid: true };
 
-      if (i > 0 && checkIntersection(activities[i - 1].to, activities[i].from)) {
-        activities[i - 1].isValid = false;
+      if (i > 1 && checkIntersection(activities[i - 2].to, activities[i].from)) {
+        activities[i - 2].validation.isValid = false;
+        activities[i - 2].validation.cell = "time";
+        activities[i - 2].validation.description = "Intersection of time intervals";
       }
-      if (activities[i].duration <= 0 || (activities[i].project && !activities[i].to)) {
-        activities[i].isValid = false;
+      if (activities[i].duration <= 0) {
+        activities[i].validation.isValid = false;
+        activities[i].validation.cell = "duration";
+        activities[i].validation.description = "Negative or zero duration of the time interval";
+      }
+      if (activities[i].project && !activities[i].to) {
+        activities[i].validation.isValid = false;
+        activities[i].validation.cell = "time";
+        activities[i].validation.description = "The event has no end time";
       }
       if (activities[i].description.startsWith("!")) {
         activities[i].mistakes += " startsWith!";
       }
-      if (i > 0 && activities[i].to && !activities[i].project) {
-        activities[i].isValid = false;
+      if (activities[i].to && !activities[i].project) {
+        activities[i].validation.isValid = false;
+        activities[i].validation.cell = "project";
+        activities[i].validation.description = "The project must be specified in the activity";
       }
       if (!activities[i].project) {
-        activities[i].isValid = false;
+        activities[i].validation.isValid = false;
+        activities[i].validation.cell = "project";
+        activities[i].validation.description = "The project must be specified in the activity";
       }
       if (
         toHours < 0 ||
@@ -313,7 +331,9 @@ export function validation(activities: Array<ReportActivity>) {
         fromMinutes < 0 ||
         fromMinutes > 59
       ) {
-        activities[i].isValid = false;
+        activities[i].validation.isValid = false;
+        activities[i].validation.cell = "time";
+        activities[i].validation.description = "Impossible time";
       }
       if (
         activities[i].project &&
