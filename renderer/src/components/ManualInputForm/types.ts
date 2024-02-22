@@ -1,7 +1,7 @@
 import { SetStateAction } from "react";
 
 export type ManualInputFormProps = {
-  saveReportTrigger: number;
+  saveReportTrigger: boolean;
   onSave: (selectedDateReport: SetStateAction<string>, shouldAutosave: SetStateAction<boolean>) => void;
   selectedDateReport: string;
   selectedDate: Date;

@@ -33,7 +33,7 @@ const MainPage = ({
   const [calendarDate, setCalendarDate] = useState(new Date());
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>([]);
   const [selectedDateReport, setSelectedDateReport] = useState("");
-  const [saveReportTrigger, setSaveReportTrigger] = useState(0);
+  const [saveReportTrigger, setSaveReportTrigger] = useState(false);
   const { screenSizes } = useScreenSizes();
   const isManualInputMain = localStorage.getItem(LOCAL_STORAGE_VARIABLES.IS_MANUAL_INPUT_MAIN) === "true";
   const showBookings = !!JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
@@ -244,7 +244,7 @@ const MainPage = ({
       )}
       <Link
         href="/settings"
-        onClick={() => setSaveReportTrigger((prev) => prev + 1)}
+        onClick={() => setSaveReportTrigger(true)}
         className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold before:dark:text-gray-100"
       >
         <span className="w-8 flex items-center justify-center text-white ">

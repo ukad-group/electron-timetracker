@@ -30,6 +30,7 @@ const ManualInputForm = ({
   const editingHistoryManager = useEditingHistoryManager(report);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
+  const isReportChanged = selectedDateReport !== report;
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyS" && saveBtnStatus === "enabled") {
@@ -70,8 +71,9 @@ const ManualInputForm = ({
   }, [report]);
 
   useEffect(() => {
-    if (saveReportTrigger !== 0) {
-      saveReportHandler();
+    if (saveReportTrigger && isReportChanged) {
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "manuall_save");
+      onSave(report, true);
     }
   }, [saveReportTrigger]);
 
@@ -95,7 +97,7 @@ const ManualInputForm = ({
   };
 
   const setReportHandler = (report: string) => {
-    setSaveBtnStatus(selectedDateReport !== report ? "enabled" : "disabled");
+    setSaveBtnStatus(isReportChanged ? "enabled" : "disabled");
     setReport(report);
   };
 
