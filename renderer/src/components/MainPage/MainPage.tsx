@@ -116,7 +116,7 @@ const MainPage = ({
 
   const saveSerializedReport = (serializedReport: string) => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
-    global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.WRITE_REPORT, reportsFolder, selectedDate, serializedReport);
+    global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_WRITE_DAY_REPORT, reportsFolder, selectedDate, serializedReport);
     setSelectedDateReport(serializedReport);
   };
   const onDeleteActivity = (id: number) => {

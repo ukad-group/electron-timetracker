@@ -19,7 +19,7 @@ const Placeholder = ({ onEditActivity, backgroundError, selectedDate, setSelecte
     const prevDayReport = await global.ipcRenderer.invoke("app:find-last-report", reportsFolder, selectedDate);
 
     if (prevDayReport) {
-      global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.WRITE_REPORT, reportsFolder, selectedDate, prevDayReport);
+      global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_WRITE_DAY_REPORT, reportsFolder, selectedDate, prevDayReport);
 
       setSelectedDateReport(prevDayReport);
     } else {
