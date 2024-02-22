@@ -15,6 +15,7 @@ import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { Hint } from "@/shared/Hint";
 import { SCREENS } from "@/constants";
+import { MS_PER_HOUR } from "@/helpers/utils/datetime-ui";
 import { changeHintConditions, trackConnections } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import FullCalendarWrapper from "./FullCalendarWrapper";
@@ -71,12 +72,9 @@ export const Calendar = ({
         (out of {daysRequiredHours})
         {!!overUnderHours && (
           <span
-            className={
-              (overUnder === "overtime" && "text-green-500/50 ml-1") ||
-              (overUnder === "undertime" && "text-red-500/50 ml-1")
-            }
+            className={`ml-1 ${overUnder === "undertime" && overUnderHours >= 8 * MS_PER_HOUR && "text-red-500/50"}`}
           >
-            {overUnder === "undertime" && "-"}
+            {overUnder === "undertime" ? "-" : "+"}
             {formatDuration(overUnderHours)}
           </span>
         )}
