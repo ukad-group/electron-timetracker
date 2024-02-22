@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_VARIABLES, TRACK_CONNECTIONS } from "../contstants";
+import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS } from "../contstants";
 import { trackConnections } from "./utils";
 export interface Office365User {
   accessToken: string;
@@ -39,7 +39,7 @@ export const getOffice365Events = async () => {
 
   if (!storedUsers.length) return [];
 
-  trackConnections(TRACK_CONNECTIONS.OFFICE365_CALENDAR);
+  trackConnections(TRACK_ANALYTICS.OFFICE365_CALENDAR);
 
   const usersPromises = storedUsers.map((user: Office365User) => {
     const { accessToken, refreshToken, userId } = user;

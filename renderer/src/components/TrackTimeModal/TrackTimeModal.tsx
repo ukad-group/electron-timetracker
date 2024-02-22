@@ -1,29 +1,32 @@
 import clsx from "clsx";
 import { FormEvent, useEffect, useMemo, useState, useRef } from "react";
 import { useTimeInput } from "@/helpers/hooks";
-import {
-  calcDurationBetweenTimes,
-  formatDurationAsDecimals,
-  addSuggestions,
-  addDurationToTime,
-} from "@/helpers/utils/reports";
-import { padStringToMinutes, getDateTimeData } from "@/helpers/utils/datetime-ui";
+import { calcDurationBetweenTimes, formatDurationAsDecimals, addDurationToTime } from "@/helpers/utils/reports";
 import { AutocompleteSelector } from "@/shared/AutocompleteSelector";
 import { shallow } from "zustand/shallow";
-import { useScheduledEventsStore } from "@/store/googleEventsStore";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
+import { useScheduledEventsStore } from "@/store/googleEventsStore";
 import { getJiraCardsFromAPI } from "@/helpers/utils/jira";
 import { getAllTrelloCardsFromApi } from "@/helpers/utils/trello";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { TrackTimeModalProps } from "./types";
 import { Modal } from "@/shared/Modal";
 import { TextField } from "@/shared/TextField";
-import { changeMinutesAndHours, changeHours, getTimetrackerYearProjects } from "./utils";
+import {
+  getTimetrackerYearProjects,
+  addSuggestions,
+  setTimeOnOpen,
+  replaceDashes,
+  saveSheduledEvents,
+  handleKey,
+  addNewActivity,
+} from "./utils";
 import { Hint } from "@/shared/Hint";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { SCREENS } from "@/constants";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
-import { changeHintConditions } from "@/helpers/utils/utils";
+import { KEY_CODES } from "@/helpers/contstants";
+import { TRACK_ANALYTICS } from "@/helpers/contstants";
 
 const TrackTimeModal = ({
   activities,
@@ -47,11 +50,11 @@ const TrackTimeModal = ({
   const [otherTrelloTasks, setOtherTrelloTasks] = useState([]);
   const [userJiraTasks, setUserJiraTasks] = useState([]);
   const [otherJiraTasks, setOtherJiraTasks] = useState([]);
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const [scheduledEvents, setScheduledEvents] = useScheduledEventsStore(
     (state) => [state.event, state.setEvent],
     shallow,
   );
-  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const [latestProjects, setLatestProjects] = useState([]);
   const [webTrackerProjects, setWebTrackerProjects] = useState([]);
   const [uniqueWebTrackerProjects, setUniqueWebTrackerProjects] = useState([]);
@@ -74,78 +77,37 @@ const TrackTimeModal = ({
   }, [userTrelloTasks, otherTrelloTasks, userJiraTasks, otherJiraTasks]);
 
   useEffect(() => {
-    if (!editedActivity || editedActivity === "new") {
-      let trackingConditions = [];
-      if (
-        progress[HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"] &&
-        progress[HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"].includes(false)
-      ) {
-        const lastFalse = progress[HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"].lastIndexOf(false);
-        trackingConditions = progress[HINTS_GROUP_NAMES.TRACK_TIME_MODAL + "Conditions"];
-        trackingConditions[lastFalse] = true;
-      }
-      changeHintConditions(progress, setProgress, [
-        {
-          groupName: HINTS_GROUP_NAMES.TRACK_TIME_MODAL,
-          newConditions: trackingConditions,
-          existingConditions: ["same", "same", "same", "same", "same", "same", "same", "same", "same", "same"],
-        },
-      ]);
-      resetModal();
-      return;
-    }
-
-    if (editedActivity?.calendarId) {
-      const lastRegistrationTo = activities[activities?.length - 2]?.to;
-
-      padStringToMinutes(lastRegistrationTo) > padStringToMinutes(editedActivity?.from)
-        ? setFrom(lastRegistrationTo || "")
-        : setFrom(editedActivity?.from || "");
-    } else {
-      setFrom(editedActivity?.from || "");
-    }
-
-    setTo(editedActivity.to || "");
-    setFormattedDuration(formatDurationAsDecimals(editedActivity.duration) || "");
-    setProject(editedActivity.project || "");
-    setActivity(editedActivity.activity || "");
-    setDescription(editedActivity.description || "");
+    addNewActivity(
+      progress,
+      setProgress,
+      editedActivity,
+      activities,
+      setFrom,
+      setTo,
+      setFormattedDuration,
+      setProject,
+      setActivity,
+      setDescription,
+      resetModal,
+    );
   }, [editedActivity]);
 
   useEffect(() => {
     if (editedActivity !== "new") {
       return;
     }
-
-    const { hours, floorMinutes, isToday, ceilHours, ceilMinutes } = getDateTimeData(selectedDate);
-
-    if (activities?.length && activities[activities?.length - 1].to) {
-      setFrom(activities[activities?.length - 1].to);
-    } else if (activities.length && !activities[activities?.length - 1].to) {
-      setFrom(activities[activities?.length - 1].from);
-    } else {
-      setFrom(`${hours}:${floorMinutes}`);
-    }
-
-    isToday ? setTo(`${ceilHours}:${ceilMinutes}`) : setTo("");
+    setTimeOnOpen(activities, selectedDate, setFrom, setTo);
   }, [isOpen]);
 
   useEffect(() => {
-    addSuggestions(activities, latestProjAndDesc, latestProjAndAct);
-    const tempLatestProj = Object.keys(latestProjAndAct);
-
-    if (webTrackerProjects) {
-      const tempWebTrackerProjects = [];
-      for (let i = 0; i < webTrackerProjects.length; i++) {
-        if (!tempLatestProj.includes(webTrackerProjects[i])) {
-          tempWebTrackerProjects.push(webTrackerProjects[i]);
-          global.ipcRenderer.send(IPC_MAIN_CHANNELS.DICTIONATY_UPDATE, webTrackerProjects[i]);
-        }
-      }
-      setUniqueWebTrackerProjects(tempWebTrackerProjects);
-    }
-
-    setLatestProjects(tempLatestProj);
+    addSuggestions(
+      activities,
+      latestProjAndDesc,
+      latestProjAndAct,
+      webTrackerProjects,
+      setUniqueWebTrackerProjects,
+      setLatestProjects,
+    );
   }, [isOpen, latestProjAndDesc, latestProjAndAct, webTrackerProjects]);
 
   useEffect(() => {
@@ -155,16 +117,7 @@ const TrackTimeModal = ({
   }, [from, to]);
 
   useEffect(() => {
-    (async () => {
-      const allTrelloCards = await getAllTrelloCardsFromApi();
-      setUserTrelloTasks(allTrelloCards[0]);
-      setOtherTrelloTasks(allTrelloCards[1]);
-
-      const allJiraCards = await getJiraCardsFromAPI();
-      setUserJiraTasks(allJiraCards[0]);
-      setOtherJiraTasks(allJiraCards[1]);
-    })();
-
+    getBoardTasks();
     getTimetrackerYearProjects(setWebTrackerProjects);
 
     document.addEventListener("keyup", handleCloseModal);
@@ -173,9 +126,20 @@ const TrackTimeModal = ({
       document.removeEventListener("keyup", handleCloseModal);
     };
   }, []);
+
   useEffect(() => {
     setProgress(progress);
   }, [screenSizes]);
+
+  const getBoardTasks = async () => {
+    const allTrelloCards = await getAllTrelloCardsFromApi();
+    setUserTrelloTasks(allTrelloCards[0]);
+    setOtherTrelloTasks(allTrelloCards[1]);
+
+    const allJiraCards = await getJiraCardsFromAPI();
+    setUserJiraTasks(allJiraCards[0]);
+    setOtherJiraTasks(allJiraCards[1]);
+  };
 
   const onSave = (e: FormEvent | MouseEvent) => {
     e.preventDefault();
@@ -185,16 +149,14 @@ const TrackTimeModal = ({
       return;
     }
 
-    if (progress["shortcutsEditingConditions"] && progress["shortcutsEditingConditions"][0]) {
-      progress["shortcutsEditingConditions"][1] = true;
+    if (
+      progress[HINTS_GROUP_NAMES.SHORTCUTS_EDITING + "Conditions"] &&
+      progress[HINTS_GROUP_NAMES.SHORTCUTS_EDITING + "Conditions"][0]
+    ) {
+      progress[HINTS_GROUP_NAMES.SHORTCUTS_EDITING + "Conditions"][1] = true;
       setProgress(progress);
     }
-    let dashedDescription = description;
-
-    if (description.includes(" - ")) {
-      setDescription(description.replace(/ - /g, " -- "));
-      dashedDescription = description.replace(/ - /g, " -- ");
-    }
+    let dashedDescription = replaceDashes(description, setDescription);
 
     submitActivity({
       id: editedActivity === "new" ? null : editedActivity.id,
@@ -208,21 +170,10 @@ const TrackTimeModal = ({
       validation: { isValid: true },
     });
 
-    if (!scheduledEvents[dashedDescription] && editedActivity !== "new" && editedActivity.calendarId?.length > 0) {
-      scheduledEvents[dashedDescription] = { project: "", activity: "" };
-    }
-    if (scheduledEvents[dashedDescription] && !scheduledEvents[dashedDescription].project) {
-      scheduledEvents[dashedDescription].project = project;
-    }
+    saveSheduledEvents(scheduledEvents, setScheduledEvents, dashedDescription, editedActivity, project, activity);
 
-    if (scheduledEvents[dashedDescription] && scheduledEvents[dashedDescription].activity !== activity) {
-      scheduledEvents[dashedDescription].activity = activity || "";
-    }
-
-    setScheduledEvents(scheduledEvents);
-
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "registrations", {
-      registration: "time_registrations",
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.REGISTRATIONS, {
+      registration: TRACK_ANALYTICS.TIME_REGISTRATION,
     });
     close();
   };
@@ -237,7 +188,7 @@ const TrackTimeModal = ({
     setIsValidationEnabled(false);
   };
 
-  const disableTextDrag = (e) => {
+  const disableTextDrag = (e: React.MouseEvent<HTMLInputElement>) => {
     e.preventDefault();
   };
 
@@ -257,56 +208,17 @@ const TrackTimeModal = ({
     setFormattedDuration(formatDurationAsDecimals(duration));
   };
 
-  const selectText = (e) => {
+  const selectText = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.target.select();
   };
 
-  const handleKey = (
-    e: React.KeyboardEvent<HTMLInputElement>,
-    callback: (value: string) => void | undefined = undefined,
-  ) => {
-    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-      e.preventDefault();
-
-      if (!callback) return;
-
-      const input = e.target as HTMLInputElement;
-      const value = input.value;
-
-      if (value.length < 5) return;
-
-      if (input.selectionStart === 0 && input.selectionEnd === value.length) {
-        input.selectionStart = value.length;
-        input.selectionEnd = value.length;
-      }
-
-      const cursorPosition = input.selectionStart;
-      let [hours, minutes] = value.split(":").map(Number);
-
-      if (cursorPosition > 2) {
-        const [newMinutes, newHours] = changeMinutesAndHours(e.key, minutes, hours);
-        minutes = newMinutes;
-        hours = newHours;
-      } else {
-        hours = changeHours(e.key, hours);
-      }
-
-      const adjustedTime = hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
-
-      input.value = adjustedTime;
-      input.selectionStart = cursorPosition;
-      input.selectionEnd = cursorPosition;
-      callback(adjustedTime);
-    }
-  };
-
   const handleCloseModal = (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+    if ((e.ctrlKey || e.metaKey) && e.key === KEY_CODES.ENTER) {
       e.preventDefault();
       onSave(e);
     }
 
-    if (e.key === "Escape" || e.key === "Esc") {
+    if (e.key === KEY_CODES.ESCAPE || e.key === KEY_CODES.ESC) {
       close();
     }
   };

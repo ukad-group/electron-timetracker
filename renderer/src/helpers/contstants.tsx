@@ -46,6 +46,9 @@ export const KEY_CODES = {
   ARROW_DOWN: "ArrowDown",
   META: "Meta",
   CONTROL: "Control",
+  ENTER: "Enter",
+  ESCAPE: "Escape",
+  ESC: "Esc",
   TAB: "Tab",
   // ...Add more key codes as needed
 };
@@ -93,10 +96,20 @@ export const HINTS_ALERTS = {
     "Here you can see your application version. Links to contact us. And the list of changes that were added in this version.",
 };
 
-export const TRACK_CONNECTIONS = {
+export const TRACK_ANALYTICS = {
   TIMETRACKER_WEB: "timetrackerWeb",
   GOOGLE_CALENDAR: "google-calendar",
   JIRA: "jira",
   OFFICE365_CALENDAR: "office365-calendar",
   TRELLO: "trello",
+  REGISTRATIONS: "registrations",
+  TIME_REGISTRATION: "time_registrations",
+  COPY_REGISTRATION: "copy_registration",
+  EDIT_REGISTRATION: "edit_registration",
+  GOOGLE_CALENDAR_EVENT_REGISTRATION: "google-calendar-event_registration",
+  ALL_CALENDAR_EVENT_REGISTRATION: "all_calendar-events_registration",
+  CALENDARS_CONNECTIONS: "calendars_connections",
+  CALENDAR_GOOGLE: "googleCalendar",
+  MANUAL_SAVE: "manuall_save",
+  CALENDAR_OFFICE: "office365",
 };
