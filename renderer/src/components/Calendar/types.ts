@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, MutableRefObject, ReactElement } from "react";
 import { BookingFromApi } from "@/components/Bookings/types";
 
 export type CalendarProps = {
@@ -48,4 +48,17 @@ export type TTUserInfo = {
   plannerAccessToken: string;
   plannerRefreshToken: string;
   monthBookings: BookingFromApi[];
+};
+
+export type VacationSickDaysData = {
+  periods: ApiDayOff[];
+};
+
+export type FullCalendarWrapperProps = {
+  children: ReactElement;
+  selectedDate: Date;
+  setSelectedDate: Dispatch<SetStateAction<Date>>;
+  daysOff: DayOff[];
+  formattedQuarterReports: FormattedReport[];
+  weekNumberRef: MutableRefObject<any>;
 };

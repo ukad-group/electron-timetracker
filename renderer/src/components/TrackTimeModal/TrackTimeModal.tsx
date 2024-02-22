@@ -28,7 +28,7 @@ import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import { KEY_CODES } from "@/helpers/contstants";
 import { TRACK_ANALYTICS } from "@/helpers/contstants";
 
-export default function TrackTimeModal({
+const TrackTimeModal = ({
   activities,
   isOpen,
   editedActivity,
@@ -37,7 +37,7 @@ export default function TrackTimeModal({
   close,
   submitActivity,
   selectedDate,
-}: TrackTimeModalProps) {
+}: TrackTimeModalProps) => {
   const [from, onFromChange, onFromBlur, setFrom] = useTimeInput();
   const [to, onToChange, onToBlur, setTo] = useTimeInput();
   const [formattedDuration, setFormattedDuration] = useState("");
@@ -370,4 +370,5 @@ export default function TrackTimeModal({
       </div>
     </Modal>
   );
-}
+};
+export default TrackTimeModal;

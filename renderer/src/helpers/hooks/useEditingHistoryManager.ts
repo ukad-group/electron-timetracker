@@ -61,20 +61,41 @@ const useEditingHistoryManager = (initialValue: string) => {
   };
   const [state, dispatch] = useReducer(EditingHistoryReducer, editingHistoryState);
 
+  function findFirstDifferenceIndex(prevText, currentText) {
+    const minLength = Math.min(prevText.length, currentText.length);
+    for (let i = 0; i < minLength; i++) {
+      if (prevText[i] !== currentText[i]) {
+        return prevText > currentText ? i + prevText.length - currentText.length : i;
+      }
+    }
+
+    return minLength;
+  }
+
   const handleSetValue = useCallback((value: string) => dispatch(setValue(value)), [dispatch]);
   const handleUndoEditing = useCallback(() => {
     dispatch(undoEditing());
 
     if (state.undoStack.length > 2) {
-      return state.undoStack[state.undoStack.length - 2];
-    }
+      const changePlace = findFirstDifferenceIndex(
+        state.undoStack[state.undoStack.length - 2],
+        state.undoStack[state.undoStack.length - 1],
+      );
 
-    return state.undoStack[0];
+      return [state.undoStack[state.undoStack.length - 2], changePlace];
+    }
+    return [state.undoStack[0], 0];
   }, [dispatch, state]);
+
   const handleRedoEditing = useCallback(() => {
     dispatch(redoEditing());
 
-    return state.redoStack[state.redoStack.length - 1];
+    const changePlace = findFirstDifferenceIndex(
+      state.redoStack[state.redoStack.length - 1],
+      state.undoStack[state.undoStack.length - 1],
+    );
+
+    return [state.redoStack[state.redoStack.length - 1], changePlace];
   }, [dispatch, state]);
 
   return {
