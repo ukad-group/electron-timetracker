@@ -52,20 +52,14 @@ const MainPage = ({
       });
     }
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
-
-    changeHintConditions(progress, setProgress, [
-      {
-        groupName: HINTS_GROUP_NAMES.ZOOM_IN,
-        newConditions: [false],
-        existingConditions: [false],
-      },
-    ]);
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.WINDOW_FOCUSED, handleWindowFocus);
 
     document.addEventListener("keydown", handleCtrlPlus);
 
     return () => {
       global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.STOP_PATH_WATCHER, reportsFolder);
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.WINDOW_FOCUSED);
       document.removeEventListener("keydown", handleCtrlPlus);
     };
   }, []);
@@ -153,6 +147,18 @@ const MainPage = ({
     setShouldAutosave(true);
   };
 
+  const handleWindowFocus = () => {
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.ZOOM_IN,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+    ]);
+    progress[HINTS_GROUP_NAMES.ZOOM_IN] = [false];
+    setProgress(progress);
+  };
+
   const handleCtrlPlus = (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === "=") {
       changeHintConditions(progress, setProgress, [
@@ -172,6 +178,7 @@ const MainPage = ({
         <>
           <div className="lg:col-start-1 lg:col-span-2 flex flex-col gap-6">
             <Hint
+              ignoreSkip
               displayCondition
               learningMethod="nextClick"
               order={1}

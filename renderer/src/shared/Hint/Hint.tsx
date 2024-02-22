@@ -10,6 +10,7 @@ import { positioning } from "./positioning";
 import { HintProps } from "./types";
 
 function Hint({
+  ignoreSkip = false,
   displayCondition = false,
   learningMethod,
   order,
@@ -122,7 +123,7 @@ function Hint({
   };
 
   useEffect(() => {
-    if (!progress.skipAll[0]) {
+    if (!progress.skipAll[0] || ignoreSkip) {
       positioning(
         learnHint,
         referenceRef,
@@ -157,7 +158,7 @@ function Hint({
 
   return (
     <>
-      {showHint && !progress["skipAll"][0] && (
+      {showHint && (!progress["skipAll"][0] || ignoreSkip) && (
         <>
           {createPortal(
             <div className="h-screen w-full fixed justify-center top-0 z-20 items-center bg-gray-900/40 pointer-events-auto" />,
