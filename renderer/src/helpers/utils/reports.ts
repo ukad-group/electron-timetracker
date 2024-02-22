@@ -110,15 +110,15 @@ export function parseReport(fileContent: string) {
 
       const activityInTheLinePattern = startTime > new Date(2016, 7, 23) ? /(.+?)\s-\s+/ : /(.+?)-\s*/;
       const activityInTheLineRegex = new RegExp(activityInTheLinePattern);
+      const isEmptyActivity = currentLine.startsWith("- ");
 
-      if (activityInTheLineRegex.test(currentLine)) {
-        let activityName = currentLine.match(activityInTheLineRegex)[1];
+      if (activityInTheLineRegex.test(currentLine) || isEmptyActivity) {
+        let activityName = isEmptyActivity ? " " : currentLine.match(activityInTheLineRegex)[1].trim();
 
-        registration.activity =
-          startTime > new Date(2016, 7, 26) ? activityName.trim() : activityName.trim().toLowerCase();
+        registration.activity = startTime > new Date(2016, 7, 26) ? activityName : activityName.toLowerCase();
 
         // removing activity with '-'
-        currentLine = currentLine.replace(activityInTheLineRegex, "");
+        currentLine = isEmptyActivity ? currentLine.replace(/-/, "") : currentLine.replace(activityInTheLineRegex, "");
       }
       registration.description = currentLine.replace(/�/g, "-");
 
@@ -148,7 +148,7 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
       parts.push(activity.project);
 
       if (activity.activity) {
-        parts.push(activity.activity);
+        parts.push(activity.activity === " " ? "" : activity.activity);
       }
 
       if (activity.description) {
