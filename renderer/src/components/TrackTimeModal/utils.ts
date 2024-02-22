@@ -280,7 +280,7 @@ export function addNewActivity(
       {
         groupName: HINTS_GROUP_NAMES.TRACK_TIME_MODAL,
         newConditions: trackingConditions,
-        existingConditions: ["same", "same", "same", "same", "same", "same", "same", "same", "same", "same"],
+        existingConditions: Array(10).fill("same"),
       },
     ]);
     resetModal();

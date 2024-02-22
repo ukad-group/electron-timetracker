@@ -117,7 +117,7 @@ export default function TrackTimeModal({
   }, [from, to]);
 
   useEffect(() => {
-    getManageBoardsTasks();
+    getBoardTasks();
     getTimetrackerYearProjects(setWebTrackerProjects);
 
     document.addEventListener("keyup", handleCloseModal);
@@ -131,7 +131,7 @@ export default function TrackTimeModal({
     setProgress(progress);
   }, [screenSizes]);
 
-  const getManageBoardsTasks = async () => {
+  const getBoardTasks = async () => {
     const allTrelloCards = await getAllTrelloCardsFromApi();
     setUserTrelloTasks(allTrelloCards[0]);
     setOtherTrelloTasks(allTrelloCards[1]);
