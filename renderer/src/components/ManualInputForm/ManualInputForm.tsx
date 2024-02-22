@@ -13,12 +13,13 @@ import { Hint } from "@/shared/Hint";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 
-export default function ManualInputForm({
+const ManualInputForm = ({
+  saveReportTrigger,
   onSave,
   selectedDateReport,
   selectedDate,
   setSelectedDateReport,
-}: ManualInputFormProps) {
+}: ManualInputFormProps) => {
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [report, setReport] = useState("");
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
@@ -28,7 +29,6 @@ export default function ManualInputForm({
   const [isFileExist, setIsFileExist] = useState(false);
   const editingHistoryManager = useEditingHistoryManager(report);
   const [cursorPosition, setCursorPosition] = useState(0);
-
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
@@ -68,6 +68,12 @@ export default function ManualInputForm({
       document.removeEventListener("keydown", saveOnPressHandler);
     };
   }, [report]);
+
+  useEffect(() => {
+    if (saveReportTrigger !== 0) {
+      saveReportHandler();
+    }
+  }, [saveReportTrigger]);
 
   const readReport = async () => {
     const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.READ_DAY_REPORT, reportsFolder, selectedDate);
@@ -264,4 +270,6 @@ export default function ManualInputForm({
       </div>
     </div>
   );
-}
+};
+
+export default ManualInputForm;
