@@ -50,6 +50,10 @@ export const KEY_CODES = {
   ESCAPE: "Escape",
   ESC: "Esc",
   TAB: "Tab",
+  KEY_D: "KeyD",
+  KEY_S: "KeyS",
+  KEY_Y: "KeyY",
+  KEY_Z: "KeyZ",
   // ...Add more key codes as needed
 };
 

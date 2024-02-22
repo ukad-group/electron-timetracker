@@ -1,25 +1,19 @@
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@/shared/Button";
 import { DeleteMessage } from "@/shared/DeleteMessage";
-import { parseReport, serializeReport } from "@/helpers/utils/reports";
-import { getCurrentTimeRoundedUp } from "@/helpers/utils/datetime-ui";
 import { useMainStore } from "@/store/mainStore";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { useEditingHistoryManager } from "@/helpers/hooks";
-import { ManualInputFormProps } from "./types";
+import { KeyboardEventProps, ManualInputFormProps } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { Hint } from "@/shared/Hint";
-import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS, KEY_CODES } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import { TRACK_ANALYTICS } from "@/helpers/contstants";
+import { getReportWithCopiedLine } from "./utils";
 
-export default function ManualInputForm({
-  onSave,
-  selectedDateReport,
-  selectedDate,
-  setSelectedDateReport,
-}: ManualInputFormProps) {
+const ManualInputForm = ({ onSave, selectedDateReport, selectedDate, setSelectedDateReport }: ManualInputFormProps) => {
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [report, setReport] = useState("");
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
@@ -29,28 +23,98 @@ export default function ManualInputForm({
   const [isFileExist, setIsFileExist] = useState(false);
   const editingHistoryManager = useEditingHistoryManager(report);
   const [cursorPosition, setCursorPosition] = useState(0);
-
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
 
-  const saveOnPressHandler = (e: KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && e.code === "KeyS" && saveBtnStatus === "enabled") {
-      saveReportHandler();
+  const readReport = async () => {
+    const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.READ_DAY_REPORT, reportsFolder, selectedDate);
+
+    setIsFileExist(dayReport !== null);
+    setShowDeleteButton(dayReport === "");
+  };
+
+  const handleCtrlSSave = (e: KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_S && saveBtnStatus === "enabled") {
+      handleSaveReport();
     }
   };
+
+  const handleSaveReport = () => {
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.MANUAL_SAVE);
+    onSave(report, true);
+    setSaveBtnStatus("inprogress");
+
+    if (isFileExist) {
+      setShowDeleteButton(!report.length);
+    } else {
+      setShowDeleteButton(false);
+    }
+  };
+
+  const handleSetReport = (report: string) => {
+    setSaveBtnStatus(selectedDateReport !== report ? "enabled" : "disabled");
+    setReport(report);
+  };
+
+  const handleTextAreaKeyDown = (e: KeyboardEventProps) => {
+    if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_D) {
+      e.preventDefault();
+      handleSetReport(getReportWithCopiedLine(textareaRef, report));
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_Z) {
+      e.preventDefault();
+      const [currentValue, changePlace] = editingHistoryManager.undoEditing();
+
+      if (typeof currentValue === "string") {
+        setReport(currentValue);
+        setCursorPosition(typeof changePlace === "number" ? changePlace : 0);
+      }
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_Y) {
+      e.preventDefault();
+      const [currentValue, changePlace] = editingHistoryManager.redoEditing();
+
+      if (typeof currentValue === "string") {
+        setReport(currentValue);
+        setCursorPosition(typeof changePlace === "number" ? changePlace : 0);
+      }
+    }
+  };
+
+  const handleOnFocus = () => {
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.MANUAL_INPUT,
+        newConditions: [true],
+        existingConditions: [true],
+      },
+    ]);
+  };
+
+  useEffect(() => {
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.MANUAL_INPUT,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+    ]);
+  }, []);
 
   useEffect(() => {
     setShowDeleteMessage(false);
   }, [selectedDate]);
 
   useEffect(() => {
-    setReportHandler(selectedDateReport);
+    handleSetReport(selectedDateReport);
   }, [selectedDateReport]);
 
   useEffect(() => {
     readReport();
 
     editingHistoryManager.setValue(report);
-    setReportHandler(report);
+    handleSetReport(report);
 
     if (isFileExist) {
       setShowDeleteButton(!report.length);
@@ -63,143 +127,12 @@ export default function ManualInputForm({
     }
     setCursorPosition(0);
 
-    document.addEventListener("keydown", saveOnPressHandler);
+    document.addEventListener("keydown", handleCtrlSSave);
 
     return () => {
-      document.removeEventListener("keydown", saveOnPressHandler);
+      document.removeEventListener("keydown", handleCtrlSSave);
     };
   }, [report]);
-
-  const readReport = async () => {
-    const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.READ_DAY_REPORT, reportsFolder, selectedDate);
-
-    setIsFileExist(dayReport !== null);
-    setShowDeleteButton(dayReport === "");
-  };
-
-  const saveReportHandler = () => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.MANUAL_SAVE);
-    onSave(report, true);
-    setSaveBtnStatus("inprogress");
-
-    if (isFileExist) {
-      setShowDeleteButton(!report.length);
-    } else {
-      setShowDeleteButton(false);
-    }
-  };
-
-  const setReportHandler = (report: string) => {
-    setSaveBtnStatus(selectedDateReport !== report ? "enabled" : "disabled");
-    setReport(report);
-  };
-
-  const textAreaKeyHandler = (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.code === "KeyD") {
-      e.preventDefault();
-      copyCurrentLine();
-    }
-
-    if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
-      e.preventDefault();
-      const [currentValue, changePlace] = editingHistoryManager.undoEditing();
-
-      if (typeof currentValue === "string") {
-        setReport(currentValue);
-        setCursorPosition(typeof changePlace === "number" ? changePlace : 0);
-      }
-    }
-
-    if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
-      e.preventDefault();
-      const [currentValue, changePlace] = editingHistoryManager.redoEditing();
-
-      if (typeof currentValue === "string") {
-        setReport(currentValue);
-        setCursorPosition(typeof changePlace === "number" ? changePlace : 0);
-      }
-    }
-  };
-
-  const getCurrentCursorLineValue = (textarea: HTMLTextAreaElement, report: string) => {
-    const cursorPosition = textarea.selectionStart;
-    const currentLineStart = report.lastIndexOf("\n", cursorPosition - 1) + 1;
-    const currentLineEnd = report.indexOf("\n", cursorPosition);
-
-    return report.slice(currentLineStart, currentLineEnd !== -1 ? currentLineEnd : undefined);
-  };
-
-  const copyCurrentLine = () => {
-    const textarea = textareaRef.current;
-    const reportAndNotes = parseReport(report);
-    const activities = reportAndNotes[0] || [];
-    const lastActivity = activities[activities.length - 1];
-
-    if (textarea) {
-      const currentLineValue = getCurrentCursorLineValue(textarea, report);
-      const isCursorOnRegistration = parseReport(currentLineValue)[0]?.length !== 0;
-
-      if (!isCursorOnRegistration) return;
-      const currentLineItems = currentLineValue.split(" - ");
-
-      // forbid copying the end of the day
-      if (currentLineItems.length <= 2 && !currentLineItems[1]?.trim()) return;
-
-      const project = currentLineItems[1];
-      let activity = "";
-      let description = "";
-
-      if (currentLineItems.length === 3) {
-        description = currentLineItems[2];
-      }
-
-      if (currentLineItems.length === 4) {
-        activity = currentLineItems[2];
-        description = currentLineItems[3];
-      }
-
-      // if user hasn't end of the day
-      if (!lastActivity.isBreak) {
-        activities.push({
-          from: getCurrentTimeRoundedUp(),
-          project: project,
-          activity: activity,
-          description: description,
-          to: getCurrentTimeRoundedUp(),
-        });
-      } else {
-        lastActivity.project = project;
-        lastActivity.activity = activity;
-        lastActivity.description = description;
-        lastActivity.to = getCurrentTimeRoundedUp();
-      }
-    }
-
-    const serializedReport =
-      serializeReport(activities) +
-      (!reportAndNotes[1] || reportAndNotes[1].startsWith("undefined") ? "" : reportAndNotes[1]);
-
-    setReportHandler(serializedReport);
-  };
-  useEffect(() => {
-    changeHintConditions(progress, setProgress, [
-      {
-        groupName: HINTS_GROUP_NAMES.MANUAL_INPUT,
-        newConditions: [false],
-        existingConditions: [false],
-      },
-    ]);
-  }, []);
-
-  const onFocusHandler = () => {
-    changeHintConditions(progress, setProgress, [
-      {
-        groupName: HINTS_GROUP_NAMES.MANUAL_INPUT,
-        newConditions: [true],
-        existingConditions: [true],
-      },
-    ]);
-  };
 
   return (
     <div>
@@ -226,13 +159,13 @@ export default function ManualInputForm({
 
       <textarea
         value={report}
-        onFocus={onFocusHandler}
-        onChange={(e) => setReportHandler(e.target.value)}
+        onFocus={handleOnFocus}
+        onChange={(e) => handleSetReport(e.target.value)}
         rows={15}
         className="block w-full px-3 py-2 mt-3 border border-gray-300 rounded-md shadow-sm focus-visible:outline-blue-500 sm:text-sm dark:bg-dark-back dark:border-dark-border dark:text-slate-400 focus-visible:dark:outline-slate-500"
         spellCheck={true}
         ref={textareaRef}
-        onKeyDown={textAreaKeyHandler}
+        onKeyDown={handleTextAreaKeyDown}
       />
       <div className="relative flex flex-col gap-4 mt-6 justify-stretch">
         {showDeleteMessage && (
@@ -246,7 +179,7 @@ export default function ManualInputForm({
         <div className="flex flex-col justify-stretch">
           <Button
             text="Save"
-            callback={saveReportHandler}
+            callback={handleSaveReport}
             status={saveBtnStatus}
             disabled={saveBtnStatus === "disabled"}
             type={"button"}
@@ -265,4 +198,6 @@ export default function ManualInputForm({
       </div>
     </div>
   );
-}
+};
+
+export default ManualInputForm;
