@@ -88,7 +88,7 @@ const Totals = ({ selectedDate }) => {
 
       switch (true) {
         case name.length > 0 && withTime:
-          textForCopying = `${name} (${duration})`;
+          textForCopying = `(${duration}) ${name} `;
           break;
 
         case !name.length && withTime:
@@ -291,7 +291,7 @@ const Totals = ({ selectedDate }) => {
             totals={totals}
             toggleActivitiesList={toggleActivitiesList}
             isShowedActivitiesList={isShowedActivitiesList}
-            period={period}
+            period={period.periodName}
             onCopyDescriptions={copyDescriptionsHandler}
           />
         </div>
