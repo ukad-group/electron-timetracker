@@ -352,10 +352,10 @@ export function validation(activities: Array<ReportActivity>) {
   }
 }
 
-
 export function stringToMinutes(str: string) {
   const [hours, minutes] = str.split(":");
   return Number(hours) * 60 + Number(minutes);
+}
 
 export function addSuggestions(
   activities: Array<ReportActivity> | null,

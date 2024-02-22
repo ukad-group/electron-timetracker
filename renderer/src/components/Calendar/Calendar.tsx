@@ -9,7 +9,7 @@ import { ErrorPlaceholder, RenderError } from "@/shared/ErrorPlaceholder";
 import { getMonthWorkHours, getRequiredHours, MONTHS, mathOvertimeUndertime } from "@/helpers/utils/datetime-ui";
 import { getFormattedReports, loadHolidaysAndVacations } from "./utils";
 import { CalendarProps, ParsedReport, FormattedReport, TTUserInfo, DayOff } from "./types";
-import { LOCAL_STORAGE_VARIABLES, TRACK_CONNECTIONS, HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS, HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
@@ -159,7 +159,7 @@ export const Calendar = ({
 
   useEffect(() => {
     if (timetrackerUserInfo) {
-      trackConnections(TRACK_CONNECTIONS.TIMETRACKER_WEB);
+      trackConnections(TRACK_ANALYTICS.TIMETRACKER_WEB);
     }
 
     handleHintsBehaviour();
