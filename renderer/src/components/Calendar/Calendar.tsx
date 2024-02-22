@@ -114,12 +114,9 @@ export function Calendar({
         (out of {daysRequiredHours})
         {!!overUnderHours && (
           <span
-            className={
-              (overUnder === "overtime" && "text-green-500/50 ml-1") ||
-              (overUnder === "undertime" && "text-red-500/50 ml-1")
-            }
+            className={`ml-1 ${overUnder === "undertime" && overUnderHours >= 28800000 && "text-red-500/50"}`}
           >
-            {overUnder === "undertime" && "-"}
+            {overUnder === "undertime" ? "-" : "+"}
             {formatDuration(overUnderHours)}
           </span>
         )}
