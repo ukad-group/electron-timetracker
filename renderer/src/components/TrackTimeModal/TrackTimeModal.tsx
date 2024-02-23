@@ -156,7 +156,7 @@ const TrackTimeModal = ({
       progress[HINTS_GROUP_NAMES.SHORTCUTS_EDITING + "Conditions"][1] = true;
       setProgress(progress);
     }
-    const newActiviti = handleDashedDescription(description, activity, setActivity);
+    const newActivity = handleDashedDescription(description, activity, setActivity);
 
     submitActivity({
       id: editedActivity === "new" ? null : editedActivity.id,
@@ -164,7 +164,7 @@ const TrackTimeModal = ({
       to,
       duration,
       project,
-      activity: newActiviti,
+      activity: newActivity,
       description,
       calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
       validation: { isValid: true },
