@@ -446,7 +446,7 @@ app.on("ready", async () => {
           return;
         }
         if (stdout) {
-          const isRun = stdout.toLowerCase().includes("dropbox.exe");
+          const isRun = stdout.toLowerCase().includes(process.platform === "win32" ? "dropbox.exe" : "dropbox");
           mainWindow?.webContents.send("dropbox-connection", isRun);
         }
       });
