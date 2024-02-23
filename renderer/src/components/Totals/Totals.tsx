@@ -298,7 +298,7 @@ const Totals = ({ selectedDate }) => {
       )}
       {!totals.length && (
         <div className="text-sm text-gray-700 font-semibold pt-2 dark:text-dark-main ml-5">
-          No tracked time this {period.date}
+          No tracked time this {period.periodName}
         </div>
       )}
     </section>
