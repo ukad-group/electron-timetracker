@@ -47,6 +47,7 @@ export const KEY_CODES = {
   META: "Meta",
   CONTROL: "Control",
   TAB: "Tab",
+  EQUAL_SIGN: "=",
   // ...Add more key codes as needed
 };
 

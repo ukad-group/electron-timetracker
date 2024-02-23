@@ -18,6 +18,7 @@ import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { SCREENS } from "@/constants";
+import { KEY_CODES } from "@/helpers/contstants";
 import { MainPageProps } from "./types";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 
@@ -160,7 +161,7 @@ const MainPage = ({
   };
 
   const handleCtrlPlus = (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "=") {
+    if ((e.ctrlKey || e.metaKey) && e.key === KEY_CODES.EQUAL_SIGN) {
       changeHintConditions(progress, setProgress, [
         {
           groupName: HINTS_GROUP_NAMES.ZOOM_IN,
