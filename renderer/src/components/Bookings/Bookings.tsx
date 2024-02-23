@@ -84,7 +84,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         );
       });
 
-      const monthParsedActivities = monthLocalReports.map((report: ParsedReport) => {
+      const monthParsedActivities = oneMonthLocalReports.map((report: ParsedReport) => {
         return (parseReport(report?.data)[0] || []).filter((activity: ReportActivity) => !activity.isBreak);
       });
 
@@ -116,6 +116,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
     setBookedProjects(bookedProjects);
 
     const monthLocalActivities = await getMonthLocalActivities();
+    console.log(monthLocalActivities);
 
     const bookedSpentStatisticArray: BookedSpentStat[] = bookedProjects
       .map((booking) => {
