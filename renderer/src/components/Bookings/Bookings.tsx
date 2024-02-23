@@ -47,6 +47,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         return await getBookings(updatedCookie, userName);
       } else if (allLoggedProjects === "invalid_token") {
         // cases when we can't update token after 3 attempts
+        console.log("invalid_token");
         return [];
       }
 
@@ -96,12 +97,15 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   const getBookedStatistic = async () => {
     const TTUserInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
+    console.log("TTUserInfo", TTUserInfo);
     if (!TTUserInfo) return;
 
     const timetrackerCookie = TTUserInfo?.TTCookie;
     const timetrackerUserName = TTUserInfo?.name;
 
     const bookedProjects = await getBookings(timetrackerCookie, timetrackerUserName);
+
+    console.log("bookedProjects", bookedProjects);
 
     if (!bookedProjects || bookedProjects?.length === 0) {
       setBookedProjects([]);
