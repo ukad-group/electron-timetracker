@@ -6,10 +6,10 @@ import { VersionMessage } from "@/shared/VersionMessage";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import { ReportActivity } from "@/helpers/utils/reports";
-import { addPastTime, editActivity } from "./utils";
 import useColorTheme from "@/helpers/hooks/useTheme";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { addPastTime, editActivity } from "@/helpers/utils/utils";
 
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date());
