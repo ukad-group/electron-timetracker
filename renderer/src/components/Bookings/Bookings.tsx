@@ -116,8 +116,6 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
     setBookedProjects(bookedProjects);
 
     const monthLocalActivities = await getMonthLocalActivities();
-    console.log(monthLocalActivities);
-
     const bookedSpentStatisticArray: BookedSpentStat[] = bookedProjects
       .map((booking) => {
         const spentProjectTime = monthLocalActivities.reduce((acc, activity) => {
