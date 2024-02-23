@@ -1,4 +1,4 @@
-import { SetStateAction } from "react";
+import { KeyboardEvent, SetStateAction } from "react";
 
 export type ManualInputFormProps = {
   saveReportTrigger: boolean;
@@ -7,3 +7,7 @@ export type ManualInputFormProps = {
   selectedDate: Date;
   setSelectedDateReport: (value: string) => void;
 };
+
+export interface KeyboardEventProps extends KeyboardEvent<HTMLTextAreaElement> {
+  code: string;
+}
