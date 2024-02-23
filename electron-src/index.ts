@@ -198,8 +198,18 @@ app.on("ready", async () => {
     dir: app.getAppPath() + "/renderer",
   });
 
-  globalShortcut.register("CommandOrControl+Q", () => {
-    app.exit();
+  app.on("browser-window-focus", () => {
+    globalShortcut.register("CommandOrControl+Q", () => {
+      app.exit();
+    });
+  });
+
+  app.on("browser-window-blur", () => {
+    globalShortcut.unregister("CommandOrControl+Q");
+  });
+
+  app.on("will-quit", () => {
+    globalShortcut.unregisterAll();
   });
 
   const requestHandler = nextApp.getRequestHandler();
