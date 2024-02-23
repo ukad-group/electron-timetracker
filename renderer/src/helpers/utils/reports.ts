@@ -297,11 +297,14 @@ export function validation(activities: Array<ReportActivity>) {
         activities[i - 2].validation.isValid = false;
         activities[i - 2].validation.cell = "time";
         activities[i - 2].validation.description = "Intersection of time intervals";
+        activities[i].validation.isValid = false;
+        activities[i].validation.cell = "time";
+        activities[i].validation.description = "Intersection of time intervals";
       }
       if (activities[i].duration <= 0) {
         activities[i].validation.isValid = false;
         activities[i].validation.cell = "duration";
-        activities[i].validation.description = "Negative or zero duration of the time interval";
+        activities[i].validation.description = "Negative or zero duration";
       }
       if (activities[i].project && !activities[i].to) {
         activities[i].validation.isValid = false;
