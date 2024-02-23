@@ -50,6 +50,7 @@ export const KEY_CODES = {
   ESCAPE: "Escape",
   ESC: "Esc",
   TAB: "Tab",
+  EQUAL_SIGN: "=",
   // ...Add more key codes as needed
 };
 
@@ -65,6 +66,7 @@ export const HINTS_GROUP_NAMES = {
   TOTALS: "totals",
   TRACK_TIME_MODAL: "trackTimeModal",
   WHATS_NEW: "whatsNew",
+  ZOOM_IN: "zoomIn",
 };
 
 export const HINTS_ALERTS = {
@@ -94,6 +96,7 @@ export const HINTS_ALERTS = {
     "In the text fields, you'll find suggestions for projects, activities, and descriptions based on your usage in the past month. Upon linking the timetracker website, all company projects become available for selection. After connecting Trello and Jira, you'll be prompted to choose tasks from your boards in the description field, prioritizing those assigned to you.",
   WHATS_NEW:
     "Here you can see your application version. Links to contact us. And the list of changes that were added in this version.",
+  ZOOM_IN: 'To zoom in, press "Ctrl Shift +"',
 };
 
 export const TRACK_ANALYTICS = {
