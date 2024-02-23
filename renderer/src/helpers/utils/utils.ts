@@ -28,8 +28,8 @@ export function parseEventTitle(event, latestProjAndAct: Record<string, [string]
   const { summary } = event; // Google
   const { subject } = event; // Office365
   const eventTitle = summary || subject;
-  const items = eventTitle ? eventTitle.split(" - ") : "";
-  const words = eventTitle ? eventTitle.split(" ") : "";
+  const items = eventTitle ? eventTitle.trim().split(" - ") : "";
+  const words = eventTitle ? eventTitle.trim().split(" ") : "";
   let allProjects: Array<string> = Object.keys(latestProjAndAct);
   const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
 
