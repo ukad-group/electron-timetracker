@@ -9,12 +9,13 @@ import { ErrorPlaceholder, RenderError } from "@/shared/ErrorPlaceholder";
 import { getMonthWorkHours, getRequiredHours, MONTHS, mathOvertimeUndertime } from "@/helpers/utils/datetime-ui";
 import { getFormattedReports, loadHolidaysAndVacations } from "./utils";
 import { CalendarProps, ParsedReport, FormattedReport, TTUserInfo, DayOff } from "./types";
-import { LOCAL_STORAGE_VARIABLES, TRACK_CONNECTIONS, HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS, HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { Hint } from "@/shared/Hint";
 import { SCREENS } from "@/constants";
+import { MS_PER_HOUR } from "@/helpers/utils/datetime-ui";
 import { changeHintConditions, trackConnections } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import FullCalendarWrapper from "./FullCalendarWrapper";
@@ -71,12 +72,9 @@ export const Calendar = ({
         (out of {daysRequiredHours})
         {!!overUnderHours && (
           <span
-            className={
-              (overUnder === "overtime" && "text-green-500/50 ml-1") ||
-              (overUnder === "undertime" && "text-red-500/50 ml-1")
-            }
+            className={`ml-1 ${overUnder === "undertime" && overUnderHours >= 8 * MS_PER_HOUR && "text-red-500/50"}`}
           >
-            {overUnder === "undertime" && "-"}
+            {overUnder === "undertime" ? "-" : "+"}
             {formatDuration(overUnderHours)}
           </span>
         )}
@@ -161,7 +159,7 @@ export const Calendar = ({
 
   useEffect(() => {
     if (timetrackerUserInfo) {
-      trackConnections(TRACK_CONNECTIONS.TIMETRACKER_WEB);
+      trackConnections(TRACK_ANALYTICS.TIMETRACKER_WEB);
     }
 
     handleHintsBehaviour();

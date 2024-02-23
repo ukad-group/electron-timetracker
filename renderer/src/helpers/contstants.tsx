@@ -46,7 +46,11 @@ export const KEY_CODES = {
   ARROW_DOWN: "ArrowDown",
   META: "Meta",
   CONTROL: "Control",
+  ENTER: "Enter",
+  ESCAPE: "Escape",
+  ESC: "Esc",
   TAB: "Tab",
+  EQUAL_SIGN: "=",
   // ...Add more key codes as needed
 };
 
@@ -62,6 +66,7 @@ export const HINTS_GROUP_NAMES = {
   TOTALS: "totals",
   TRACK_TIME_MODAL: "trackTimeModal",
   WHATS_NEW: "whatsNew",
+  ZOOM_IN: "zoomIn",
 };
 
 export const HINTS_ALERTS = {
@@ -91,12 +96,23 @@ export const HINTS_ALERTS = {
     "In the text fields, you'll find suggestions for projects, activities, and descriptions based on your usage in the past month. Upon linking the timetracker website, all company projects become available for selection. After connecting Trello and Jira, you'll be prompted to choose tasks from your boards in the description field, prioritizing those assigned to you.",
   WHATS_NEW:
     "Here you can see your application version. Links to contact us. And the list of changes that were added in this version.",
+  ZOOM_IN: 'To zoom in, press "Ctrl Shift +"',
 };
 
-export const TRACK_CONNECTIONS = {
+export const TRACK_ANALYTICS = {
   TIMETRACKER_WEB: "timetrackerWeb",
   GOOGLE_CALENDAR: "google-calendar",
   JIRA: "jira",
   OFFICE365_CALENDAR: "office365-calendar",
   TRELLO: "trello",
+  REGISTRATIONS: "registrations",
+  TIME_REGISTRATION: "time_registrations",
+  COPY_REGISTRATION: "copy_registration",
+  EDIT_REGISTRATION: "edit_registration",
+  GOOGLE_CALENDAR_EVENT_REGISTRATION: "google-calendar-event_registration",
+  ALL_CALENDAR_EVENT_REGISTRATION: "all_calendar-events_registration",
+  CALENDARS_CONNECTIONS: "calendars_connections",
+  CALENDAR_GOOGLE: "googleCalendar",
+  MANUAL_SAVE: "manuall_save",
+  CALENDAR_OFFICE: "office365",
 };

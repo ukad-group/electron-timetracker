@@ -12,6 +12,7 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { Hint } from "@/shared/Hint";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
+import { TRACK_ANALYTICS } from "@/helpers/contstants";
 
 const ManualInputForm = ({
   saveReportTrigger,
@@ -85,7 +86,7 @@ const ManualInputForm = ({
   };
 
   const saveReportHandler = () => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "manuall_save");
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.MANUAL_SAVE);
     onSave(report, true);
     setSaveBtnStatus("inprogress");
 

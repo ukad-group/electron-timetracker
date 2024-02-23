@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { DateSelector } from "@/components/DateSelector";
 import { ManualInputForm } from "@/components/ManualInputForm";
 import { Calendar } from "@/components/Calendar/Calendar";
@@ -7,13 +7,16 @@ import { Bookings } from "@/components/Bookings";
 import { ActivitiesSection } from "@/components/ActivitiesSection";
 import { SelectFolderPlaceholder } from "@/components/SelectFolderPlaceholder";
 import { UpdateDescription } from "@/components/UpdateDescription";
+import { Hint } from "@/shared/Hint";
 import { useMainStore } from "@/store/mainStore";
 import { useBetaStore } from "@/store/betaUpdatesStore";
+import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { parseReport, serializeReport, ReportAndNotes } from "@/helpers/utils/reports";
+import { changeHintConditions } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES, HINTS_GROUP_NAMES, HINTS_ALERTS, KEY_CODES } from "@/helpers/contstants";
 import { SCREENS } from "@/constants";
 import { MainPageProps } from "./types";
 import Link from "next/link";
@@ -39,6 +42,8 @@ const MainPage = ({
   const showBookings = !!JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [isBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
+  const mainPageRef = useRef(null);
 
   useEffect(() => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FOLDER_WATCHER, reportsFolder);
@@ -49,10 +54,15 @@ const MainPage = ({
       });
     }
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.WINDOW_FOCUSED, handleWindowFocus);
+
+    document.addEventListener("keydown", handleCtrlPlus);
 
     return () => {
       global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.STOP_PATH_WATCHER, reportsFolder);
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.WINDOW_FOCUSED);
+      document.removeEventListener("keydown", handleCtrlPlus);
     };
   }, []);
 
@@ -139,11 +149,53 @@ const MainPage = ({
     setShouldAutosave(true);
   };
 
+  const handleWindowFocus = () => {
+    changeHintConditions(progress, setProgress, [
+      {
+        groupName: HINTS_GROUP_NAMES.ZOOM_IN,
+        newConditions: [false],
+        existingConditions: [false],
+      },
+    ]);
+    progress[HINTS_GROUP_NAMES.ZOOM_IN] = [false];
+    setProgress(progress);
+  };
+
+  const handleCtrlPlus = (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === KEY_CODES.EQUAL_SIGN) {
+      changeHintConditions(progress, setProgress, [
+        {
+          groupName: HINTS_GROUP_NAMES.ZOOM_IN,
+          newConditions: [true],
+          existingConditions: [true],
+        },
+      ]);
+    }
+  };
+
   return (
     <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
+      <span className="mx-auto" ref={mainPageRef}></span>
       {reportsFolder ? (
         <>
           <div className="lg:col-start-1 lg:col-span-2 flex flex-col gap-6">
+            <Hint
+              ignoreSkip
+              displayCondition
+              learningMethod="nextClick"
+              order={1}
+              groupName={HINTS_GROUP_NAMES.ZOOM_IN}
+              referenceRef={mainPageRef}
+              shiftY={0}
+              shiftX={200}
+              width={"large"}
+              position={{
+                basePosition: "bottom",
+                diagonalPosition: "right",
+              }}
+            >
+              {HINTS_ALERTS.ZOOM_IN}
+            </Hint>
             <section className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
               <DateSelector
                 selectedDate={selectedDate}

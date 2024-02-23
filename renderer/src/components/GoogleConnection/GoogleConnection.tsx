@@ -6,6 +6,7 @@ import { GoogleCredentails, GoogleUser } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import isOnline from "is-online";
+import { TRACK_ANALYTICS } from "@/helpers/contstants";
 
 const GoogleConnection = () => {
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);
@@ -55,8 +56,8 @@ const GoogleConnection = () => {
           userName: googleProfileUsername,
           accountId: googleProfileId,
         };
-        global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "calendars_connections", {
-          calendar: "googleCalendar",
+        global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.CALENDARS_CONNECTIONS, {
+          calendar: TRACK_ANALYTICS.CALENDAR_GOOGLE,
         });
         googleUsersFromLs.push(userObject);
         localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify(googleUsersFromLs));
