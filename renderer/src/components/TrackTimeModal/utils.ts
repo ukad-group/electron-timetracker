@@ -206,12 +206,16 @@ export function saveSheduledEvents(
   setScheduledEvents(scheduledEvents);
 }
 
-export function replaceDashes(description: string, setDescription: Dispatch<SetStateAction<string>>) {
-  if (description.includes(" - ")) {
-    setDescription(description.replace(/ - /g, " -- "));
-    return description.replace(/ - /g, " -- ");
+export function handleDashedDescription(
+  description: string,
+  activity: string,
+  setActivity: Dispatch<SetStateAction<string>>,
+) {
+  if (description.includes(" - ") && !activity) {
+    setActivity(" ");
+    return " ";
   }
-  return description;
+  return activity;
 }
 
 export function handleKey(

@@ -320,7 +320,7 @@ const CompactViewTable = () => {
                       </Tooltip>
                     </div>
 
-                    {activity.activity && (
+                    {activity.activity && activity.activity !== " " && (
                       <Tooltip
                         isClickable={activity.validation.isValid}
                         tooltipText={

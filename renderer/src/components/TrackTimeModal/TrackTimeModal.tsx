@@ -16,7 +16,7 @@ import {
   getTimetrackerYearProjects,
   addSuggestions,
   setTimeOnOpen,
-  replaceDashes,
+  handleDashedDescription,
   saveSheduledEvents,
   handleKey,
   addNewActivity,
@@ -156,7 +156,7 @@ const TrackTimeModal = ({
       progress[HINTS_GROUP_NAMES.SHORTCUTS_EDITING + "Conditions"][1] = true;
       setProgress(progress);
     }
-    let dashedDescription = replaceDashes(description, setDescription);
+    const newActivity = handleDashedDescription(description, activity, setActivity);
 
     submitActivity({
       id: editedActivity === "new" ? null : editedActivity.id,
@@ -164,13 +164,13 @@ const TrackTimeModal = ({
       to,
       duration,
       project,
-      activity,
-      description: dashedDescription,
+      activity: newActivity,
+      description,
       calendarId: editedActivity === "new" ? null : editedActivity.calendarId,
       validation: { isValid: true },
     });
 
-    saveSheduledEvents(scheduledEvents, setScheduledEvents, dashedDescription, editedActivity, project, activity);
+    saveSheduledEvents(scheduledEvents, setScheduledEvents, description, editedActivity, project, activity);
 
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.REGISTRATIONS, {
       registration: TRACK_ANALYTICS.TIME_REGISTRATION,

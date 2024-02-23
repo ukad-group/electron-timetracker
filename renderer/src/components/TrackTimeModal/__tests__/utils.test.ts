@@ -5,7 +5,7 @@ import {
   addSuggestions,
   setTimeOnOpen,
   saveSheduledEvents,
-  replaceDashes,
+  handleDashedDescription,
   handleKey,
   addNewActivity,
 } from "../utils";
@@ -362,25 +362,38 @@ describe("GIVEN saveSheduledEvents", () => {
   });
 });
 
-describe("GIVEN replaceDashes", () => {
-  it("should replace dashes with double dashes if description contains dashes", () => {
-    const setDescriptionMock = jest.fn();
-    const description = "description - with - dashes";
+describe("GIVEN handleDashedDescription", () => {
+  it('should set activity to " " if description includes " - " and activity is empty', () => {
+    const setActivityMock = jest.fn();
+    const description = "Test - Description";
+    const expectedActivity = " ";
 
-    const result = replaceDashes(description, setDescriptionMock);
+    const result = handleDashedDescription(description, "", setActivityMock);
 
-    expect(setDescriptionMock).toHaveBeenCalledWith("description -- with -- dashes");
-    expect(result).toBe("description -- with -- dashes");
+    expect(result).toEqual(expectedActivity);
+    expect(setActivityMock).toHaveBeenCalledWith(" ");
   });
 
-  it("should not replace dashes if description does not contain dashes", () => {
-    const setDescriptionMock = jest.fn();
-    const description = "description without dashes";
+  it('should not change activity if description includes " - " but activity is not empty', () => {
+    const setActivityMock = jest.fn();
+    const description = "Test - Description";
+    const initialActivity = "Some activity";
 
-    const result = replaceDashes(description, setDescriptionMock);
+    const result = handleDashedDescription(description, initialActivity, setActivityMock);
 
-    expect(setDescriptionMock).not.toHaveBeenCalled();
-    expect(result).toBe("description without dashes");
+    expect(result).toEqual(initialActivity);
+    expect(setActivityMock).not.toHaveBeenCalled();
+  });
+
+  it('should not change activity if description does not include " - "', () => {
+    const setActivityMock = jest.fn();
+    const description = "Test Description";
+    const initialActivity = "Some activity";
+
+    const result = handleDashedDescription(description, initialActivity, setActivityMock);
+
+    expect(result).toEqual(initialActivity);
+    expect(setActivityMock).not.toHaveBeenCalled();
   });
 });
 
