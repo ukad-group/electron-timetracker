@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { TrackTimeModal } from "@/components/TrackTimeModal";
 import { MainPage } from "@/components/MainPage";
 import { VersionMessage } from "@/shared/VersionMessage";
@@ -8,7 +7,6 @@ import { shallow } from "zustand/shallow";
 import { ReportActivity } from "@/helpers/utils/reports";
 import { addPastTime, editActivity } from "./utils";
 import useColorTheme from "@/helpers/hooks/useTheme";
-import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 export default function Home() {
@@ -114,14 +112,6 @@ export default function Home() {
           latestProjAndAct={latestProjAndAct}
           setTrackTimeModalActivity={setTrackTimeModalActivity}
         />
-        <Link
-          href="/settings"
-          className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold before:dark:text-gray-100"
-        >
-          <span className="w-8 flex items-center justify-center text-white ">
-            <Cog8ToothIcon />
-          </span>
-        </Link>
       </main>
       {trackTimeModalActivity && (
         <TrackTimeModal

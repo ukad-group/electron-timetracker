@@ -14,12 +14,13 @@ import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import { TRACK_ANALYTICS } from "@/helpers/contstants";
 
-export default function ManualInputForm({
+const ManualInputForm = ({
+  saveReportTrigger,
   onSave,
   selectedDateReport,
   selectedDate,
   setSelectedDateReport,
-}: ManualInputFormProps) {
+}: ManualInputFormProps) => {
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [report, setReport] = useState("");
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
@@ -29,8 +30,8 @@ export default function ManualInputForm({
   const [isFileExist, setIsFileExist] = useState(false);
   const editingHistoryManager = useEditingHistoryManager(report);
   const [cursorPosition, setCursorPosition] = useState(0);
-
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
+  const isReportChanged = selectedDateReport !== report;
 
   const saveOnPressHandler = (e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.code === "KeyS" && saveBtnStatus === "enabled") {
@@ -70,6 +71,13 @@ export default function ManualInputForm({
     };
   }, [report]);
 
+  useEffect(() => {
+    if (saveReportTrigger && isReportChanged) {
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "manuall_save");
+      onSave(report, true);
+    }
+  }, [saveReportTrigger]);
+
   const readReport = async () => {
     const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.READ_DAY_REPORT, reportsFolder, selectedDate);
 
@@ -90,7 +98,7 @@ export default function ManualInputForm({
   };
 
   const setReportHandler = (report: string) => {
-    setSaveBtnStatus(selectedDateReport !== report ? "enabled" : "disabled");
+    setSaveBtnStatus(isReportChanged ? "enabled" : "disabled");
     setReport(report);
   };
 
@@ -265,4 +273,6 @@ export default function ManualInputForm({
       </div>
     </div>
   );
-}
+};
+
+export default ManualInputForm;
