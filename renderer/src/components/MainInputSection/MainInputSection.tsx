@@ -1,10 +1,13 @@
 import { useState } from "react";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 
 const MainInputSection = () => {
-  const [mainSection, setMainSection] = useState(localStorage.getItem("is-manual-input-main-section") === "true");
+  const [mainSection, setMainSection] = useState(
+    localStorage.getItem(LOCAL_STORAGE_VARIABLES.IS_MANUAL_INPUT_MAIN) === "true",
+  );
 
   const onToggle = () => {
-    localStorage.setItem("is-manual-input-main-section", (!mainSection).toString());
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.IS_MANUAL_INPUT_MAIN, (!mainSection).toString());
     setMainSection(!mainSection);
   };
 

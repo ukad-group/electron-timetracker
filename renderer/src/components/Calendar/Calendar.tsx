@@ -1,41 +1,32 @@
-import { useState, useEffect, useRef, useMemo, cloneElement, ReactElement } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { ExclamationCircleIcon } from "@heroicons/react/24/solid";
-import { CalendarDaysIcon, FaceFrownIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
-import { formatDuration, parseReport, validation, ReportActivity } from "@/helpers/utils/reports";
+import { formatDuration } from "@/helpers/utils/reports";
 import { NavButtons } from "@/shared/NavButtons";
 import { Button } from "@/shared/Button";
-import { ErrorPlaceholder, RenderError } from "../../shared/ErrorPlaceholder";
-import {
-  getMonthWorkHours,
-  getRequiredHours,
-  getWeekNumber,
-  isTheSameDates,
-  MONTHS,
-  mathOvertimeUndertime,
-} from "@/helpers/utils/datetime-ui";
-import { loadHolidaysAndVacations } from "./utils";
-import { CalendarProps, ParsedReport, FormattedReport, TTUserInfo } from "./types";
-import { LOCAL_STORAGE_VARIABLES, TRACK_CONNECTIONS } from "@/helpers/contstants";
+import { ErrorPlaceholder, RenderError } from "@/shared/ErrorPlaceholder";
+import { getMonthWorkHours, getRequiredHours, MONTHS, mathOvertimeUndertime } from "@/helpers/utils/datetime-ui";
+import { getFormattedReports, loadHolidaysAndVacations } from "./utils";
+import { CalendarProps, ParsedReport, FormattedReport, TTUserInfo, DayOff } from "./types";
+import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS, HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { Hint } from "@/shared/Hint";
 import { SCREENS } from "@/constants";
-import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
-import { changeHintConditions } from "@/helpers/utils/utils";
+import { MS_PER_HOUR } from "@/helpers/utils/datetime-ui";
+import { changeHintConditions, trackConnections } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
-import { trackConnections } from "@/helpers/utils/utils";
+import FullCalendarWrapper from "./FullCalendarWrapper";
 
-export function Calendar({
+export const Calendar = ({
   reportsFolder,
   selectedDate,
   setSelectedDate,
   calendarDate,
   setCalendarDate,
-}: CalendarProps) {
+}: CalendarProps) => {
   const [parsedQuarterReports, setParsedQuarterReports] = useState<ParsedReport[]>([]);
   const [formattedQuarterReports, setFormattedQuarterReports] = useState<FormattedReport[]>([]);
   const calendarRef = useRef(null);
@@ -44,13 +35,15 @@ export function Calendar({
   const weekNumberRef = useRef(null);
   const currentReadableMonth = MONTHS[calendarDate.getMonth()];
   const currentYear = calendarDate.getFullYear();
-  const [daysOff, setDaysOff] = useState([]);
+  const [daysOff, setDaysOff] = useState<DayOff[]>([]);
   const [renderError, setRenderError] = useState<RenderError>({
     errorTitle: "",
     errorMessage: "",
   });
   const { screenSizes } = useScreenSizes();
+  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const timetrackerUserInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+  const getCalendarApi = () => calendarRef.current.getApi();
 
   const monthWorkedHours = useMemo(() => {
     return formatDuration(getMonthWorkHours(formattedQuarterReports, calendarDate));
@@ -58,6 +51,7 @@ export function Calendar({
 
   const monthRequiredHours = useMemo(() => {
     const lastDayOfMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0);
+
     return formatDuration(getRequiredHours(calendarDate, daysOff, lastDayOfMonth));
   }, [daysOff, calendarDate]);
 
@@ -78,12 +72,9 @@ export function Calendar({
         (out of {daysRequiredHours})
         {!!overUnderHours && (
           <span
-            className={
-              (overUnder === "overtime" && "text-green-500/50 ml-1") ||
-              (overUnder === "undertime" && "text-red-500/50 ml-1")
-            }
+            className={`ml-1 ${overUnder === "undertime" && overUnderHours >= 8 * MS_PER_HOUR && "text-red-500/50"}`}
           >
-            {overUnder === "undertime" && "-"}
+            {overUnder === "undertime" ? "-" : "+"}
             {formatDuration(overUnderHours)}
           </span>
         )}
@@ -91,7 +82,22 @@ export function Calendar({
     );
   }, [formattedQuarterReports, calendarDate, daysOff, selectedDate]);
 
-  useEffect(() => {
+  const prevButtonHandle = () => {
+    getCalendarApi().prev();
+    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() - 1, 1)));
+  };
+
+  const nextButtonHandle = () => {
+    getCalendarApi().next();
+    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() + 1, 1)));
+  };
+
+  const todayButtonHandle = () => {
+    getCalendarApi().today();
+    setCalendarDate(new Date());
+  };
+
+  const getQuarterReports = async () => {
     try {
       (async () => {
         setParsedQuarterReports(
@@ -119,163 +125,9 @@ export function Calendar({
         errorMessage: "An error occurred when validating reports for the last month. ",
       });
     }
-  }, [calendarDate, reportsFolder]);
-
-  // prettier-ignore
-  useEffect(() => { 
-    try{
-      const fromattedReports = parsedQuarterReports.map((report) => {
-        const { reportDate, data } = report;
-        const activities: ReportActivity[] = validation((parseReport(data)[0] || []).filter(
-          (activity: ReportActivity) => !activity.isBreak
-        ));
-        const workDurationMs = activities.reduce((acc, { duration }) => acc + (duration || 0), 0);
-
-        return {
-          date: reportDate,
-          week: getWeekNumber(reportDate),
-          workDurationMs: workDurationMs,
-          isValid: activities.every((report: ReportActivity) => report.validation.isValid ),
-        };
-      });
-
-      setFormattedQuarterReports(fromattedReports);
-    } catch (err) {
-      console.log("Error details ", err)
-      setRenderError({errorTitle:"Calendar error", errorMessage:"An error occurred when validating reports for the last month. "})
-    }
-  }, [parsedQuarterReports]);
-
-  useEffect(() => {
-    (async () => {
-      setDaysOff(await loadHolidaysAndVacations(calendarDate));
-    })();
-
-    global.ipcRenderer.on("window-focused", () => {
-      (async () => {
-        setDaysOff(await loadHolidaysAndVacations(calendarDate));
-      })();
-    });
-
-    return () => {
-      global.ipcRenderer.removeAllListeners("window-focused");
-    };
-  }, [calendarDate, selectedDate]);
-
-  useEffect(() => {
-    setProgress(progress);
-  }, [screenSizes]);
-
-  const getCalendarApi = () => calendarRef.current.getApi();
-
-  useEffect(() => {
-    if (
-      selectedDate.getFullYear() === calendarDate.getFullYear() &&
-      selectedDate.getMonth() === calendarDate.getMonth()
-    )
-      return;
-
-    queueMicrotask(() => {
-      const reportDate = new Date(selectedDate);
-      getCalendarApi().gotoDate(reportDate);
-      setCalendarDate(reportDate);
-    });
-  }, [selectedDate]);
-
-  useEffect(() => {
-    if (timetrackerUserInfo) {
-      trackConnections(TRACK_CONNECTIONS.TIMETRACKER_WEB);
-    }
-  }, []);
-  const prevButtonHandle = () => {
-    getCalendarApi().prev();
-    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() - 1, 1)));
   };
 
-  const nextButtonHandle = () => {
-    getCalendarApi().next();
-    setCalendarDate((date) => new Date(date.setMonth(date.getMonth() + 1, 1)));
-  };
-
-  const todayButtonHandle = () => {
-    getCalendarApi().today();
-    setCalendarDate(new Date());
-  };
-
-  const dateClickHandle = (info) => {
-    info.date.setHours(1); // by default info.date is 00:00, sometimes it can cause a bug, considering the date as the previous day
-    setSelectedDate(info.date);
-  };
-
-  const addCellClassNameHandle = (info) => {
-    const isToday = isTheSameDates(info.date, selectedDate);
-    if (isToday) {
-      return "fc-custom-today-date";
-    }
-    return "";
-  };
-
-  const renderWeekNumberContent = (options) => {
-    const weekTotalHours = formatDuration(
-      formattedQuarterReports.reduce((acc, report) => {
-        if (report.week === options.num) {
-          acc += report.workDurationMs;
-        }
-        return acc;
-      }, 0),
-    );
-
-    return (
-      <div ref={weekNumberRef} className="flex flex-col text-xs text-zinc-400">
-        <span>week {options.num}</span>
-        <span className="self-start">{weekTotalHours}</span>
-      </div>
-    );
-  };
-
-  const getDayCellContent = (info) => {
-    if (!daysOff || daysOff?.length === 0) {
-      return info.dayNumberText;
-    }
-
-    const userDayOff = daysOff?.find((day) => isTheSameDates(info.date, day.date));
-
-    if (userDayOff) {
-      const duration = userDayOff?.duration === 8 ? "all day" : userDayOff?.duration + "h";
-      let icon: ReactElement | undefined;
-      let title: string | undefined;
-
-      switch (userDayOff?.type) {
-        case 2:
-          icon = <GlobeAltIcon className="absolute top-[30px] right-[2px] w-5 h-5" />;
-          title = userDayOff?.description ? `${userDayOff?.description}, ${duration}` : "Holiday";
-          break;
-        case 0:
-          icon = <CalendarDaysIcon className="absolute top-[30px] right-[2px] w-5 h-5" />;
-          title = `Vacation, ${duration}`;
-          break;
-        case 1:
-          icon = <FaceFrownIcon className="absolute top-[30px] right-[2px] w-5 h-5" />;
-          title = `Sickday, ${duration}`;
-          break;
-        default:
-          return info.dayNumberText;
-      }
-
-      return (
-        <div>
-          {info.dayNumberText}
-          {cloneElement(icon, { title })}
-        </div>
-      );
-    } else {
-      return info.dayNumberText;
-    }
-  };
-
-  const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
-
-  useEffect(() => {
+  const handleHintsBehaviour = () => {
     changeHintConditions(progress, setProgress, [
       {
         groupName: HINTS_GROUP_NAMES.CALENDAR,
@@ -303,7 +155,63 @@ export function Calendar({
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
+  };
+
+  useEffect(() => {
+    if (timetrackerUserInfo) {
+      trackConnections(TRACK_ANALYTICS.TIMETRACKER_WEB);
+    }
+
+    handleHintsBehaviour();
   }, []);
+
+  useEffect(() => {
+    getQuarterReports();
+  }, [calendarDate, reportsFolder]);
+
+  // prettier-ignore
+  useEffect(() => { 
+    try{
+      setFormattedQuarterReports(getFormattedReports(parsedQuarterReports));
+    } catch (err) {
+      console.log("Error details ", err)
+      setRenderError({errorTitle:"Calendar error", errorMessage:"An error occurred when validating reports for the last month. "})
+    }
+  }, [parsedQuarterReports]);
+
+  useEffect(() => {
+    (async () => {
+      setDaysOff(await loadHolidaysAndVacations(calendarDate));
+    })();
+
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.WINDOW_FOCUSED, () => {
+      (async () => {
+        setDaysOff(await loadHolidaysAndVacations(calendarDate));
+      })();
+    });
+
+    return () => {
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.WINDOW_FOCUSED);
+    };
+  }, [calendarDate, selectedDate]);
+
+  useEffect(() => {
+    setProgress(progress);
+  }, [screenSizes]);
+
+  useEffect(() => {
+    if (
+      selectedDate.getFullYear() === calendarDate.getFullYear() &&
+      selectedDate.getMonth() === calendarDate.getMonth()
+    )
+      return;
+
+    queueMicrotask(() => {
+      const reportDate = new Date(selectedDate);
+      getCalendarApi().gotoDate(reportDate);
+      setCalendarDate(reportDate);
+    });
+  }, [selectedDate]);
 
   if (renderError.errorMessage && renderError.errorTitle) {
     return <ErrorPlaceholder {...renderError} />;
@@ -397,36 +305,24 @@ export function Calendar({
           {HINTS_ALERTS.CALENDAR_WEEKS}
         </Hint>
       </div>
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[dayGridPlugin, interactionPlugin]}
-        headerToolbar={false}
-        initialView="dayGridMonth"
-        firstDay={1}
-        events={formattedQuarterReports}
-        eventContent={renderEventContent}
-        dateClick={dateClickHandle}
-        dayCellClassNames={addCellClassNameHandle}
-        weekNumbers={true}
-        weekNumberContent={renderWeekNumberContent}
-        height="auto"
-        dayCellContent={getDayCellContent}
-      />
+      <FullCalendarWrapper
+        setSelectedDate={setSelectedDate}
+        selectedDate={selectedDate}
+        formattedQuarterReports={formattedQuarterReports}
+        weekNumberRef={weekNumberRef}
+        daysOff={daysOff}
+      >
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin, interactionPlugin]}
+          headerToolbar={false}
+          initialView="dayGridMonth"
+          firstDay={1}
+          events={formattedQuarterReports}
+          weekNumbers
+          height="auto"
+        />
+      </FullCalendarWrapper>
     </div>
   );
-}
-
-function renderEventContent(eventInfo) {
-  return (
-    <>
-      {eventInfo.event.extendedProps.isValid === false && (
-        <ExclamationCircleIcon className="w-5 h-5 absolute fill-red-500 -top-[25px] -left-[1px] dark:fill-red-500/70" />
-      )}
-      {eventInfo.event.extendedProps.workDurationMs ? (
-        <p className="whitespace-normal">Logged: {formatDuration(eventInfo.event.extendedProps.workDurationMs)}</p>
-      ) : (
-        <p className="whitespace-normal">File is empty</p>
-      )}
-    </>
-  );
-}
+};

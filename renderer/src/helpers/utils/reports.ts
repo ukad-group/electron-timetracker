@@ -110,15 +110,15 @@ export function parseReport(fileContent: string) {
 
       const activityInTheLinePattern = startTime > new Date(2016, 7, 23) ? /(.+?)\s-\s+/ : /(.+?)-\s*/;
       const activityInTheLineRegex = new RegExp(activityInTheLinePattern);
+      const isEmptyActivity = currentLine.startsWith("- ");
 
-      if (activityInTheLineRegex.test(currentLine)) {
-        let activityName = currentLine.match(activityInTheLineRegex)[1];
+      if (activityInTheLineRegex.test(currentLine) || isEmptyActivity) {
+        let activityName = isEmptyActivity ? " " : currentLine.match(activityInTheLineRegex)[1].trim();
 
-        registration.activity =
-          startTime > new Date(2016, 7, 26) ? activityName.trim() : activityName.trim().toLowerCase();
+        registration.activity = startTime > new Date(2016, 7, 26) ? activityName : activityName.toLowerCase();
 
         // removing activity with '-'
-        currentLine = currentLine.replace(activityInTheLineRegex, "");
+        currentLine = isEmptyActivity ? currentLine.replace(/-/, "") : currentLine.replace(activityInTheLineRegex, "");
       }
       registration.description = currentLine.replace(/�/g, "-");
 
@@ -148,7 +148,7 @@ export function serializeReport(activities: Array<Partial<ReportActivity>>) {
       parts.push(activity.project);
 
       if (activity.activity) {
-        parts.push(activity.activity);
+        parts.push(activity.activity === " " ? "" : activity.activity);
       }
 
       if (activity.description) {
@@ -297,11 +297,14 @@ export function validation(activities: Array<ReportActivity>) {
         activities[i - 2].validation.isValid = false;
         activities[i - 2].validation.cell = "time";
         activities[i - 2].validation.description = "Intersection of time intervals";
+        activities[i].validation.isValid = false;
+        activities[i].validation.cell = "time";
+        activities[i].validation.description = "Intersection of time intervals";
       }
       if (activities[i].duration <= 0) {
         activities[i].validation.isValid = false;
         activities[i].validation.cell = "duration";
-        activities[i].validation.description = "Negative or zero duration of the time interval";
+        activities[i].validation.description = "Negative or zero duration";
       }
       if (activities[i].project && !activities[i].to) {
         activities[i].validation.isValid = false;
@@ -352,6 +355,11 @@ export function validation(activities: Array<ReportActivity>) {
   }
 }
 
+export function stringToMinutes(str: string) {
+  const [hours, minutes] = str.split(":");
+  return Number(hours) * 60 + Number(minutes);
+}
+
 export function addSuggestions(
   activities: Array<ReportActivity> | null,
   latestProjAndDesc: Record<string, [string]>,
@@ -398,9 +406,4 @@ export function addSuggestions(
   } catch (err) {
     console.log(err);
   }
-}
-
-export function stringToMinutes(str: string) {
-  const [hours, minutes] = str.split(":");
-  return Number(hours) * 60 + Number(minutes);
 }

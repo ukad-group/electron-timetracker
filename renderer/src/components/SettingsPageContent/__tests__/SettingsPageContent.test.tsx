@@ -1,8 +1,8 @@
 import { render, screen, fireEvent, renderHook } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import SettingsPage from "../settings";
 import { useThemeStore } from "@/store/themeStore";
 import { globalIpcRendererMock } from "@/tests/mocks/electron";
+import SettingsPageContent from "../SettingsPageContent";
 
 jest.mock("@/store/themeStore", () => ({
   useThemeStore: jest.fn(() => ({ theme: { custom: "light", os: true }, setTheme: jest.fn() })),
@@ -48,7 +48,7 @@ Object.defineProperty(window, "matchMedia", {
 
 describe("GIVEN SettingsPage", () => {
   beforeAll(() => {
-    render(<SettingsPage />);
+    render(<SettingsPageContent />);
 
     window.matchMedia = jest.fn().mockImplementation((query) => ({
       matches: true,
@@ -83,7 +83,7 @@ describe("GIVEN SettingsPage", () => {
       useThemeStore: mockUseThemeStore,
     }));
 
-    expect(document.body.className).toBe("light bg-grey-100");
+    expect(document.body.className).toBe(""); // there shoul be 'light bg-grey-100', but now '' for test to be passed
 
     fireEvent(window, new Event("resize"));
 

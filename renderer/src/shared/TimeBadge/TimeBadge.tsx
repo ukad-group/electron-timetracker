@@ -1,5 +1,5 @@
 import React from "react";
-import { stringToMinutes } from "@/helpers/utils/reports";
+import { stringToMinutes } from "@/helpers/utils/utils";
 import { TimeBadgeProps } from "./types";
 
 const TimeBadge = ({ hours, startTime, selectedDate }: TimeBadgeProps) => {

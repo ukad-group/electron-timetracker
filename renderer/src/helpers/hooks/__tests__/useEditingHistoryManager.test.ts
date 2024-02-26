@@ -106,7 +106,7 @@ describe("GIVEN useEditingHistoryManager", () => {
       redoEditing: expect.any(Function),
     });
 
-    expect(result.current.undoEditing()).toEqual(initialValue);
+    expect(result.current.undoEditing()).toEqual([initialValue, 0]);
   });
 
   it("should handle undoEditing correctly", () => {
@@ -120,6 +120,6 @@ describe("GIVEN useEditingHistoryManager", () => {
       result.current.undoEditing();
     });
 
-    expect(result.current.undoEditing()).toEqual("initial");
+    expect(result.current.undoEditing()).toEqual(["initial", 0]);
   });
 });

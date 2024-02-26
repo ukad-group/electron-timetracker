@@ -10,6 +10,7 @@ import { ActivitiesTableContext } from "./context";
 import { MainView, CompactView } from "./components";
 import { getTotalDuration, formatEvents, getActualEvents } from "./utils";
 import { KEY_CODES } from "@/helpers/contstants";
+import { TRACK_ANALYTICS } from "@/helpers/contstants";
 
 export default function ActivitiesTable({
   activities,
@@ -95,7 +96,7 @@ export default function ActivitiesTable({
   };
 
   const copyActivityHandler = (activity) => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "copy_registration");
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.COPY_REGISTRATION);
     onEditActivity({
       ...activity,
       id: null,
@@ -163,17 +164,17 @@ export default function ActivitiesTable({
   };
 
   const editActivityHandler = (activity) => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "edit_registration");
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.EDIT_REGISTRATION);
     if (activity.calendarId) {
       onEditActivity({
         ...activity,
         id: null,
       });
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "registrations", {
-        registration: "google-calendar-event_registration",
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.REGISTRATIONS, {
+        registration: TRACK_ANALYTICS.GOOGLE_CALENDAR_EVENT_REGISTRATION,
       });
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "registrations", {
-        registration: `all_calendar-events_registration`,
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.REGISTRATIONS, {
+        registration: TRACK_ANALYTICS.ALL_CALENDAR_EVENT_REGISTRATION,
       });
     } else {
       onEditActivity(activity);

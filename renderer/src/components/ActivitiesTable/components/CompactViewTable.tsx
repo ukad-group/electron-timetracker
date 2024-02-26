@@ -183,9 +183,10 @@ const CompactViewTable = () => {
 
                 <Tooltip
                   tooltipText={
-                    !activity.validation.isValid &&
-                    activity.validation.cell === "time" &&
-                    activity.validation.description
+                    (!activity.validation.isValid &&
+                      activity.validation.cell === "time" &&
+                      activity.validation.description) ||
+                    "Copied"
                   }
                   disabled={activity.validation.isValid || activity.validation?.cell !== "time"}
                 >
@@ -261,9 +262,10 @@ const CompactViewTable = () => {
                   )}
                   <Tooltip
                     tooltipText={
-                      !activity.validation.isValid &&
-                      activity.validation.cell === "time" &&
-                      activity.validation.description
+                      (!activity.validation.isValid &&
+                        activity.validation.cell === "time" &&
+                        activity.validation.description) ||
+                      "Copied"
                     }
                     disabled={activity.validation.isValid || activity.validation.cell !== "time"}
                   >
@@ -292,9 +294,10 @@ const CompactViewTable = () => {
                       <Tooltip
                         isClickable={activity.validation.isValid}
                         tooltipText={
-                          !activity.validation.isValid &&
-                          activity.validation.cell === "project" &&
-                          activity.validation.description
+                          (!activity.validation.isValid &&
+                            activity.validation.cell === "project" &&
+                            activity.validation.description) ||
+                          "Copied"
                         }
                         disabled={activity.validation.isValid || activity.validation.cell !== "project"}
                       >
@@ -319,13 +322,14 @@ const CompactViewTable = () => {
                       </Tooltip>
                     </div>
 
-                    {activity.activity && (
+                    {activity.activity && activity.activity !== " " && (
                       <Tooltip
                         isClickable={activity.validation.isValid}
                         tooltipText={
-                          !activity.validation.isValid &&
-                          activity.validation.cell === "activity" &&
-                          activity.validation.description
+                          (!activity.validation.isValid &&
+                            activity.validation.cell === "activity" &&
+                            activity.validation.description) ||
+                          "Copied"
                         }
                         disabled={activity.validation.isValid || activity.validation.cell !== "activity"}
                       >
@@ -390,9 +394,10 @@ const CompactViewTable = () => {
                     <Tooltip
                       isClickable={activity.validation.isValid}
                       tooltipText={
-                        !activity.validation.isValid &&
-                        activity.validation.cell === "duration" &&
-                        activity.validation.description
+                        (!activity.validation.isValid &&
+                          activity.validation.cell === "duration" &&
+                          activity.validation.description) ||
+                        "Copied"
                       }
                       disabled={activity.validation.isValid || activity.validation.cell !== "duration"}
                     >
@@ -421,9 +426,10 @@ const CompactViewTable = () => {
                     <Tooltip
                       isClickable={activity.validation.isValid}
                       tooltipText={
-                        !activity.validation.isValid &&
-                        activity.validation.cell === "description" &&
-                        activity.validation.description
+                        (!activity.validation.isValid &&
+                          activity.validation.cell === "description" &&
+                          activity.validation.description) ||
+                        "Copied"
                       }
                       disabled={activity.validation.isValid || activity.validation.cell !== "description"}
                     >

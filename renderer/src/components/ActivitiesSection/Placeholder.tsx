@@ -8,6 +8,7 @@ import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { Popup } from "@/shared/Popup";
 import { Hint } from "@/shared/Hint";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const Placeholder = ({ onEditActivity, backgroundError, selectedDate, setSelectedDateReport }: PlaceholderProps) => {
   const [showModal, setShowModal] = useState(false);
@@ -18,7 +19,7 @@ const Placeholder = ({ onEditActivity, backgroundError, selectedDate, setSelecte
     const prevDayReport = await global.ipcRenderer.invoke("app:find-last-report", reportsFolder, selectedDate);
 
     if (prevDayReport) {
-      global.ipcRenderer.invoke("app:write-day-report", reportsFolder, selectedDate, prevDayReport);
+      global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_WRITE_DAY_REPORT, reportsFolder, selectedDate, prevDayReport);
 
       setSelectedDateReport(prevDayReport);
     } else {
