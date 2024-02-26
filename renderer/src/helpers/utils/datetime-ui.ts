@@ -36,8 +36,10 @@ export function getWeekNumber(dateString: string) {
   const dateObj = getDateFromString(dateString);
   const startOfYear = new Date(dateObj.getFullYear(), 0, 1);
   const days = Math.floor((dateObj.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
+  const year = dateObj.getFullYear();
+  const leapYearDay = year === 2020 || year === 2024 || year === 2028 || year === 2032 ? 0 : 1;
 
-  return Math.ceil((days + startOfYear.getDay()) / 7);
+  return Math.ceil((days + startOfYear.getDay() + leapYearDay) / 7);
 }
 
 export function getDateFromString(dateString: string) {

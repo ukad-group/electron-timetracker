@@ -1,14 +1,17 @@
 import { cloneElement, ReactElement, Children } from "react";
-import { isTheSameDates } from "@/helpers/utils/datetime-ui";
+import { isTheSameDates, MS_PER_HOUR, getWeekNumber } from "@/helpers/utils/datetime-ui";
 import { formatDuration } from "@/helpers/utils/reports";
 import { DatePointApi, DayCellContentArg, EventContentArg, WeekNumberContentArg } from "@fullcalendar/core";
 import { CalendarDaysIcon, FaceFrownIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import { ExclamationCircleIcon } from "@heroicons/react/24/solid";
 import { DayOff, FormattedReport, FullCalendarWrapperProps } from "./types";
 
+type daysOffAccumulatorType = { numberedDays: string[]; hours: number };
+
 const FullCalendarWrapper = ({
   children,
   setSelectedDate,
+  calendarDate,
   selectedDate,
   formattedQuarterReports,
   weekNumberRef,
@@ -39,13 +42,31 @@ const FullCalendarWrapper = ({
   };
 
   const renderWeekNumberContent = (options: WeekNumberContentArg) => {
+    const daysOffWeekTotal = daysOff.reduce(
+      (acc: daysOffAccumulatorType, day: DayOff) => {
+        const dayOffStringDate = `${day.date.getFullYear()}${String(day.date.getMonth() + 1).padStart(2, "0")}${String(day.date.getDate()).padStart(2, "0")}`;
+
+        if (
+          day.date.getFullYear() === calendarDate.getFullYear() &&
+          getWeekNumber(dayOffStringDate) === options.num &&
+          !acc.numberedDays.includes(dayOffStringDate)
+        ) {
+          acc.numberedDays.push(dayOffStringDate);
+          acc.hours += day.duration;
+        }
+        return acc;
+      },
+      { numberedDays: [], hours: 0 },
+    ).hours;
+
     const weekTotalHours = formatDuration(
       formattedQuarterReports.reduce((acc: number, report: FormattedReport) => {
         if (report.week === options.num) {
           acc += report.workDurationMs;
         }
         return acc;
-      }, 0),
+      }, 0) +
+        daysOffWeekTotal * MS_PER_HOUR,
     );
 
     return (

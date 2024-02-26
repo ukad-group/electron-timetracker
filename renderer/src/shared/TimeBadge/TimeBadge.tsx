@@ -1,14 +1,32 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { stringToMinutes } from "@/helpers/utils/utils";
 import { TimeBadgeProps } from "./types";
+import { loadHolidaysAndVacations } from "@/components/Calendar/utils";
 
 export default function TimeBadge({ hours, startTime, selectedDate }: TimeBadgeProps) {
   const curDate = new Date();
   const curTime = curDate.getHours() * 60 + curDate.getMinutes();
+  const [dayOffDuration, setDayOffDuration] = useState(0);
+
+  useEffect(() => {
+    setDayOffDuration(0);
+    (async () => {
+      const daysOff = await loadHolidaysAndVacations(selectedDate);
+      daysOff.forEach((day) => {
+        if (
+          day.date.getDate() === selectedDate.getDate() &&
+          day.date.getMonth() === selectedDate.getMonth() &&
+          day.date.getFullYear() === selectedDate.getFullYear()
+        ) {
+          setDayOffDuration(Number(day.duration));
+        }
+      });
+    })();
+  }, [selectedDate, hours]);
 
   if (
-    (hours < 6 && selectedDate.toDateString() !== curDate.toDateString()) ||
-    (hours < 6 && curTime - stringToMinutes(startTime) > 360)
+    (hours + dayOffDuration < 6 && selectedDate.toDateString() !== curDate.toDateString()) ||
+    (hours + dayOffDuration < 6 && curTime - stringToMinutes(startTime) > 360)
   ) {
     return (
       <span
@@ -20,8 +38,8 @@ export default function TimeBadge({ hours, startTime, selectedDate }: TimeBadgeP
     );
   }
   if (
-    (hours < 8 && selectedDate.toLocaleDateString() !== curDate.toLocaleDateString()) ||
-    (hours < 8 && curTime - stringToMinutes(startTime) > 480)
+    (hours + dayOffDuration < 8 && selectedDate.toLocaleDateString() !== curDate.toLocaleDateString()) ||
+    (hours + dayOffDuration < 8 && curTime - stringToMinutes(startTime) > 480)
   ) {
     return (
       <span
