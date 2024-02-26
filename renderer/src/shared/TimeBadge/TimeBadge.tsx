@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { stringToMinutes } from "@/helpers/utils/utils";
 import { TimeBadgeProps } from "./types";
 import { loadHolidaysAndVacations } from "@/components/Calendar/utils";
+import { DayOff } from "@/components/Calendar/types";
 
 export default function TimeBadge({ hours, startTime, selectedDate }: TimeBadgeProps) {
   const curDate = new Date();
@@ -12,7 +13,7 @@ export default function TimeBadge({ hours, startTime, selectedDate }: TimeBadgeP
     setDayOffDuration(0);
     (async () => {
       const daysOff = await loadHolidaysAndVacations(selectedDate);
-      daysOff.forEach((day) => {
+      daysOff.forEach((day: DayOff) => {
         if (
           day.date.getDate() === selectedDate.getDate() &&
           day.date.getMonth() === selectedDate.getMonth() &&
