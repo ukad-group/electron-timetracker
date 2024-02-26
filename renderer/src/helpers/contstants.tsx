@@ -4,6 +4,7 @@ import { MainInputSection } from "@/components/MainInputSection";
 import { ReportsFolderSection } from "@/components/ReportsFolderSection";
 import { ThemeSection } from "@/components/ThemeSection";
 import { VersionSection } from "@/components/VersionSection";
+import { LocalStorageVariablesTypes } from "@/helpers/types";
 
 export enum SidebarNavItem {
   Connections = "Connections",
@@ -23,7 +24,7 @@ export const SETTING_SECTIONS = {
   [SidebarNavItem.MainInputSelect]: <MainInputSection />,
 };
 
-export const LOCAL_STORAGE_VARIABLES = {
+export const LOCAL_STORAGE_VARIABLES: LocalStorageVariablesTypes = {
   SHOW_GOOGLE_EVENTS: "showGoogleEvents",
   SHOW_OFFICE_365_EVENTS: "showOffice365Events",
   TIMETRACKER_USER: "timetracker-user",

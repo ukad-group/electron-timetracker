@@ -1,6 +1,6 @@
 import { TrackTimeButtonProps } from "./types";
 
-const TrackTimeButton = ({ isLoading, onEditActivity }: TrackTimeButtonProps) => (
+const TrackTimeButton = ({ onEditActivity }: TrackTimeButtonProps) => (
   <>
     <button
       className="block w-full px-4 py-4 text-sm font-medium text-center text-blue-500 bg-blue-200 hover:bg-blue-300 sm:rounded-b-lg dark:bg-dark-button-back-gray hover:dark:bg-dark-button-gray-hover dark:text-dark-heading"

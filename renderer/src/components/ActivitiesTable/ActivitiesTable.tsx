@@ -36,7 +36,7 @@ export default function ActivitiesTable({
 
   const tableActivities = useMemo(() => {
     const badgedActivities = validatedActivities.map((activity) => {
-      const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+      const userInfo = JSON.parse(localStorage.getItem("timetracker-user") as string);
       if (userInfo && !userInfo?.yearProjects?.includes(activity.project)) {
         return { ...activity, isNewProject: true };
       }
@@ -60,7 +60,7 @@ export default function ActivitiesTable({
       : badgedActivities;
   }, [validatedActivities, events]);
 
-  const copyToClipboardHandle = (e) => {
+  const copyToClipboardHandle = (e: Event) => {
     const cell = e.target;
     const originaValue = cell.textContent;
     const cellColumnName = cell.getAttribute("data-column");

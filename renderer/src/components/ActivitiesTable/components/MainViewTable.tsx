@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useRef } from "react";
+import { useState, useContext, useEffect, useRef, SetStateAction } from "react";
 import clsx from "clsx";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { formatDuration } from "@/helpers/utils/reports";
@@ -13,6 +13,7 @@ import { SCREENS } from "@/constants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import usePrevious from "@/helpers/hooks/usePrevious";
+import { Activity } from "../types";
 
 const MainViewTable = () => {
   const {
@@ -25,7 +26,7 @@ const MainViewTable = () => {
     editActivityHandler,
     onDeleteActivity,
     isLoading,
-  } = useContext(ActivitiesTableContext);
+  }: any = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
   const firstEditButtonRef = useRef(null);
@@ -79,7 +80,7 @@ const MainViewTable = () => {
       progress[`${HINTS_GROUP_NAMES.COPY_BUTTON}Conditions`].includes(false)
     ) {
       const description = tableActivities[tableActivities.length - 1].description;
-      tableActivities.forEach((item, index) => {
+      tableActivities.forEach((item: { description: string }, index: SetStateAction<number>) => {
         if (index !== tableActivities.length - 1 && item.description === description) {
           setDublicateIndex(index);
           changeHintConditions(progress, setProgress, [
@@ -115,7 +116,7 @@ const MainViewTable = () => {
     setProgress(progress);
   }, [screenSizes]);
 
-  const handleEditClick = (activity) => {
+  const handleEditClick = (activity: Activity) => {
     changeHintConditions(progress, setProgress, [
       {
         groupName: HINTS_GROUP_NAMES.SHORTCUTS_EDITING,
@@ -126,7 +127,7 @@ const MainViewTable = () => {
     editActivityHandler(activity);
   };
 
-  const handleCopyClick = (activity) => {
+  const handleCopyClick = (activity: Activity) => {
     changeHintConditions(progress, setProgress, [
       {
         groupName: HINTS_GROUP_NAMES.COPY_BUTTON,
@@ -194,7 +195,7 @@ const MainViewTable = () => {
           </Hint>
         )}
 
-        {tableActivities?.map((activity, i) => (
+        {tableActivities?.map((activity: Activity, i: number) => (
           <tr
             key={i}
             ref={!activity.calendarId ? firstRowRef : undefined}

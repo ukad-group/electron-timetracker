@@ -1,4 +1,4 @@
-import { Fragment, useState, useContext, useEffect, useRef } from "react";
+import { Fragment, useState, useContext, useEffect, useRef, SetStateAction } from "react";
 import clsx from "clsx";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { checkIsToday, getCeiledTime } from "@/helpers/utils/datetime-ui";
@@ -12,6 +12,7 @@ import { shallow } from "zustand/shallow";
 import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import usePrevious from "@/helpers/hooks/usePrevious";
+import { Activity } from "../types";
 
 const CompactViewTable = () => {
   const {
@@ -24,11 +25,9 @@ const CompactViewTable = () => {
     firstKey,
     secondKey,
     editActivityHandler,
-
     onDeleteActivity,
-
     isLoading,
-  } = useContext(ActivitiesTableContext);
+  }: any = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
   const firstEditButtonRef = useRef(null);
@@ -70,7 +69,7 @@ const CompactViewTable = () => {
       progress[`${HINTS_GROUP_NAMES.COPY_BUTTON}Conditions`].includes(false)
     ) {
       const description = tableActivities[tableActivities.length - 1].description;
-      tableActivities.forEach((item, index) => {
+      tableActivities.forEach((item: { description: string }, index: SetStateAction<number>) => {
         if (index !== tableActivities.length - 1 && item.description === description) {
           setDublicateIndex(index);
           changeHintConditions(progress, setProgress, [
@@ -102,7 +101,7 @@ const CompactViewTable = () => {
     ]);
   }, [tableActivities]);
 
-  const handleEditClick = (activity) => {
+  const handleEditClick = (activity: Activity) => {
     changeHintConditions(progress, setProgress, [
       {
         groupName: HINTS_GROUP_NAMES.SHORTCUTS_EDITING,
@@ -113,7 +112,7 @@ const CompactViewTable = () => {
     editActivityHandler(activity);
   };
 
-  const handleCopyClick = (activity) => {
+  const handleCopyClick = (activity: Activity) => {
     changeHintConditions(progress, setProgress, [
       {
         groupName: HINTS_GROUP_NAMES.COPY_BUTTON,
@@ -167,7 +166,7 @@ const CompactViewTable = () => {
           {HINTS_ALERTS.COPY_BUTTON}
         </Hint>
 
-        {tableActivities?.map((activity, i) =>
+        {tableActivities?.map((activity: Activity, i: number) =>
           activity.isBreak ? (
             <tr
               key={i}
@@ -188,7 +187,7 @@ const CompactViewTable = () => {
                     activity.validation.cell === "time" &&
                     activity.validation.description
                   }
-                  disabled={activity.validation.isValid || activity.validation.cell !== "time"}
+                  disabled={activity.validation.isValid || activity.validation?.cell !== "time"}
                 >
                   <span
                     ref={
