@@ -1,13 +1,13 @@
 import React from "react";
 import "@testing-library/jest-dom";
-import { render, fireEvent, cleanup, screen, getByTestId, waitFor } from "@testing-library/react";
+import { render, fireEvent, cleanup, screen, getByTestId } from "@testing-library/react";
 import DateSelector from "../DateSelector";
 
-afterEach(() => {
-  cleanup();
-});
-
 describe("GIVEN DateSelector", () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   const mockProps = {
     isDropboxConnected: true,
     selectedDate: new Date(),
@@ -71,9 +71,9 @@ describe("GIVEN DateSelector", () => {
   });
 
   it.only("renders buttons that changing day, handlers are called", async () => {
-    const { getByTestId } = render(<DateSelector {...mockProps} />);
-    const prevButton = getByTestId("prev-button-test-id");
-    const nextButton = getByTestId("next-button-test-id");
+    render(<DateSelector {...mockProps} />);
+    const prevButton = screen.getByTestId("prev-button-test-id");
+    const nextButton = screen.getByTestId("next-button-test-id");
 
     expect(prevButton).toBeInTheDocument();
     expect(nextButton).toBeInTheDocument();
