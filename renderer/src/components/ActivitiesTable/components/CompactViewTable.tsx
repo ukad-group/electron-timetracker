@@ -1,4 +1,4 @@
-import { Fragment, useState, useContext, useEffect, useRef } from "react";
+import { Fragment, useState, useContext, useEffect, useRef, SetStateAction } from "react";
 import clsx from "clsx";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { checkIsToday, getCeiledTime } from "@/helpers/utils/datetime-ui";
@@ -26,7 +26,7 @@ const CompactViewTable = () => {
     handleEditActivity,
     onDeleteActivity,
     isLoading,
-  } = useContext(ActivitiesTableContext);
+  }: any = useContext(ActivitiesTableContext);
 
   const firstRowRef = useRef(null);
   const firstEditButtonRef = useRef(null);
@@ -69,7 +69,7 @@ const CompactViewTable = () => {
       progress[`${HINTS_GROUP_NAMES.COPY_BUTTON}Conditions`].includes(false)
     ) {
       const description = tableActivities[tableActivities.length - 1].description;
-      tableActivities.forEach((item, index) => {
+      tableActivities.forEach((item: { description: string }, index: SetStateAction<number>) => {
         if (index !== tableActivities.length - 1 && item.description === description) {
           setDublicateIndex(index);
           changeHintConditions(progress, setProgress, [
@@ -101,7 +101,7 @@ const CompactViewTable = () => {
     ]);
   }, [tableActivities]);
 
-  const handleEditClick = (activity) => {
+  const handleEditClick = (activity: any) => {
     changeHintConditions(progress, setProgress, [
       {
         groupName: HINTS_GROUP_NAMES.SHORTCUTS_EDITING,
@@ -166,7 +166,7 @@ const CompactViewTable = () => {
           {HINTS_ALERTS.COPY_BUTTON}
         </Hint>
 
-        {tableActivities?.map((activity, i) =>
+        {tableActivities?.map((activity, i: number) =>
           activity.isBreak ? (
             <tr
               key={i}
@@ -188,7 +188,7 @@ const CompactViewTable = () => {
                       activity.validation.description) ||
                     "Copied"
                   }
-                  disabled={activity.validation.isValid || activity.validation.cell !== "time"}
+                  disabled={activity.validation.isValid || activity.validation?.cell !== "time"}
                 >
                   <span
                     ref={

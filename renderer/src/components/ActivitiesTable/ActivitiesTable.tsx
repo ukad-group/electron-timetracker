@@ -37,7 +37,7 @@ const ActivitiesTable = ({
 
   const tableActivities = useMemo(() => {
     const badgedActivities = validatedActivities.map((activity) => {
-      const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+      const userInfo = JSON.parse(localStorage.getItem("timetracker-user") as string);
       if (userInfo && !userInfo?.yearProjects?.includes(activity.project)) {
         return { ...activity, isNewProject: true };
       }

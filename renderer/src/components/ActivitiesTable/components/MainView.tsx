@@ -8,7 +8,7 @@ import MainViewTable from "./MainViewTable";
 import { ActivitiesTableContext } from "../context";
 
 const MainView = () => {
-  const { copyToClipboardHandle, totalDuration, tableActivities, selectedDate, isLoading } =
+  const { copyToClipboardHandle, totalDuration, tableActivities, selectedDate, isLoading }: any =
     useContext(ActivitiesTableContext);
 
   return (

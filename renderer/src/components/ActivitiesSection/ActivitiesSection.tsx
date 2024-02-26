@@ -30,10 +30,13 @@ const ActivitiesSection = ({
     errorTitle: "",
     errorMessage: "",
   });
+
   const [errorType, setErrorType] = useState<null | "updater">(null);
   const [isErrorShown, setIsErrorShown] = useState<boolean>(true);
-  const isGoogleEventsShown = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS));
-  const isOffice365EventsShown = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS));
+  const isGoogleEventsShown = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS) as string);
+  const isOffice365EventsShown = JSON.parse(
+    localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS) as string,
+  );
   const validatedActivities = useMemo(() => {
     return validation(activities.filter((activity) => activity.to));
   }, [activities]);
@@ -54,7 +57,7 @@ const ActivitiesSection = ({
       const allEvents = [...googleEvents, ...office365Events];
 
       setIsLoading(false);
-      isAvailable.isAvailable && setEvents(allEvents);
+      isAvailable.isAvailable && setEvents(allEvents as []);
     } else {
       setEvents([]);
     }

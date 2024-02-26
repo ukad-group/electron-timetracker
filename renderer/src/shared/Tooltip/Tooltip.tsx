@@ -3,7 +3,7 @@ import { CheckIcon } from "@heroicons/react/24/solid";
 
 interface Props {
   children: ReactNode;
-  tooltipText?: string;
+  tooltipText?: string | boolean;
   isClickable?: boolean;
   disabled?: boolean;
 }
