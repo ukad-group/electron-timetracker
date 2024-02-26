@@ -1,6 +1,7 @@
 import { updateJiraAccessToken, removeJiraStoredUser, updateJiraStoredUser } from "../jira";
 import { globalIpcRendererMock } from "@/tests/mocks/electron";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 jest.mock("electron", () => ({
   ipcRenderer: {
@@ -28,7 +29,7 @@ describe("GIVEN jira/updateJiraAccessToken", () => {
 
     const result = await updateJiraAccessToken(refreshToken);
 
-    expect(global.ipcRenderer.invoke).toHaveBeenCalledWith("jira:refresh-access-token", refreshToken);
+    expect(global.ipcRenderer.invoke).toHaveBeenCalledWith(IPC_MAIN_CHANNELS.JIRA_REFRESH_ACCESS_TOKEN, refreshToken);
 
     expect(result).toEqual(expectedResult);
   });

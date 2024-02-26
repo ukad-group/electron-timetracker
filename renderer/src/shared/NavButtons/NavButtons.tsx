@@ -1,7 +1,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { NavButtonsProps } from "./types";
 
-export default function NavButtons({ prevCallback, nextCallback }: NavButtonsProps) {
+const NavButtons = ({ prevCallback, nextCallback }: NavButtonsProps) => {
   return (
     <div className="flex items-center rounded-md shadow-sm">
       <button
@@ -23,4 +23,6 @@ export default function NavButtons({ prevCallback, nextCallback }: NavButtonsPro
       </button>
     </div>
   );
-}
+};
+
+export default NavButtons;

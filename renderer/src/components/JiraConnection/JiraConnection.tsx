@@ -16,7 +16,7 @@ const JiraConnection = () => {
     if (online) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "jira");
     } else {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.APP_LOAD_OFFLINE_PAGE);
     }
   };
 
@@ -38,11 +38,14 @@ const JiraConnection = () => {
 
     if (!authorizationCode) return;
 
-    const { access_token, refresh_token } = await global.ipcRenderer.invoke("jira:get-tokens", authorizationCode);
+    const { access_token, refresh_token } = await global.ipcRenderer.invoke(
+      IPC_MAIN_CHANNELS.JIRA_GET_TOKENS,
+      authorizationCode,
+    );
 
     if (!access_token) return;
 
-    const { account_id, email } = await global.ipcRenderer.invoke("jira:get-profile", access_token);
+    const { account_id, email } = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.JIRA_GET_PROFILE, access_token);
 
     const username = email || "";
     const isUserExists = users.some((user: JiraUser) => account_id === user.userId);

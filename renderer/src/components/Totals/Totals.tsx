@@ -80,7 +80,7 @@ const Totals = ({ selectedDate }) => {
     }
   };
 
-  const copyDescriptionsHandler = (descriptions: Description[], withTime: boolean) => {
+  const handleCopyDescriptions = (descriptions: Description[], withTime: boolean) => {
     const formattedDescriptions = descriptions.reduce((acc: string[], curr: Description) => {
       const name = curr.name ? curr.name : "";
       const duration = convertMillisecondsToTime(curr.duration);
@@ -178,7 +178,7 @@ const Totals = ({ selectedDate }) => {
     setProgress(progress);
   }, [screenSizes]);
 
-  const onFocusHandler = () => {
+  const handleOnFocus = () => {
     changeHintConditions(progress, setProgress, [
       {
         groupName: HINTS_GROUP_NAMES.TOTALS,
@@ -190,7 +190,7 @@ const Totals = ({ selectedDate }) => {
 
   return (
     <section
-      onFocus={onFocusHandler}
+      onFocus={handleOnFocus}
       className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border"
     >
       {screenSizes.screenWidth >= SCREENS.LG && (
@@ -292,7 +292,7 @@ const Totals = ({ selectedDate }) => {
             toggleActivitiesList={toggleActivitiesList}
             isShowedActivitiesList={isShowedActivitiesList}
             period={period.periodName}
-            onCopyDescriptions={copyDescriptionsHandler}
+            onCopyDescriptions={handleCopyDescriptions}
           />
         </div>
       )}

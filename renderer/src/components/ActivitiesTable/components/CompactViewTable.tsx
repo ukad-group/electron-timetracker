@@ -23,10 +23,8 @@ const CompactViewTable = () => {
     selectedDate,
     firstKey,
     secondKey,
-    editActivityHandler,
-
+    handleEditActivity,
     onDeleteActivity,
-
     isLoading,
   } = useContext(ActivitiesTableContext);
 
@@ -38,6 +36,7 @@ const CompactViewTable = () => {
   const [dublicateIndex, setDublicateIndex] = useState(-1);
 
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
+
   useEffect(() => {
     changeHintConditions(progress, setProgress, [
       {
@@ -110,7 +109,7 @@ const CompactViewTable = () => {
         existingConditions: [true, false],
       },
     ]);
-    editActivityHandler(activity);
+    handleEditActivity(activity);
   };
 
   const handleCopyClick = (activity) => {

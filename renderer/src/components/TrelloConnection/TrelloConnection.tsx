@@ -14,7 +14,7 @@ const TrelloConnection = () => {
     if (online) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "trello");
     } else {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.APP_LOAD_OFFLINE_PAGE);
     }
   };
 
@@ -29,7 +29,10 @@ const TrelloConnection = () => {
 
     if (!token) return;
 
-    const { id, username, fullName } = await global.ipcRenderer.invoke("trello:get-profile-info", token);
+    const { id, username, fullName } = await global.ipcRenderer.invoke(
+      IPC_MAIN_CHANNELS.TRELLO_GET_PROFILE_INFO,
+      token,
+    );
 
     const newUser = {
       userId: id,

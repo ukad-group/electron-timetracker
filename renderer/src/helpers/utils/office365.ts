@@ -1,3 +1,4 @@
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS } from "../contstants";
 import { trackConnections } from "./utils";
 export interface Office365User {
@@ -8,7 +9,7 @@ export interface Office365User {
 }
 
 export const updateAccessToken = async (refreshToken: string) =>
-  await global.ipcRenderer.invoke("office365:refresh-access-token", refreshToken);
+  await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.OFFICE365_REFRESH_ACCESS_TOKEN, refreshToken);
 
 export const removeStoredUser = (userId: string) => {
   const storedUsers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || [];
@@ -52,7 +53,7 @@ export const getOffice365Events = async () => {
 };
 
 export const getOffice365EventByUser = async (accessToken: string, refreshToken: string, userId: string) => {
-  let res = await global.ipcRenderer.invoke("office365:get-today-events", accessToken);
+  let res = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.OFFICE365_GET_TODAY_EVENTS, accessToken);
 
   if (res?.error?.code === "MailboxNotEnabledForRESTAPI") {
     return [];

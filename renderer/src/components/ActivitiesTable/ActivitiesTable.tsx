@@ -9,10 +9,10 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { ActivitiesTableContext } from "./context";
 import { MainView, CompactView } from "./components";
 import { getTotalDuration, formatEvents, getActualEvents } from "./utils";
-import { KEY_CODES } from "@/helpers/contstants";
+import { KEY_CODES, LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { TRACK_ANALYTICS } from "@/helpers/contstants";
 
-export default function ActivitiesTable({
+const ActivitiesTable = ({
   activities,
   onEditActivity,
   onDeleteActivity,
@@ -22,7 +22,7 @@ export default function ActivitiesTable({
   isLoading,
   showAsMain,
   validatedActivities,
-}: ActivitiesTableProps) {
+}: ActivitiesTableProps) => {
   const [ctrlPressed, setCtrlPressed] = useState(false);
   const [firstKey, setFirstKey] = useState(null);
   const [secondKey, setSecondtKey] = useState(null);
@@ -37,7 +37,7 @@ export default function ActivitiesTable({
 
   const tableActivities = useMemo(() => {
     const badgedActivities = validatedActivities.map((activity) => {
-      const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+      const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
       if (userInfo && !userInfo?.yearProjects?.includes(activity.project)) {
         return { ...activity, isNewProject: true };
       }
@@ -95,7 +95,7 @@ export default function ActivitiesTable({
       });
   };
 
-  const copyActivityHandler = (activity) => {
+  const handleCopyActivity = (activity) => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.COPY_REGISTRATION);
     onEditActivity({
       ...activity,
@@ -163,7 +163,7 @@ export default function ActivitiesTable({
     }
   };
 
-  const editActivityHandler = (activity) => {
+  const handleEditActivity = (activity) => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.EDIT_REGISTRATION);
     if (activity.calendarId) {
       onEditActivity({
@@ -204,8 +204,8 @@ export default function ActivitiesTable({
       activities,
       firstKey,
       secondKey,
-      editActivityHandler,
-      copyActivityHandler,
+      handleEditActivity,
+      handleCopyActivity,
     }),
     [
       totalDuration,
@@ -219,8 +219,8 @@ export default function ActivitiesTable({
       activities,
       firstKey,
       secondKey,
-      editActivityHandler,
-      copyActivityHandler,
+      handleEditActivity,
+      handleCopyActivity,
     ],
   );
 
@@ -229,4 +229,6 @@ export default function ActivitiesTable({
       {showAsMain ? <MainView /> : <CompactView />}
     </ActivitiesTableContext.Provider>
   );
-}
+};
+
+export default ActivitiesTable;

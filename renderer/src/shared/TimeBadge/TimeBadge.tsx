@@ -2,7 +2,7 @@ import React from "react";
 import { stringToMinutes } from "@/helpers/utils/utils";
 import { TimeBadgeProps } from "./types";
 
-export default function TimeBadge({ hours, startTime, selectedDate }: TimeBadgeProps) {
+const TimeBadge = ({ hours, startTime, selectedDate }: TimeBadgeProps) => {
   const curDate = new Date();
   const curTime = curDate.getHours() * 60 + curDate.getMinutes();
 
@@ -32,4 +32,6 @@ export default function TimeBadge({ hours, startTime, selectedDate }: TimeBadgeP
       </span>
     );
   }
-}
+};
+
+export default TimeBadge;

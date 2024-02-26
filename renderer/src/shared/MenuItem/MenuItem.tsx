@@ -1,13 +1,6 @@
-import { ReactNode } from "react";
+import { MenuItemProps } from "./types";
 
-type MenuItemProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  children: ReactNode;
-  callback?: () => void;
-  isActive?: boolean;
-};
-// import { MenuItemProps } from './types';
-
-export default function MenuItem({ children, callback, isActive, ...props }: MenuItemProps) {
+const MenuItem = ({ children, callback, isActive, ...props }: MenuItemProps) => {
   return (
     <button
       onClick={callback}
@@ -20,4 +13,6 @@ export default function MenuItem({ children, callback, isActive, ...props }: Men
       {children}
     </button>
   );
-}
+};
+
+export default MenuItem;
