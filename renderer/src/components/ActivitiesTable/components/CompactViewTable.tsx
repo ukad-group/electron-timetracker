@@ -201,7 +201,6 @@ const CompactViewTable = () => {
                     })}
                   >
                     {activity.from} - {activity.to}
-                    {activity.from} - {activity.to}{" "}
                     <span
                       className={` pl-2 pr-8 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
                         activity.calendarId ? "opacity-50" : ""
@@ -214,12 +213,11 @@ const CompactViewTable = () => {
               </td>
 
               <td className={`pr-3 text-sm `}>
-                {activity.isBreak && (
-                  <p onClick={copyToClipboardHandle} className="old-break-word">
-                    {activity.project.split("").slice(1).join("")}
-                  </p>
-                )}
+                <p onClick={copyToClipboardHandle} className="old-break-word">
+                  {activity.project.split("").slice(1).join("")}
+                </p>
               </td>
+              <td className="relative text-sm font-medium text-right whitespace-nowrap"></td>
               <td className="relative text-sm font-medium text-right whitespace-nowrap">
                 <button
                   className="group py-1 px-1"
@@ -345,7 +343,7 @@ const CompactViewTable = () => {
                   </div>
                 </td>
                 <td className="relative text-sm font-medium text-right whitespace-nowrap">
-                  {!activity.isBreak && (
+                  {!activity.calendarId && (
                     <button
                       className="group pt-4 px-1"
                       title="Delete"
@@ -446,7 +444,7 @@ const CompactViewTable = () => {
                       {activity.mistakes && (
                         <p
                           onClick={copyToClipboardHandle}
-                          className="w-fit old-break-word py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-gray-400 dark:bg-transparent dark:border-2 dark:border-yellow-400/50"
+                          className="w-fit old-break-word ml-1 py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-gray-400 dark:bg-transparent dark:border-2 dark:border-yellow-400/50"
                         >
                           {activity.mistakes}
                         </p>
