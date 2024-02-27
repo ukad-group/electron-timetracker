@@ -161,7 +161,8 @@ const AutocompleteSelector = ({
         {fullSuggestionsList?.length > 0 && (
           <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm dark:bg-dark-container dark:shadow-lg dark:shadow-slate-900">
             <div className="block text-xs text-gray-500 text-center">tab to choose</div>
-            {/*<SuggestionsList list={fullSuggestionsList} />*/}
+            {/*@ts-ignore*/}
+            <SuggestionsList list={fullSuggestionsList} />
           </Combobox.Options>
         )}
       </div>
