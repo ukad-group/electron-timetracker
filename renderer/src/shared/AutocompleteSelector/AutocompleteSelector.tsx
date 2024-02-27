@@ -1,4 +1,4 @@
-import { FormEvent, useState, useRef, ChangeEvent, useEffect } from "react";
+import { KeyboardEventHandler, useState, useRef, ChangeEvent, useEffect } from "react";
 import { ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
@@ -26,7 +26,7 @@ export default function AutocompleteSelector({
 }: AutocompleteProps) {
   const [isNew, setIsNew] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const allItems = useMemo(() => {
     return additionalItems ? availableItems?.concat(additionalItems) : availableItems;
   }, [availableItems, additionalItems]);
@@ -41,19 +41,25 @@ export default function AutocompleteSelector({
     return selectedItem.trim() === "" ? filteredList : [selectedItem, ...filteredList];
   }, [selectedItem, filteredList]);
 
-  const handleKey = (e) => {
+  const handleKey: KeyboardEventHandler<HTMLInputElement> = (e) => {
     if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.key === "Home") {
       e.preventDefault();
-      inputRef.current.selectionStart = 0;
-      inputRef.current.selectionEnd = 0;
+
+      if (inputRef.current) {
+        inputRef.current.selectionStart = 0;
+        inputRef.current.selectionEnd = 0;
+      }
     }
 
     if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.key === "End") {
       e.preventDefault();
       const input = inputRef.current;
-      const length = input.value.length;
-      input.selectionStart = length;
-      input.selectionEnd = length;
+
+      if (input) {
+        const length = input.value.length;
+        input.selectionStart = length;
+        input.selectionEnd = length;
+      }
     }
 
     if (e.ctrlKey && e.key === "Enter") {
@@ -82,7 +88,7 @@ export default function AutocompleteSelector({
     }
   };
 
-  const onChangeHandler = (value) => {
+  const onChangeHandler = (value: string) => {
     let newValue = value;
 
     if (value.startsWith("TT:: ") || value.startsWith("JI:: ")) {
@@ -98,7 +104,7 @@ export default function AutocompleteSelector({
     onChangeHandler(e.target.value);
 
     if (isNewCheck && allItems) {
-      setIsNew(selectedItem && !allItems.includes(selectedItem));
+      setIsNew(!!selectedItem && !allItems.includes(selectedItem));
     }
   };
 
@@ -107,7 +113,7 @@ export default function AutocompleteSelector({
       setIsNew(false);
     }
 
-    if (cursorPosition) {
+    if (cursorPosition && inputRef.current) {
       inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
     }
     setCursorPosition(0);
@@ -131,7 +137,7 @@ export default function AutocompleteSelector({
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
-          onKeyDown={(event: FormEvent) => handleKey(event)}
+          onKeyDown={handleKey}
           ref={inputRef}
           value={selectedItem}
           required={required}

@@ -1,3 +1,4 @@
+import React from "react";
 import { Loader } from "../Loader";
 import { ButtonProps } from "./types";
 import {
@@ -9,7 +10,15 @@ import {
   disabledStyles,
 } from "./constants";
 
-export default function Button({ callback, text, disabled, status, type = "button", tabIndex, children }: ButtonProps) {
+export default function Button({
+  callback,
+  text,
+  disabled,
+  status = "default",
+  type = "button",
+  tabIndex,
+  children,
+}: ButtonProps) {
   const saveBtnStatuses = {
     enabled: {
       text: "Save",
@@ -34,6 +43,10 @@ export default function Button({ callback, text, disabled, status, type = "butto
     cancel: {
       text: "Cancel",
       classes: "bg-white text-gray-700 border-gray-300 dark:bg-gray-200 " + cancelHoverStyles,
+    },
+    default: {
+      text,
+      classes: "",
     },
   };
 

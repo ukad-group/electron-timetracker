@@ -1,7 +1,14 @@
-export const filterList = ({ selectedItem, availableItems, additionalItems, showedSuggestionsNumber }) => {
-  const mostRelevantItems = [];
+import { FilterListOptions } from "./types";
 
-  const relevantItems =
+export const filterList = ({
+  selectedItem,
+  availableItems,
+  additionalItems,
+  showedSuggestionsNumber,
+}: FilterListOptions) => {
+  const mostRelevantItems: string[] = [];
+
+  const relevantItems: string[] =
     selectedItem === ""
       ? availableItems &&
         [...availableItems].concat(additionalItems ? additionalItems : []).filter((activity, i) => {
@@ -14,7 +21,7 @@ export const filterList = ({ selectedItem, availableItems, additionalItems, show
         [...availableItems]
           .sort()
           .concat(additionalItems ? additionalItems : [])
-          .reduce((accumulator, current) => {
+          .reduce((accumulator: string[], current: string) => {
             let duplicate = false;
             if (current.startsWith("TT:: ") || current.startsWith("JI:: ")) {
               duplicate = availableItems.includes(current.slice(5));

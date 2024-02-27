@@ -7,7 +7,10 @@ export default function VersionMessage() {
   const [isUpdate, setIsUpdate] = useState(false);
   const [isDownload, setIsDownload] = useState(false);
   const [version, setVersion] = useState("");
-  const storedVersionData = JSON.parse(localStorage.getItem("version-data")) || { version: "", showMessage: true };
+  const storedVersionDataString = localStorage.getItem("version-data");
+  const storedVersionData = storedVersionDataString
+    ? JSON.parse(storedVersionDataString)
+    : { version: "", showMessage: true };
   const [showMessage, setShowMessage] = useState(storedVersionData.showMessage);
 
   useEffect(() => {
