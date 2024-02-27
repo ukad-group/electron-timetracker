@@ -8,6 +8,7 @@ const DropboxIcon = () => {
       width="20px"
       version="1.1"
       id="Layer_1"
+      data-testid="dropbox-icon-test-id"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-271 282 256 238"
     >
