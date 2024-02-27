@@ -13,7 +13,7 @@ import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 
-export default function UpdateDescription() {
+const UpdateDescription = () => {
   const [release, setRelease] = useState<Release | null>();
   const [currentVersion, setCurrentVersion] = useState(global.app?.getVersion());
   const [isUpdate, setIsUpdate] = useState(false);
@@ -28,17 +28,17 @@ export default function UpdateDescription() {
   useEffect(() => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.GET_CURRENT_VERSION);
 
-    global.ipcRenderer.on("update-available", (event, data, info) => {
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.UPDATE_AVAILABLE, (_, data, __) => {
       setIsUpdate(data);
     });
 
-    global.ipcRenderer.on("downloaded", (event, data, info) => {
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.DOWNLOADED, (_, __, info) => {
       setRelease(info);
       setIsOpen(true);
       setUpdate({ age: "new", description: info?.releaseNotes });
     });
 
-    global.ipcRenderer.on("current-version", (event, data) => {
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.CURRENT_VERSION, (_, data) => {
       setCurrentVersion(data);
     });
     changeHintConditions(progress, setProgress, [
@@ -50,9 +50,9 @@ export default function UpdateDescription() {
     ]);
 
     return () => {
-      global.ipcRenderer.removeAllListeners("update-available");
-      global.ipcRenderer.removeAllListeners("downloaded");
-      global.ipcRenderer.removeAllListeners("current-version");
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.UPDATE_AVAILABLE);
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.DOWNLOADED);
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.CURRENT_VERSION);
     };
   }, []);
 
@@ -90,7 +90,7 @@ export default function UpdateDescription() {
     return tempDiv.innerHTML;
   };
 
-  const supportClickHandler = (link: string) => {
+  const handleSupportClick = (link: string) => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.REDIRECT, link);
   };
 
@@ -142,14 +142,14 @@ export default function UpdateDescription() {
         </p>
         <button
           className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
-          onClick={() => supportClickHandler(SLACK_DESTOP_LINK)}
+          onClick={() => handleSupportClick(SLACK_DESTOP_LINK)}
         >
           <SlackIcon />
           Open in desktop Slack
         </button>
         <button
           className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
-          onClick={() => supportClickHandler(SLACK_WEB_LINK)}
+          onClick={() => handleSupportClick(SLACK_WEB_LINK)}
         >
           <GlobeAltIcon className="w-6 h-6 fill-gray-600" />
           Open Slack in the browser
@@ -172,4 +172,6 @@ export default function UpdateDescription() {
       )}
     </DisclosureSection>
   );
-}
+};
+
+export default UpdateDescription;

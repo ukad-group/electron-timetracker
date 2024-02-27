@@ -6,22 +6,23 @@ import { GoogleCredentails, GoogleUser } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import isOnline from "is-online";
+import { TRACK_ANALYTICS } from "@/helpers/contstants";
 
 const GoogleConnection = () => {
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);
   const [loggedUsers, setLoggedUsers] = useState([]);
 
-  const signInHandler = async () => {
+  const handleSignIn = async () => {
     const online = await isOnline();
 
     if (online) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "google");
     } else {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.APP_LOAD_OFFLINE_PAGE);
     }
   };
 
-  const signOutHandler = (id: string) => {
+  const handleSignOut = (id: string) => {
     const loggedUsersFromLs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
     const filteredUsers = loggedUsersFromLs.filter((user: GoogleUser) => user.accountId !== id);
 
@@ -55,8 +56,8 @@ const GoogleConnection = () => {
           userName: googleProfileUsername,
           accountId: googleProfileId,
         };
-        global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "calendars_connections", {
-          calendar: "googleCalendar",
+        global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.CALENDARS_CONNECTIONS, {
+          calendar: TRACK_ANALYTICS.CALENDAR_GOOGLE,
         });
         googleUsersFromLs.push(userObject);
         localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify(googleUsersFromLs));
@@ -119,7 +120,7 @@ const GoogleConnection = () => {
         <span className="font-medium dark:text-dark-heading">Google</span>
         <Button
           text={!loggedUsers.length ? "Add account" : "Add another account"}
-          callback={signInHandler}
+          callback={handleSignIn}
           type="button"
         />
       </div>
@@ -137,7 +138,7 @@ const GoogleConnection = () => {
                   {user.userName}
                 </div>
                 <div
-                  onClick={() => signOutHandler(user.accountId)}
+                  onClick={() => handleSignOut(user.accountId)}
                   className="cursor-pointer bg-gray-400 hover:bg-gray-500 transition duration-300 inline-flex gap-2 px-2.5 py-0.5 rounded-full text-xs font-medium text-white dark:text-dark-heading dark:bg-dark-button-back-gray dark:hover:bg-dark-button-gray-hover"
                 >
                   <ArrowRightOnRectangleIcon className="w-4 h-4 fill-white dark:fill-dark-heading" />

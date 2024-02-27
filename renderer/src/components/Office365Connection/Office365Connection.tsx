@@ -5,6 +5,7 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import Users from "./Users";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import isOnline from "is-online";
+import { TRACK_ANALYTICS } from "@/helpers/contstants";
 
 const Office365Connection = () => {
   const [users, setUsers] = useState(JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || []);
@@ -16,7 +17,7 @@ const Office365Connection = () => {
     if (online) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "office365");
     } else {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.APP_LOAD_OFFLINE_PAGE);
     }
   };
 
@@ -39,12 +40,15 @@ const Office365Connection = () => {
 
     if (!authorizationCode) return;
 
-    const { access_token, refresh_token } = await global.ipcRenderer.invoke("office365:get-tokens", authorizationCode);
+    const { access_token, refresh_token } = await global.ipcRenderer.invoke(
+      IPC_MAIN_CHANNELS.OFFICE365_GET_TOKENS,
+      authorizationCode,
+    );
 
     if (!access_token) return;
 
     const { userPrincipalName, mail, displayName, id } = await global.ipcRenderer.invoke(
-      "office365:get-profile-info",
+      IPC_MAIN_CHANNELS.OFFICE365_GET_PROFILE_INFO,
       access_token,
     );
 
@@ -62,8 +66,8 @@ const Office365Connection = () => {
       refreshToken: refresh_token,
       username: username,
     };
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "calendars_connections", {
-      calendar: "office365",
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.CALENDARS_CONNECTIONS, {
+      calendar: TRACK_ANALYTICS.CALENDAR_OFFICE,
     });
     const newUsers = [...users, user];
 

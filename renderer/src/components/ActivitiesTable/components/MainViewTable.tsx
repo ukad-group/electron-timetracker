@@ -21,8 +21,8 @@ const MainViewTable = () => {
     firstKey,
     secondKey,
     copyToClipboardHandle,
-    copyActivityHandler,
-    editActivityHandler,
+    handleCopyActivity,
+    handleEditActivity,
     onDeleteActivity,
     isLoading,
   } = useContext(ActivitiesTableContext);
@@ -123,7 +123,7 @@ const MainViewTable = () => {
         existingConditions: [true, false],
       },
     ]);
-    editActivityHandler(activity);
+    handleEditActivity(activity);
   };
 
   const handleCopyClick = (activity) => {
@@ -134,7 +134,7 @@ const MainViewTable = () => {
         existingConditions: [false, false],
       },
     ]);
-    copyActivityHandler(activity);
+    handleCopyActivity(activity);
   };
 
   return (
@@ -232,7 +232,10 @@ const MainViewTable = () => {
               )}
               <Tooltip
                 tooltipText={
-                  !activity.validation.isValid && activity.validation.cell === "time" && activity.validation.description
+                  (!activity.validation.isValid &&
+                    activity.validation.cell === "time" &&
+                    activity.validation.description) ||
+                  "Copied"
                 }
                 disabled={activity.validation.isValid || activity.validation.cell !== "time"}
               >
@@ -255,9 +258,10 @@ const MainViewTable = () => {
               <Tooltip
                 isClickable={activity.validation.isValid}
                 tooltipText={
-                  !activity.validation.isValid &&
-                  activity.validation.cell === "duration" &&
-                  activity.validation.description
+                  (!activity.validation.isValid &&
+                    activity.validation.cell === "duration" &&
+                    activity.validation.description) ||
+                  "Copied"
                 }
                 disabled={activity.validation.isValid || activity.validation.cell !== "duration"}
               >
@@ -281,9 +285,10 @@ const MainViewTable = () => {
                 <Tooltip
                   isClickable={activity.validation.isValid}
                   tooltipText={
-                    !activity.validation.isValid &&
-                    activity.validation.cell === "project" &&
-                    activity.validation.description
+                    (!activity.validation.isValid &&
+                      activity.validation.cell === "project" &&
+                      activity.validation.description) ||
+                    "Copied"
                   }
                   disabled={activity.validation.isValid || activity.validation.cell !== "project"}
                 >
@@ -312,13 +317,14 @@ const MainViewTable = () => {
                   </p>
                 )}
               </div>
-              {activity.activity && (
+              {activity.activity && activity.activity !== " " && (
                 <Tooltip
                   isClickable={activity.validation.isValid}
                   tooltipText={
-                    !activity.validation.isValid &&
-                    activity.validation.cell === "activity" &&
-                    activity.validation.description
+                    (!activity.validation.isValid &&
+                      activity.validation.cell === "activity" &&
+                      activity.validation.description) ||
+                    "Copied"
                   }
                   disabled={activity.validation.isValid || activity.validation.cell !== "activity"}
                 >
@@ -333,9 +339,10 @@ const MainViewTable = () => {
                 <Tooltip
                   isClickable={activity.validation.isValid}
                   tooltipText={
-                    !activity.validation.isValid &&
-                    activity.validation.cell === "description" &&
-                    activity.validation.description
+                    (!activity.validation.isValid &&
+                      activity.validation.cell === "description" &&
+                      activity.validation.description) ||
+                    "Copied"
                   }
                   disabled={activity.validation.isValid || activity.validation.cell !== "description"}
                 >

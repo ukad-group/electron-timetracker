@@ -3,7 +3,6 @@ import { Dispatch, SetStateAction } from "react";
 
 export type TrackTimeButtonProps = {
   onEditActivity: (activity: ReportActivity | "new") => void;
-  isLoading: boolean;
 };
 
 export type ActivitiesSectionProps = {

@@ -19,6 +19,7 @@ export type Position =
     };
 
 export type HintProps = {
+  ignoreSkip?: boolean;
   displayCondition?: boolean;
   learningMethod: "buttonClick" | "nextClick" | "ctrlArrowNumberPress";
   order: number;

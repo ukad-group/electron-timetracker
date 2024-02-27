@@ -380,7 +380,7 @@ describe("validation function", () => {
     expect(activity).toHaveProperty("validation", {
       isValid: false,
       cell: "duration",
-      description: "Negative or zero duration of the time interval",
+      description: "Negative or zero duration",
     });
   });
 
@@ -402,7 +402,7 @@ describe("validation function", () => {
     expect(activity).toHaveProperty("validation", {
       isValid: false,
       cell: "duration",
-      description: "Negative or zero duration of the time interval",
+      description: "Negative or zero duration",
     });
   });
 

@@ -2,7 +2,7 @@ import { PencilIcon } from "@heroicons/react/24/solid";
 import { FolderSelectorProps } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
-export default function FolderSelector({ folderLocation, setFolderLocation }: FolderSelectorProps) {
+const FolderSelector = ({ folderLocation, setFolderLocation }: FolderSelectorProps) => {
   const handleClick = () => {
     global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_SELECT_FOLDER).then((folder: string | null) => {
       if (folder) {
@@ -23,4 +23,6 @@ export default function FolderSelector({ folderLocation, setFolderLocation }: Fo
       <PencilIcon className="w-4 h-4" aria-hidden="true" />
     </button>
   );
-}
+};
+
+export default FolderSelector;

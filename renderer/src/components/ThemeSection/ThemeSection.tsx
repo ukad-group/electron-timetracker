@@ -1,9 +1,8 @@
-import { useThemeStore } from "@/store/themeStore";
-import { shallow } from "zustand/shallow";
+import useColorTheme from "@/helpers/hooks/useTheme";
 import clsx from "clsx";
 
 const ThemeSection = () => {
-  const [theme, setTheme] = useThemeStore((state) => [state.theme, state.setTheme], shallow);
+  const { theme, setTheme } = useColorTheme();
 
   return (
     <section className="h-full">

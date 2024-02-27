@@ -1,22 +1,23 @@
 import { shallow } from "zustand/shallow";
 import { useMainStore } from "@/store/mainStore";
 import { DeleteMessageProps } from "./types";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
-export default function DeleteMessage({
+const DeleteMessage = ({
   setShowDeleteButton,
   setShowDeleteMessage,
   selectedDate,
   setSelectedDateReport,
-}: DeleteMessageProps) {
+}: DeleteMessageProps) => {
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
 
-  const deleteFileHandler = () => {
+  const handleDeleteFile = () => {
     setShowDeleteButton(false);
     setShowDeleteMessage(false);
     setSelectedDateReport("");
 
     global.ipcRenderer
-      .invoke("app:delete-file", reportsFolder, selectedDate)
+      .invoke(IPC_MAIN_CHANNELS.APP_DELETE_FILE, reportsFolder, selectedDate)
       .then((success) => {
         if (!success) {
           console.log("File deleting error.");
@@ -63,7 +64,7 @@ export default function DeleteMessage({
       </div>
       <div className="bg-gray-50 px-4 py-2 sm:flex sm:flex-row-reverse sm:px-6 dark:bg-dark-container">
         <button
-          onClick={deleteFileHandler}
+          onClick={handleDeleteFile}
           type="button"
           className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto dark:text-dark-heading dark:bg-red-600/70 hover:dark:bg-red-500/70"
         >
@@ -79,4 +80,6 @@ export default function DeleteMessage({
       </div>
     </div>
   );
-}
+};
+
+export default DeleteMessage;

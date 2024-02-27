@@ -9,7 +9,7 @@ import {
   disabledStyles,
 } from "./constants";
 
-export default function Button({ callback, text, disabled, status, type = "button", tabIndex, children }: ButtonProps) {
+const Button = ({ callback, text, disabled, status, type = "button", tabIndex, children }: ButtonProps) => {
   const saveBtnStatuses = {
     enabled: {
       text: "Save",
@@ -57,4 +57,6 @@ export default function Button({ callback, text, disabled, status, type = "butto
       {saveBtnStatuses[status] ? saveBtnStatuses[status].text : text}
     </button>
   );
-}
+};
+
+export default Button;

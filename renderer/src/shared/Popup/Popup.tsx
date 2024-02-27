@@ -1,7 +1,7 @@
 import { PopupProps } from "./types";
 import { buttonColors } from "./constants";
 
-export default function Popup({ title, description, top, left, buttons }: PopupProps) {
+const Popup = ({ title, description, top, left, buttons }: PopupProps) => {
   return (
     <div
       style={{ top: `${top ? top : "0"}`, left: `${left ? left : "0"}` }}
@@ -24,4 +24,6 @@ export default function Popup({ title, description, top, left, buttons }: PopupP
       </div>
     </div>
   );
-}
+};
+
+export default Popup;

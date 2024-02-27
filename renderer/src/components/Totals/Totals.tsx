@@ -80,7 +80,7 @@ const Totals = ({ selectedDate }) => {
     }
   };
 
-  const copyDescriptionsHandler = (descriptions: Description[], withTime: boolean) => {
+  const handleCopyDescriptions = (descriptions: Description[], withTime: boolean) => {
     const formattedDescriptions = descriptions.reduce((acc: string[], curr: Description) => {
       const name = curr.name ? curr.name : "";
       const duration = convertMillisecondsToTime(curr.duration);
@@ -88,7 +88,7 @@ const Totals = ({ selectedDate }) => {
 
       switch (true) {
         case name.length > 0 && withTime:
-          textForCopying = `${name} (${duration})`;
+          textForCopying = `(${duration}) ${name} `;
           break;
 
         case !name.length && withTime:
@@ -178,7 +178,7 @@ const Totals = ({ selectedDate }) => {
     setProgress(progress);
   }, [screenSizes]);
 
-  const onFocusHandler = () => {
+  const handleOnFocus = () => {
     changeHintConditions(progress, setProgress, [
       {
         groupName: HINTS_GROUP_NAMES.TOTALS,
@@ -190,7 +190,7 @@ const Totals = ({ selectedDate }) => {
 
   return (
     <section
-      onFocus={onFocusHandler}
+      onFocus={handleOnFocus}
       className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border"
     >
       {screenSizes.screenWidth >= SCREENS.LG && (
@@ -291,14 +291,14 @@ const Totals = ({ selectedDate }) => {
             totals={totals}
             toggleActivitiesList={toggleActivitiesList}
             isShowedActivitiesList={isShowedActivitiesList}
-            period={period}
-            onCopyDescriptions={copyDescriptionsHandler}
+            period={period.periodName}
+            onCopyDescriptions={handleCopyDescriptions}
           />
         </div>
       )}
       {!totals.length && (
         <div className="text-sm text-gray-700 font-semibold pt-2 dark:text-dark-main ml-5">
-          No tracked time this {period.date}
+          No tracked time this {period.periodName}
         </div>
       )}
     </section>

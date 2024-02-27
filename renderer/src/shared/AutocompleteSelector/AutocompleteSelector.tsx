@@ -8,8 +8,9 @@ import { useEditingHistoryManager } from "@/helpers/hooks";
 import { AutocompleteProps } from "./types";
 import SuggestionsList from "./SuggestionsList";
 import { filterList } from "./utils";
+import { KEY_CODES } from "@/helpers/contstants";
 
-export default function AutocompleteSelector({
+const AutocompleteSelector = ({
   isNewCheck = false,
   onSave,
   title,
@@ -23,8 +24,9 @@ export default function AutocompleteSelector({
   isValidationEnabled,
   showedSuggestionsNumber,
   spellCheck = false,
-}: AutocompleteProps) {
+}: AutocompleteProps) => {
   const [isNew, setIsNew] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState(0);
   const inputRef = useRef(null);
   const allItems = useMemo(() => {
     return additionalItems ? availableItems?.concat(additionalItems) : availableItems;
@@ -41,13 +43,13 @@ export default function AutocompleteSelector({
   }, [selectedItem, filteredList]);
 
   const handleKey = (e) => {
-    if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.key === "Home") {
+    if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.key === KEY_CODES.HOME) {
       e.preventDefault();
       inputRef.current.selectionStart = 0;
       inputRef.current.selectionEnd = 0;
     }
 
-    if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.key === "End") {
+    if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.key === KEY_CODES.END) {
       e.preventDefault();
       const input = inputRef.current;
       const length = input.value.length;
@@ -55,31 +57,33 @@ export default function AutocompleteSelector({
       input.selectionEnd = length;
     }
 
-    if (e.ctrlKey && e.key === "Enter") {
+    if (e.ctrlKey && e.key === KEY_CODES.ENTER) {
       e.preventDefault();
       onSave(e);
     }
 
-    if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
+    if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_Z) {
       e.preventDefault();
-      const currentValue = editingHistoryManager.undoEditing();
+      const [currentValue, changePlace] = editingHistoryManager.undoEditing();
 
       if (currentValue !== undefined) {
         setSelectedItem(currentValue as string);
+        setCursorPosition(typeof changePlace === "number" ? changePlace : 0);
       }
     }
 
-    if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
+    if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_Y) {
       e.preventDefault();
-      const currentValue = editingHistoryManager.redoEditing();
+      const [currentValue, changePlace] = editingHistoryManager.redoEditing();
 
       if (currentValue !== undefined) {
         setSelectedItem(currentValue as string);
+        setCursorPosition(typeof changePlace === "number" ? changePlace : 0);
       }
     }
   };
 
-  const onChangeHandler = (value) => {
+  const handleOnChange = (value: string) => {
     let newValue = value;
 
     if (value.startsWith("TT:: ") || value.startsWith("JI:: ")) {
@@ -90,9 +94,9 @@ export default function AutocompleteSelector({
     editingHistoryManager.setValue(newValue);
   };
 
-  const onBlurHandler = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleOnBlur = (e: ChangeEvent<HTMLInputElement>) => {
     e.target.value = e.target.value.trim();
-    onChangeHandler(e.target.value);
+    handleOnChange(e.target.value);
 
     if (isNewCheck && allItems) {
       setIsNew(selectedItem && !allItems.includes(selectedItem));
@@ -103,10 +107,15 @@ export default function AutocompleteSelector({
     if (isNewCheck && allItems?.includes(selectedItem)) {
       setIsNew(false);
     }
+
+    if (cursorPosition) {
+      inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
+    }
+    setCursorPosition(0);
   }, [selectedItem, allItems]);
 
   return (
-    <Combobox className={className} as="div" value={selectedItem} onChange={onChangeHandler}>
+    <Combobox className={className} as="div" value={selectedItem} onChange={handleOnChange}>
       <Combobox.Label className="flex items-center gap-1 text-sm font-medium text-gray-700 dark:text-dark-main ">
         {title}{" "}
         {title === "Activity" && (
@@ -123,7 +132,7 @@ export default function AutocompleteSelector({
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
-          onKeyDown={(event: FormEvent) => handleKey(event)}
+          onKeyDown={(event) => handleKey(event)}
           ref={inputRef}
           value={selectedItem}
           required={required}
@@ -135,9 +144,9 @@ export default function AutocompleteSelector({
               "border-red-300 text-red-900 placeholder-red-300": required && isValidationEnabled && !selectedItem,
             },
           )}
-          onChange={(e) => onChangeHandler(e.target.value)}
+          onChange={(e) => handleOnChange(e.target.value)}
           tabIndex={tabIndex}
-          onBlur={onBlurHandler}
+          onBlur={handleOnBlur}
         />
         <Combobox.Button className="absolute inset-y-0 right-0 flex items-center px-2 rounded-r-md focus:outline-none">
           <ChevronUpDownIcon className="w-5 h-5 text-gray-400" aria-hidden="true" />
@@ -152,4 +161,6 @@ export default function AutocompleteSelector({
       </div>
     </Combobox>
   );
-}
+};
+
+export default AutocompleteSelector;

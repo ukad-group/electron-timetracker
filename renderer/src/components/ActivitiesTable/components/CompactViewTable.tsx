@@ -23,10 +23,8 @@ const CompactViewTable = () => {
     selectedDate,
     firstKey,
     secondKey,
-    editActivityHandler,
-
+    handleEditActivity,
     onDeleteActivity,
-
     isLoading,
   } = useContext(ActivitiesTableContext);
 
@@ -38,6 +36,7 @@ const CompactViewTable = () => {
   const [dublicateIndex, setDublicateIndex] = useState(-1);
 
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
+
   useEffect(() => {
     changeHintConditions(progress, setProgress, [
       {
@@ -110,7 +109,7 @@ const CompactViewTable = () => {
         existingConditions: [true, false],
       },
     ]);
-    editActivityHandler(activity);
+    handleEditActivity(activity);
   };
 
   const handleCopyClick = (activity) => {
@@ -184,9 +183,10 @@ const CompactViewTable = () => {
 
                 <Tooltip
                   tooltipText={
-                    !activity.validation.isValid &&
-                    activity.validation.cell === "time" &&
-                    activity.validation.description
+                    (!activity.validation.isValid &&
+                      activity.validation.cell === "time" &&
+                      activity.validation.description) ||
+                    "Copied"
                   }
                   disabled={activity.validation.isValid || activity.validation.cell !== "time"}
                 >
@@ -200,7 +200,6 @@ const CompactViewTable = () => {
                     })}
                   >
                     {activity.from} - {activity.to}
-                    {activity.from} - {activity.to}{" "}
                     <span
                       className={` pl-2 pr-8 text-sm font-medium text-gray-900 dark:text-dark-heading whitespace-nowrap ${
                         activity.calendarId ? "opacity-50" : ""
@@ -213,12 +212,11 @@ const CompactViewTable = () => {
               </td>
 
               <td className={`pr-3 text-sm `}>
-                {activity.isBreak && (
-                  <p onClick={copyToClipboardHandle} className="old-break-word">
-                    {activity.project.split("").slice(1).join("")}
-                  </p>
-                )}
+                <p onClick={copyToClipboardHandle} className="old-break-word">
+                  {activity.project.split("").slice(1).join("")}
+                </p>
               </td>
+              <td className="relative text-sm font-medium text-right whitespace-nowrap"></td>
               <td className="relative text-sm font-medium text-right whitespace-nowrap">
                 <button
                   className="group py-1 px-1"
@@ -262,9 +260,10 @@ const CompactViewTable = () => {
                   )}
                   <Tooltip
                     tooltipText={
-                      !activity.validation.isValid &&
-                      activity.validation.cell === "time" &&
-                      activity.validation.description
+                      (!activity.validation.isValid &&
+                        activity.validation.cell === "time" &&
+                        activity.validation.description) ||
+                      "Copied"
                     }
                     disabled={activity.validation.isValid || activity.validation.cell !== "time"}
                   >
@@ -293,9 +292,10 @@ const CompactViewTable = () => {
                       <Tooltip
                         isClickable={activity.validation.isValid}
                         tooltipText={
-                          !activity.validation.isValid &&
-                          activity.validation.cell === "project" &&
-                          activity.validation.description
+                          (!activity.validation.isValid &&
+                            activity.validation.cell === "project" &&
+                            activity.validation.description) ||
+                          "Copied"
                         }
                         disabled={activity.validation.isValid || activity.validation.cell !== "project"}
                       >
@@ -320,13 +320,14 @@ const CompactViewTable = () => {
                       </Tooltip>
                     </div>
 
-                    {activity.activity && (
+                    {activity.activity && activity.activity !== " " && (
                       <Tooltip
                         isClickable={activity.validation.isValid}
                         tooltipText={
-                          !activity.validation.isValid &&
-                          activity.validation.cell === "activity" &&
-                          activity.validation.description
+                          (!activity.validation.isValid &&
+                            activity.validation.cell === "activity" &&
+                            activity.validation.description) ||
+                          "Copied"
                         }
                         disabled={activity.validation.isValid || activity.validation.cell !== "activity"}
                       >
@@ -341,7 +342,7 @@ const CompactViewTable = () => {
                   </div>
                 </td>
                 <td className="relative text-sm font-medium text-right whitespace-nowrap">
-                  {!activity.isBreak && (
+                  {!activity.calendarId && (
                     <button
                       className="group pt-4 px-1"
                       title="Delete"
@@ -391,9 +392,10 @@ const CompactViewTable = () => {
                     <Tooltip
                       isClickable={activity.validation.isValid}
                       tooltipText={
-                        !activity.validation.isValid &&
-                        activity.validation.cell === "duration" &&
-                        activity.validation.description
+                        (!activity.validation.isValid &&
+                          activity.validation.cell === "duration" &&
+                          activity.validation.description) ||
+                        "Copied"
                       }
                       disabled={activity.validation.isValid || activity.validation.cell !== "duration"}
                     >
@@ -422,9 +424,10 @@ const CompactViewTable = () => {
                     <Tooltip
                       isClickable={activity.validation.isValid}
                       tooltipText={
-                        !activity.validation.isValid &&
-                        activity.validation.cell === "description" &&
-                        activity.validation.description
+                        (!activity.validation.isValid &&
+                          activity.validation.cell === "description" &&
+                          activity.validation.description) ||
+                        "Copied"
                       }
                       disabled={activity.validation.isValid || activity.validation.cell !== "description"}
                     >
@@ -440,7 +443,7 @@ const CompactViewTable = () => {
                       {activity.mistakes && (
                         <p
                           onClick={copyToClipboardHandle}
-                          className="w-fit old-break-word py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-gray-400 dark:bg-transparent dark:border-2 dark:border-yellow-400/50"
+                          className="w-fit old-break-word ml-1 py-1 px-2 -mx-2 rounded-2xl font-medium bg-yellow-100 text-yellow-800 dark:text-gray-400 dark:bg-transparent dark:border-2 dark:border-yellow-400/50"
                         >
                           {activity.mistakes}
                         </p>

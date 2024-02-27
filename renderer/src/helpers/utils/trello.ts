@@ -1,4 +1,5 @@
-import { LOCAL_STORAGE_VARIABLES, TRACK_CONNECTIONS } from "../contstants";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS } from "../contstants";
 import { replaceHyphensWithSpaces } from "./utils";
 import { trackConnections } from "./utils";
 
@@ -14,11 +15,11 @@ export const getAllTrelloCardsFromApi = async () => {
 
   if (!user) return [[], []];
 
-  trackConnections(TRACK_CONNECTIONS.TRELLO);
+  trackConnections(TRACK_ANALYTICS.TRELLO);
 
   try {
     const { assignedCards, notAssignedCards } = await global.ipcRenderer.invoke(
-      "trello:get-cards-of-all-boards",
+      IPC_MAIN_CHANNELS.TRELLO_GET_CARDS_OF_ALL_BOARDS,
       user.userId,
       user.accessToken,
     );

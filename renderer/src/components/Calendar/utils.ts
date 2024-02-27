@@ -1,13 +1,12 @@
-import { extractDatesFromPeriod, isTheSameDates } from "@/helpers/utils/datetime-ui";
-import { DayOff, ApiDayOff, TTUserInfo } from "./types";
-
-type VacationSickDaysData = {
-  periods: ApiDayOff[];
-};
+import { extractDatesFromPeriod, getWeekNumber, isTheSameDates } from "@/helpers/utils/datetime-ui";
+import { DayOff, ApiDayOff, TTUserInfo, ParsedReport, VacationSickDaysData } from "./types";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { ReportActivity, parseReport, validation } from "@/helpers/utils/reports";
 
 export const loadHolidaysAndVacations = async (calendarDate: Date) => {
   try {
-    const timetrackerUserInfo: TTUserInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+    const timetrackerUserInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
     if (!timetrackerUserInfo) return;
 
@@ -18,7 +17,7 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
     let prevYearVacationsPromise: Promise<VacationSickDaysData> | undefined;
 
     const vacationsPromise: Promise<VacationSickDaysData> = global.ipcRenderer.invoke(
-      "timetracker:get-vacations",
+      IPC_MAIN_CHANNELS.TIMETRACKER_GET_VACATIONS,
       plannerToken,
       userEmail,
       calendarDate,
@@ -30,7 +29,7 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
       const nextYear = new Date(currentDate.setFullYear(currentDate.getFullYear() + 1));
 
       nextYearVacationsPromise = global.ipcRenderer.invoke(
-        "timetracker:get-vacations",
+        IPC_MAIN_CHANNELS.TIMETRACKER_GET_VACATIONS,
         plannerToken,
         userEmail,
         nextYear,
@@ -43,7 +42,7 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
       const prevYear = new Date(currentDate.setFullYear(currentDate.getFullYear() - 1));
 
       prevYearVacationsPromise = global.ipcRenderer.invoke(
-        "timetracker:get-vacations",
+        IPC_MAIN_CHANNELS.TIMETRACKER_GET_VACATIONS,
         plannerToken,
         userEmail,
         prevYear,
@@ -51,6 +50,7 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
     }
 
     userPromises.push(vacationsPromise);
+
     if (nextYearVacationsPromise) userPromises.push(nextYearVacationsPromise);
     if (prevYearVacationsPromise) userPromises.push(prevYearVacationsPromise);
 
@@ -59,21 +59,24 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
     if (userFetchedData.includes("invalid_token")) {
       const refreshToken = timetrackerUserInfo?.plannerRefreshToken;
 
-      const refreshedPlannerCreds = await global.ipcRenderer.invoke("timetracker:refresh-planner-token", refreshToken);
+      const refreshedPlannerCreds = await global.ipcRenderer.invoke(
+        IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_PLANNER_TOKEN,
+        refreshToken,
+      );
 
       const refreshedUserInfo = {
         ...timetrackerUserInfo,
         plannerAccessToken: refreshedPlannerCreds?.access_token,
       };
 
-      localStorage.setItem("timetracker-user", JSON.stringify(refreshedUserInfo));
+      localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(refreshedUserInfo));
 
       return await loadHolidaysAndVacations(calendarDate);
     }
 
     const vacationsAndSickdays: ApiDayOff[] = [];
 
-    userFetchedData.forEach((data) => data.periods.forEach((period) => vacationsAndSickdays.push(period)));
+    userFetchedData.forEach((data) => data.periods.forEach((period: ApiDayOff) => vacationsAndSickdays.push(period)));
 
     const userDaysOff: DayOff[] = [];
 
@@ -106,4 +109,21 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
   } catch (error) {
     console.log(error);
   }
+};
+
+export const getFormattedReports = (reports: ParsedReport[]) => {
+  return reports.map((report) => {
+    const { reportDate, data } = report;
+    const activities: ReportActivity[] = validation(
+      (parseReport(data)[0] || []).filter((activity: ReportActivity) => !activity.isBreak),
+    );
+    const workDurationMs = activities.reduce((acc, { duration }) => acc + (duration || 0), 0);
+
+    return {
+      date: reportDate,
+      week: getWeekNumber(reportDate),
+      workDurationMs: workDurationMs,
+      isValid: activities.every((report: ReportActivity) => report.validation.isValid),
+    };
+  });
 };
