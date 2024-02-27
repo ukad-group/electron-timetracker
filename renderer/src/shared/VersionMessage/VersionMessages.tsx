@@ -2,16 +2,16 @@ import { useEffect, useState } from "react";
 import { CheckIcon, ExclamationCircleIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { UpdateInfo } from "electron-updater";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+// import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 
 const VersionMessage = () => {
   const [isUpdate, setIsUpdate] = useState(false);
   const [isDownload, setIsDownload] = useState(false);
   const [version, setVersion] = useState("");
-  const storedVersionData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.VERSION_DATA)) || {
-    version: "",
-    showMessage: true,
-  };
+  const storedVersionDataString = localStorage.getItem("version-data");
+  const storedVersionData = storedVersionDataString
+    ? JSON.parse(storedVersionDataString)
+    : { version: "", showMessage: true };
   const [showMessage, setShowMessage] = useState(storedVersionData.showMessage);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const VersionMessage = () => {
       storedVersionData.version = version;
       storedVersionData.showMessage = true;
 
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.VERSION_DATA, JSON.stringify(storedVersionData));
+      localStorage.setItem("version-data", JSON.stringify(storedVersionData));
     }
 
     setShowMessage(storedVersionData.showMessage);
@@ -62,7 +62,7 @@ const VersionMessage = () => {
 
   const handleCloseBtnClick = () => {
     storedVersionData.showMessage = false;
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.VERSION_DATA, JSON.stringify(storedVersionData));
+    localStorage.setItem("version-data", JSON.stringify(storedVersionData));
 
     setShowMessage(storedVersionData.showMessage);
   };

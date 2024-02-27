@@ -39,6 +39,7 @@ const TimeBadge = ({ hours, startTime, selectedDate }: TimeBadgeProps) => {
       </span>
     );
   }
+
   if (
     (hours + dayOffDuration < EIGHT_HOURS && selectedDate.toLocaleDateString() !== curDate.toLocaleDateString()) ||
     (hours + dayOffDuration < EIGHT_HOURS && curTime - stringToMinutes(startTime) > EIGHT_HOURS_IN_MINUTES)
@@ -52,6 +53,8 @@ const TimeBadge = ({ hours, startTime, selectedDate }: TimeBadgeProps) => {
       </span>
     );
   }
+
+  return null;
 };
 
 export default TimeBadge;

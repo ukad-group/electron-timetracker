@@ -2,7 +2,7 @@ import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
 import { CheckIcon } from "@heroicons/react/24/solid";
 
-const SuggestionsList = ({ list }) =>
+const SuggestionsList = ({ list }: { list: string[] }) =>
   list.map((item, i) => (
     <Combobox.Option
       key={i}

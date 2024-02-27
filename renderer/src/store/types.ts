@@ -60,7 +60,7 @@ export type UpdateStore = {
 };
 
 export type TutorialProgress = {
-  [key: string]: boolean[];
+  [key: string]: (boolean | null)[];
 };
 export type TutorialProgressStore = {
   progress: TutorialProgress;

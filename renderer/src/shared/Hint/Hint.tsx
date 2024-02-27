@@ -1,13 +1,13 @@
 import clsx from "clsx";
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-
 import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { positioning } from "./positioning";
 import { HintProps } from "./types";
+import { TutorialProgressStore } from "@/store/types";
 
 function Hint({
   ignoreSkip = false,
@@ -53,10 +53,11 @@ function Hint({
     window.addEventListener("resize", handleResize);
 
     if (order > 1 && progress[groupName] === undefined) {
-      const tempArr = [null];
+      const tempArr: (boolean | null)[] = [null];
       for (let i = 1; i < order; i++) {
         tempArr[i] = true;
       }
+
       progress[groupName] = tempArr;
       setProgress(progress);
       learnHint();
@@ -66,8 +67,8 @@ function Hint({
       learnHint();
     }
 
-    const unsubscribe = useTutorialProgressStore.subscribe((newProgress) => {
-      newProgress[groupName]?.length ? setGroupSize(newProgress[groupName]?.length) : null;
+    const unsubscribe = useTutorialProgressStore.subscribe((newProgress: TutorialProgressStore) => {
+      newProgress.progress[groupName]?.length ? setGroupSize(newProgress.progress[groupName]?.length) : null;
 
       if (
         (!newProgress.progress.hasOwnProperty(groupName) &&

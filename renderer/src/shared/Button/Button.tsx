@@ -1,3 +1,4 @@
+import React from "react";
 import { Loader } from "../Loader";
 import { ButtonProps } from "./types";
 import {
@@ -34,6 +35,10 @@ const Button = ({ callback, text, disabled, status, type = "button", tabIndex, c
     cancel: {
       text: "Cancel",
       classes: "bg-white text-gray-700 border-gray-300 dark:bg-gray-200 " + cancelHoverStyles,
+    },
+    default: {
+      text,
+      classes: "",
     },
   };
 

@@ -1,4 +1,4 @@
-import { FormEvent, useState, useRef, ChangeEvent, useEffect } from "react";
+import { KeyboardEventHandler, useState, useRef, ChangeEvent, useEffect } from "react";
 import { ChevronUpDownIcon } from "@heroicons/react/24/solid";
 import { Combobox } from "@headlessui/react";
 import clsx from "clsx";
@@ -27,7 +27,7 @@ const AutocompleteSelector = ({
 }: AutocompleteProps) => {
   const [isNew, setIsNew] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const allItems = useMemo(() => {
     return additionalItems ? availableItems?.concat(additionalItems) : availableItems;
   }, [availableItems, additionalItems]);
@@ -42,19 +42,25 @@ const AutocompleteSelector = ({
     return selectedItem.trim() === "" ? filteredList : [selectedItem, ...filteredList];
   }, [selectedItem, filteredList]);
 
-  const handleKey = (e) => {
-    if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.key === KEY_CODES.HOME) {
+  const handleKey: KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.key === "Home") {
       e.preventDefault();
-      inputRef.current.selectionStart = 0;
-      inputRef.current.selectionEnd = 0;
+
+      if (inputRef.current) {
+        inputRef.current.selectionStart = 0;
+        inputRef.current.selectionEnd = 0;
+      }
     }
 
     if (!e.ctrlKey && !e.shiftKey && !e.metaKey && e.key === KEY_CODES.END) {
       e.preventDefault();
       const input = inputRef.current;
-      const length = input.value.length;
-      input.selectionStart = length;
-      input.selectionEnd = length;
+
+      if (input) {
+        const length = input.value.length;
+        input.selectionStart = length;
+        input.selectionEnd = length;
+      }
     }
 
     if (e.ctrlKey && e.key === KEY_CODES.ENTER) {
@@ -99,7 +105,7 @@ const AutocompleteSelector = ({
     handleOnChange(e.target.value);
 
     if (isNewCheck && allItems) {
-      setIsNew(selectedItem && !allItems.includes(selectedItem));
+      setIsNew(!!selectedItem && !allItems.includes(selectedItem));
     }
   };
 
@@ -108,7 +114,7 @@ const AutocompleteSelector = ({
       setIsNew(false);
     }
 
-    if (cursorPosition) {
+    if (cursorPosition && inputRef.current) {
       inputRef.current.setSelectionRange(cursorPosition, cursorPosition);
     }
     setCursorPosition(0);
@@ -132,7 +138,7 @@ const AutocompleteSelector = ({
       </Combobox.Label>
       <div className="relative mt-1">
         <Combobox.Input
-          onKeyDown={(event) => handleKey(event)}
+          onKeyDown={handleKey}
           ref={inputRef}
           value={selectedItem}
           required={required}
@@ -155,7 +161,7 @@ const AutocompleteSelector = ({
         {fullSuggestionsList?.length > 0 && (
           <Combobox.Options className="absolute z-10 w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-40 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm dark:bg-dark-container dark:shadow-lg dark:shadow-slate-900">
             <div className="block text-xs text-gray-500 text-center">tab to choose</div>
-            <SuggestionsList list={fullSuggestionsList} />
+            {/*<SuggestionsList list={fullSuggestionsList} />*/}
           </Combobox.Options>
         )}
       </div>

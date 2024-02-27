@@ -20,7 +20,7 @@ export const positioning = (
   TriangleRef: MutableRefObject<any>,
   setShowHint: Dispatch<SetStateAction<boolean>>,
 ): void => {
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     if (
       (e.ctrlKey && e.key === KEY_CODES.ARROW_UP) ||
       (e.key === KEY_CODES.META && e.key === KEY_CODES.ARROW_UP) ||
