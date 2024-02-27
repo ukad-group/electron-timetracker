@@ -56,9 +56,12 @@ export type VacationSickDaysData = {
 
 export type FullCalendarWrapperProps = {
   children: ReactElement;
+  calendarDate: Date;
   selectedDate: Date;
   setSelectedDate: Dispatch<SetStateAction<Date>>;
   daysOff: DayOff[];
   formattedQuarterReports: FormattedReport[];
   weekNumberRef: MutableRefObject<any>;
 };
+
+export type daysOffAccumulatorType = { numberedDays: string[]; hours: number };

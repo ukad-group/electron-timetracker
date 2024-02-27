@@ -308,6 +308,7 @@ export const Calendar = ({
       <FullCalendarWrapper
         setSelectedDate={setSelectedDate}
         selectedDate={selectedDate}
+        calendarDate={calendarDate}
         formattedQuarterReports={formattedQuarterReports}
         weekNumberRef={weekNumberRef}
         daysOff={daysOff}
