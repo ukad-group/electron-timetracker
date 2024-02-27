@@ -21,8 +21,8 @@ const MainViewTable = () => {
     firstKey,
     secondKey,
     copyToClipboardHandle,
-    copyActivityHandler,
-    editActivityHandler,
+    handleCopyActivity,
+    handleEditActivity,
     onDeleteActivity,
     isLoading,
   } = useContext(ActivitiesTableContext);
@@ -123,7 +123,7 @@ const MainViewTable = () => {
         existingConditions: [true, false],
       },
     ]);
-    editActivityHandler(activity);
+    handleEditActivity(activity);
   };
 
   const handleCopyClick = (activity) => {
@@ -134,7 +134,7 @@ const MainViewTable = () => {
         existingConditions: [false, false],
       },
     ]);
-    copyActivityHandler(activity);
+    handleCopyActivity(activity);
   };
 
   return (

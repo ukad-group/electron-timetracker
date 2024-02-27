@@ -18,7 +18,7 @@ export const getDates = (period, selectedDate) => {
 };
 
 const getParsedActivities = async (day: Date, reportsFolder) => {
-  const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.READ_DAY_REPORT, reportsFolder, day);
+  const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_READ_DAY_REPORT, reportsFolder, day);
 
   const parsedReportsAndNotes = parseReport(dayReport);
 

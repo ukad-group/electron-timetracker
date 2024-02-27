@@ -37,7 +37,7 @@ export default function Home() {
     try {
       (async () => {
         const sortedActAndDesc = await global.ipcRenderer.invoke(
-          "app:find-latest-projects",
+          IPC_MAIN_CHANNELS.APP_FIND_LATEST_PROJECTS,
           reportsFolder,
           selectedDate,
         );
@@ -91,7 +91,7 @@ export default function Home() {
     }
   };
 
-  const closeModalHandler = () => {
+  const handleCloseModal = () => {
     setTrackTimeModalActivity(null);
     setFocusOnNewActivityBtn();
   };
@@ -120,7 +120,7 @@ export default function Home() {
           editedActivity={trackTimeModalActivity}
           latestProjAndAct={latestProjAndAct}
           latestProjAndDesc={latestProjAndDesc}
-          close={closeModalHandler}
+          close={handleCloseModal}
           submitActivity={submitActivity}
           selectedDate={selectedDate}
         />

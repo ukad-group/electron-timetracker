@@ -1,7 +1,7 @@
 import React from "react";
 import { RenderError } from "./types";
 
-function ErrorPlaceholder({ errorTitle, errorMessage }: RenderError) {
+const ErrorPlaceholder = ({ errorTitle, errorMessage }: RenderError) => {
   return (
     <div className="py-16 text-center bg-white lg:col-start-1 lg:col-span-3 sm:rounded-lg h-full dark:bg-dark-container dark:border dark:border-dark-border">
       <svg
@@ -20,6 +20,6 @@ function ErrorPlaceholder({ errorTitle, errorMessage }: RenderError) {
       <p className="mt-1 px-48 text-sm text-gray-500 dark:text-dark-main">{errorMessage}</p>
     </div>
   );
-}
+};
 
 export default ErrorPlaceholder;

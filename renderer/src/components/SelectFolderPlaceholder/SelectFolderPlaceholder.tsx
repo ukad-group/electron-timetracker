@@ -5,10 +5,7 @@ import { useMainStore } from "@/store/mainStore";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const SelectFolderPlaceholder = () => {
-  const [reportsFolder, setReportsFolder] = useMainStore(
-    (state) => [state.reportsFolder, state.setReportsFolder],
-    shallow,
-  );
+  const [_, setReportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const handleButtonClick = () => {
     global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_SELECT_FOLDER).then((folder: string | null) => {
       if (folder) {

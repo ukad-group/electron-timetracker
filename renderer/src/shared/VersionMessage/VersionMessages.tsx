@@ -2,26 +2,30 @@ import { useEffect, useState } from "react";
 import { CheckIcon, ExclamationCircleIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { UpdateInfo } from "electron-updater";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 
-export default function VersionMessage() {
+const VersionMessage = () => {
   const [isUpdate, setIsUpdate] = useState(false);
   const [isDownload, setIsDownload] = useState(false);
   const [version, setVersion] = useState("");
-  const storedVersionData = JSON.parse(localStorage.getItem("version-data")) || { version: "", showMessage: true };
+  const storedVersionData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.VERSION_DATA)) || {
+    version: "",
+    showMessage: true,
+  };
   const [showMessage, setShowMessage] = useState(storedVersionData.showMessage);
 
   useEffect(() => {
-    global.ipcRenderer.on("update-available", (_, data: boolean, info: UpdateInfo) => {
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.UPDATE_AVAILABLE, (_, data: boolean, info: UpdateInfo) => {
       setIsUpdate(data);
       setVersion(info.version);
     });
-    global.ipcRenderer.on("downloaded", (_, data: boolean, info: UpdateInfo) => {
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.DOWNLOADED, (_, data: boolean, info: UpdateInfo) => {
       setIsDownload(data);
       setVersion(info.version);
     });
 
     (async () => {
-      const [updateStatus, currentVersion] = await global.ipcRenderer.invoke("app:update-status");
+      const [updateStatus, currentVersion] = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_UPDATE_STATUS);
 
       setVersion(currentVersion);
 
@@ -36,8 +40,8 @@ export default function VersionMessage() {
     })();
 
     return () => {
-      global.ipcRenderer.removeAllListeners("update-available");
-      global.ipcRenderer.removeAllListeners("downloaded");
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.UPDATE_AVAILABLE);
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.DOWNLOADED);
     };
   }, []);
 
@@ -46,7 +50,7 @@ export default function VersionMessage() {
       storedVersionData.version = version;
       storedVersionData.showMessage = true;
 
-      localStorage.setItem("version-data", JSON.stringify(storedVersionData));
+      localStorage.setItem(LOCAL_STORAGE_VARIABLES.VERSION_DATA, JSON.stringify(storedVersionData));
     }
 
     setShowMessage(storedVersionData.showMessage);
@@ -56,9 +60,9 @@ export default function VersionMessage() {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.INSTALL_VERSION);
   };
 
-  const closeBtnHandler = () => {
+  const handleCloseBtnClick = () => {
     storedVersionData.showMessage = false;
-    localStorage.setItem("version-data", JSON.stringify(storedVersionData));
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.VERSION_DATA, JSON.stringify(storedVersionData));
 
     setShowMessage(storedVersionData.showMessage);
   };
@@ -86,11 +90,13 @@ export default function VersionMessage() {
             </button>
             <XMarkIcon
               className="w-6 h-6 fill-green-800 dark:fill-green-400/70 absolute right-1 top-1 cursor-pointer"
-              onClick={closeBtnHandler}
+              onClick={handleCloseBtnClick}
             />
           </span>
         )}
       </div>
     </div>
   );
-}
+};
+
+export default VersionMessage;

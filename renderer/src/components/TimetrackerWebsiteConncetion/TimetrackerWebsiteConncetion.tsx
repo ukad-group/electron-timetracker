@@ -10,7 +10,9 @@ import isOnline from "is-online";
 
 const TimetrackerWebsiteConnection = () => {
   const router = useRouter();
-  const [loggedUser, setLoggedUser] = useState(JSON.parse(localStorage.getItem("timetracker-user")));
+  const [loggedUser, setLoggedUser] = useState(
+    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)),
+  );
   const [loading, setLoading] = useState(false);
 
   const handleSignInButton = async () => {
@@ -19,12 +21,12 @@ const TimetrackerWebsiteConnection = () => {
     if (online) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.OPEN_CHILD_WINDOW, "timetracker-website");
     } else {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.LOAD_OFFLINE_PAGE);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.APP_LOAD_OFFLINE_PAGE);
     }
   };
 
   const handleSignOutButton = () => {
-    localStorage.removeItem("timetracker-user");
+    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER);
     setLoggedUser(null);
   };
 
@@ -40,11 +42,17 @@ const TimetrackerWebsiteConnection = () => {
     const userPromises = [];
 
     try {
-      const userCreds = await global.ipcRenderer.invoke("timetracker:get-user-info-token", authorizationCode);
+      const userCreds = await global.ipcRenderer.invoke(
+        IPC_MAIN_CHANNELS.TIMETRACKER_GET_USER_INFO_TOKEN,
+        authorizationCode,
+      );
 
-      const profilePromise = global.ipcRenderer.invoke("office365:get-profile-info", userCreds.access_token);
+      const profilePromise = global.ipcRenderer.invoke(
+        IPC_MAIN_CHANNELS.OFFICE365_GET_PROFILE_INFO,
+        userCreds.access_token,
+      );
 
-      const TTCookiePromise = global.ipcRenderer.invoke("timetracker:login", userCreds?.id_token);
+      const TTCookiePromise = global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.TIMETRACKER_LOGIN, userCreds?.id_token);
 
       userPromises.push(profilePromise, TTCookiePromise);
 
@@ -60,9 +68,9 @@ const TimetrackerWebsiteConnection = () => {
         TTCookie: timetrackerCookie,
       };
 
-      localStorage.setItem("timetracker-user", JSON.stringify(timetrackerUserInfo));
+      localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(timetrackerUserInfo));
 
-      global.ipcRenderer.send("azure:login-additional");
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.AZURE_LOGIN_ADDITIONAL);
     } catch (error) {
       console.log(error);
       alert(error);
@@ -80,26 +88,39 @@ const TimetrackerWebsiteConnection = () => {
     const userPromises = [];
 
     try {
-      const plannerCreds = await global.ipcRenderer.invoke("timetracker:get-planner-token", authorizationCode);
+      const plannerCreds = await global.ipcRenderer.invoke(
+        IPC_MAIN_CHANNELS.TIMETRACKER_GET_PLANNER_TOKEN,
+        authorizationCode,
+      );
 
-      const userInfo: TTUserInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+      const userInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
       userInfo.plannerAccessToken = plannerCreds?.access_token;
       userInfo.plannerRefreshToken = plannerCreds?.refresh_token;
 
-      const holidaysPromise = global.ipcRenderer.invoke("timetracker:get-holidays", plannerCreds?.access_token);
+      const holidaysPromise = global.ipcRenderer.invoke(
+        IPC_MAIN_CHANNELS.TIMETRACKER_GET_HOLIDAYS,
+        plannerCreds?.access_token,
+      );
 
       const userEmail = userInfo.email;
       const vacationsPromise = global.ipcRenderer.invoke(
-        "timetracker:get-vacations",
+        IPC_MAIN_CHANNELS.TIMETRACKER_GET_VACATIONS,
         plannerCreds?.access_token,
         userEmail,
       );
 
       const timetrackerCookie = userInfo.TTCookie;
-      const timtrackerProjectsPromise = global.ipcRenderer.invoke("timetracker:get-projects", timetrackerCookie);
+      const timtrackerProjectsPromise = global.ipcRenderer.invoke(
+        IPC_MAIN_CHANNELS.TIMETRACKER_GET_PROJECTS,
+        timetrackerCookie,
+      );
 
       const userName = userInfo.name;
-      const bookingsPromise = global.ipcRenderer.invoke("timetracker:get-bookings", timetrackerCookie, userName);
+      const bookingsPromise = global.ipcRenderer.invoke(
+        IPC_MAIN_CHANNELS.TIMETRACKER_GET_BOOKINGS,
+        timetrackerCookie,
+        userName,
+      );
 
       userPromises.push(holidaysPromise, vacationsPromise, timtrackerProjectsPromise, bookingsPromise);
 
@@ -110,7 +131,7 @@ const TimetrackerWebsiteConnection = () => {
       userInfo.yearProjects = userFetchedData[2];
       userInfo.monthBookings = userFetchedData[3];
 
-      localStorage.setItem("timetracker-user", JSON.stringify(userInfo));
+      localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(userInfo));
 
       setLoggedUser(userInfo);
       setLoading(false);

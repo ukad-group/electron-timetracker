@@ -16,7 +16,11 @@ const Placeholder = ({ onEditActivity, backgroundError, selectedDate, setSelecte
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
 
   const copyLastReport = async () => {
-    const prevDayReport = await global.ipcRenderer.invoke("app:find-last-report", reportsFolder, selectedDate);
+    const prevDayReport = await global.ipcRenderer.invoke(
+      IPC_MAIN_CHANNELS.APP_FIND_LAST_REPORT,
+      reportsFolder,
+      selectedDate,
+    );
 
     if (prevDayReport) {
       global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_WRITE_DAY_REPORT, reportsFolder, selectedDate, prevDayReport);

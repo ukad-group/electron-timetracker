@@ -1,3 +1,4 @@
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS } from "../contstants";
 import { Office365User } from "./office365";
 import { trackConnections } from "./utils";
@@ -15,7 +16,7 @@ interface JiraResourceData {
 }
 
 export const updateJiraAccessToken = async (refreshToken: string) => {
-  return await global.ipcRenderer.invoke("jira:refresh-access-token", refreshToken);
+  return await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.JIRA_REFRESH_ACCESS_TOKEN, refreshToken);
 };
 
 export const removeJiraStoredUser = (userId: string) => {
@@ -77,7 +78,7 @@ export const getJiraResources = async () => {
 };
 
 export const getJiraResourcesByUser = async (accessToken: string, refreshToken: string, userId: string) => {
-  const resources = await global.ipcRenderer.invoke("jira:get-resources", accessToken);
+  const resources = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.JIRA_GET_RESOURCES, accessToken);
 
   if (resources?.code === 401) {
     const data = await updateJiraAccessToken(refreshToken);
@@ -138,7 +139,7 @@ export const getAllJiraCards = async (resourcesData: JiraResourceData[]) => {
 };
 
 export const getJiraCardsByResourceId = async (resourceId: string, accessToken: string, assignee: string) => {
-  const cards = await global.ipcRenderer.invoke("jira:get-issues", accessToken, resourceId, assignee);
+  const cards = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.JIRA_GET_ISSUES, accessToken, resourceId, assignee);
 
   if (cards) return cards;
 

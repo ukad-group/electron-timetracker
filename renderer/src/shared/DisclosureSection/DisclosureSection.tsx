@@ -4,7 +4,7 @@ import { Disclosure } from "@headlessui/react";
 import React from "react";
 import { DisclosureSectionProps } from "./types";
 
-export default function DisclosureSection(props: DisclosureSectionProps) {
+const DisclosureSection = (props: DisclosureSectionProps) => {
   return (
     <div className="w-full">
       <Disclosure>
@@ -38,4 +38,6 @@ export default function DisclosureSection(props: DisclosureSectionProps) {
       </Disclosure>
     </div>
   );
-}
+};
+
+export default DisclosureSection;

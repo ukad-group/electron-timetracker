@@ -37,6 +37,7 @@ export const LOCAL_STORAGE_VARIABLES = {
   TRELLO_USER: "trello-user",
   TRELLO_AUTH_TOKEN: "trello-auth-token",
   IS_MANUAL_INPUT_MAIN: "is-manual-input-main-section",
+  VERSION_DATA: "version-data",
   // ...Add more local storage variables as needed
 };
 
@@ -55,6 +56,8 @@ export const KEY_CODES = {
   KEY_S: "KeyS",
   KEY_Y: "KeyY",
   KEY_Z: "KeyZ",
+  HOME: "Home",
+  END: "End",
   // ...Add more key codes as needed
 };
 

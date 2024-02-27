@@ -31,7 +31,7 @@ export function parseEventTitle(event, latestProjAndAct: Record<string, [string]
   const items = eventTitle ? eventTitle.trim().split(" - ") : "";
   const words = eventTitle ? eventTitle.trim().split(" ") : "";
   let allProjects: Array<string> = Object.keys(latestProjAndAct);
-  const userInfo = JSON.parse(localStorage.getItem("timetracker-user"));
+  const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
   if (userInfo && userInfo.yearProjects) {
     allProjects = Object.keys(latestProjAndAct).concat(userInfo.yearProjects);

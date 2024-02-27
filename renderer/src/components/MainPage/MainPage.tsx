@@ -117,7 +117,11 @@ const MainPage = ({
   }, [selectedDate, reportsFolder]);
 
   const readDayReport = async () => {
-    const dayReport = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.READ_DAY_REPORT, reportsFolder, selectedDate);
+    const dayReport = await global.ipcRenderer.invoke(
+      IPC_MAIN_CHANNELS.APP_READ_DAY_REPORT,
+      reportsFolder,
+      selectedDate,
+    );
 
     setSelectedDateReport(dayReport || "");
   };
