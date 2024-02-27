@@ -15,3 +15,10 @@ export type AutocompleteProps = {
   showedSuggestionsNumber: number;
   spellCheck?: boolean;
 };
+
+export interface FilterListOptions {
+  selectedItem: string;
+  availableItems: string[];
+  additionalItems?: string[];
+  showedSuggestionsNumber?: number;
+}
