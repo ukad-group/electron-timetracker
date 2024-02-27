@@ -7,6 +7,7 @@ const DropboxIcon = () => (
     id="Layer_1"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="-271 282 256 238"
+    data-testid="dropbox-icon-test-id"
   >
     <g>
       <polygon points="-271,414.5 -195.7,463.6 -143,419.7 -218.9,372.8 	" />
