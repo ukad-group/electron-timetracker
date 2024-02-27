@@ -5,6 +5,7 @@ import { ButtonTransparent } from "@/shared/ButtonTransparent";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { SidebarNavItem, SETTING_SECTIONS } from "@/helpers/contstants";
 import { closeWindowIfNeeded } from "@/helpers/utils/utils";
+import useColorTheme from "@/helpers/hooks/useTheme";
 
 const SettingsPageContent = () => {
   const [currentMenuItem, setCurrentMenuItem] = useState<SidebarNavItem>(SidebarNavItem.Connections);
@@ -22,6 +23,8 @@ const SettingsPageContent = () => {
         </MenuItem>
       </li>
     ));
+
+  useColorTheme();
 
   return (
     <div className="w-full overflow-hidden h-screen bg-gray-100 dark:bg-dark-back">
