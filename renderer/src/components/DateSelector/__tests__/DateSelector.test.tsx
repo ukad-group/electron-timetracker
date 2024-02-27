@@ -70,7 +70,7 @@ describe("GIVEN DateSelector", () => {
     expect(queryByTestId("dropbox-icon-test-id")).not.toBeInTheDocument();
   });
 
-  it.only("renders buttons that changing day, handlers are called", async () => {
+  it("renders buttons that changing day, handlers are called", async () => {
     render(<DateSelector {...mockProps} />);
     const prevButton = screen.getByTestId("prev-button-test-id");
     const nextButton = screen.getByTestId("next-button-test-id");
