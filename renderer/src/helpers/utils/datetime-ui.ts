@@ -31,13 +31,16 @@ export function isTheSameDates(date1: Date, date2: Date): boolean {
 
   return firstDate.setHours(0, 0, 0, 0) === socondDate.setHours(0, 0, 0, 0);
 }
+function isLeapYear(year: number) {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
 
 export function getWeekNumber(dateString: string) {
   const dateObj = getDateFromString(dateString);
   const startOfYear = new Date(dateObj.getFullYear(), 0, 1);
   const days = Math.floor((dateObj.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000));
   const year = dateObj.getFullYear();
-  const leapYearDay = year === 2020 || year === 2024 || year === 2028 || year === 2032 ? 0 : 1;
+  const leapYearDay = isLeapYear(year) ? 0 : 1;
 
   return Math.ceil((days + startOfYear.getDay() + leapYearDay) / 7);
 }

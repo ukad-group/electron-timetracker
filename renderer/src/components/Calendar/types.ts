@@ -63,3 +63,5 @@ export type FullCalendarWrapperProps = {
   formattedQuarterReports: FormattedReport[];
   weekNumberRef: MutableRefObject<any>;
 };
+
+export type daysOffAccumulatorType = { numberedDays: string[]; hours: number };

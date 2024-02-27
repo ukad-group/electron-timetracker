@@ -4,9 +4,7 @@ import { formatDuration } from "@/helpers/utils/reports";
 import { DatePointApi, DayCellContentArg, EventContentArg, WeekNumberContentArg } from "@fullcalendar/core";
 import { CalendarDaysIcon, FaceFrownIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import { ExclamationCircleIcon } from "@heroicons/react/24/solid";
-import { DayOff, FormattedReport, FullCalendarWrapperProps } from "./types";
-
-type daysOffAccumulatorType = { numberedDays: string[]; hours: number };
+import { DayOff, FormattedReport, FullCalendarWrapperProps, daysOffAccumulatorType } from "./types";
 
 const FullCalendarWrapper = ({
   children,
