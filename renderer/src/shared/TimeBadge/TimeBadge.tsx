@@ -14,7 +14,7 @@ const TimeBadge = ({ hours, startTime, selectedDate }: TimeBadgeProps) => {
     setDayOffDuration(0);
     (async () => {
       const daysOff = await loadHolidaysAndVacations(selectedDate);
-      daysOff.forEach((day: DayOff) => {
+      daysOff?.forEach((day: DayOff) => {
         if (
           day.date.getDate() === selectedDate.getDate() &&
           day.date.getMonth() === selectedDate.getMonth() &&
