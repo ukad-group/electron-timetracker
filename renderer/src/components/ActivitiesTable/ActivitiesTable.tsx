@@ -15,7 +15,6 @@ import { TRACK_ANALYTICS } from "@/helpers/contstants";
 const ActivitiesTable = ({
   activities,
   onEditActivity,
-  onDeleteActivity,
   selectedDate,
   latestProjAndAct,
   events,
@@ -200,7 +199,6 @@ const ActivitiesTable = ({
       ctrlPressed,
       copyToClipboardHandle,
       onEditActivity,
-      onDeleteActivity,
       activities,
       firstKey,
       secondKey,
@@ -215,7 +213,6 @@ const ActivitiesTable = ({
       ctrlPressed,
       copyToClipboardHandle,
       onEditActivity,
-      onDeleteActivity,
       activities,
       firstKey,
       secondKey,
