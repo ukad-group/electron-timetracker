@@ -40,22 +40,24 @@ const FullCalendarWrapper = ({
   };
 
   const renderWeekNumberContent = (options: WeekNumberContentArg) => {
-    const daysOffWeekTotal = daysOff.reduce(
-      (acc: daysOffAccumulatorType, day: DayOff) => {
-        const dayOffStringDate = `${day.date.getFullYear()}${String(day.date.getMonth() + 1).padStart(2, "0")}${String(day.date.getDate()).padStart(2, "0")}`;
+    const daysOffWeekTotal = daysOff
+      ? daysOff.reduce(
+          (acc: daysOffAccumulatorType, day: DayOff) => {
+            const dayOffStringDate = `${day.date.getFullYear()}${String(day.date.getMonth() + 1).padStart(2, "0")}${String(day.date.getDate()).padStart(2, "0")}`;
 
-        if (
-          day.date.getFullYear() === calendarDate.getFullYear() &&
-          getWeekNumber(dayOffStringDate) === options.num &&
-          !acc.numberedDays.includes(dayOffStringDate)
-        ) {
-          acc.numberedDays.push(dayOffStringDate);
-          acc.hours += day.duration;
-        }
-        return acc;
-      },
-      { numberedDays: [], hours: 0 },
-    ).hours;
+            if (
+              day.date.getFullYear() === calendarDate.getFullYear() &&
+              getWeekNumber(dayOffStringDate) === options.num &&
+              !acc.numberedDays.includes(dayOffStringDate)
+            ) {
+              acc.numberedDays.push(dayOffStringDate);
+              acc.hours += day.duration;
+            }
+            return acc;
+          },
+          { numberedDays: [], hours: 0 },
+        ).hours
+      : 0;
 
     const weekTotalHours = formatDuration(
       formattedQuarterReports.reduce((acc: number, report: FormattedReport) => {
