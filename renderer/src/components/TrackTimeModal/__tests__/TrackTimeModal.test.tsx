@@ -12,6 +12,7 @@ const mockedActivities = [
     from: "09:00",
     project: "timetracker.e",
     to: "10:00",
+    validation: { isValid: true },
   },
   {
     id: 2,
@@ -21,6 +22,7 @@ const mockedActivities = [
     from: "10:00",
     project: "timetracker.e",
     to: "11:00",
+    validation: { isValid: true },
   },
   {
     id: 3,
@@ -30,6 +32,7 @@ const mockedActivities = [
     from: "11:00",
     project: "timetracker.e",
     to: "12:00",
+    validation: { isValid: true },
   },
 ];
 

@@ -3,10 +3,8 @@ import { useThemeStore } from "@/store/themeStore";
 import { shallow } from "zustand/shallow";
 
 const useTheme = () => {
-  const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
-
   const [theme, setTheme] = useThemeStore((state) => [state.theme, state.setTheme], shallow);
-
+  const [isOSDarkTheme, setIsOSDarkTheme] = useState(true);
   const handleThemeChange = (e) => (e.matches ? setIsOSDarkTheme(true) : setIsOSDarkTheme(false));
 
   useEffect(() => {
