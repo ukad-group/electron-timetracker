@@ -4,8 +4,10 @@ import { checkIsToday, getCeiledTime } from "@/helpers/utils/datetime-ui";
 import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "@/store/googleEventsStore";
 import { concatSortArrays } from "@/helpers/utils/utils";
+import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import { ActivitiesTableProps } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import { SCREENS } from "@/constants";
 import { ActivitiesTableContext } from "./context";
 import { MainView, CompactView } from "./components";
 import { getTotalDuration, formatEvents, getActualEvents } from "./utils";
@@ -28,6 +30,7 @@ const ActivitiesTable = ({
   const [firstKeyPressTime, setFirstKeyPressTime] = useState(null);
   const [timerId, setTimerId] = useState(null);
   const [scheduledEvents] = useScheduledEventsStore((state) => [state.event, state.setEvent], shallow);
+  const { screenSizes } = useScreenSizes();
 
   const totalDuration = useMemo(
     () => getTotalDuration(validatedActivities.filter((activity) => !activity.isBreak)),
@@ -223,7 +226,7 @@ const ActivitiesTable = ({
 
   return (
     <ActivitiesTableContext.Provider value={value}>
-      {showAsMain ? <MainView /> : <CompactView />}
+      {showAsMain || screenSizes.screenWidth < SCREENS.LG ? <MainView /> : <CompactView />}
     </ActivitiesTableContext.Provider>
   );
 };
