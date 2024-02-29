@@ -17,7 +17,6 @@ import { LOCAL_STORAGE_VARIABLES, KEY_CODES } from "@/helpers/contstants";
 const ActivitiesSection = ({
   onEditActivity,
   activities,
-  onDeleteActivity,
   selectedDate,
   latestProjAndAct,
   setSelectedDateReport,
@@ -153,7 +152,6 @@ const ActivitiesSection = ({
           <ActivitiesTable
             onEditActivity={onEditActivity}
             activities={activities}
-            onDeleteActivity={onDeleteActivity}
             selectedDate={selectedDate}
             latestProjAndAct={latestProjAndAct}
             events={events}
