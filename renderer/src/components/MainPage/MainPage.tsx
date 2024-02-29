@@ -7,6 +7,7 @@ import { Bookings } from "@/components/Bookings";
 import { ActivitiesSection } from "@/components/ActivitiesSection";
 import { SelectFolderPlaceholder } from "@/components/SelectFolderPlaceholder";
 import { UpdateDescription } from "@/components/UpdateDescription";
+import { SupportSection } from "../SupportSection";
 import { Hint } from "@/shared/Hint";
 import { useMainStore } from "@/store/mainStore";
 import { useBetaStore } from "@/store/betaUpdatesStore";
@@ -137,22 +138,6 @@ const MainPage = ({
     setSelectedDateReport(serializedReport);
   };
 
-  const onDeleteActivity = (id: number) => {
-    setSelectedDateActivities((activities) => {
-      const newActivities = activities.map((activity) => {
-        if (activity.id === id) {
-          activity.isBreak = true;
-          activity.description = "";
-          activity.activity = "";
-          activity.project = "!removed";
-        }
-        return activity;
-      });
-      return newActivities;
-    });
-    setShouldAutosave(true);
-  };
-
   const handleWindowFocus = () => {
     changeHintConditions(progress, setProgress, [
       {
@@ -214,7 +199,6 @@ const MainPage = ({
                 <ActivitiesSection
                   activities={selectedDateActivities}
                   onEditActivity={setTrackTimeModalActivity}
-                  onDeleteActivity={onDeleteActivity}
                   selectedDate={selectedDate}
                   latestProjAndAct={latestProjAndAct}
                   setSelectedDateReport={setSelectedDateReport}
@@ -253,7 +237,6 @@ const MainPage = ({
                 <ActivitiesSection
                   activities={selectedDateActivities}
                   onEditActivity={setTrackTimeModalActivity}
-                  onDeleteActivity={onDeleteActivity}
                   selectedDate={selectedDate}
                   latestProjAndAct={latestProjAndAct}
                   setSelectedDateReport={setSelectedDateReport}
@@ -307,6 +290,7 @@ const MainPage = ({
           <Cog8ToothIcon />
         </span>
       </Link>
+      <SupportSection />
     </div>
   );
 };

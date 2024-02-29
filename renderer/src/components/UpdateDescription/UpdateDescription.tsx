@@ -3,8 +3,6 @@ import { shallow } from "zustand/shallow";
 import { useUpdateStore } from "@/store/updateStore";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { DisclosureSection } from "@/shared/DisclosureSection";
-import { GlobeAltIcon } from "@heroicons/react/24/solid";
-import SlackIcon from "@/shared/SlackIcon/SlackIcon";
 import { Release } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { SCREENS } from "@/constants";
@@ -22,8 +20,6 @@ const UpdateDescription = () => {
   const [isOpen, setIsOpen] = useState(update?.age === "new");
   const { screenSizes } = useScreenSizes();
   const whatsNewRef = useRef(null);
-  const SLACK_DESTOP_LINK = "slack://channel?team=T3PV37ANP&id=C069N5LUP3M";
-  const SLACK_WEB_LINK = "https://app.slack.com/client/T3PV37ANP/C069N5LUP3M";
 
   useEffect(() => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.GET_CURRENT_VERSION);
@@ -90,10 +86,6 @@ const UpdateDescription = () => {
     return tempDiv.innerHTML;
   };
 
-  const handleSupportClick = (link: string) => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.REDIRECT, link);
-  };
-
   return (
     <DisclosureSection reference={whatsNewRef} toggleFunction={isOpenToggle} isOpen={isOpen} title="What's new?">
       {screenSizes.screenWidth >= SCREENS.LG && (
@@ -136,25 +128,6 @@ const UpdateDescription = () => {
         Current version {currentVersion} {!isUpdate && "(latest)"}
       </p>
 
-      <div className="flex flex-col my-5 gap-3 ">
-        <p className=" text-gray-700 font-semibold dark:text-dark-main">
-          You can leave your feedback or questions in our slack channel
-        </p>
-        <button
-          className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
-          onClick={() => handleSupportClick(SLACK_DESTOP_LINK)}
-        >
-          <SlackIcon />
-          Open in desktop Slack
-        </button>
-        <button
-          className="flex gap-2 text-blue-700 font-semibold hover:text-blue-800 dark:text-blue-700/70 dark:hover:text-blue-700"
-          onClick={() => handleSupportClick(SLACK_WEB_LINK)}
-        >
-          <GlobeAltIcon className="w-6 h-6 fill-gray-600" />
-          Open Slack in the browser
-        </button>
-      </div>
       <h2 className="font-bold text-gray-700 dark:text-dark-heading">
         In {release?.version ? release?.version : currentVersion} version
       </h2>

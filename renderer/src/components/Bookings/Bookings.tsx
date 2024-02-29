@@ -38,30 +38,14 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
       if (allLoggedProjects === "invalid_token" && maxRecurse <= 3) {
         maxRecurse += 1; // we are already refreshing the token in calendar compenent, so i just want to re execute function maximum 3 times to prevent loop
-        console.log("Refresh", maxRecurse);
 
         const updatedTTUserInfo: TTUserInfo = JSON.parse(
           localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
         );
 
-        const refreshToken = updatedTTUserInfo?.plannerRefreshToken;
-
-        const refreshedPlannerCreds = await global.ipcRenderer.invoke(
-          IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_PLANNER_TOKEN,
-          refreshToken,
-        );
-
-        const refreshedUserInfo = {
-          ...updatedTTUserInfo,
-          plannerAccessToken: refreshedPlannerCreds?.access_token,
-        };
-
-        localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(refreshedUserInfo));
-
-        return await getBookings(refreshedUserInfo?.TTCookie, userName);
+        return await getBookings(updatedTTUserInfo?.TTCookie, userName);
       } else if (allLoggedProjects === "invalid_token") {
         // cases when we can't update token after 3 attempts
-        console.log("invalid_token");
         return [];
       }
 
@@ -111,15 +95,12 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   const getBookedStatistic = async () => {
     const TTUserInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
-    console.log("TTUserInfo", TTUserInfo);
     if (!TTUserInfo) return;
 
     const timetrackerCookie = TTUserInfo?.TTCookie;
     const timetrackerUserName = TTUserInfo?.name;
 
     const bookedProjects = await getBookings(timetrackerCookie, timetrackerUserName);
-
-    console.log("bookedProjects", bookedProjects);
 
     if (!bookedProjects || bookedProjects?.length === 0) {
       setBookedProjects([]);
