@@ -1,1 +1,1 @@
-export { default } from "./SettingsPageContent";
+export { default as SettingsPageContent } from "./SettingsPageContent";
