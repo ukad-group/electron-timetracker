@@ -101,7 +101,7 @@ export default function Home() {
   return (
     <div className="h-full bg-gray-100 dark:bg-dark-back">
       <VersionMessage />
-      <main className="py-10">
+      <main className="pt-10">
         <MainPage
           selectedDate={selectedDate}
           selectedDateActivities={selectedDateActivities}
