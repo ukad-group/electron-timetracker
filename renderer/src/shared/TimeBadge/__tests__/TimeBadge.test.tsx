@@ -59,7 +59,7 @@ const useFakeTime = () => {
 };
 useFakeTime();
 
-describe("badge for the previous day", () => {
+describe("GIVEN TimeBadge: badge for the previous day", () => {
   test("should render 'less than 6h' when hours are less than 6", () => {
     render(<TimeBadge {...yesterdayLess6MockedProps} />);
 
@@ -88,7 +88,7 @@ describe("badge for the previous day", () => {
   });
 });
 
-describe("badge for the today morning", () => {
+describe("GIVEN TimeBadge: badge for the today morning", () => {
   test("should not render 'less than 6h' when hours are less than 6", () => {
     render(<TimeBadge {...todayStartWorkLess6MockedProps} />);
 
@@ -111,7 +111,7 @@ describe("badge for the today morning", () => {
   });
 });
 
-describe("badge for the today evening", () => {
+describe("GIVEN TimeBadge: badge for the today evening", () => {
   test("should render 'less than 6h' when hours are less than 6", () => {
     render(<TimeBadge {...todayEndWorkLess6MockedProps} />);
 
