@@ -7,6 +7,7 @@ import { Bookings } from "@/components/Bookings";
 import { ActivitiesSection } from "@/components/ActivitiesSection";
 import { SelectFolderPlaceholder } from "@/components/SelectFolderPlaceholder";
 import { UpdateDescription } from "@/components/UpdateDescription";
+import { SupportSection } from "../SupportSection";
 import { Hint } from "@/shared/Hint";
 import { useMainStore } from "@/store/mainStore";
 import { useBetaStore } from "@/store/betaUpdatesStore";
@@ -289,6 +290,7 @@ const MainPage = ({
           <Cog8ToothIcon />
         </span>
       </Link>
+      <SupportSection />
     </div>
   );
 };
