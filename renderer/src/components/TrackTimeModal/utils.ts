@@ -63,6 +63,8 @@ export const getTimetrackerYearProjects = async (setWebTrackerProjects: Dispatch
     if (yearProjects === "invalid_token") {
       const refresh_token = userInfo?.userInfoRefreshToken;
 
+      console.log("REFREESH PROJECTS");
+
       if (!refresh_token) return;
 
       const updatedCreds = await global.ipcRenderer.invoke(

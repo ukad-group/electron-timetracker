@@ -35,7 +35,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         userName,
         calendarDate,
       );
-
+      console.log("Cookie", cookie);
       if (allLoggedProjects === "invalid_token" && maxRecurse <= 3) {
         maxRecurse += 1; // we are already refreshing the token in calendar compenent, so i just want to re execute function maximum 3 times to prevent loop
         console.log("Refresh", maxRecurse);
@@ -57,7 +57,8 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         };
 
         localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(refreshedUserInfo));
-
+        console.log("refreshedUserInfo?.TTCookie", refreshedUserInfo?.TTCookie);
+        console.log("refreshedPlannerCreds", refreshedPlannerCreds);
         return await getBookings(refreshedUserInfo?.TTCookie, userName);
       } else if (allLoggedProjects === "invalid_token") {
         // cases when we can't update token after 3 attempts
@@ -111,7 +112,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   const getBookedStatistic = async () => {
     const TTUserInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
-    console.log("TTUserInfo", TTUserInfo);
+    // console.log("TTUserInfo", TTUserInfo);
     if (!TTUserInfo) return;
 
     const timetrackerCookie = TTUserInfo?.TTCookie;
