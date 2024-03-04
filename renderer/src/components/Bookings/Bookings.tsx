@@ -10,6 +10,8 @@ import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
+  const showBookings = !!JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+  if (!showBookings) return;
   const [bookedProjects, setBookedProjects] = useState<BookingFromApi[]>([]);
   const [bookedSpentStatistic, setBookedSpentStatistic] = useState<BookedSpentStat[]>([]);
   const [loading, setLoading] = useState(false);

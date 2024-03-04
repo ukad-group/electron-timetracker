@@ -7,6 +7,5 @@ export type ActivitiesTableProps = {
   latestProjAndAct: Record<string, [string]>;
   events: ReportActivity[];
   isLoading: boolean;
-  showAsMain: boolean;
   validatedActivities: ReportActivity[];
 };

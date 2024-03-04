@@ -11,7 +11,6 @@ export type ActivitiesSectionProps = {
   selectedDate: Date;
   latestProjAndAct: Record<string, [string]>;
   setSelectedDateReport: Dispatch<SetStateAction<String>>;
-  showAsMain: boolean;
 };
 
 export type PlaceholderProps = {
