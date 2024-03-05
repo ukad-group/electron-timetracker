@@ -15,11 +15,9 @@ import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { parseReport, serializeReport, ReportAndNotes } from "@/helpers/utils/reports";
 import { changeHintConditions } from "@/helpers/utils/utils";
-import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES, HINTS_GROUP_NAMES, HINTS_ALERTS, KEY_CODES } from "@/helpers/contstants";
-import { SCREENS } from "@/constants";
-import { MainPageProps } from "./types";
+import { MainPageProps, Section } from "./types";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 
@@ -38,11 +36,10 @@ const MainPage = ({
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>([]);
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [saveReportTrigger, setSaveReportTrigger] = useState(false);
-  const { screenSizes } = useScreenSizes();
-  const isManualInputMain = localStorage.getItem(LOCAL_STORAGE_VARIABLES.IS_MANUAL_INPUT_MAIN) === "true";
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [isBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
+  const storedSectionsOptions = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER));
   const mainPageRef = useRef(null);
 
   useEffect(() => {
@@ -249,14 +246,7 @@ const MainPage = ({
     },
   ];
 
-  type Section = {
-    sectionName: string;
-    section: JSX.Element;
-    order: number;
-    side: "left" | "right";
-  };
   const [sections, setSections] = useState<Section[]>(MAIN_PAGE_SECTIONS);
-  const storedSectionsOptions = JSON.parse(localStorage.getItem("sectionsOptions"));
 
   useEffect(() => {
     const tempSections = storedSectionsOptions

@@ -30,9 +30,11 @@ const ActivitiesTable = ({
   const [timerId, setTimerId] = useState(null);
   const [scheduledEvents] = useScheduledEventsStore((state) => [state.event, state.setEvent], shallow);
   const { screenSizes } = useScreenSizes();
-  const showAsMain =
-    JSON.parse(localStorage.getItem("sectionsOptions")).find((section) => section.id === "Activities Table").side ===
-    "left";
+  const showAsMain = localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER)
+    ? JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER)).find(
+        (section) => section.id === "Activities Table",
+      ).side === "left"
+    : true;
 
   const totalDuration = useMemo(
     () => getTotalDuration(validatedActivities.filter((activity) => !activity.isBreak)),

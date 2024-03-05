@@ -38,6 +38,7 @@ export const LOCAL_STORAGE_VARIABLES = {
   TRELLO_AUTH_TOKEN: "trello-auth-token",
   IS_MANUAL_INPUT_MAIN: "is-manual-input-main-section",
   VERSION_DATA: "version-data",
+  WIDGET_ORDER: "sectionsOptions",
   // ...Add more local storage variables as needed
 };
 
