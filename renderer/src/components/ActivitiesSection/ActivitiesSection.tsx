@@ -20,7 +20,6 @@ const ActivitiesSection = ({
   selectedDate,
   latestProjAndAct,
   setSelectedDateReport,
-  showAsMain,
 }: ActivitiesSectionProps) => {
   const [backgroundError, setBackgroundError] = useState("");
   const [events, setEvents] = useState([]);
@@ -156,7 +155,6 @@ const ActivitiesSection = ({
             latestProjAndAct={latestProjAndAct}
             events={events}
             isLoading={isLoading}
-            showAsMain={showAsMain}
             validatedActivities={validatedActivities}
           />
         </div>
