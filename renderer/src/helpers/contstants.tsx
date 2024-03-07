@@ -1,6 +1,6 @@
 import { ConnectionsSection } from "@/components/ConnectionsSection";
 import { HelpSection } from "@/components/HelpSection";
-import { MainInputSection } from "@/components/MainInputSection";
+import { WidgetOrderSection } from "@/components/WidgetOrderSection";
 import { ReportsFolderSection } from "@/components/ReportsFolderSection";
 import { ThemeSection } from "@/components/ThemeSection";
 import { VersionSection } from "@/components/VersionSection";
@@ -11,7 +11,7 @@ export enum SidebarNavItem {
   ReportsFolder = "Reports folder",
   Theme = "Theme",
   VersionSelect = "Version",
-  MainInputSelect = "Main input",
+  WidgetOrder = "Widget Order",
 }
 
 export const SETTING_SECTIONS = {
@@ -20,7 +20,7 @@ export const SETTING_SECTIONS = {
   [SidebarNavItem.ReportsFolder]: <ReportsFolderSection />,
   [SidebarNavItem.Theme]: <ThemeSection />,
   [SidebarNavItem.VersionSelect]: <VersionSection />,
-  [SidebarNavItem.MainInputSelect]: <MainInputSection />,
+  [SidebarNavItem.WidgetOrder]: <WidgetOrderSection />,
 };
 
 export const LOCAL_STORAGE_VARIABLES = {
@@ -38,6 +38,7 @@ export const LOCAL_STORAGE_VARIABLES = {
   TRELLO_AUTH_TOKEN: "trello-auth-token",
   IS_MANUAL_INPUT_MAIN: "is-manual-input-main-section",
   VERSION_DATA: "version-data",
+  WIDGET_ORDER: "sectionsOptions",
   // ...Add more local storage variables as needed
 };
 

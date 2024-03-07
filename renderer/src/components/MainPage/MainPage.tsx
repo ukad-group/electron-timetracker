@@ -15,11 +15,9 @@ import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { parseReport, serializeReport, ReportAndNotes } from "@/helpers/utils/reports";
 import { changeHintConditions } from "@/helpers/utils/utils";
-import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES, HINTS_GROUP_NAMES, HINTS_ALERTS, KEY_CODES } from "@/helpers/contstants";
-import { SCREENS } from "@/constants";
-import { MainPageProps } from "./types";
+import { MainPageProps, Section } from "./types";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 
@@ -38,12 +36,10 @@ const MainPage = ({
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>([]);
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [saveReportTrigger, setSaveReportTrigger] = useState(false);
-  const { screenSizes } = useScreenSizes();
-  const isManualInputMain = localStorage.getItem(LOCAL_STORAGE_VARIABLES.IS_MANUAL_INPUT_MAIN) === "true";
-  const showBookings = !!JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [isBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
+  const storedSectionsOptions = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER));
   const mainPageRef = useRef(null);
 
   useEffect(() => {
@@ -162,120 +158,161 @@ const MainPage = ({
     }
   };
 
+  const MAIN_PAGE_SECTIONS: Section[] = [
+    {
+      sectionName: "Date Selector",
+      section: (
+        <section className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
+          <DateSelector
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            isDropboxConnected={isDropboxConnected}
+            selectedDateReport={selectedDateReport}
+          />
+        </section>
+      ),
+      order: 1,
+      side: "left",
+    },
+    {
+      sectionName: "Activities Table",
+      section: (
+        <section className="bg-white shadow sm:rounded-lg h-full dark:bg-dark-container dark:border dark:border-dark-border">
+          <ActivitiesSection
+            activities={selectedDateActivities}
+            onEditActivity={setTrackTimeModalActivity}
+            selectedDate={selectedDate}
+            latestProjAndAct={latestProjAndAct}
+            setSelectedDateReport={setSelectedDateReport}
+          />
+        </section>
+      ),
+      order: 2,
+      side: "left",
+    },
+    {
+      sectionName: "Manual InputForm",
+      section: (
+        <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
+          <ManualInputForm
+            saveReportTrigger={saveReportTrigger}
+            onSave={handleSave}
+            selectedDateReport={selectedDateReport}
+            selectedDate={selectedDate}
+            setSelectedDateReport={setSelectedDateReport}
+          />
+        </section>
+      ),
+      order: 1,
+      side: "right",
+    },
+    {
+      sectionName: "Calendar",
+      section: (
+        <section className="lg:col-span-2">
+          <Calendar
+            reportsFolder={reportsFolder}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            calendarDate={calendarDate}
+            setCalendarDate={setCalendarDate}
+          />
+        </section>
+      ),
+      order: 4,
+      side: "left",
+    },
+    {
+      sectionName: "Totals",
+      section: <Totals selectedDate={selectedDate} />,
+      order: 2,
+      side: "right",
+    },
+    {
+      sectionName: "Bookings",
+      section: <Bookings calendarDate={calendarDate} />,
+      order: 3,
+      side: "right",
+    },
+    {
+      sectionName: "Update Description",
+      section: (
+        <section>
+          <UpdateDescription />
+        </section>
+      ),
+      order: 4,
+      side: "right",
+    },
+  ];
+
+  const [sections, setSections] = useState<Section[]>(MAIN_PAGE_SECTIONS);
+
+  useEffect(() => {
+    const tempSections = storedSectionsOptions
+      ? MAIN_PAGE_SECTIONS.map((item) => {
+          const storedSectionOption = storedSectionsOptions.find((section) => section.id === item.sectionName);
+          item.side = storedSectionOption.side;
+          item.order = storedSectionOption.order;
+          return item;
+        })
+      : MAIN_PAGE_SECTIONS;
+
+    setSections(tempSections);
+  }, [
+    selectedDate,
+    selectedDateReport,
+    isDropboxConnected,
+    latestProjAndAct,
+    saveReportTrigger,
+    reportsFolder,
+    calendarDate,
+    selectedDateActivities,
+  ]);
+
   return (
     <div className="grid max-w-3xl grid-cols-1 gap-6 mx-auto sm:px-6 lg:max-w-[1400px] lg:grid-cols-[31%_31%_auto]">
-      <span className="mx-auto" ref={mainPageRef}></span>
+      <span className="mx-auto" ref={mainPageRef}>
+        <Hint
+          ignoreSkip
+          displayCondition
+          learningMethod="nextClick"
+          order={1}
+          groupName={HINTS_GROUP_NAMES.ZOOM_IN}
+          referenceRef={mainPageRef}
+          shiftY={0}
+          shiftX={200}
+          width={"large"}
+          position={{
+            basePosition: "bottom",
+            diagonalPosition: "right",
+          }}
+        >
+          {HINTS_ALERTS.ZOOM_IN}
+        </Hint>
+      </span>
       {reportsFolder ? (
         <>
           <div className="lg:col-start-1 lg:col-span-2 flex flex-col gap-6">
-            <Hint
-              ignoreSkip
-              displayCondition
-              learningMethod="nextClick"
-              order={1}
-              groupName={HINTS_GROUP_NAMES.ZOOM_IN}
-              referenceRef={mainPageRef}
-              shiftY={0}
-              shiftX={200}
-              width={"large"}
-              position={{
-                basePosition: "bottom",
-                diagonalPosition: "right",
-              }}
-            >
-              {HINTS_ALERTS.ZOOM_IN}
-            </Hint>
-            <section className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
-              <DateSelector
-                selectedDate={selectedDate}
-                setSelectedDate={setSelectedDate}
-                isDropboxConnected={isDropboxConnected}
-                selectedDateReport={selectedDateReport}
-              />
-            </section>
-
-            {!isManualInputMain && (
-              <section className="bg-white shadow sm:rounded-lg h-full dark:bg-dark-container dark:border dark:border-dark-border">
-                <ActivitiesSection
-                  activities={selectedDateActivities}
-                  onEditActivity={setTrackTimeModalActivity}
-                  selectedDate={selectedDate}
-                  latestProjAndAct={latestProjAndAct}
-                  setSelectedDateReport={setSelectedDateReport}
-                  showAsMain={!isManualInputMain}
-                />
-              </section>
-            )}
-
-            {isManualInputMain && (
-              <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                <ManualInputForm
-                  saveReportTrigger={saveReportTrigger}
-                  onSave={handleSave}
-                  selectedDateReport={selectedDateReport}
-                  selectedDate={selectedDate}
-                  setSelectedDateReport={setSelectedDateReport}
-                />
-              </section>
-            )}
-            {screenSizes.screenWidth >= SCREENS.LG && (
-              <section className="lg:col-span-2">
-                <Calendar
-                  reportsFolder={reportsFolder}
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                  calendarDate={calendarDate}
-                  setCalendarDate={setCalendarDate}
-                />
-              </section>
+            {sections.map(
+              (item) =>
+                item.side === "left" && (
+                  <div key={item.order} style={{ order: item.order }}>
+                    {item.section}
+                  </div>
+                ),
             )}
           </div>
 
           <aside className="lg:col-start-3 lg:col-span-1 lg:row-span-2 relative flex flex-col gap-6">
-            {isManualInputMain && (
-              <section className="bg-white shadow sm:rounded-lg dark:bg-dark-container dark:border dark:border-dark-border">
-                <ActivitiesSection
-                  activities={selectedDateActivities}
-                  onEditActivity={setTrackTimeModalActivity}
-                  selectedDate={selectedDate}
-                  latestProjAndAct={latestProjAndAct}
-                  setSelectedDateReport={setSelectedDateReport}
-                  showAsMain={!isManualInputMain}
-                />
-              </section>
+            {sections.map(
+              (item) =>
+                item.side === "right" && (
+                  <div key={item.order} style={{ order: item.order }}>
+                    {item.section}
+                  </div>
+                ),
             )}
-
-            {!isManualInputMain && (
-              <section className="px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-                <ManualInputForm
-                  saveReportTrigger={saveReportTrigger}
-                  onSave={handleSave}
-                  selectedDateReport={selectedDateReport}
-                  selectedDate={selectedDate}
-                  setSelectedDateReport={setSelectedDateReport}
-                />
-              </section>
-            )}
-
-            <Totals selectedDate={selectedDate} />
-
-            {showBookings && <Bookings calendarDate={calendarDate} />}
-
-            {screenSizes.screenWidth < SCREENS.LG && (
-              <section className="lg:col-span-2">
-                <Calendar
-                  reportsFolder={reportsFolder}
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                  calendarDate={calendarDate}
-                  setCalendarDate={setCalendarDate}
-                />
-              </section>
-            )}
-
-            <section>
-              <UpdateDescription />
-            </section>
           </aside>
         </>
       ) : (

@@ -21,7 +21,6 @@ const ActivitiesTable = ({
   latestProjAndAct,
   events,
   isLoading,
-  showAsMain,
   validatedActivities,
 }: ActivitiesTableProps) => {
   const [ctrlPressed, setCtrlPressed] = useState(false);
@@ -31,6 +30,11 @@ const ActivitiesTable = ({
   const [timerId, setTimerId] = useState(null);
   const [scheduledEvents] = useScheduledEventsStore((state) => [state.event, state.setEvent], shallow);
   const { screenSizes } = useScreenSizes();
+  const showAsMain = localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER)
+    ? JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER)).find(
+        (section) => section.id === "Activities Table",
+      ).side === "left"
+    : true;
 
   const totalDuration = useMemo(
     () => getTotalDuration(validatedActivities.filter((activity) => !activity.isBreak)),
