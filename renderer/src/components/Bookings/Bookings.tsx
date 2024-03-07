@@ -62,8 +62,31 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         return await getBookings(refreshedUserInfo?.TTCookie, userName);
       } else if (allLoggedProjects === "invalid_token") {
         // cases when we can't update token after 3 attempts
+        const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+
+        const refresh_token = userInfo?.userInfoRefreshToken;
+
         console.log("invalid_token");
-        return [];
+
+        if (!refresh_token) return;
+
+        const updatedCreds = await global.ipcRenderer.invoke(
+          IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_USER_INFO_TOKEN,
+          refresh_token,
+        );
+
+        const updatedIdToken = updatedCreds?.id_token;
+
+        const updatedCookie = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.TIMETRACKER_LOGIN, updatedIdToken);
+
+        const updatedUser = {
+          ...userInfo,
+          userInfoIdToken: updatedIdToken,
+          TTCookie: updatedCookie,
+        };
+
+        localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUser));
+        return await getBookings(updatedCookie, userName);
       }
 
       maxRecurse = 0;

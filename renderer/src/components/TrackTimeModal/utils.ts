@@ -81,7 +81,7 @@ export const getTimetrackerYearProjects = async (setWebTrackerProjects: Dispatch
         userInfoIdToken: updatedIdToken,
         TTCookie: updatedCookie,
       };
-
+      console.log("updatedCookie PROJECTS", updatedCookie);
       localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUser));
       return await getTimetrackerYearProjects(setWebTrackerProjects);
     }
