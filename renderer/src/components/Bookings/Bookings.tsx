@@ -35,7 +35,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         userName,
         calendarDate,
       );
-
+      console.log("Cookie", cookie);
       if (allLoggedProjects === "invalid_token" && maxRecurse <= 3) {
         maxRecurse += 1; // we are already refreshing the token in calendar compenent, so i just want to re execute function maximum 3 times to prevent loop
 
@@ -43,10 +43,49 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
           localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
         );
 
-        return await getBookings(updatedTTUserInfo?.TTCookie, userName);
+        const refreshToken = updatedTTUserInfo?.plannerRefreshToken;
+
+        const refreshedPlannerCreds = await global.ipcRenderer.invoke(
+          IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_PLANNER_TOKEN,
+          refreshToken,
+        );
+
+        const refreshedUserInfo = {
+          ...updatedTTUserInfo,
+          plannerAccessToken: refreshedPlannerCreds?.access_token,
+        };
+
+        localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(refreshedUserInfo));
+        console.log("refreshedUserInfo?.TTCookie", refreshedUserInfo?.TTCookie);
+        console.log("refreshedPlannerCreds", refreshedPlannerCreds);
+        return await getBookings(refreshedUserInfo?.TTCookie, userName);
       } else if (allLoggedProjects === "invalid_token") {
         // cases when we can't update token after 3 attempts
-        return [];
+        const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+
+        const refresh_token = userInfo?.userInfoRefreshToken;
+
+        console.log("invalid_token");
+
+        if (!refresh_token) return;
+
+        const updatedCreds = await global.ipcRenderer.invoke(
+          IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_USER_INFO_TOKEN,
+          refresh_token,
+        );
+
+        const updatedIdToken = updatedCreds?.id_token;
+
+        const updatedCookie = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.TIMETRACKER_LOGIN, updatedIdToken);
+
+        const updatedUser = {
+          ...userInfo,
+          userInfoIdToken: updatedIdToken,
+          TTCookie: updatedCookie,
+        };
+
+        localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUser));
+        return await getBookings(updatedCookie, userName);
       }
 
       maxRecurse = 0;
