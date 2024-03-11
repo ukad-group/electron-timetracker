@@ -18,6 +18,7 @@ import { changeHintConditions } from "@/helpers/utils/utils";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES, HINTS_GROUP_NAMES, HINTS_ALERTS, KEY_CODES } from "@/helpers/contstants";
 import { MainPageProps, Section } from "./types";
+import { StoredSection } from "@/components/WidgetOrderSection/types";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 
@@ -251,7 +252,9 @@ const MainPage = ({
   useEffect(() => {
     const tempSections = storedSectionsOptions
       ? MAIN_PAGE_SECTIONS.map((item) => {
-          const storedSectionOption = storedSectionsOptions.find((section) => section.id === item.sectionName);
+          const storedSectionOption = storedSectionsOptions.find(
+            (section: StoredSection) => section.id === item.sectionName,
+          );
           item.side = storedSectionOption.side;
           item.order = storedSectionOption.order;
           return item;

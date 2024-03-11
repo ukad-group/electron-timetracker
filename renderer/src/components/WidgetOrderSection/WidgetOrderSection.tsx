@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { StoredSection } from "./types";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import DragNDropIcon from "@/shared/DragNDropIcon/DragNDropIcon";
 
 const WidgetOrderSection = () => {
-  const sectionsOptions = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER))
+  const sectionsOptions: StoredSection[] = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER))
     ? JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER))
     : [
         { id: "Date Selector", side: "left", order: 1 },
@@ -16,8 +17,18 @@ const WidgetOrderSection = () => {
         { id: "Update Description", side: "right", order: 4 },
       ];
 
-  const [leftSections, setLeftSections] = useState(sectionsOptions.filter((section) => section.side === "left"));
-  const [rightSections, setRightSections] = useState(sectionsOptions.filter((section) => section.side === "right"));
+  const distribution = (sectionsList: StoredSection[], side: "left" | "right") => {
+    const tempSectionsList = [];
+    sectionsList.forEach((element) => {
+      if (element.side === side) {
+        tempSectionsList[element.order - 1] = element;
+      }
+    });
+    return tempSectionsList;
+  };
+
+  const [leftSections, setLeftSections] = useState(distribution(sectionsOptions, "left"));
+  const [rightSections, setRightSections] = useState(distribution(sectionsOptions, "right"));
 
   const handleOnDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -78,10 +89,8 @@ const WidgetOrderSection = () => {
   };
 
   useEffect(() => {
-    return () => {
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER, JSON.stringify([...leftSections, ...rightSections]));
-    };
-  }, []);
+    localStorage.setItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER, JSON.stringify([...leftSections, ...rightSections]));
+  }, [leftSections, rightSections]);
 
   return (
     <section className="h-full">
