@@ -60,10 +60,19 @@ const HelpSection = () => {
             <h2 className="text-lg font-semibold mt-4 mb-2 text-gray-900 dark:text-dark-heading">Global Shortcuts</h2>
             <ul className="list-disc pl-4">
               <li>
+                <strong className="mr-2">Ctrl + Q:</strong> Close the app
+              </li>
+              <li>
                 <strong className="mr-2">Ctrl + Z:</strong> Undo changes
               </li>
               <li>
                 <strong className="mr-2">Ctrl + Y:</strong> Redo changes
+              </li>
+              <li>
+                <strong className="mr-2">Ctrl + Shift + [+]:</strong> Zoom in
+              </li>
+              <li>
+                <strong className="mr-2">Ctrl + [-]:</strong> Zoom out
               </li>
               <li>
                 <strong className="mr-2">Tab:</strong> Move forward (Next)

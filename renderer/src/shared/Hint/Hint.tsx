@@ -187,7 +187,7 @@ function Hint({
             <div
               id="hint"
               className={clsx(
-                "p-4 pt-5 flex gap-2 flex-col text-sm rounded-lg  z-50 border border-gray-500 bg-white dark:bg-black absolute text-gray-900 dark:text-dark-heading",
+                "p-4 pt-5 flex gap-2 flex-col text-sm rounded-lg z-50 border border-gray-500 bg-white dark:bg-black absolute text-gray-900 dark:text-dark-heading",
                 { "w-1/3 lg:w-1/5": width === "small" },
                 { "w-2/5 lg:w-1/4": width === "medium" },
                 { "w-3/5 lg:w-2/5": width === "large" },
