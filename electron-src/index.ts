@@ -59,8 +59,13 @@ autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
 ipcMain.on(IPC_MAIN_CHANNELS.BETA_CHANNEL, (event: any, isBeta: boolean) => {
-  autoUpdater.allowPrerelease = isBeta;
-  autoUpdater.checkForUpdates();
+  try {
+    autoUpdater.allowPrerelease = isBeta;
+    autoUpdater.checkForUpdates();
+  } catch (err) {
+    console.log(err);
+    mainWindow?.webContents.send(IPC_MAIN_CHANNELS.BACKEND_ERROR, "Updater error. Check for update", err);
+  }
 });
 
 function setUpdateStatus(status: "available" | "downloaded", version: string) {

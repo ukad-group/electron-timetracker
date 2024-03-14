@@ -58,12 +58,10 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         };
 
         localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(refreshedUserInfo));
-        console.log("refreshedUserInfo?.TTCookie", refreshedUserInfo?.TTCookie);
-        console.log("refreshedPlannerCreds", refreshedPlannerCreds);
         return await getBookings(refreshedUserInfo?.TTCookie, userName);
       } else if (allLoggedProjects === "invalid_token") {
         // cases when we can't update token after 3 attempts
-        const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+        const userInfo = await JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
         const refresh_token = userInfo?.userInfoRefreshToken;
 
