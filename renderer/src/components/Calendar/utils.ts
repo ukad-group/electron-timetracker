@@ -6,7 +6,9 @@ import { ReportActivity, parseReport, validation } from "@/helpers/utils/reports
 
 export const loadHolidaysAndVacations = async (calendarDate: Date) => {
   try {
-    const timetrackerUserInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+    const timetrackerUserInfo: TTUserInfo = await JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+    );
 
     if (!timetrackerUserInfo) return;
 
@@ -58,6 +60,8 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
 
     if (userFetchedData.includes("invalid_token")) {
       const refreshToken = timetrackerUserInfo?.plannerRefreshToken;
+      console.log("REFREESH CALENDAR");
+      console.log("timetrackerUserInfo", timetrackerUserInfo);
 
       const refreshedPlannerCreds = await global.ipcRenderer.invoke(
         IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_PLANNER_TOKEN,

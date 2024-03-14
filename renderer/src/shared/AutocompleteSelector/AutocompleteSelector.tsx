@@ -121,7 +121,7 @@ const AutocompleteSelector = ({
         {title === "Activity" && (
           <QuestionMarkCircleIcon
             className="w-4 h-4 inline-block"
-            title="Usually the project manager will provide information on when and how to fill this field. Otherwise, you are not required to do this"
+            title="You can write whatever you want in the activity, or write nothing. Sometimes the project manager will provide information on when and how to fill this field."
           />
         )}
         {isNew && (
