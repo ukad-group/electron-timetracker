@@ -1,26 +1,23 @@
 import { ConnectionsSection } from "@/components/ConnectionsSection";
 import { HelpSection } from "@/components/HelpSection";
-import { WidgetOrderSection } from "@/components/WidgetOrderSection";
 import { ReportsFolderSection } from "@/components/ReportsFolderSection";
-import { ThemeSection } from "@/components/ThemeSection";
+import { LayoutSection } from "@/components/LayoutSection";
 import { VersionSection } from "@/components/VersionSection";
 
 export enum SidebarNavItem {
   Connections = "Connections",
   Help = "Help",
+  Layout = "Layout",
   ReportsFolder = "Reports folder",
-  Theme = "Theme",
   VersionSelect = "Version",
-  WidgetOrder = "Widget Order",
 }
 
 export const SETTING_SECTIONS = {
   [SidebarNavItem.Connections]: <ConnectionsSection />,
   [SidebarNavItem.Help]: <HelpSection />,
   [SidebarNavItem.ReportsFolder]: <ReportsFolderSection />,
-  [SidebarNavItem.Theme]: <ThemeSection />,
+  [SidebarNavItem.Layout]: <LayoutSection />,
   [SidebarNavItem.VersionSelect]: <VersionSection />,
-  [SidebarNavItem.WidgetOrder]: <WidgetOrderSection />,
 };
 
 export const LOCAL_STORAGE_VARIABLES = {
