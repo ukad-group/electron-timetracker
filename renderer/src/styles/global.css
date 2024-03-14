@@ -34,7 +34,7 @@ body {
 }
 
 .old-break-word {
-  @apply break-words;
+  @apply break-all;
 }
 
 .diagonalLines {
