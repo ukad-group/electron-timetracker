@@ -51,7 +51,7 @@ const MainPage = ({
         setIsDropboxConnected(!reportsFolder.includes("Dropbox") || data);
       });
     }
-    console.log("isBeta", isBeta);
+    // console.log("isBeta", isBeta);
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
     global.ipcRenderer.on(IPC_MAIN_CHANNELS.WINDOW_FOCUSED, handleWindowFocus);
 
