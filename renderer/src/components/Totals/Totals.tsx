@@ -147,7 +147,7 @@ const Totals = ({ selectedDate }) => {
         dateName = handlePeriodDay(selectedDate);
         break;
       case DATE_PERIODS.WEEK:
-        dateName = `week ${getWeekNumber(`${year}${month}${day}`)}`;
+        dateName = `week ${getWeekNumber(`${year}${month}${day}`, true)}`;
         break;
       case DATE_PERIODS.MONTH:
         dateName = longMonth;

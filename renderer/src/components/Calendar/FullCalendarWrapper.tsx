@@ -47,7 +47,7 @@ const FullCalendarWrapper = ({
 
             if (
               day.date.getFullYear() === calendarDate.getFullYear() &&
-              getWeekNumber(dayOffStringDate) === options.num &&
+              getWeekNumber(dayOffStringDate, false) === options.num &&
               !acc.numberedDays.includes(dayOffStringDate)
             ) {
               acc.numberedDays.push(dayOffStringDate);
@@ -68,7 +68,7 @@ const FullCalendarWrapper = ({
       }, 0) +
         daysOffWeekTotal * MS_PER_HOUR,
     );
-
+    console.log(options.num, formattedQuarterReports);
     return (
       <div ref={weekNumberRef} className="flex flex-col text-xs text-zinc-400">
         <span>week {options.num}</span>
