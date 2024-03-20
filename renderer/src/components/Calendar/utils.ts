@@ -60,8 +60,8 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
 
     if (userFetchedData.includes("invalid_token")) {
       const refreshToken = timetrackerUserInfo?.plannerRefreshToken;
-      console.log("REFREESH CALENDAR");
-      console.log("timetrackerUserInfo", timetrackerUserInfo);
+      // console.log("REFREESH CALENDAR");
+      // console.log("timetrackerUserInfo", timetrackerUserInfo);
 
       const refreshedPlannerCreds = await global.ipcRenderer.invoke(
         IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_PLANNER_TOKEN,
