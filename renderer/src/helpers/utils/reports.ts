@@ -224,6 +224,8 @@ export function formatDuration(ms: number): string {
   const hours = Math.floor(ms / msPerHour);
   const minutes = Math.floor((ms % msPerHour) / msPerMinute);
 
+  if (ms === 0) return `${minutes}h`;
+
   if (hours === 0) {
     return `${minutes}m`;
   }

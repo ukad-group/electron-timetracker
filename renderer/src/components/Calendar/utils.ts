@@ -125,7 +125,7 @@ export const getFormattedReports = (reports: ParsedReport[]) => {
 
     return {
       date: reportDate,
-      week: getWeekNumber(reportDate),
+      week: getWeekNumber(reportDate, true),
       workDurationMs: workDurationMs,
       isValid: activities.every((report: ReportActivity) => report.validation.isValid),
     };
