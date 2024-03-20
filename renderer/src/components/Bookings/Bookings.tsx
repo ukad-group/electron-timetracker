@@ -37,7 +37,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         userName,
         calendarDate,
       );
-      console.log("Cookie", cookie);
+      // console.log("Cookie", cookie);
       if (allLoggedProjects === "invalid_token" && maxRecurse <= 3) {
         maxRecurse += 1; // we are already refreshing the token in calendar compenent, so i just want to re execute function maximum 3 times to prevent loop
 
@@ -65,7 +65,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
         const refresh_token = userInfo?.userInfoRefreshToken;
 
-        console.log("invalid_token");
+        // console.log("invalid_token");
 
         if (!refresh_token) return;
 
