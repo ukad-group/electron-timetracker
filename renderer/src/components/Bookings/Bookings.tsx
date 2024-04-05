@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
+import clsx from "clsx";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import { MONTHS } from "@/helpers/utils/datetime-ui";
 import { ReportActivity, formatDurationAsDecimals, parseReport } from "@/helpers/utils/reports";
 import { ParsedReport, TTUserInfo } from "../Calendar/types";
 import { Loader } from "@/shared/Loader";
+import Tooltip from "@/shared/Tooltip/Tooltip";
 import { BookingsProps, BookingFromApi, BookedSpentStat } from "./types";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
@@ -128,6 +130,8 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
           project: booking?.name,
           booked: booking?.plans[0]?.hours,
           spent: spentProjectTime,
+          isOvertime: booking?.plans[0].isOvertime,
+          isUndertime: booking?.plans[0].isUndertime,
         };
       })
       .sort((a, b) => {
@@ -167,7 +171,23 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   const renderProjectsHours = () =>
     bookedSpentStatistic.map((project, i) => (
       <tr key={i} className="border-b dark:border-gray-700">
-        <td className="pr-6 py-2 text-gray-700 dark:text-dark-main">{project.project}</td>
+        <td className="pr-6 py-2 text-gray-700 dark:text-dark-main">
+          <Tooltip
+            tooltipText={(project.isOvertime && "Overtime") || (project.isUndertime && "Undertime")}
+            disabled={!(project.isOvertime || project.isUndertime)}
+          >
+            <span
+              className={clsx("py-1 px-1 rounded-full font-medium -ml-1", {
+                "bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20": project.isOvertime,
+
+                "bg-yellow-100 text-yellow-600 dark:text-yellow-400 dark:bg-yellow-400/20": project.isUndertime,
+              })}
+            >
+              {project.project}
+            </span>
+          </Tooltip>
+        </td>
+
         <td className="px-6 py-2 text-gray-700 dark:text-dark-main">{project.booked}h</td>
         <td className="px-6 py-2 text-gray-700 dark:text-dark-main">{formatDurationAsDecimals(project.spent)}</td>
       </tr>
@@ -183,7 +203,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
           <Loader />
         </div>
       )}
-      <div className="relative overflow-x-auto">
+      <div className="relative ">
         <table className="w-full text-sm text-left">
           <thead className="text-gray-900 dark:text-dark-heading border-b dark:border-gray-700">
             <tr>
