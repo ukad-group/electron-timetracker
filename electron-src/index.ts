@@ -33,6 +33,7 @@ import {
   getTimetrackerBookings,
 } from "./TimetrackerWebsiteApi";
 import { exec } from "child_process";
+import net from "net";
 import {
   getJiraAuthUrl,
   getJiraIssues,
@@ -236,6 +237,38 @@ app.on("ready", async () => {
       });
     });
   };
+
+  function isPortFree(port: number) {
+    return new Promise((resolve) => {
+      const server = net.createServer();
+      server.once("error", () => resolve(false));
+      server.once("listening", () => {
+        server.close(() => resolve(true));
+      });
+      server.listen(port, "localhost");
+    });
+  }
+
+  function killProcessUsingPort(port: number) {
+    return new Promise<void>((resolve, reject) => {
+      exec(`lsof -t -i:${port} | xargs kill -9`, (error, stdout, stderr) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        resolve();
+      });
+    });
+  }
+
+  async function startElectronApp() {
+    const isFree = await isPortFree(PORT);
+    if (!isFree) {
+      await killProcessUsingPort(PORT);
+    }
+  }
+
+  startElectronApp();
 
   server.on("error", function (error) {
     if (mainWindow) {
