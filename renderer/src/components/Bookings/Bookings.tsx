@@ -213,12 +213,10 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
             disabled={!(project.isOvertime || project.isUndertime)}
           >
             <span
-              className={clsx("", {
-                "py-1 px-1 rounded-full font-medium bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20":
-                  project.isOvertime,
+              className={clsx("py-1 px-1 rounded-full font-medium -ml-1", {
+                "bg-red-100 text-red-800 dark:text-red-400 dark:bg-red-400/20": project.isOvertime,
 
-                "py-1 px-1 rounded-full text-yellow-600 bg-yellow-100 dark:text-yellow-400 dark:bg-yellow-400/20":
-                  project.isUndertime,
+                "bg-yellow-100 text-yellow-600 dark:text-yellow-400 dark:bg-yellow-400/20": project.isUndertime,
               })}
             >
               {project.project}
