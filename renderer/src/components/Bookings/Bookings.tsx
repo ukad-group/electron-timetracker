@@ -28,6 +28,11 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   }, [bookedSpentStatistic]);
 
   const getBookings = async (cookie: string, userName: string): Promise<BookingFromApi[]> => {
+    const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+    if (!userInfo) return;
+
+    const timetrackerCookie = userInfo?.TTCookie;
+
     try {
       setLoading(true);
 
@@ -38,18 +43,30 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         calendarDate,
       );
       // console.log("Cookie", cookie);
-      if (allLoggedProjects === "invalid_token" && maxRecurse <= 3) {
-        maxRecurse += 1; // we are already refreshing the token in calendar compenent, so i just want to re execute function maximum 3 times to prevent loop
+      if (allLoggedProjects === "invalid_token") {
+        const refresh_token = userInfo?.userInfoRefreshToken;
 
-        const updatedTTUserInfo: TTUserInfo = JSON.parse(
-          localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+        console.log("REFREESH BOOKING", userInfo.TTCookie);
+
+        if (!refresh_token) return;
+
+        const updatedCreds = await global.ipcRenderer.invoke(
+          IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_USER_INFO_TOKEN,
+          refresh_token,
         );
-        const updatedCookie = updatedTTUserInfo?.TTCookie;
 
+        const updatedIdToken = updatedCreds?.id_token;
+
+        const updatedCookie = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.TIMETRACKER_LOGIN, updatedIdToken);
+
+        const updatedUser = {
+          ...userInfo,
+          userInfoIdToken: updatedIdToken,
+          TTCookie: updatedCookie,
+        };
+        console.log("updatedCookie BOOKING", updatedCookie);
+        localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUser));
         return await getBookings(updatedCookie, userName);
-      } else if (allLoggedProjects === "invalid_token") {
-        // cases when we can't update token after 3 attempts
-        return [];
       }
 
       maxRecurse = 0;
