@@ -1,14 +1,8 @@
-import { useEffect } from "react";
 import { shallow } from "zustand/shallow";
 import { useBetaStore } from "@/store/betaUpdatesStore";
-import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const BetaToggle = () => {
   const [isBeta, setIsBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
-
-  useEffect(() => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
-  }, [isBeta]);
 
   return (
     <div className="relative flex flex-col">
