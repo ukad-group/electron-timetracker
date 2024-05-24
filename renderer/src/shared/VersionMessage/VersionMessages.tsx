@@ -24,21 +24,6 @@ const VersionMessage = () => {
       setVersion(info.version);
     });
 
-    (async () => {
-      const [updateStatus, currentVersion] = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_UPDATE_STATUS);
-
-      setVersion(currentVersion);
-
-      switch (updateStatus) {
-        case "available":
-          setIsUpdate(true);
-          break;
-        case "downloaded":
-          setIsDownload(true);
-          break;
-      }
-    })();
-
     return () => {
       global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.UPDATE_AVAILABLE);
       global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.DOWNLOADED);

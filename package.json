@@ -22,7 +22,7 @@
     "build-client:win32": "electron-builder --win",
     "build-client:darwin": "npm list -g dmg-license || sudo npm i -g dmg-license && electron-builder --mac",
     "type-check": "tsc -p ./renderer/tsconfig.json && tsc -p ./electron-src/tsconfig.json",
-    "prettier": "prettier --write",
+    "prettier": "prettier --write \"./renderer/src/**/*.{ts,tsx}\"",
     "lint": "eslint \"./renderer/src/**/*.{ts,tsx}\" --fix",
     "prepare": "husky install"
   },

@@ -74,6 +74,24 @@ function setUpdateStatus(status: "available" | "downloaded", version: string) {
   updateVersion = version;
 }
 
+function isLaterVersion(currentVersion: string, updateVersion: string) {
+  const currentParts = currentVersion.split(".").map(Number);
+  const updateParts = updateVersion.split(".").map(Number);
+
+  for (let i = 0; i < Math.max(currentParts.length, updateParts.length); i++) {
+    const currentPart = currentParts[i] || 0;
+    const updatePart = updateParts[i] || 0;
+
+    if (currentPart > updatePart) {
+      return true;
+    }
+    if (currentPart < updatePart) {
+      return false;
+    }
+  }
+  return false;
+}
+
 autoUpdater.allowDowngrade = true;
 autoUpdater.on("error", (e: Error, message?: string) => {
   mainWindow?.webContents.send(
@@ -89,6 +107,18 @@ ipcMain.on(IPC_MAIN_CHANNELS.GET_CURRENT_VERSION, () => {
 
 autoUpdater.on("update-available", (info: UpdateInfo) => {
   setUpdateStatus("available", info.version);
+
+  const lowerCurrentVersion = app.getVersion().toLowerCase();
+  const lowerNewVersion = info.version.toLowerCase();
+  const shouldSkipDownloading =
+    isLaterVersion(lowerCurrentVersion, lowerNewVersion) &&
+    (!lowerCurrentVersion.includes("beta") ||
+      (lowerCurrentVersion.includes("beta") && lowerNewVersion.includes("beta")));
+
+  if (shouldSkipDownloading) {
+    return;
+  }
+
   autoUpdater.downloadUpdate();
   if (mainWindow) {
     mainWindow.webContents.send(IPC_MAIN_CHANNELS.UPDATE_AVAILABLE, true, info);
@@ -604,10 +634,6 @@ const deleteFile = (filePath: string): Promise<void> => {
     });
   });
 };
-
-ipcMain.handle(IPC_MAIN_CHANNELS.APP_UPDATE_STATUS, async () => {
-  return [updateStatus, updateVersion];
-});
 
 ipcMain.handle(IPC_MAIN_CHANNELS.APP_DELETE_FILE, async (_, reportsFolder: string, selectedDate: Date) => {
   const timereportPath = getPathFromDate(selectedDate, reportsFolder);

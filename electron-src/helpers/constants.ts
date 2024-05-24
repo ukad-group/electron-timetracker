@@ -35,7 +35,6 @@ export const IPC_MAIN_CHANNELS = {
   APP_FIND_MONTH_PROJECTS: "app:find-month-projects",
   ANY_FILE_CHANGED: "any-file-changed",
   APP_DELETE_FILE: "app:delete-file",
-  APP_UPDATE_STATUS: "app:update-status",
   APP_READ_DAY_REPORT: "app:read-day-report",
   APP_FIND_QUARTER_PROJECTS: "app:find-quarter-projects",
   APP_FIND_LATEST_PROJECTS: "app:find-latest-projects",
