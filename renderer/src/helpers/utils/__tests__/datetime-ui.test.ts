@@ -74,15 +74,15 @@ describe("GIVEN datetime-ui/getWeekNumber", () => {
   });
 
   it("returns the correct week number for a given date", () => {
-    getDateFromString("2022-02-01");
+    getDateFromString("20220201");
 
-    expect(getWeekNumber("2022-02-01", true)).toBe(49);
+    expect(getWeekNumber("20220719")).toBe(29);
   });
 
   it("handles different dates and returns the correct week number", () => {
-    getDateFromString("2022-01-10");
+    getDateFromString("20220110");
 
-    expect(getWeekNumber("2022-01-10", true)).toBe(49);
+    expect(getWeekNumber("20220110")).toBe(2);
   });
 });
 

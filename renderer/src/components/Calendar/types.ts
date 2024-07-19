@@ -60,8 +60,12 @@ export type FullCalendarWrapperProps = {
   selectedDate: Date;
   setSelectedDate: Dispatch<SetStateAction<Date>>;
   daysOff: DayOff[];
-  formattedQuarterReports: FormattedReport[];
   weekNumberRef: MutableRefObject<any>;
+  workDurationByWeek: SumWorkDurationByWeekProps;
 };
 
 export type daysOffAccumulatorType = { numberedDays: string[]; hours: number };
+
+export interface SumWorkDurationByWeekProps {
+  [week: number]: number;
+}

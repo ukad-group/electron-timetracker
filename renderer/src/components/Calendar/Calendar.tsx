@@ -7,7 +7,7 @@ import { NavButtons } from "@/shared/NavButtons";
 import { Button } from "@/shared/Button";
 import { ErrorPlaceholder, RenderError } from "@/shared/ErrorPlaceholder";
 import { getMonthWorkHours, getRequiredHours, MONTHS, mathOvertimeUndertime } from "@/helpers/utils/datetime-ui";
-import { getFormattedReports, loadHolidaysAndVacations } from "./utils";
+import { getFormattedReports, loadHolidaysAndVacations, getSumWorkDurationByWeek } from "./utils";
 import { CalendarProps, ParsedReport, FormattedReport, TTUserInfo, DayOff } from "./types";
 import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS, HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
@@ -170,7 +170,7 @@ export const Calendar = ({
   }, [calendarDate, reportsFolder]);
 
   // prettier-ignore
-  useEffect(() => { 
+  useEffect(() => {
     try{
       setFormattedQuarterReports(getFormattedReports(parsedQuarterReports));
     } catch (err) {
@@ -309,9 +309,9 @@ export const Calendar = ({
         setSelectedDate={setSelectedDate}
         selectedDate={selectedDate}
         calendarDate={calendarDate}
-        formattedQuarterReports={formattedQuarterReports}
         weekNumberRef={weekNumberRef}
         daysOff={daysOff}
+        workDurationByWeek={getSumWorkDurationByWeek(formattedQuarterReports)}
       >
         <FullCalendar
           ref={calendarRef}

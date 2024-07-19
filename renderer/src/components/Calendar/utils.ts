@@ -1,5 +1,13 @@
 import { extractDatesFromPeriod, getWeekNumber, isTheSameDates } from "@/helpers/utils/datetime-ui";
-import { DayOff, ApiDayOff, TTUserInfo, ParsedReport, VacationSickDaysData } from "./types";
+import {
+  DayOff,
+  ApiDayOff,
+  TTUserInfo,
+  ParsedReport,
+  VacationSickDaysData,
+  FormattedReport,
+  SumWorkDurationByWeekProps,
+} from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
 import { ReportActivity, parseReport, validation } from "@/helpers/utils/reports";
@@ -125,9 +133,23 @@ export const getFormattedReports = (reports: ParsedReport[]) => {
 
     return {
       date: reportDate,
-      week: getWeekNumber(reportDate, true),
+      week: getWeekNumber(reportDate),
       workDurationMs: workDurationMs,
       isValid: activities.every((report: ReportActivity) => report.validation.isValid),
     };
   });
+};
+
+export const getSumWorkDurationByWeek = (dataArray: FormattedReport[]): SumWorkDurationByWeekProps => {
+  const result = {};
+
+  dataArray.forEach((item) => {
+    if (result[item.week]) {
+      result[item.week] += item.workDurationMs;
+    } else {
+      result[item.week] = item.workDurationMs;
+    }
+  });
+
+  return result;
 };
