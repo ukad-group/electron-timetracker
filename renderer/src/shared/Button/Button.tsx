@@ -44,13 +44,7 @@ const Button = ({ callback, text, disabled, status, type = "button", tabIndex, c
     disabledStyles;
 
   return (
-    <button
-      onClick={callback}
-      type={type}
-      className={styles}
-      disabled={disabled ? disabled : false}
-      tabIndex={tabIndex}
-    >
+    <button onClick={callback} type={type} className={styles} disabled={disabled} tabIndex={tabIndex}>
       {children}
       {status && status === "inprogress" && <Loader />}
       {status && status === "loading" && <Loader />}

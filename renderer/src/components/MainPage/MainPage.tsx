@@ -21,6 +21,7 @@ import { MainPageProps, Section } from "./types";
 import { StoredSection } from "@/components/WidgetOrderSection/types";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
+import clsx from "clsx";
 
 const MainPage = ({
   selectedDate,
@@ -37,6 +38,7 @@ const MainPage = ({
   const [reportAndNotes, setReportAndNotes] = useState<any[] | ReportAndNotes>([]);
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [saveReportTrigger, setSaveReportTrigger] = useState(false);
+  const [isFileExist, setIsFileExist] = useState(false);
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [isBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
@@ -46,11 +48,13 @@ const MainPage = ({
   useEffect(() => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FOLDER_WATCHER, reportsFolder);
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
+
     if (reportsFolder) {
       global.ipcRenderer.on(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION, (event, data) => {
         setIsDropboxConnected(!reportsFolder.includes("Dropbox") || data);
       });
     }
+
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
     global.ipcRenderer.on(IPC_MAIN_CHANNELS.WINDOW_FOCUSED, handleWindowFocus);
 
@@ -91,6 +95,7 @@ const MainPage = ({
 
       setReportAndNotes(parsedReportsAndNotes);
       setSelectedDateActivities(parsedActivities);
+
       return;
     }
 
@@ -100,8 +105,8 @@ const MainPage = ({
 
   useEffect(() => {
     readDayReport();
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FILE_WATCHER, reportsFolder, selectedDate);
 
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FILE_WATCHER, reportsFolder, selectedDate);
     global.ipcRenderer.on(IPC_MAIN_CHANNELS.FILE_CHANGED, (event, data) => {
       if (selectedDateReport != data) {
         setSelectedDateReport(data || "");
@@ -115,13 +120,20 @@ const MainPage = ({
   }, [selectedDate, reportsFolder]);
 
   const readDayReport = async () => {
-    const dayReport = await global.ipcRenderer.invoke(
-      IPC_MAIN_CHANNELS.APP_READ_DAY_REPORT,
-      reportsFolder,
-      selectedDate,
-    );
+    try {
+      const dayReport = await global.ipcRenderer.invoke(
+        IPC_MAIN_CHANNELS.APP_READ_DAY_REPORT,
+        reportsFolder,
+        selectedDate,
+      );
 
-    setSelectedDateReport(dayReport || "");
+      setIsFileExist(dayReport !== null);
+      setSelectedDateReport(dayReport || "");
+    } catch (error) {
+      console.error("Failed to read day report:", error);
+      setIsFileExist(false);
+      setSelectedDateReport("");
+    }
   };
 
   const handleSave = (report: string, shouldAutosave: boolean) => {
@@ -132,6 +144,7 @@ const MainPage = ({
   const saveSerializedReport = (serializedReport: string) => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
     global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_WRITE_DAY_REPORT, reportsFolder, selectedDate, serializedReport);
+
     setSelectedDateReport(serializedReport);
   };
 
@@ -143,11 +156,13 @@ const MainPage = ({
         existingConditions: [false],
       },
     ]);
+
     progress[HINTS_GROUP_NAMES.ZOOM_IN] = [false];
+
     setProgress(progress);
   };
 
-  const handleCtrlPlus = (e) => {
+  const handleCtrlPlus = (e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.key === KEY_CODES.EQUAL_SIGN) {
       changeHintConditions(progress, setProgress, [
         {
@@ -201,6 +216,8 @@ const MainPage = ({
             selectedDateReport={selectedDateReport}
             selectedDate={selectedDate}
             setSelectedDateReport={setSelectedDateReport}
+            isFileExist={isFileExist}
+            setIsFileExist={setIsFileExist}
           />
         </section>
       ),
@@ -324,7 +341,11 @@ const MainPage = ({
       <Link
         href="/settings"
         onClick={() => setSaveReportTrigger(true)}
-        className="z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300 hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full before:text-blue-950 before:font-bold before:dark:text-gray-100"
+        className={clsx(
+          "z-20 h-12 w-12 bg-blue-950 rounded-full fixed right-10 bottom-10 flex items-center justify-center transition-colors duration-300",
+          "hover:bg-blue-800 hover:before:flex before:content-['Settings'] before:hidden before:absolute before:-translate-x-full",
+          "before:text-blue-950 before:font-bold before:dark:text-gray-100",
+        )}
       >
         <span className="w-8 flex items-center justify-center text-white ">
           <Cog8ToothIcon />
