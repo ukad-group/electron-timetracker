@@ -4,9 +4,9 @@ import { getGoogleCredentials, getGoogleUserInfo } from "@/API/googleCalendarAPI
 import { ArrowRightOnRectangleIcon } from "@heroicons/react/24/solid";
 import { GoogleCredentails, GoogleUser } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 import isOnline from "is-online";
-import { TRACK_ANALYTICS } from "@/helpers/contstants";
+import { TRACK_ANALYTICS } from "@/helpers/constants";
 
 const GoogleConnection = () => {
   const [showGoogleEvents, setShowGoogleEvents] = useState(false);

@@ -121,3 +121,5 @@ export const TRACK_ANALYTICS = {
   MANUAL_SAVE: "manuall_save",
   CALENDAR_OFFICE: "office365",
 };
+
+export const OFFLINE_MESSAGE = "You're offline! Please check your internet connection.";

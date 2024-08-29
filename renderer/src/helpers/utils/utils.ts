@@ -2,7 +2,7 @@ import { ReportActivity } from "./reports";
 import { TutorialProgress } from "@/store/types";
 import { HintConitions } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 import { Dispatch, SetStateAction } from "react";
 
 export const replaceHyphensWithSpaces = (inputString: string): string => inputString.replace(/ - /g, " ");

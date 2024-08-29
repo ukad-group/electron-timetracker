@@ -1,13 +1,13 @@
 import { Dispatch, SetStateAction } from "react";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { KEY_CODES } from "@/helpers/contstants";
+import { KEY_CODES } from "@/helpers/constants";
 import { ReportActivity } from "@/helpers/utils/reports";
 import { getDateTimeData } from "@/helpers/utils/datetime-ui";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import { padStringToMinutes } from "@/helpers/utils/datetime-ui";
 import { formatDurationAsDecimals } from "@/helpers/utils/reports";
-import { HINTS_GROUP_NAMES } from "@/helpers/contstants";
+import { HINTS_GROUP_NAMES } from "@/helpers/constants";
 import { TutorialProgress } from "@/store/types";
 import { ScheduledEvents } from "@/store/types";
 

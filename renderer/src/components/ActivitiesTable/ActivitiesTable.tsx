@@ -11,8 +11,8 @@ import { SCREENS } from "@/constants";
 import { ActivitiesTableContext } from "./context";
 import { MainView, CompactView } from "./components";
 import { getTotalDuration, formatEvents, getActualEvents } from "./utils";
-import { KEY_CODES, LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
-import { TRACK_ANALYTICS } from "@/helpers/contstants";
+import { KEY_CODES, LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
+import { TRACK_ANALYTICS } from "@/helpers/constants";
 
 const ActivitiesTable = ({
   activities,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 import { StoredSection } from "./types";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import DragNDropIcon from "@/shared/DragNDropIcon/DragNDropIcon";

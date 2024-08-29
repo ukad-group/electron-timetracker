@@ -10,7 +10,7 @@ import { getTotals, createEnding } from "./utils";
 import TotalsList from "./TotalsList";
 import { Hint } from "@/shared/Hint";
 import { SCREENS } from "@/constants";
-import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/constants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import { Listbox } from "@headlessui/react";

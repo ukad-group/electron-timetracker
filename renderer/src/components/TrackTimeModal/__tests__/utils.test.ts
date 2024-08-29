@@ -10,7 +10,7 @@ import {
   addNewActivity,
 } from "../utils";
 import { getDateTimeData } from "@/helpers/utils/datetime-ui";
-import { KEY_CODES } from "@/helpers/contstants";
+import { KEY_CODES } from "@/helpers/constants";
 import { globalIpcRendererMock } from "@/tests/mocks/electron";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 

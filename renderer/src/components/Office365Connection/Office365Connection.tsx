@@ -3,9 +3,9 @@ import { Button } from "@/shared/Button";
 import { Office365User } from "@/helpers/utils/office365";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import Users from "./Users";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 import isOnline from "is-online";
-import { TRACK_ANALYTICS } from "@/helpers/contstants";
+import { TRACK_ANALYTICS } from "@/helpers/constants";
 
 const Office365Connection = () => {
   const [users, setUsers] = useState(JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || []);

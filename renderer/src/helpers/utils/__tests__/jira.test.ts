@@ -1,6 +1,6 @@
 import { updateJiraAccessToken, removeJiraStoredUser, updateJiraStoredUser } from "../jira";
 import { globalIpcRendererMock } from "@/tests/mocks/electron";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 jest.mock("electron", () => ({

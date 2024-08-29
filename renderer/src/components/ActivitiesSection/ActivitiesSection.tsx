@@ -12,7 +12,7 @@ import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import Placeholder from "./Placeholder";
 import TrackTimeButton from "./TrackTimeButton";
 import { RELEASES_LINK } from "./constants";
-import { LOCAL_STORAGE_VARIABLES, KEY_CODES } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES, KEY_CODES } from "@/helpers/constants";
 
 const ActivitiesSection = ({
   onEditActivity,

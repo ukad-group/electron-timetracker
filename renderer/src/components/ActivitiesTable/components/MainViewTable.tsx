@@ -8,7 +8,7 @@ import { ActivitiesTableContext } from "../context";
 import { Hint } from "@/shared/Hint";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
-import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/constants";
 import { SCREENS } from "@/constants";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";

@@ -8,9 +8,9 @@ import { useEditingHistoryManager } from "@/helpers/hooks";
 import { KeyboardEventProps, ManualInputFormProps } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { Hint } from "@/shared/Hint";
-import { HINTS_GROUP_NAMES, HINTS_ALERTS, KEY_CODES } from "@/helpers/contstants";
+import { HINTS_GROUP_NAMES, HINTS_ALERTS, KEY_CODES } from "@/helpers/constants";
 import { changeHintConditions } from "@/helpers/utils/utils";
-import { TRACK_ANALYTICS } from "@/helpers/contstants";
+import { TRACK_ANALYTICS } from "@/helpers/constants";
 import { getReportWithCopiedLine } from "./utils";
 
 const ManualInputForm = ({

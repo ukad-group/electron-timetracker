@@ -1,5 +1,5 @@
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS } from "../contstants";
+import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS } from "../constants";
 import { replaceHyphensWithSpaces } from "./utils";
 import { trackConnections } from "./utils";
 
