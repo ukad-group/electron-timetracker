@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Button } from "@/shared/Button";
 import { DeleteMessage } from "@/shared/DeleteMessage";
-import { useMainStore } from "@/store/mainStore";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
 import { useEditingHistoryManager } from "@/helpers/hooks";
@@ -19,32 +18,21 @@ const ManualInputForm = ({
   selectedDateReport,
   selectedDate,
   setSelectedDateReport,
+  isFileExist,
+  setIsFileExist,
 }: ManualInputFormProps) => {
-  const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [report, setReport] = useState("");
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
   const textareaRef = useRef(null);
   const [showDeleteMessage, setShowDeleteMessage] = useState(false);
   const [showDeleteButton, setShowDeleteButton] = useState(false);
-  const [isFileExist, setIsFileExist] = useState(false);
   const editingHistoryManager = useEditingHistoryManager(report);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
-  const isReportChanged = selectedDateReport !== report;
-
-  const readReport = async () => {
-    const dayReport = await global.ipcRenderer.invoke(
-      IPC_MAIN_CHANNELS.APP_READ_DAY_REPORT,
-      reportsFolder,
-      selectedDate,
-    );
-
-    setIsFileExist(dayReport !== null);
-    setShowDeleteButton(dayReport === "");
-  };
 
   const handleCtrlSSave = (e: KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_S && saveBtnStatus === "enabled") {
+    if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_S && selectedDateReport !== report) {
+      e.preventDefault();
       handleSaveReport();
     }
   };
@@ -53,27 +41,17 @@ const ManualInputForm = ({
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.MANUAL_SAVE);
     onSave(report, true);
     setSaveBtnStatus("inprogress");
-
-    if (isFileExist) {
-      setShowDeleteButton(!report.length);
-    } else {
-      setShowDeleteButton(false);
-    }
-  };
-
-  const handleSetReport = (report: string) => {
-    setSaveBtnStatus(selectedDateReport !== report ? "enabled" : "disabled");
-    setReport(report);
   };
 
   const handleTextAreaKeyDown = (e: KeyboardEventProps) => {
     if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_D) {
       e.preventDefault();
-      handleSetReport(getReportWithCopiedLine(textareaRef, report));
+      setReport(getReportWithCopiedLine(textareaRef, report));
     }
 
     if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_Z) {
       e.preventDefault();
+
       const [currentValue, changePlace] = editingHistoryManager.undoEditing();
 
       if (typeof currentValue === "string") {
@@ -84,6 +62,7 @@ const ManualInputForm = ({
 
     if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_Y) {
       e.preventDefault();
+
       const [currentValue, changePlace] = editingHistoryManager.redoEditing();
 
       if (typeof currentValue === "string") {
@@ -103,6 +82,11 @@ const ManualInputForm = ({
     ]);
   };
 
+  const handleRemoveFileBtn = () => {
+    setIsFileExist(false);
+    setShowDeleteMessage(true);
+  };
+
   useEffect(() => {
     changeHintConditions(progress, setProgress, [
       {
@@ -114,39 +98,38 @@ const ManualInputForm = ({
   }, []);
 
   useEffect(() => {
-    setShowDeleteMessage(false);
-  }, [selectedDate]);
+    const newSaveBtnStatus = selectedDateReport !== report ? "enabled" : "disabled";
 
-  useEffect(() => {
-    handleSetReport(selectedDateReport);
-  }, [selectedDateReport]);
-
-  useEffect(() => {
-    readReport();
-
-    editingHistoryManager.setValue(report);
-    handleSetReport(report);
-
-    if (isFileExist) {
-      setShowDeleteButton(!report.length);
-    } else {
-      setShowDeleteButton(false);
-    }
-
-    if (cursorPosition) {
-      textareaRef.current.setSelectionRange(cursorPosition, cursorPosition);
-    }
-    setCursorPosition(0);
+    setSaveBtnStatus(newSaveBtnStatus);
 
     document.addEventListener("keydown", handleCtrlSSave);
 
     return () => {
       document.removeEventListener("keydown", handleCtrlSSave);
     };
+  }, [selectedDateReport, report]);
+
+  useEffect(() => {
+    setShowDeleteButton(isFileExist && !report.length);
+  }, [isFileExist, report]);
+
+  useEffect(() => {
+    setReport(selectedDateReport);
+  }, [selectedDateReport]);
+
+  useEffect(() => {
+    editingHistoryManager.setValue(report);
+    setReport(report);
+
+    if (cursorPosition) {
+      textareaRef.current.setSelectionRange(cursorPosition, cursorPosition);
+    }
+
+    setCursorPosition(0);
   }, [report]);
 
   useEffect(() => {
-    if (saveReportTrigger && isReportChanged) {
+    if (saveReportTrigger && selectedDateReport !== report) {
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.MANUAL_SAVE);
       onSave(report, true);
     }
@@ -178,7 +161,7 @@ const ManualInputForm = ({
       <textarea
         value={report}
         onFocus={handleOnFocus}
-        onChange={(e) => handleSetReport(e.target.value)}
+        onChange={(e) => setReport(e.target.value)}
         rows={15}
         className="block w-full px-3 py-2 mt-3 border border-gray-300 rounded-md shadow-sm focus-visible:outline-blue-500 sm:text-sm dark:bg-dark-back dark:border-dark-border dark:text-slate-400 focus-visible:dark:outline-slate-500"
         spellCheck={true}
@@ -206,7 +189,7 @@ const ManualInputForm = ({
         </div>
         {showDeleteButton && (
           <button
-            onClick={() => setShowDeleteMessage(true)}
+            onClick={handleRemoveFileBtn}
             type="button"
             className="inline-flex w-full justify-center rounded-md bg-red-100 px-3 py-2 text-sm font-semibold text-red-800 hover:text-white shadow-sm hover:bg-red-600 sm:w-auto dark:text-dark-heading dark:border dark:border-red-500/50 hover:dark:border-transparent dark:bg-transparent hover:dark:bg-red-400/20"
           >
