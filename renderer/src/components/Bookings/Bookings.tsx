@@ -8,8 +8,10 @@ import { ParsedReport, TTUserInfo } from "../Calendar/types";
 import { Loader } from "@/shared/Loader";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { BookingsProps, BookingFromApi, BookedSpentStat } from "./types";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES, OFFLINE_MESSAGE } from "@/helpers/constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+import RefreshIcon from "@/shared/RefreshIcon/RefreshIcon";
+import isOnline from "is-online";
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
   const showBookings = !!JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
@@ -167,6 +169,23 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
     setBookedSpentStatistic(bookedSpentStatisticArray);
   };
 
+  const handleRefreshButton = async () => {
+    try {
+      setLoading(true);
+      const online = await isOnline();
+
+      if (!online) {
+        alert(OFFLINE_MESSAGE);
+      } else {
+        getBookedStatistic();
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     getBookedStatistic();
 
@@ -212,9 +231,17 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
   return (
     <div className="relative px-4 py-5 bg-white shadow sm:rounded-lg sm:px-6 dark:bg-dark-container dark:border dark:border-dark-border">
-      <h2 className="text-lg font-medium text-gray-900 dark:text-dark-heading mb-2">
-        Bookings in {currentReadableMonth}
-      </h2>
+      <div className="flex items-center gap-2 text-gray-900 dark:text-dark-heading mb-2">
+        <h2 className="text-lg font-medium">Bookings in {currentReadableMonth}</h2>
+        <button
+          className="h-4 w-4 hover:rotate-180 duration-300"
+          onClick={handleRefreshButton}
+          title="Refresh bookings"
+          disabled={loading}
+        >
+          <RefreshIcon className="hover:stroke-blue-400" />
+        </button>
+      </div>
       {loading && (
         <div className="absolute top-5 right-4">
           <Loader />

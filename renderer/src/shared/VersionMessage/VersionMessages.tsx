@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { CheckIcon, ExclamationCircleIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { UpdateInfo } from "electron-updater";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 
 const VersionMessage = () => {
   const [isUpdate, setIsUpdate] = useState(false);

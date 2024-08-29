@@ -1,6 +1,6 @@
 import { getGoogleEvents, updateGoogleCredentials } from "@/API/googleCalendarAPI";
 import { trackConnections } from "./utils";
-import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS } from "../contstants";
+import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS } from "../constants";
 
 export const loadGoogleEvents = async (accessToken: string, refreshToken: string, index: number) => {
   try {

@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { Loader } from "@/shared/Loader";
 import { TTUserInfo } from "../Calendar/types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/contstants";
+import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 import isOnline from "is-online";
 
 const TimetrackerWebsiteConnection = () => {

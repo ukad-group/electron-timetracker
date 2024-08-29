@@ -9,7 +9,13 @@ import { ErrorPlaceholder, RenderError } from "@/shared/ErrorPlaceholder";
 import { getMonthWorkHours, getRequiredHours, MONTHS, mathOvertimeUndertime } from "@/helpers/utils/datetime-ui";
 import { getFormattedReports, loadHolidaysAndVacations, getSumWorkDurationByWeek } from "./utils";
 import { CalendarProps, ParsedReport, FormattedReport, TTUserInfo, DayOff } from "./types";
-import { LOCAL_STORAGE_VARIABLES, TRACK_ANALYTICS, HINTS_GROUP_NAMES, HINTS_ALERTS } from "@/helpers/contstants";
+import {
+  LOCAL_STORAGE_VARIABLES,
+  TRACK_ANALYTICS,
+  HINTS_GROUP_NAMES,
+  HINTS_ALERTS,
+  OFFLINE_MESSAGE,
+} from "@/helpers/constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
@@ -19,6 +25,9 @@ import { MS_PER_HOUR } from "@/helpers/utils/datetime-ui";
 import { changeHintConditions, trackConnections } from "@/helpers/utils/utils";
 import useScreenSizes from "@/helpers/hooks/useScreenSizes";
 import FullCalendarWrapper from "./FullCalendarWrapper";
+import RefreshIcon from "@/shared/RefreshIcon/RefreshIcon";
+import isOnline from "is-online";
+import { Loader } from "@/shared/Loader";
 
 export const Calendar = ({
   reportsFolder,
@@ -29,6 +38,7 @@ export const Calendar = ({
 }: CalendarProps) => {
   const [parsedQuarterReports, setParsedQuarterReports] = useState<ParsedReport[]>([]);
   const [formattedQuarterReports, setFormattedQuarterReports] = useState<FormattedReport[]>([]);
+  const [loading, setLoading] = useState(false);
   const calendarRef = useRef(null);
   const allCalendarRef = useRef(null);
   const totalTimeRef = useRef(null);
@@ -157,6 +167,23 @@ export const Calendar = ({
     };
   };
 
+  const handleRefreshButton = async () => {
+    try {
+      setLoading(true);
+      const online = await isOnline();
+
+      if (!online) {
+        alert(OFFLINE_MESSAGE);
+      } else {
+        setDaysOff(await loadHolidaysAndVacations(calendarDate));
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (timetrackerUserInfo) {
       trackConnections(TRACK_ANALYTICS.TIMETRACKER_WEB);
@@ -229,7 +256,17 @@ export const Calendar = ({
             Total: {monthWorkedHours} {workRequiredHours}
           </div>
           {timetrackerUserInfo && (
-            <p className="text-xs text-gray-500 dark:text-dark-main">Required: {monthRequiredHours}</p>
+            <div className="flex items-center gap-2 text-gray-500 dark:text-dark-main">
+              <p className="text-xs">Required: {monthRequiredHours}</p>
+              <button
+                className="h-4 w-4 hover:rotate-180 duration-300"
+                onClick={handleRefreshButton}
+                title="Refresh hours"
+              >
+                <RefreshIcon className="hover:stroke-blue-400" />
+              </button>
+              {loading && <Loader className="h-4 w-4" />}
+            </div>
           )}
         </div>
         <div className="flex gap-4">
