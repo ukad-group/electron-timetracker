@@ -35,11 +35,7 @@ const Notifications = () => {
   useEffect(() => {
     (async () => {
       const online = await isOnline();
-      console.log(online);
 
-      global.ipcRenderer.on("console", (_, data, lowerNewVersion, shouldSkipDownloading) =>
-        console.log(data, lowerNewVersion, shouldSkipDownloading),
-      );
       if (!online) return;
 
       global.ipcRenderer.on(IPC_MAIN_CHANNELS.UPDATE_AVAILABLE, (_, data: boolean, info: UpdateInfo) => {
@@ -60,18 +56,23 @@ const Notifications = () => {
         }
       });
 
-      global.ipcRenderer.on(IPC_MAIN_CHANNELS.RENDER_ERROR, (_, errorTitle, errorMessage, data) => {
-        setRenderError({ errorTitle, errorMessage });
-        console.log("Error data ", data);
-      });
-
       return () => {
         global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.UPDATE_AVAILABLE);
         global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.DOWNLOADED);
         global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.BACKEND_ERROR);
-        global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.RENDER_ERROR);
       };
     })();
+  }, []);
+
+  useEffect(() => {
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.RENDER_ERROR, (_, errorTitle, errorMessage, data) => {
+      setRenderError({ errorTitle, errorMessage });
+      console.log("Error data ", data);
+    });
+
+    return () => {
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.RENDER_ERROR);
+    };
   }, []);
 
   useEffect(() => {
