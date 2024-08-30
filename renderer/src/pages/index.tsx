@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { TrackTimeModal } from "@/components/TrackTimeModal";
 import { MainPage } from "@/components/MainPage";
-import { VersionMessage } from "@/shared/VersionMessage";
+import { Notifications } from "@/shared/Notifications";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import { ReportActivity } from "@/helpers/utils/reports";
@@ -100,7 +100,7 @@ export default function Home() {
 
   return (
     <div className="h-full bg-gray-100 dark:bg-dark-back">
-      <VersionMessage />
+      <Notifications />
       <main className="pt-10">
         <MainPage
           selectedDate={selectedDate}
