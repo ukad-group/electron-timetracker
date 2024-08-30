@@ -15,7 +15,7 @@ export type ActivitiesSectionProps = {
 
 export type PlaceholderProps = {
   onEditActivity: (activity: ReportActivity | "new") => void;
-  backgroundError: string;
+  backgroundError?: string;
   selectedDate: Date;
   setSelectedDateReport: Dispatch<SetStateAction<String>>;
 };
