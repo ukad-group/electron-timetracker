@@ -22,7 +22,7 @@ import {
 import { getTrelloCardsOfAllBoards, getTrelloMember, getTrelloAuthUrl } from "./helpers/API/trelloApi";
 import {
   getAzureAuthUrl,
-  getAzureAuthUrlAdditional,
+  // getAzureAuthUrlAdditional,
   getAzureTokens,
   getRefreshedPlannerToken,
   getTimetrackerCookie,
@@ -959,16 +959,18 @@ ipcMain.handle(IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_USER_INFO_TOKEN, async (_, 
   return await getRefreshedUserInfoToken(refreshToken, options);
 });
 
-ipcMain.on(IPC_MAIN_CHANNELS.AZURE_LOGIN_ADDITIONAL, async () => {
-  const options = getOffice365Options();
+// TODO: remove this handler if requests to the timetracker website don't generate errors in the beta version
 
-  const optionsWithPlannerScope = {
-    ...options,
-    scope: "api://d7d02680-bd82-47ed-95f9-e977ab5f0487/access_as_user offline_access",
-  };
+// ipcMain.on(IPC_MAIN_CHANNELS.AZURE_LOGIN_ADDITIONAL, async () => {
+//   const options = getOffice365Options();
 
-  mainWindow?.loadURL(getAzureAuthUrlAdditional(optionsWithPlannerScope));
-});
+//   const optionsWithPlannerScope = {
+//     ...options,
+//     scope: "api://d7d02680-bd82-47ed-95f9-e977ab5f0487/access_as_user offline_access",
+//   };
+
+// mainWindow?.loadURL(getAzureAuthUrlAdditional(optionsWithPlannerScope));
+// });
 
 ipcMain.handle(IPC_MAIN_CHANNELS.TIMETRACKER_GET_PLANNER_TOKEN, async (_, authCode: string) => {
   const options = getOffice365Options();

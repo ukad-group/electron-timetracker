@@ -51,25 +51,21 @@ export const changeMinutesAndHours = (eventKey: string, minutes: number, hours: 
 };
 
 export const getTimetrackerYearProjects = async (setWebTrackerProjects: Dispatch<SetStateAction<string[]>>) => {
-  const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+  const TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
-  if (!userInfo) return;
+  if (!TTUserInfo) return;
 
-  const timetrackerCookie = userInfo?.TTCookie;
+  const { cookie, refreshToken } = TTUserInfo;
 
   try {
-    const yearProjects = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.TIMETRACKER_GET_PROJECTS, timetrackerCookie);
+    const yearProjectsFromApi = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.TIMETRACKER_GET_PROJECTS, cookie);
 
-    if (yearProjects === "invalid_token") {
-      const refresh_token = userInfo?.userInfoRefreshToken;
-
-      console.log("REFREESH PROJECTS");
-
-      if (!refresh_token) return;
+    if (yearProjectsFromApi === "invalid_token") {
+      if (!refreshToken) return;
 
       const updatedCreds = await global.ipcRenderer.invoke(
         IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_USER_INFO_TOKEN,
-        refresh_token,
+        refreshToken,
       );
 
       const updatedIdToken = updatedCreds?.id_token;
@@ -77,26 +73,27 @@ export const getTimetrackerYearProjects = async (setWebTrackerProjects: Dispatch
       const updatedCookie = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.TIMETRACKER_LOGIN, updatedIdToken);
 
       const updatedUser = {
-        ...userInfo,
-        userInfoIdToken: updatedIdToken,
-        TTCookie: updatedCookie,
+        ...TTUserInfo,
+        idToken: updatedIdToken,
+        cookie: updatedCookie,
       };
-      console.log("updatedCookie PROJECTS", updatedCookie);
+
       localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUser));
+
       return await getTimetrackerYearProjects(setWebTrackerProjects);
     }
 
     const updatedUserInfo = {
-      ...userInfo,
-      yearProjects: yearProjects,
+      ...TTUserInfo,
+      yearProjects: yearProjectsFromApi,
     };
 
     localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUserInfo));
 
-    setWebTrackerProjects(yearProjects);
+    setWebTrackerProjects(yearProjectsFromApi);
   } catch (error) {
     console.log(error);
-    setWebTrackerProjects(userInfo.yearProjects);
+    setWebTrackerProjects(TTUserInfo.yearProjects);
   }
 };
 
@@ -172,7 +169,6 @@ export function setTimeOnOpen(
   setTo: Dispatch<SetStateAction<string>>,
 ) {
   const { hours, floorMinutes, isToday, ceilHours, ceilMinutes } = getDateTimeData(selectedDate);
-  // const prevActivity = activities[activities?.length - 1];
 
   if (activities?.length && activities[activities?.length - 1].to) {
     setFrom(activities[activities?.length - 1].to);

@@ -2,7 +2,7 @@ import { extractDatesFromPeriod, getWeekNumber, isTheSameDates } from "@/helpers
 import {
   DayOff,
   ApiDayOff,
-  TTUserInfo,
+  TTUserInfoProps,
   ParsedReport,
   VacationSickDaysData,
   FormattedReport,
@@ -14,21 +14,21 @@ import { ReportActivity, parseReport, validation } from "@/helpers/utils/reports
 
 export const loadHolidaysAndVacations = async (calendarDate: Date) => {
   try {
-    const timetrackerUserInfo: TTUserInfo = await JSON.parse(
+    const TTUserInfo: TTUserInfoProps = await JSON.parse(
       localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
     );
 
-    if (!timetrackerUserInfo) return;
+    if (!TTUserInfo) return;
 
-    const plannerToken = timetrackerUserInfo?.plannerAccessToken;
-    const userEmail = timetrackerUserInfo?.email;
+    const { accessToken, userEmail, refreshToken } = TTUserInfo;
+
     const userPromises = [];
     let nextYearVacationsPromise: Promise<VacationSickDaysData> | undefined;
     let prevYearVacationsPromise: Promise<VacationSickDaysData> | undefined;
 
     const vacationsPromise: Promise<VacationSickDaysData> = global.ipcRenderer.invoke(
       IPC_MAIN_CHANNELS.TIMETRACKER_GET_VACATIONS,
-      plannerToken,
+      accessToken,
       userEmail,
       calendarDate,
     );
@@ -40,7 +40,7 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
 
       nextYearVacationsPromise = global.ipcRenderer.invoke(
         IPC_MAIN_CHANNELS.TIMETRACKER_GET_VACATIONS,
-        plannerToken,
+        accessToken,
         userEmail,
         nextYear,
       );
@@ -53,7 +53,7 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
 
       prevYearVacationsPromise = global.ipcRenderer.invoke(
         IPC_MAIN_CHANNELS.TIMETRACKER_GET_VACATIONS,
-        plannerToken,
+        accessToken,
         userEmail,
         prevYear,
       );
@@ -67,18 +67,15 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
     const userFetchedData = await Promise.all(userPromises);
 
     if (userFetchedData.includes("invalid_token")) {
-      const refreshToken = timetrackerUserInfo?.plannerRefreshToken;
-      // console.log("REFREESH CALENDAR");
-      // console.log("timetrackerUserInfo", timetrackerUserInfo);
-
       const refreshedPlannerCreds = await global.ipcRenderer.invoke(
         IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_PLANNER_TOKEN,
         refreshToken,
       );
 
       const refreshedUserInfo = {
-        ...timetrackerUserInfo,
-        plannerAccessToken: refreshedPlannerCreds?.access_token,
+        ...TTUserInfo,
+        accessToken: refreshedPlannerCreds?.access_token,
+        refreshToken: refreshedPlannerCreds?.refresh_token,
       };
 
       localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(refreshedUserInfo));

@@ -8,7 +8,7 @@ import { Button } from "@/shared/Button";
 import { ErrorPlaceholder, RenderError } from "@/shared/ErrorPlaceholder";
 import { getMonthWorkHours, getRequiredHours, MONTHS, mathOvertimeUndertime } from "@/helpers/utils/datetime-ui";
 import { getFormattedReports, loadHolidaysAndVacations, getSumWorkDurationByWeek } from "./utils";
-import { CalendarProps, ParsedReport, FormattedReport, TTUserInfo, DayOff } from "./types";
+import { CalendarProps, ParsedReport, FormattedReport, TTUserInfoProps, DayOff } from "./types";
 import {
   LOCAL_STORAGE_VARIABLES,
   TRACK_ANALYTICS,
@@ -52,7 +52,9 @@ export const Calendar = ({
   });
   const { screenSizes } = useScreenSizes();
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
-  const timetrackerUserInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+  const timetrackerUserInfo: TTUserInfoProps = JSON.parse(
+    localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+  );
   const getCalendarApi = () => calendarRef.current.getApi();
 
   const monthWorkedHours = useMemo(() => {
