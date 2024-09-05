@@ -74,7 +74,7 @@ describe("GIVEN changeMinutesAndHours", () => {
 //   const setWebTrackerProjectsMock = jest.fn();
 
 //   it("should call global.ipcRenderer.invoke with the correct arguments when userInfo is present in localStorage", async () => {
-//     localStorage.setItem("timetracker-user", JSON.stringify({ TTCookie: "token" }));
+//     localStorage.setItem("timetracker-user", JSON.stringify({ cookie: "token" }));
 
 //     await getTimetrackerYearProjects(setWebTrackerProjectsMock);
 

@@ -4,7 +4,7 @@ import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import { MONTHS } from "@/helpers/utils/datetime-ui";
 import { ReportActivity, formatDurationAsDecimals, parseReport } from "@/helpers/utils/reports";
-import { ParsedReport, TTUserInfo } from "../Calendar/types";
+import { ParsedReport, TTUserInfoProps } from "../Calendar/types";
 import { Loader } from "@/shared/Loader";
 import Tooltip from "@/shared/Tooltip/Tooltip";
 import { BookingsProps, BookingFromApi, BookedSpentStat } from "./types";
@@ -15,13 +15,14 @@ import isOnline from "is-online";
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
   const showBookings = !!JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+
   if (!showBookings) return;
+
+  const [loading, setLoading] = useState(false);
   const [bookedProjects, setBookedProjects] = useState<BookingFromApi[]>([]);
   const [bookedSpentStatistic, setBookedSpentStatistic] = useState<BookedSpentStat[]>([]);
-  const [loading, setLoading] = useState(false);
   const currentReadableMonth = MONTHS[calendarDate.getMonth()];
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
-  let maxRecurse = 0;
 
   const totalBookingTime: number = useMemo(() => {
     return bookedProjects.reduce((acc, project) => acc + (project?.plans[0]?.hours || 0), 0);
@@ -31,11 +32,12 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
     return bookedSpentStatistic.reduce((acc, project) => acc + (project?.spent || 0), 0);
   }, [bookedSpentStatistic]);
 
-  const getBookings = async (cookie: string, userName: string): Promise<BookingFromApi[]> => {
-    const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
-    if (!userInfo) return;
+  const getBookings = async (): Promise<BookingFromApi[]> => {
+    const TTUserInfo: TTUserInfoProps = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
-    const timetrackerCookie = userInfo?.TTCookie;
+    if (!TTUserInfo) return;
+
+    const { cookie, userName, refreshToken } = TTUserInfo;
 
     try {
       setLoading(true);
@@ -46,34 +48,31 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
         userName,
         calendarDate,
       );
-      // console.log("Cookie", cookie);
+
       if (allLoggedProjects === "invalid_token") {
-        const refresh_token = userInfo?.userInfoRefreshToken;
-
-        console.log("REFREESH BOOKING", userInfo.TTCookie);
-
-        if (!refresh_token) return;
+        if (!refreshToken) return;
 
         const updatedCreds = await global.ipcRenderer.invoke(
           IPC_MAIN_CHANNELS.TIMETRACKER_REFRESH_USER_INFO_TOKEN,
-          refresh_token,
+          refreshToken,
         );
 
-        const updatedIdToken = updatedCreds?.id_token;
-
-        const updatedCookie = await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.TIMETRACKER_LOGIN, updatedIdToken);
+        const updatedCookie = await global.ipcRenderer.invoke(
+          IPC_MAIN_CHANNELS.TIMETRACKER_LOGIN,
+          updatedCreds?.id_token,
+        );
 
         const updatedUser = {
-          ...userInfo,
-          userInfoIdToken: updatedIdToken,
-          TTCookie: updatedCookie,
+          ...TTUserInfo,
+          idToken: updatedCreds?.id_token,
+          cookie: updatedCookie,
+          refreshToken: updatedCreds?.refresh_token,
         };
-        console.log("updatedCookie BOOKING", updatedCookie);
-        localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUser));
-        return await getBookings(updatedCookie, userName);
-      }
 
-      maxRecurse = 0;
+        localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUser));
+
+        return await getBookings();
+      }
 
       return allLoggedProjects.filter((project: BookingFromApi) => {
         const projectBooking = project?.plans[0];
@@ -88,6 +87,12 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
       });
     } catch (error) {
       console.log(error);
+
+      const online = await isOnline();
+
+      if (!online) {
+        console.log(OFFLINE_MESSAGE);
+      }
     } finally {
       setLoading(false);
     }
@@ -117,14 +122,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   };
 
   const getBookedStatistic = async () => {
-    const TTUserInfo: TTUserInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
-
-    if (!TTUserInfo) return;
-
-    const timetrackerCookie = TTUserInfo?.TTCookie;
-    const timetrackerUserName = TTUserInfo?.name;
-
-    const bookedProjects = await getBookings(timetrackerCookie, timetrackerUserName);
+    const bookedProjects = await getBookings();
 
     if (!bookedProjects || bookedProjects?.length === 0) {
       setBookedProjects([]);
@@ -189,19 +187,11 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   useEffect(() => {
     getBookedStatistic();
 
-    const fileChangeListener = () => {
-      getBookedStatistic();
-    };
-
-    global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, getBookedStatistic);
 
     return () => {
-      global.ipcRenderer.removeListener(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
+      global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED);
     };
-  }, []);
-
-  useEffect(() => {
-    getBookedStatistic();
   }, [calendarDate]);
 
   const renderProjectsHours = () =>

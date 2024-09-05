@@ -20,25 +20,27 @@ export const getAzureAuthUrl = (options: Options) => {
   return authUrl.toString();
 };
 
-export const getAzureAuthUrlAdditional = (options: Options) => {
-  const { clientId, scope, redirectUri } = options;
-  const authUrl = new URL(
-    "https://login.microsoftonline.com/22c676eb-cbe8-4058-b9da-f58799142fbe/oauth2/v2.0/authorize"
-  );
+// TODO: remove this handler if requests to the timetracker website don't generate errors in the beta version
 
-  const params = new URLSearchParams({
-    client_id: clientId,
-    scope: scope,
-    redirect_uri: redirectUri,
-    prompt: "none",
-    response_type: "code",
-    state: "azure-additional",
-  });
+// export const getAzureAuthUrlAdditional = (options: Options) => {
+//   const { clientId, scope, redirectUri } = options;
+//   const authUrl = new URL(
+//     "https://login.microsoftonline.com/22c676eb-cbe8-4058-b9da-f58799142fbe/oauth2/v2.0/authorize"
+//   );
 
-  authUrl.search = params.toString();
+//   const params = new URLSearchParams({
+//     client_id: clientId,
+//     scope: scope,
+//     redirect_uri: redirectUri,
+//     prompt: "none",
+//     response_type: "code",
+//     state: "azure-additional",
+//   });
 
-  return authUrl.toString();
-};
+//   authUrl.search = params.toString();
+
+//   return authUrl.toString();
+// };
 
 export const getAzureTokens = async (authCode: string, options: Options) => {
   if (!authCode) return;
