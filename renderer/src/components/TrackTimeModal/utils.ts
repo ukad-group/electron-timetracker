@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
+import { LOCAL_STORAGE_VARIABLES, OFFLINE_MESSAGE } from "@/helpers/constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { KEY_CODES } from "@/helpers/constants";
 import { ReportActivity } from "@/helpers/utils/reports";
@@ -10,6 +10,7 @@ import { formatDurationAsDecimals } from "@/helpers/utils/reports";
 import { HINTS_GROUP_NAMES } from "@/helpers/constants";
 import { TutorialProgress } from "@/store/types";
 import { ScheduledEvents } from "@/store/types";
+import isOnline from "is-online";
 
 export const changeHours = (eventKey: string, hours: number) => {
   let newHours = hours;
@@ -94,6 +95,12 @@ export const getTimetrackerYearProjects = async (setWebTrackerProjects: Dispatch
   } catch (error) {
     console.log(error);
     setWebTrackerProjects(TTUserInfo.yearProjects);
+
+    const online = await isOnline();
+
+    if (!online) {
+      console.log(OFFLINE_MESSAGE);
+    }
   }
 };
 

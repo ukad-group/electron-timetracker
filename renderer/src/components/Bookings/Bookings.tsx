@@ -87,6 +87,12 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
       });
     } catch (error) {
       console.log(error);
+
+      const online = await isOnline();
+
+      if (!online) {
+        console.log(OFFLINE_MESSAGE);
+      }
     } finally {
       setLoading(false);
     }
