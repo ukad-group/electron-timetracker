@@ -9,6 +9,7 @@ import {
   disabledStyles,
 } from "./constants";
 
+// TODO: create separate Button component which Extend HtmlButtom props,
 const Button = ({ callback, text, disabled, status, type = "button", tabIndex, children }: ButtonProps) => {
   const saveBtnStatuses = {
     enabled: {
