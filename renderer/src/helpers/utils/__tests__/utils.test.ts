@@ -6,8 +6,7 @@ import {
   extractTokenFromString,
   trackConnections,
 } from "../utils";
-import { ReportActivity } from "../reports";
-import { HintConitions } from "../types";
+import { HintConitions, ReportActivity } from "../types";
 import { TutorialProgress } from "@/store/types";
 import { globalIpcRendererMock } from "@/tests/mocks/electron";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";

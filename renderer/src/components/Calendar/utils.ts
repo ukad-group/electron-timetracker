@@ -10,8 +10,9 @@ import {
 } from "./types";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES, OFFLINE_MESSAGE } from "@/helpers/constants";
-import { ReportActivity, parseReport, validation } from "@/helpers/utils/reports";
+import { parseReport, validation } from "@/helpers/utils/reports";
 import isOnline from "is-online";
+import { ReportActivity } from "@/helpers/utils/types";
 
 export const loadHolidaysAndVacations = async (calendarDate: Date) => {
   try {

@@ -1,5 +1,4 @@
 import { useMemo, useEffect, useState } from "react";
-import { ReportActivity } from "@/helpers/utils/reports";
 import { checkIsToday, getCeiledTime } from "@/helpers/utils/datetime-ui";
 import { shallow } from "zustand/shallow";
 import { useScheduledEventsStore } from "@/store/googleEventsStore";
@@ -13,6 +12,7 @@ import { MainView, CompactView } from "./components";
 import { getTotalDuration, formatEvents, getActualEvents } from "./utils";
 import { KEY_CODES, LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 import { TRACK_ANALYTICS } from "@/helpers/constants";
+import { ReportActivity } from "@/helpers/utils/types";
 
 const ActivitiesTable = ({
   activities,
@@ -41,7 +41,7 @@ const ActivitiesTable = ({
     [validatedActivities],
   );
 
-  const tableActivities = useMemo(() => {
+  const tableActivities: ReportActivity[] = useMemo(() => {
     const badgedActivities = validatedActivities.map((activity) => {
       const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
       if (userInfo && !userInfo?.yearProjects?.includes(activity.project)) {

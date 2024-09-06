@@ -4,10 +4,10 @@ import { MainPage } from "@/components/MainPage";
 import { Notifications } from "@/shared/Notifications";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
-import { ReportActivity } from "@/helpers/utils/reports";
 import useColorTheme from "@/helpers/hooks/useTheme";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { addPastTime, editActivity } from "@/helpers/utils/utils";
+import { ReportActivity } from "@/helpers/utils/types";
 
 export default function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date());

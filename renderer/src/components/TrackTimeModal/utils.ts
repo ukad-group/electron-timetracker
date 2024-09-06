@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction } from "react";
 import { LOCAL_STORAGE_VARIABLES, OFFLINE_MESSAGE } from "@/helpers/constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { KEY_CODES } from "@/helpers/constants";
-import { ReportActivity } from "@/helpers/utils/reports";
 import { getDateTimeData } from "@/helpers/utils/datetime-ui";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import { padStringToMinutes } from "@/helpers/utils/datetime-ui";
@@ -11,6 +10,7 @@ import { HINTS_GROUP_NAMES } from "@/helpers/constants";
 import { TutorialProgress } from "@/store/types";
 import { ScheduledEvents } from "@/store/types";
 import isOnline from "is-online";
+import { ReportActivity } from "@/helpers/utils/types";
 
 export const changeHours = (eventKey: string, hours: number) => {
   let newHours = hours;
