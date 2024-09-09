@@ -13,7 +13,7 @@ import { useMainStore } from "@/store/mainStore";
 import { useBetaStore } from "@/store/betaUpdatesStore";
 import { useTutorialProgressStore } from "@/store/tutorialProgressStore";
 import { shallow } from "zustand/shallow";
-import { parseReport, serializeReport, ReportAndNotes } from "@/helpers/utils/reports";
+import { parseReport, serializeReport } from "@/helpers/utils/reports";
 import { changeHintConditions } from "@/helpers/utils/utils";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import { LOCAL_STORAGE_VARIABLES, HINTS_GROUP_NAMES, HINTS_ALERTS, KEY_CODES } from "@/helpers/constants";
@@ -22,6 +22,7 @@ import { StoredSection } from "@/components/WidgetOrderSection/types";
 import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
+import { ReportAndNotes } from "@/helpers/utils/types";
 
 const MainPage = ({
   selectedDate,

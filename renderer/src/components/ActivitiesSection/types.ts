@@ -1,4 +1,4 @@
-import { ReportActivity } from "@/helpers/utils/reports";
+import { ReportActivity } from "@/helpers/utils/types";
 import { Dispatch, SetStateAction } from "react";
 
 export type TrackTimeButtonProps = {

@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { useMainStore } from "@/store/mainStore";
 import { shallow } from "zustand/shallow";
 import { MONTHS } from "@/helpers/utils/datetime-ui";
-import { ReportActivity, formatDurationAsDecimals, parseReport } from "@/helpers/utils/reports";
+import { formatDurationAsDecimals, parseReport } from "@/helpers/utils/reports";
 import { ParsedReport, TTUserInfoProps } from "../Calendar/types";
 import { Loader } from "@/shared/Loader";
 import Tooltip from "@/shared/Tooltip/Tooltip";
@@ -12,6 +12,7 @@ import { LOCAL_STORAGE_VARIABLES, OFFLINE_MESSAGE } from "@/helpers/constants";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 import RefreshIcon from "@/shared/RefreshIcon/RefreshIcon";
 import isOnline from "is-online";
+import { ReportActivity } from "@/helpers/utils/types";
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
   const showBookings = !!JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
