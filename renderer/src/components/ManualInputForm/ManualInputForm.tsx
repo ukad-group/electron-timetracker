@@ -20,6 +20,7 @@ const ManualInputForm = ({
   setSelectedDateReport,
   isFileExist,
   setIsFileExist,
+  mode,
 }: ManualInputFormProps) => {
   const [report, setReport] = useState("");
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
@@ -29,6 +30,7 @@ const ManualInputForm = ({
   const editingHistoryManager = useEditingHistoryManager(report);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
+  const [isFieldDisabled, setIsFieldDisabled] = useState(true);
 
   const handleCtrlSSave = (e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_S && selectedDateReport !== report) {
@@ -41,6 +43,7 @@ const ManualInputForm = ({
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.MANUAL_SAVE);
     onSave(report, true);
     setSaveBtnStatus("inprogress");
+    setIsFieldDisabled(true);
   };
 
   const handleTextAreaKeyDown = (e: KeyboardEventProps) => {
@@ -135,6 +138,50 @@ const ManualInputForm = ({
     }
   }, [saveReportTrigger]);
 
+  const textAreaDefaultClassNames =
+    "block w-full px-3 py-2 mt-3 border border-gray-300 rounded-md shadow-sm focus-visible:outline-blue-500 sm:text-sm dark:bg-dark-back dark:border-dark-border dark:text-slate-400 focus-visible:dark:outline-slate-500 resize-none";
+  const textAreaDisabledClassnames = "opacity-40";
+
+  const textAreaClassNames = `${textAreaDefaultClassNames} ${isFieldDisabled ? textAreaDisabledClassnames : ""}`;
+
+  useEffect(() => {
+    if (mode === "create") {
+      setIsFieldDisabled(false);
+    } else {
+      setIsFieldDisabled(true);
+    }
+  }, [selectedDate]);
+
+  const renderButtons = () => {
+    if (mode === "create") {
+      return (
+        <Button
+          text="Save"
+          callback={handleSaveReport}
+          status={saveBtnStatus}
+          disabled={saveBtnStatus === "disabled"}
+          type={"button"}
+        />
+      );
+    }
+
+    return (
+      <>
+        {isFieldDisabled ? (
+          <Button text="Edit" callback={() => setIsFieldDisabled(false)} type="button" />
+        ) : (
+          <Button
+            text="Save"
+            callback={handleSaveReport}
+            status={saveBtnStatus}
+            disabled={saveBtnStatus === "disabled"}
+            type="button"
+          />
+        )}
+      </>
+    );
+  };
+
   return (
     <div>
       <Hint
@@ -163,10 +210,11 @@ const ManualInputForm = ({
         onFocus={handleOnFocus}
         onChange={(e) => setReport(e.target.value)}
         rows={15}
-        className="block w-full px-3 py-2 mt-3 border border-gray-300 rounded-md shadow-sm focus-visible:outline-blue-500 sm:text-sm dark:bg-dark-back dark:border-dark-border dark:text-slate-400 focus-visible:dark:outline-slate-500"
+        className={textAreaClassNames}
         spellCheck={true}
         ref={textareaRef}
         onKeyDown={handleTextAreaKeyDown}
+        disabled={isFieldDisabled}
       />
       <div className="relative flex flex-col gap-4 mt-6 justify-stretch">
         {showDeleteMessage && (
@@ -178,13 +226,7 @@ const ManualInputForm = ({
           />
         )}
         <div className="flex flex-col justify-stretch">
-          <Button
-            text="Save"
-            callback={handleSaveReport}
-            status={saveBtnStatus}
-            disabled={saveBtnStatus === "disabled"}
-            type={"button"}
-          />
+          {renderButtons()}
           <span className="block text-xs text-gray-500 text-center">or press ctrl/command + s</span>
         </div>
         {showDeleteButton && (

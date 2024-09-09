@@ -8,6 +8,7 @@ export type ManualInputFormProps = {
   setSelectedDateReport: (value: string) => void;
   isFileExist: boolean;
   setIsFileExist: (value: boolean) => void;
+  mode: "create" | "edit";
 };
 
 export interface KeyboardEventProps extends KeyboardEvent<HTMLTextAreaElement> {

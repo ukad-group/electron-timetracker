@@ -23,6 +23,7 @@ import Link from "next/link";
 import { Cog8ToothIcon } from "@heroicons/react/24/solid";
 import clsx from "clsx";
 import { ReportAndNotes } from "@/helpers/utils/types";
+import { checkIsToday } from "@/helpers/utils/datetime-ui";
 
 const MainPage = ({
   selectedDate,
@@ -45,6 +46,7 @@ const MainPage = ({
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const storedSectionsOptions = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER));
   const mainPageRef = useRef(null);
+  const isToday = checkIsToday(selectedDate);
 
   useEffect(() => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FOLDER_WATCHER, reportsFolder);
@@ -219,6 +221,7 @@ const MainPage = ({
             setSelectedDateReport={setSelectedDateReport}
             isFileExist={isFileExist}
             setIsFileExist={setIsFileExist}
+            mode={isToday ? "create" : "edit"}
           />
         </section>
       ),
