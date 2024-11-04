@@ -9,7 +9,7 @@ const RefreshIcon = ({ className = "" }) => {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className={clsx("size-6", className)}
+      className={clsx("size-4", className)}
     >
       <path
         strokeLinecap="round"
