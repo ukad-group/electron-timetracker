@@ -20,7 +20,7 @@ const ManualInputForm = ({
   setSelectedDateReport,
   isFileExist,
   setIsFileExist,
-  mode,
+  isToday,
 }: ManualInputFormProps) => {
   const [report, setReport] = useState("");
   const [saveBtnStatus, setSaveBtnStatus] = useState("disabled");
@@ -30,7 +30,7 @@ const ManualInputForm = ({
   const editingHistoryManager = useEditingHistoryManager(report);
   const [cursorPosition, setCursorPosition] = useState(0);
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
-  const [isFieldDisabled, setIsFieldDisabled] = useState(true);
+  const [isFieldDisabled, setIsFieldDisabled] = useState(!isToday);
 
   const handleCtrlSSave = (e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_S && selectedDateReport !== report) {
@@ -43,7 +43,9 @@ const ManualInputForm = ({
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, TRACK_ANALYTICS.MANUAL_SAVE);
     onSave(report, true);
     setSaveBtnStatus("inprogress");
-    setIsFieldDisabled(true);
+    if (!isToday) {
+      setIsFieldDisabled(true);
+    }
   };
 
   const handleTextAreaKeyDown = (e: KeyboardEventProps) => {
@@ -145,7 +147,7 @@ const ManualInputForm = ({
   const textAreaClassNames = `${textAreaDefaultClassNames} ${isFieldDisabled ? textAreaDisabledClassnames : ""}`;
 
   useEffect(() => {
-    if (mode === "create") {
+    if (isToday) {
       setIsFieldDisabled(false);
     } else {
       setIsFieldDisabled(true);
@@ -153,7 +155,7 @@ const ManualInputForm = ({
   }, [selectedDate]);
 
   const renderButtons = () => {
-    if (mode === "create") {
+    if (isToday) {
       return (
         <Button
           text="Save"

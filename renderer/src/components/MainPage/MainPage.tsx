@@ -221,7 +221,7 @@ const MainPage = ({
             setSelectedDateReport={setSelectedDateReport}
             isFileExist={isFileExist}
             setIsFileExist={setIsFileExist}
-            mode={isToday ? "create" : "edit"}
+            isToday={isToday}
           />
         </section>
       ),
