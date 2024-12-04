@@ -8,7 +8,9 @@ import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 import isOnline from "is-online";
 
 const JiraConnection = () => {
-  const [users, setUsers] = useState(JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || []);
+  const [users, setUsers] = useState(
+    JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || [],
+  );
 
   const handleSignInButton = async () => {
     const online = await isOnline();
@@ -24,17 +26,17 @@ const JiraConnection = () => {
     const filteredUsers = users.filter((user: JiraUser) => user.userId !== id);
 
     if (filteredUsers.length > 0) {
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(filteredUsers));
+      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(filteredUsers));
     } else {
-      localStorage.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS);
+      window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS);
     }
 
     setUsers(filteredUsers);
   };
 
   const addUser = async () => {
-    const authorizationCode = localStorage.getItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE);
-    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE);
+    const authorizationCode = window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE);
+    window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE);
 
     if (!authorizationCode) return;
 
@@ -64,7 +66,7 @@ const JiraConnection = () => {
 
     const newUsers = [...users, user];
 
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(newUsers));
+    window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(newUsers));
     setUsers(newUsers);
   };
 

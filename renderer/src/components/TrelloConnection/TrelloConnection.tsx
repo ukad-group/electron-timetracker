@@ -6,7 +6,9 @@ import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 import isOnline from "is-online";
 
 const TrelloConnection = () => {
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER)) || null);
+  const [user, setUser] = useState(
+    JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER)) || null,
+  );
 
   const handleSignInButton = async () => {
     const online = isOnline();
@@ -19,13 +21,13 @@ const TrelloConnection = () => {
   };
 
   const handleSignOutButton = () => {
-    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER);
+    window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER);
     setUser(null);
   };
 
   const addUser = async () => {
-    const token = localStorage.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN);
-    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN);
+    const token = window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN);
+    window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN);
 
     if (!token) return;
 
@@ -40,7 +42,7 @@ const TrelloConnection = () => {
       username: username || fullName || "",
     };
 
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER, JSON.stringify(newUser));
+    window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER, JSON.stringify(newUser));
     setUser(newUser);
   };
 

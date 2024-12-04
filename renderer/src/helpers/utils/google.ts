@@ -10,10 +10,10 @@ export const loadGoogleEvents = async (accessToken: string, refreshToken: string
     if (data?.error && data?.error?.code === 401) {
       const updatedCredentials = await updateGoogleCredentials(refreshToken);
       const newAccessToken = updatedCredentials?.access_token;
-      const usersLs = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
+      const usersLs = JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS));
 
       usersLs[index].googleAccessToken = newAccessToken;
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify(usersLs));
+      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS, JSON.stringify(usersLs));
 
       return await loadGoogleEvents(newAccessToken, refreshToken, index);
     }
@@ -28,7 +28,7 @@ export const loadGoogleEvents = async (accessToken: string, refreshToken: string
 };
 
 export const loadGoogleEventsFromAllUsers = async () => {
-  const storedUsers = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS)) || [];
+  const storedUsers = JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.GOOGLE_USERS)) || [];
 
   if (!storedUsers.length) return [];
 

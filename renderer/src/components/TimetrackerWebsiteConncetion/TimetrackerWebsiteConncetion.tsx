@@ -10,7 +10,7 @@ import isOnline from "is-online";
 const TimetrackerWebsiteConnection = () => {
   const router = useRouter();
   const [loggedUser, setLoggedUser] = useState(
-    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)),
+    JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)),
   );
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +25,7 @@ const TimetrackerWebsiteConnection = () => {
   };
 
   const handleSignOutButton = () => {
-    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER);
+    window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER);
     setLoggedUser(null);
   };
 
@@ -33,8 +33,8 @@ const TimetrackerWebsiteConnection = () => {
     setLoading(true);
     document.body.style.overflow = "hidden";
 
-    const authorizationCode = localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE);
-    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE);
+    const authorizationCode = window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE);
+    window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE);
 
     if (!authorizationCode) return;
 
@@ -66,7 +66,7 @@ const TimetrackerWebsiteConnection = () => {
         yearProjects: yearProjectsFromApi,
       };
 
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(TTUserInfo));
+      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(TTUserInfo));
       setLoggedUser(TTUserInfo);
 
       await router.push("/settings");

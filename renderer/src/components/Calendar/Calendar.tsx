@@ -53,7 +53,7 @@ export const Calendar = ({
   const { screenSizes } = useScreenSizes();
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const timetrackerUserInfo: TTUserInfoProps = JSON.parse(
-    localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+    window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
   );
   const getCalendarApi = () => calendarRef.current.getApi();
 

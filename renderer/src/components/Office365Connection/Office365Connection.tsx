@@ -8,7 +8,9 @@ import isOnline from "is-online";
 import { TRACK_ANALYTICS } from "@/helpers/constants";
 
 const Office365Connection = () => {
-  const [users, setUsers] = useState(JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || []);
+  const [users, setUsers] = useState(
+    JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS)) || [],
+  );
   const [showEventsInTable, setShowEventsInTable] = useState(false);
 
   const handleSignInButton = async () => {
@@ -25,18 +27,18 @@ const Office365Connection = () => {
     const filteredUsers = users.filter((user: Office365User) => user.userId !== id);
 
     if (filteredUsers.length > 0) {
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS, JSON.stringify(filteredUsers));
+      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS, JSON.stringify(filteredUsers));
     } else {
-      localStorage.removeItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS);
-      localStorage.removeItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS);
+      window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS);
+      window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS);
     }
 
     setUsers(filteredUsers);
   };
 
   const addUser = async () => {
-    const authorizationCode = localStorage.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE);
-    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE);
+    const authorizationCode = window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE);
+    window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE);
 
     if (!authorizationCode) return;
 
@@ -71,12 +73,12 @@ const Office365Connection = () => {
     });
     const newUsers = [...users, user];
 
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS, JSON.stringify(newUsers));
+    window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_USERS, JSON.stringify(newUsers));
     setUsers(newUsers);
   };
 
   const handleCheckboxChange = () => {
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS, (!showEventsInTable).toString());
+    window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS, (!showEventsInTable).toString());
     setShowEventsInTable(!showEventsInTable);
   };
 
@@ -85,7 +87,7 @@ const Office365Connection = () => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS) === "true") {
+    if (window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS) === "true") {
       setShowEventsInTable(true);
     }
 

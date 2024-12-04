@@ -15,3 +15,19 @@ declare global {
     }
   }
 }
+
+export interface IElectronAPI {
+  getCurrentPort: () => string | undefined;
+  store: {
+    getItem: (key: string) => any;
+    setItem: (key: string, val: any) => void;
+    removeItem: (key: string) => void;
+    clear: () => void;
+  };
+}
+
+declare global {
+  interface Window {
+    electronAPI: IElectronAPI;
+  }
+}

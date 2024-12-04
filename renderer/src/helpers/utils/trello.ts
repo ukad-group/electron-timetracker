@@ -11,7 +11,7 @@ type Card = {
 };
 
 export const getAllTrelloCardsFromApi = async () => {
-  const user = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER)) || null;
+  const user = JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER)) || null;
 
   if (!user) return [[], []];
 

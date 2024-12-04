@@ -19,8 +19,10 @@ const ActivitiesSection = ({
 }: ActivitiesSectionProps) => {
   const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const isGoogleEventsShown = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS));
-  const isOffice365EventsShown = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS));
+  const isGoogleEventsShown = JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.SHOW_GOOGLE_EVENTS));
+  const isOffice365EventsShown = JSON.parse(
+    window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.SHOW_OFFICE_365_EVENTS),
+  );
   const validatedActivities = useMemo(() => {
     return validation(activities.filter((activity) => activity.to));
   }, [activities]);

@@ -30,7 +30,7 @@ export function parseEventTitle(event, latestProjAndAct: Record<string, [string]
   const items = eventTitle ? eventTitle.trim().split(" - ") : "";
   const words = eventTitle ? eventTitle.trim().split(" ") : "";
   let allProjects: Array<string> = Object.keys(latestProjAndAct);
-  const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+  const userInfo = JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
 
   if (userInfo && userInfo.yearProjects) {
     allProjects = Object.keys(latestProjAndAct).concat(userInfo.yearProjects);
@@ -137,12 +137,12 @@ export const trackConnections = (connectedName: string) => {
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");
 
-  if (localStorage.getItem(connectedName + "Connection") !== `${year}-${month}-${day}`) {
+  if (window.electronAPI.store.getItem(connectedName + "Connection") !== `${year}-${month}-${day}`) {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.ANALYTICS_DATA, "connections", {
       connected: connectedName,
     });
 
-    localStorage.setItem(connectedName + "Connection", `${year}-${month}-${day}`);
+    window.electronAPI.store.setItem(connectedName + "Connection", `${year}-${month}-${day}`);
   }
 };
 
@@ -160,7 +160,7 @@ export const closeWindowIfNeeded = () => {
       window.location.search.includes("state=office365code") &&
       !window.location.search.includes("error")
     ) {
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE, urlParams.get("code"));
+      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.OFFICE_365_AUTH_CODE, urlParams.get("code"));
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, "office365");
     }
 
@@ -169,7 +169,7 @@ export const closeWindowIfNeeded = () => {
       window.location.search.includes("state=jiracode") &&
       !window.location.search.includes("error")
     ) {
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE, urlParams.get("code"));
+      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE, urlParams.get("code"));
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, "jira");
     }
 
@@ -178,19 +178,19 @@ export const closeWindowIfNeeded = () => {
       window.location.search.includes("state=googlecalendarcode") &&
       !window.location.search.includes("error")
     ) {
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_AUTH_CODE, urlParams.get("code"));
+      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.GOOGLE_AUTH_CODE, urlParams.get("code"));
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, "google");
     }
 
     if (window.location.hash.includes("token") && !window.location.hash.includes("error")) {
       const tokenFromUrl = extractTokenFromString(window.location.hash);
 
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN, tokenFromUrl);
+      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN, tokenFromUrl);
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, "trello");
     }
 
     if (window.location.search.includes("code") && window.location.search.includes("state=azure-base")) {
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE, urlParams.get("code"));
+      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE, urlParams.get("code"));
       global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHILD_WINDOW_CLOSED, "timetracker-website");
     }
 

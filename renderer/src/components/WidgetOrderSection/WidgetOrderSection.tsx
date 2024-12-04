@@ -5,8 +5,10 @@ import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import DragNDropIcon from "@/shared/DragNDropIcon/DragNDropIcon";
 
 const WidgetOrderSection = () => {
-  const sectionsOptions: StoredSection[] = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER))
-    ? JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER))
+  const sectionsOptions: StoredSection[] = JSON.parse(
+    window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER),
+  )
+    ? JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER))
     : [
         { id: "Date Selector", side: "left", order: 1 },
         { id: "Activities Table", side: "left", order: 2 },
@@ -89,7 +91,10 @@ const WidgetOrderSection = () => {
   };
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER, JSON.stringify([...leftSections, ...rightSections]));
+    window.electronAPI.store.setItem(
+      LOCAL_STORAGE_VARIABLES.WIDGET_ORDER,
+      JSON.stringify([...leftSections, ...rightSections]),
+    );
   }, [leftSections, rightSections]);
 
   return (

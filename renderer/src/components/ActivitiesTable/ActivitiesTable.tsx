@@ -30,8 +30,8 @@ const ActivitiesTable = ({
   const [timerId, setTimerId] = useState(null);
   const [scheduledEvents] = useScheduledEventsStore((state) => [state.event, state.setEvent], shallow);
   const { screenSizes } = useScreenSizes();
-  const showAsMain = localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER)
-    ? JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER)).find(
+  const showAsMain = window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER)
+    ? JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER)).find(
         (section) => section.id === "Activities Table",
       ).side === "left"
     : true;
@@ -43,7 +43,7 @@ const ActivitiesTable = ({
 
   const tableActivities: ReportActivity[] = useMemo(() => {
     const badgedActivities = validatedActivities.map((activity) => {
-      const userInfo = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+      const userInfo = JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
       if (userInfo && !userInfo?.yearProjects?.includes(activity.project)) {
         return { ...activity, isNewProject: true };
       }
