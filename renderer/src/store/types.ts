@@ -31,6 +31,8 @@ export type googleCalendarStoreProps = {
 export type BetaStore = {
   isBeta: boolean;
   setIsBeta: (isDownload: boolean) => void;
+  hydrated: boolean;
+  setHydrated: () => void;
 };
 
 export type ScheduledEvents = Record<string, { project?: string; activity?: string }>;

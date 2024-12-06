@@ -42,11 +42,18 @@ const MainPage = ({
   const [saveReportTrigger, setSaveReportTrigger] = useState(false);
   const [isFileExist, setIsFileExist] = useState(false);
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
-  const [isBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
+  const [isBeta, hydrated] = useBetaStore((state) => [state.isBeta, state.hydrated], shallow);
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const storedSectionsOptions = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER));
   const mainPageRef = useRef(null);
   const isToday = checkIsToday(selectedDate);
+
+  useEffect(() => {
+    // Checking if the storage file has been loaded
+    if (hydrated) {
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
+    }
+  }, [isBeta, hydrated]);
 
   useEffect(() => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FOLDER_WATCHER, reportsFolder);
@@ -58,7 +65,6 @@ const MainPage = ({
       });
     }
 
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
     global.ipcRenderer.on(IPC_MAIN_CHANNELS.WINDOW_FOCUSED, handleWindowFocus);
 
     document.addEventListener("keydown", handleCtrlPlus);
