@@ -41,22 +41,32 @@ const MainPage = ({
   const [selectedDateReport, setSelectedDateReport] = useState("");
   const [saveReportTrigger, setSaveReportTrigger] = useState(false);
   const [isFileExist, setIsFileExist] = useState(false);
-  const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
-  const [isBeta, hydrated] = useBetaStore((state) => [state.isBeta, state.hydrated], shallow);
+  const [reportsFolder, mainStoreLoaded] = useMainStore(
+    (state) => [state.reportsFolder, state.mainStoreLoaded],
+    shallow,
+  );
+  const [isBeta, betaUpdateStoreLoaded] = useBetaStore((state) => [state.isBeta, state.betaUpdateStoreLoaded], shallow);
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const storedSectionsOptions = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER));
   const mainPageRef = useRef(null);
   const isToday = checkIsToday(selectedDate);
 
   useEffect(() => {
-    // Checking if the storage file has been loaded
-    if (hydrated) {
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
+    if (mainStoreLoaded) {
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FOLDER_WATCHER, reportsFolder);
     }
-  }, [isBeta, hydrated]);
+    return () => {
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.STOP_PATH_WATCHER, reportsFolder);
+    };
+  }, [reportsFolder, mainStoreLoaded]);
 
   useEffect(() => {
-    global.ipcRenderer.send(IPC_MAIN_CHANNELS.START_FOLDER_WATCHER, reportsFolder);
+    if (betaUpdateStoreLoaded) {
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.BETA_CHANNEL, isBeta);
+    }
+  }, [isBeta, betaUpdateStoreLoaded]);
+
+  useEffect(() => {
     global.ipcRenderer.send(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
 
     if (reportsFolder) {
@@ -71,7 +81,6 @@ const MainPage = ({
 
     return () => {
       global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.CHECK_DROPBOX_CONNECTION);
-      global.ipcRenderer.send(IPC_MAIN_CHANNELS.STOP_PATH_WATCHER, reportsFolder);
       global.ipcRenderer.removeAllListeners(IPC_MAIN_CHANNELS.WINDOW_FOCUSED);
       document.removeEventListener("keydown", handleCtrlPlus);
     };
