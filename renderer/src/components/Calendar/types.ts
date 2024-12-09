@@ -6,6 +6,7 @@ export type CalendarProps = {
   setCalendarDate: Dispatch<SetStateAction<Date>>;
   selectedDate: Date;
   setSelectedDate: Dispatch<SetStateAction<Date>>;
+  selectedDateReport: string;
 };
 
 export type ParsedReport = {

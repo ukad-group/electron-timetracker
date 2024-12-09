@@ -238,6 +238,7 @@ const MainPage = ({
             setSelectedDate={setSelectedDate}
             calendarDate={calendarDate}
             setCalendarDate={setCalendarDate}
+            selectedDateReport={selectedDateReport}
           />
         </section>
       ),

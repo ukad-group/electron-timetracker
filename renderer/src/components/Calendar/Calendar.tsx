@@ -35,6 +35,7 @@ export const Calendar = ({
   setSelectedDate,
   calendarDate,
   setCalendarDate,
+  selectedDateReport,
 }: CalendarProps) => {
   const [parsedQuarterReports, setParsedQuarterReports] = useState<ParsedReport[]>([]);
   const [formattedQuarterReports, setFormattedQuarterReports] = useState<FormattedReport[]>([]);
@@ -111,25 +112,9 @@ export const Calendar = ({
 
   const getQuarterReports = async () => {
     try {
-      (async () => {
-        setParsedQuarterReports(
-          await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_FIND_QUARTER_PROJECTS, reportsFolder, calendarDate),
-        );
-      })();
-
-      const fileChangeListener = () => {
-        (async () => {
-          setParsedQuarterReports(
-            await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_FIND_QUARTER_PROJECTS, reportsFolder, calendarDate),
-          );
-        })();
-      };
-
-      global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
-
-      return () => {
-        global.ipcRenderer.removeListener(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, fileChangeListener);
-      };
+      setParsedQuarterReports(
+        await global.ipcRenderer.invoke(IPC_MAIN_CHANNELS.APP_FIND_QUARTER_PROJECTS, reportsFolder, calendarDate),
+      );
     } catch (err) {
       console.log("Error details ", err);
       setRenderError({
@@ -196,15 +181,27 @@ export const Calendar = ({
 
   useEffect(() => {
     getQuarterReports();
-  }, [calendarDate, reportsFolder]);
 
-  // prettier-ignore
+    const calendarFileChangeListener = () => {
+      getQuarterReports();
+    };
+
+    global.ipcRenderer.on(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, calendarFileChangeListener);
+
+    return () => {
+      global.ipcRenderer.removeListener(IPC_MAIN_CHANNELS.ANY_FILE_CHANGED, calendarFileChangeListener);
+    };
+  }, [calendarDate, selectedDateReport, reportsFolder]);
+
   useEffect(() => {
-    try{
+    try {
       setFormattedQuarterReports(getFormattedReports(parsedQuarterReports));
     } catch (err) {
-      console.log("Error details ", err)
-      setRenderError({errorTitle:"Calendar error", errorMessage:"An error occurred when validating reports for the last month. "})
+      console.log("Error details ", err);
+      setRenderError({
+        errorTitle: "Calendar error",
+        errorMessage: "An error occurred when validating reports for the last month. ",
+      });
     }
   }, [parsedQuarterReports]);
 
