@@ -35,7 +35,7 @@ declare global {
 }
 
 window.electronAPI = {
-  getCurrentPort: () => process.env.NEXT_PUBLIC_PORT,
+  getCurrentPort: () => ipcRenderer.sendSync('electron-get-current-port'),
   store: {
     getItem: (key: string) => {
       return ipcRenderer.sendSync('electron-store-get', key);

@@ -4,7 +4,8 @@ import next from "next";
 import { parse } from "url";
 import { createServer, Server, IncomingMessage, ServerResponse } from "http";
 import { AddressInfo } from "net";
-import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItem, shell, Tray, globalShortcut, contextBridge } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItem, shell, Tray, globalShortcut, protocol, net } from "electron";
+import url from "node:url";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import isDev from "electron-is-dev";
 import { createWindow } from "./helpers/create-window";
@@ -150,6 +151,10 @@ ipcMain.on(IPC_MAIN_CHANNELS.REDIRECT, (_, link: string) => {
 //defined the store
 let electronStore = new Store();
 
+ipcMain.on('electron-get-current-port', async (_) => {
+  _.returnValue = getServerPort();
+});
+
 ipcMain.on('electron-store-get', async (_, val) => {
   var value = electronStore.get(val)
   _.returnValue = value ? value : null;
@@ -171,11 +176,14 @@ const gotTheLock = app.requestSingleInstanceLock();
 let server : Server<typeof IncomingMessage, typeof ServerResponse>;
 
 const getServerPort = () => {
-  var address = server?.address() as AddressInfo;
-
-  var serverPort = address?.port ? address.port : 0
-
+  let address = server?.address() as AddressInfo;
+  let serverPort = address?.port ? address.port : 0
   return serverPort;
+}
+
+const getServerAddress = () => {
+  var address = process.env.NEXT_PUBLIC_SERVER_ADDRESS?.replace(process.env.NEXT_PUBLIC_PORT_REPLACE_TOKEN_NAME || "", getServerPort().toString()) || ""
+  return address;
 }
 
 const generateWindow = () => {
@@ -256,6 +264,7 @@ app.on("before-quit", () => {
 });
 
 app.on("ready", async () => {
+
   const nextApp = next({
     dev: isDev,
     dir: app.getAppPath() + "/renderer",
@@ -348,6 +357,11 @@ app.on("ready", async () => {
     if (mainWindow) {
       app.whenReady().then(() => {
         if (process.platform === "darwin") return;
+        
+        protocol.handle(process.env.NEXT_PUBLIC_PROTOCOL as string, (request) => {
+          const localUrl = request.url.replace(process.env.NEXT_PUBLIC_PROTOCOL_SERVER_ADDRESS || "", getServerAddress());
+          return net.fetch(localUrl);
+        })
 
         try {
           generateTray();
@@ -544,6 +558,10 @@ app.on("ready", async () => {
             err,
           );
         }
+      });
+
+      mainWindow.webContents.on('will-navigate', function (event, newUrl) {
+          console.log('will-navigate', newUrl);
       });
 
       mainWindow.webContents.on("context-menu", (_, params) => {
@@ -826,8 +844,8 @@ const getGoogleOptions = () => {
 const getTrelloOptions = () => {
   return {
     key: process.env.NEXT_PUBLIC_TRELLO_KEY || "",
-    returnUrl: process.env.NEXT_PUBLIC_TRELLO_REDIRECT_URI?.replace(process.env.NEXT_PUBLIC_PORT_REPLACE_TOKEN_NAME as string, getServerPort().toString()) || "",
-  };
+    returnUrl: process.env.NEXT_PUBLIC_TRELLO_REDIRECT_URI || "",
+  };;
 };
 
 ipcMain.on(IPC_MAIN_CHANNELS.TRELLO_LOGIN, async () => {
@@ -857,7 +875,7 @@ const getJiraOptions = () => {
   return {
     clientId: process.env.NEXT_PUBLIC_JIRA_CLIENT_ID || "",
     clientSecret: process.env.NEXT_PUBLIC_JIRA_CLIENT_SECRET || "",
-    redirectUri: process.env.NEXT_PUBLIC_JIRA_REDIRECT_URI?.replace(process.env.NEXT_PUBLIC_PORT_REPLACE_TOKEN_NAME as string, getServerPort().toString()) || "",
+    redirectUri: process.env.NEXT_PUBLIC_JIRA_REDIRECT_URI || "",
     scope: process.env.NEXT_PUBLIC_JIRA_SCOPE || "",
   };
 };
@@ -904,7 +922,7 @@ const getOffice365Options = () => {
   return {
     clientId: process.env.NEXT_PUBLIC_OFFICE365_CLIENT_ID || "",
     clientSecret: process.env.NEXT_PUBLIC_OFFICE365_CLIENT_SECRET || "",
-    redirectUri: process.env.NEXT_PUBLIC_OFFICE365_REDIRECT_URI?.replace(process.env.NEXT_PUBLIC_PORT_REPLACE_TOKEN_NAME as string, getServerPort().toString()) || "",
+    redirectUri: process.env.NEXT_PUBLIC_OFFICE365_REDIRECT_URI?.replace(process.env.NEXT_PUBLIC_PORT_REPLACE_TOKEN_NAME || "", getServerPort().toString()) || "",
     scope: process.env.NEXT_PUBLIC_OFFICE365_SCOPE || "",
   };
 };
