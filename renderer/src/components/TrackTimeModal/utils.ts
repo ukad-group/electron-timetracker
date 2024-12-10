@@ -52,7 +52,9 @@ export const changeMinutesAndHours = (eventKey: string, minutes: number, hours: 
 };
 
 export const getTimetrackerYearProjects = async (setWebTrackerProjects: Dispatch<SetStateAction<string[]>>) => {
-  const TTUserInfo = JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+  const TTUserInfo = JSON.parse(
+    global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+  );
 
   if (!TTUserInfo) return;
 
@@ -79,7 +81,11 @@ export const getTimetrackerYearProjects = async (setWebTrackerProjects: Dispatch
         cookie: updatedCookie,
       };
 
-      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUser));
+      global.ipcRenderer.send(
+        IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
+        LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER,
+        JSON.stringify(updatedUser),
+      );
 
       return await getTimetrackerYearProjects(setWebTrackerProjects);
     }
@@ -89,7 +95,11 @@ export const getTimetrackerYearProjects = async (setWebTrackerProjects: Dispatch
       yearProjects: yearProjectsFromApi,
     };
 
-    window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUserInfo));
+    global.ipcRenderer.send(
+      IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
+      LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER,
+      JSON.stringify(updatedUserInfo),
+    );
 
     setWebTrackerProjects(yearProjectsFromApi);
   } catch (error) {

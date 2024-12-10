@@ -151,21 +151,21 @@ ipcMain.on(IPC_MAIN_CHANNELS.REDIRECT, (_, link: string) => {
 //defined the store
 let electronStore = new Store();
 
-ipcMain.on('electron-get-current-port', async (_) => {
+ipcMain.on(IPC_MAIN_CHANNELS.GET_CURRENT_PORT, async (_) => {
   _.returnValue = getServerPort();
 });
 
-ipcMain.on('electron-store-get', async (_, val) => {
+ipcMain.on(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, async (_, val) => {
   var value = electronStore.get(val)
   _.returnValue = value ? value : null;
 });
-ipcMain.on('electron-store-set', (_, key, val) => {
+ipcMain.on(IPC_MAIN_CHANNELS.ELECTRON_STORE_SET, (_, key, val) => {
   electronStore.set(key, typeof val == "string" ? val : JSON.stringify(val));
 });
-ipcMain.on('electron-store-remove', (_, key) => {
+ipcMain.on(IPC_MAIN_CHANNELS.ELECTRON_STORE_DELETE, (_, key) => {
   electronStore.delete(key);
 });
-ipcMain.on('electron-store-clear', (_) => {
+ipcMain.on(IPC_MAIN_CHANNELS.ELECTRON_STORE_CLEAR, (_) => {
   electronStore.clear();
 });
 
@@ -356,13 +356,14 @@ app.on("ready", async () => {
 
     if (mainWindow) {
       app.whenReady().then(() => {
-        if (process.platform === "darwin") return;
-        
+
         protocol.handle(process.env.NEXT_PUBLIC_PROTOCOL as string, (request) => {
           const localUrl = request.url.replace(process.env.NEXT_PUBLIC_PROTOCOL_SERVER_ADDRESS || "", getServerAddress());
           return net.fetch(localUrl);
-        })
+        });
 
+        if (process.platform === "darwin") return;
+        
         try {
           generateTray();
         } catch (err) {
@@ -845,7 +846,7 @@ const getTrelloOptions = () => {
   return {
     key: process.env.NEXT_PUBLIC_TRELLO_KEY || "",
     returnUrl: process.env.NEXT_PUBLIC_TRELLO_REDIRECT_URI || "",
-  };;
+  };
 };
 
 ipcMain.on(IPC_MAIN_CHANNELS.TRELLO_LOGIN, async () => {

@@ -17,7 +17,7 @@ import { ReportActivity } from "@/helpers/utils/types";
 export const loadHolidaysAndVacations = async (calendarDate: Date) => {
   try {
     const TTUserInfo: TTUserInfoProps = await JSON.parse(
-      window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+      global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
     );
 
     if (!TTUserInfo) return;
@@ -80,7 +80,11 @@ export const loadHolidaysAndVacations = async (calendarDate: Date) => {
         refreshToken: refreshedPlannerCreds?.refresh_token,
       };
 
-      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(refreshedUserInfo));
+      global.ipcRenderer.send(
+        IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
+        LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER,
+        JSON.stringify(refreshedUserInfo),
+      );
 
       return await loadHolidaysAndVacations(calendarDate);
     }

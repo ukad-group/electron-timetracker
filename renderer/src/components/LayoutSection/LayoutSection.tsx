@@ -5,14 +5,17 @@ import { LOCAL_STORAGE_VARIABLES } from "@/helpers/constants";
 import { StoredSection } from "./types";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import DragNDropIcon from "@/shared/DragNDropIcon/DragNDropIcon";
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 const LayoutSection = () => {
   const { theme, setTheme } = useColorTheme();
 
   const sectionsOptions: StoredSection[] = JSON.parse(
-    window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER),
+    global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.WIDGET_ORDER),
   )
-    ? JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER))
+    ? JSON.parse(
+        global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.WIDGET_ORDER),
+      )
     : [
         { id: "Date Selector", side: "left", order: 1 },
         { id: "Activities Table", side: "left", order: 2 },
@@ -95,7 +98,8 @@ const LayoutSection = () => {
   };
 
   useEffect(() => {
-    window.electronAPI.store.setItem(
+    global.ipcRenderer.send(
+      IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
       LOCAL_STORAGE_VARIABLES.WIDGET_ORDER,
       JSON.stringify([...leftSections, ...rightSections]),
     );

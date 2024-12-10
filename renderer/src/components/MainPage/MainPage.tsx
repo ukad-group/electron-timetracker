@@ -44,7 +44,9 @@ const MainPage = ({
   const [reportsFolder] = useMainStore((state) => [state.reportsFolder, state.setReportsFolder], shallow);
   const [isBeta] = useBetaStore((state) => [state.isBeta, state.setIsBeta], shallow);
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
-  const storedSectionsOptions = JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.WIDGET_ORDER));
+  const storedSectionsOptions = JSON.parse(
+    global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.WIDGET_ORDER),
+  );
   const mainPageRef = useRef(null);
   const isToday = checkIsToday(selectedDate);
 

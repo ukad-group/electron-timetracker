@@ -15,7 +15,9 @@ import isOnline from "is-online";
 import { ReportActivity } from "@/helpers/utils/types";
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
-  const showBookings = !!JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+  const showBookings = !!JSON.parse(
+    global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+  );
 
   if (!showBookings) return;
 
@@ -35,7 +37,7 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
 
   const getBookings = async (): Promise<BookingFromApi[]> => {
     const TTUserInfo: TTUserInfoProps = JSON.parse(
-      window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+      global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
     );
 
     if (!TTUserInfo) return;
@@ -72,7 +74,11 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
           refreshToken: updatedCreds?.refresh_token,
         };
 
-        window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUser));
+        global.ipcRenderer.send(
+          IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
+          LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER,
+          JSON.stringify(updatedUser),
+        );
 
         return await getBookings();
       }

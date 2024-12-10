@@ -1,9 +1,11 @@
+import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
+
 const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const clientSecret = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET;
 const scope = "https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.profile";
 
 const getRedirectUri = () => {
-  return `http://localhost:${window.electronAPI.getCurrentPort()}/settings`;
+  return `http://localhost:${global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.GET_CURRENT_PORT)}/settings`;
 };
 
 export const getGoogleAuthUrl = () => {

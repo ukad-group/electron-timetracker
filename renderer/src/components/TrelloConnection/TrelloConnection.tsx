@@ -7,7 +7,9 @@ import isOnline from "is-online";
 
 const TrelloConnection = () => {
   const [user, setUser] = useState(
-    JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER)) || null,
+    JSON.parse(
+      global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.TRELLO_USER),
+    ) || null,
   );
 
   const handleSignInButton = async () => {
@@ -21,13 +23,16 @@ const TrelloConnection = () => {
   };
 
   const handleSignOutButton = () => {
-    window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER);
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ELECTRON_STORE_DELETE, LOCAL_STORAGE_VARIABLES.TRELLO_USER);
     setUser(null);
   };
 
   const addUser = async () => {
-    const token = window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN);
-    window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN);
+    const token = global.ipcRenderer.sendSync(
+      IPC_MAIN_CHANNELS.ELECTRON_STORE_GET,
+      LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN,
+    );
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ELECTRON_STORE_DELETE, LOCAL_STORAGE_VARIABLES.TRELLO_AUTH_TOKEN);
 
     if (!token) return;
 
@@ -42,7 +47,11 @@ const TrelloConnection = () => {
       username: username || fullName || "",
     };
 
-    window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER, JSON.stringify(newUser));
+    global.ipcRenderer.send(
+      IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
+      LOCAL_STORAGE_VARIABLES.TRELLO_USER,
+      JSON.stringify(newUser),
+    );
     setUser(newUser);
   };
 

@@ -9,7 +9,8 @@ import isOnline from "is-online";
 
 const JiraConnection = () => {
   const [users, setUsers] = useState(
-    JSON.parse(window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS)) || [],
+    JSON.parse(global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.JIRA_USERS)) ||
+      [],
   );
 
   const handleSignInButton = async () => {
@@ -26,17 +27,24 @@ const JiraConnection = () => {
     const filteredUsers = users.filter((user: JiraUser) => user.userId !== id);
 
     if (filteredUsers.length > 0) {
-      window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(filteredUsers));
+      global.ipcRenderer.send(
+        IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
+        LOCAL_STORAGE_VARIABLES.JIRA_USERS,
+        JSON.stringify(filteredUsers),
+      );
     } else {
-      window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS);
+      global.ipcRenderer.send(IPC_MAIN_CHANNELS.ELECTRON_STORE_DELETE, LOCAL_STORAGE_VARIABLES.JIRA_USERS);
     }
 
     setUsers(filteredUsers);
   };
 
   const addUser = async () => {
-    const authorizationCode = window.electronAPI.store.getItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE);
-    window.electronAPI.store.removeItem(LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE);
+    const authorizationCode = global.ipcRenderer.sendSync(
+      IPC_MAIN_CHANNELS.ELECTRON_STORE_GET,
+      LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE,
+    );
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ELECTRON_STORE_DELETE, LOCAL_STORAGE_VARIABLES.JIRA_AUTH_CODE);
 
     if (!authorizationCode) return;
 
@@ -66,7 +74,11 @@ const JiraConnection = () => {
 
     const newUsers = [...users, user];
 
-    window.electronAPI.store.setItem(LOCAL_STORAGE_VARIABLES.JIRA_USERS, JSON.stringify(newUsers));
+    global.ipcRenderer.send(
+      IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
+      LOCAL_STORAGE_VARIABLES.JIRA_USERS,
+      JSON.stringify(newUsers),
+    );
     setUsers(newUsers);
   };
 
