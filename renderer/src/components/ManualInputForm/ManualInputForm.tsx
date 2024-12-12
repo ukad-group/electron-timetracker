@@ -54,7 +54,7 @@ const ManualInputForm = ({
       setReport(getReportWithCopiedLine(textareaRef, report));
     }
 
-    if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_Z) {
+    if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_Z && !e.shiftKey) {
       e.preventDefault();
 
       const [currentValue, changePlace] = editingHistoryManager.undoEditing();
@@ -65,7 +65,10 @@ const ManualInputForm = ({
       }
     }
 
-    if ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_Y) {
+    if (
+      ((e.ctrlKey || e.metaKey) && e.code === KEY_CODES.KEY_Y) ||
+      ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === KEY_CODES.KEY_Z)
+    ) {
       e.preventDefault();
 
       const [currentValue, changePlace] = editingHistoryManager.redoEditing();
