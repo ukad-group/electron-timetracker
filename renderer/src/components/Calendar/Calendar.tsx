@@ -54,7 +54,7 @@ export const Calendar = ({
   const { screenSizes } = useScreenSizes();
   const [progress, setProgress] = useTutorialProgressStore((state) => [state.progress, state.setProgress], shallow);
   const timetrackerUserInfo: TTUserInfoProps = JSON.parse(
-    localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+    global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
   );
   const getCalendarApi = () => calendarRef.current.getApi();
 

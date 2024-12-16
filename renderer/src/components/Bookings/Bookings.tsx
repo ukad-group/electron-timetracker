@@ -15,7 +15,9 @@ import isOnline from "is-online";
 import { ReportActivity } from "@/helpers/utils/types";
 
 const Bookings = ({ calendarDate }: BookingsProps) => {
-  const showBookings = !!JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+  const showBookings = !!JSON.parse(
+    global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+  );
 
   if (!showBookings) return;
 
@@ -34,7 +36,9 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
   }, [bookedSpentStatistic]);
 
   const getBookings = async (): Promise<BookingFromApi[]> => {
-    const TTUserInfo: TTUserInfoProps = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER));
+    const TTUserInfo: TTUserInfoProps = JSON.parse(
+      global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+    );
 
     if (!TTUserInfo) return;
 
@@ -70,7 +74,11 @@ const Bookings = ({ calendarDate }: BookingsProps) => {
           refreshToken: updatedCreds?.refresh_token,
         };
 
-        localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(updatedUser));
+        global.ipcRenderer.send(
+          IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
+          LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER,
+          JSON.stringify(updatedUser),
+        );
 
         return await getBookings();
       }

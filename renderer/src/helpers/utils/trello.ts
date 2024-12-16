@@ -11,7 +11,10 @@ type Card = {
 };
 
 export const getAllTrelloCardsFromApi = async () => {
-  const user = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TRELLO_USER)) || null;
+  const user =
+    JSON.parse(
+      global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.TRELLO_USER),
+    ) || null;
 
   if (!user) return [[], []];
 

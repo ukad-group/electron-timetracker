@@ -10,7 +10,9 @@ import isOnline from "is-online";
 const TimetrackerWebsiteConnection = () => {
   const router = useRouter();
   const [loggedUser, setLoggedUser] = useState(
-    JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER)),
+    JSON.parse(
+      global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER),
+    ),
   );
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +27,7 @@ const TimetrackerWebsiteConnection = () => {
   };
 
   const handleSignOutButton = () => {
-    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER);
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ELECTRON_STORE_DELETE, LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER);
     setLoggedUser(null);
   };
 
@@ -33,8 +35,11 @@ const TimetrackerWebsiteConnection = () => {
     setLoading(true);
     document.body.style.overflow = "hidden";
 
-    const authorizationCode = localStorage.getItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE);
-    localStorage.removeItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE);
+    const authorizationCode = global.ipcRenderer.sendSync(
+      IPC_MAIN_CHANNELS.ELECTRON_STORE_GET,
+      LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE,
+    );
+    global.ipcRenderer.send(IPC_MAIN_CHANNELS.ELECTRON_STORE_DELETE, LOCAL_STORAGE_VARIABLES.TIMETRACKER_WEBSITE_CODE);
 
     if (!authorizationCode) return;
 
@@ -66,7 +71,11 @@ const TimetrackerWebsiteConnection = () => {
         yearProjects: yearProjectsFromApi,
       };
 
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER, JSON.stringify(TTUserInfo));
+      global.ipcRenderer.send(
+        IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
+        LOCAL_STORAGE_VARIABLES.TIMETRACKER_USER,
+        JSON.stringify(TTUserInfo),
+      );
       setLoggedUser(TTUserInfo);
 
       await router.push("/settings");

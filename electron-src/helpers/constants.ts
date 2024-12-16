@@ -63,4 +63,9 @@ export const IPC_MAIN_CHANNELS = {
   STORAGE_DELETE: "storage:delete",
   STORAGE_SET: "storage:set",
   STORAGE_GET: "storage:get",
+  GET_CURRENT_PORT: "electron-get-current-port",
+  ELECTRON_STORE_GET: "electron-store-get",
+  ELECTRON_STORE_SET: "electron-store-set",
+  ELECTRON_STORE_DELETE: "electron-store-delete",
+  ELECTRON_STORE_CLEAR: "electron-store-clear"
 };

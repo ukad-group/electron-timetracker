@@ -11,7 +11,9 @@ const Notifications = () => {
   const [isUpdate, setIsUpdate] = useState(false);
   const [isDownload, setIsDownload] = useState(false);
   const [version, setVersion] = useState("");
-  const storedVersionData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_VARIABLES.VERSION_DATA)) || {
+  const storedVersionData = JSON.parse(
+    global.ipcRenderer.sendSync(IPC_MAIN_CHANNELS.ELECTRON_STORE_GET, LOCAL_STORAGE_VARIABLES.VERSION_DATA),
+  ) || {
     version: "",
     showMessage: true,
   };
@@ -80,7 +82,11 @@ const Notifications = () => {
       storedVersionData.version = version;
       storedVersionData.showMessage = true;
 
-      localStorage.setItem(LOCAL_STORAGE_VARIABLES.VERSION_DATA, JSON.stringify(storedVersionData));
+      global.ipcRenderer.send(
+        IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
+        LOCAL_STORAGE_VARIABLES.VERSION_DATA,
+        JSON.stringify(storedVersionData),
+      );
     }
 
     setShowMessage(storedVersionData.showMessage);
@@ -92,7 +98,11 @@ const Notifications = () => {
 
   const handleCloseBtnClick = () => {
     storedVersionData.showMessage = false;
-    localStorage.setItem(LOCAL_STORAGE_VARIABLES.VERSION_DATA, JSON.stringify(storedVersionData));
+    global.ipcRenderer.send(
+      IPC_MAIN_CHANNELS.ELECTRON_STORE_SET,
+      LOCAL_STORAGE_VARIABLES.VERSION_DATA,
+      JSON.stringify(storedVersionData),
+    );
 
     setShowMessage(storedVersionData.showMessage);
   };
