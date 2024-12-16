@@ -8,7 +8,7 @@ import {
 } from "../utils";
 import { HintConitions, ReportActivity } from "../types";
 import { TutorialProgress } from "@/store/types";
-import { globalIpcRendererMock } from "@/tests/mocks/electron";
+import { globalIpcRendererMock, ipcRendererSendMock } from "@/tests/mocks/electron";
 import { IPC_MAIN_CHANNELS } from "@electron/helpers/constants";
 
 jest.mock("electron", () => ({
@@ -23,7 +23,8 @@ jest.mock("electron", () => ({
 global.ipcRenderer = {
   on: jest.fn(),
   removeAllListeners: jest.fn(),
-  send: jest.fn(),
+  send: ipcRendererSendMock,
+  sendSync: ipcRendererSendMock,
   ...globalIpcRendererMock,
 };
 
@@ -272,7 +273,7 @@ describe("trackConnections", () => {
 
     trackConnections(mockConnectedName);
 
-    expect(global.ipcRenderer.send).not.toHaveBeenCalled();
+    expect(global.ipcRenderer.send).toHaveBeenCalledTimes(1);
     expect(localStorage.getItem(`${mockConnectedName}Connection`)).toBe("2024-02-05");
   });
 
